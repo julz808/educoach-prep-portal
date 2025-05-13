@@ -1,0 +1,43 @@
+
+import { Bell } from "lucide-react";
+
+const Header = () => {
+  // Mock user data - would come from authentication in a real app
+  const user = {
+    name: "Julian",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Julian",
+  };
+
+  return (
+    <header className="bg-white border-b border-b-edu-teal/10 h-16 px-6 flex items-center justify-between">
+      <div>
+        <h1 className="text-xl font-semibold text-edu-navy">Learning Portal</h1>
+      </div>
+      
+      <div className="flex items-center space-x-6">
+        <button className="relative">
+          <Bell size={20} className="text-edu-navy/70" />
+          <span className="absolute -top-1 -right-1 bg-edu-coral text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+            2
+          </span>
+        </button>
+        
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-sm">Hi, {user.name}</p>
+            <p className="text-xs text-edu-navy/70">Student</p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-edu-teal/20 overflow-hidden">
+            <img 
+              src={user.avatar} 
+              alt={user.name} 
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
