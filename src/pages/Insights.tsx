@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { ArrowTrendingUp, ArrowTrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 // Mock data
 const progressData = [
@@ -68,7 +68,7 @@ const Insights = () => {
           <div className="flex items-end gap-2">
             <p className="text-3xl font-bold text-edu-navy">73%</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
-              <ArrowTrendingUp size={12} className="mr-0.5" /> +5%
+              <TrendingUp size={12} className="mr-0.5" /> +5%
             </span>
           </div>
         </Card>
@@ -78,7 +78,7 @@ const Insights = () => {
           <div className="flex items-end gap-2">
             <p className="text-3xl font-bold text-edu-navy">17</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
-              <ArrowTrendingUp size={12} className="mr-0.5" /> +3
+              <TrendingUp size={12} className="mr-0.5" /> +3
             </span>
           </div>
         </Card>
@@ -88,7 +88,7 @@ const Insights = () => {
           <div className="flex items-end gap-2">
             <p className="text-3xl font-bold text-edu-navy">38h</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
-              <ArrowTrendingUp size={12} className="mr-0.5" /> +7h
+              <TrendingUp size={12} className="mr-0.5" /> +7h
             </span>
           </div>
         </Card>
