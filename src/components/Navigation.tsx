@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Target, FileQuestion, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Target, FileQuestion, BarChart3, TestTube } from "lucide-react";
 
 export const Navigation = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -44,6 +44,17 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
+              to="/diagnostic" 
+              className={({ isActive }) => 
+                `nav-item ${isActive ? "active" : ""}`
+              }
+            >
+              <TestTube size={20} />
+              {!isCollapsed && <span>Diagnostic</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
               to="/drill" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
@@ -55,13 +66,13 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
-              to="/mock-tests" 
+              to="/practice-tests" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
             >
               <FileQuestion size={20} />
-              {!isCollapsed && <span>Mock Tests</span>}
+              {!isCollapsed && <span>Practice Tests</span>}
             </NavLink>
           </li>
           <li>
@@ -77,15 +88,6 @@ export const Navigation = () => {
           </li>
         </ul>
       </div>
-
-      {!isCollapsed && (
-        <div className="absolute bottom-8 left-0 right-0 px-4">
-          <div className="bg-edu-light-blue rounded-lg p-4">
-            <h4 className="font-medium text-sm">Need help?</h4>
-            <p className="text-xs text-edu-navy/70">Contact your teacher or email support@educourse.com.au</p>
-          </div>
-        </div>
-      )}
     </nav>
   );
 };

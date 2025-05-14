@@ -1,5 +1,12 @@
 
 import { Bell } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 const Header = () => {
   // Mock user data - would come from authentication in a real app
@@ -8,6 +15,13 @@ const Header = () => {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Julian",
   };
 
+  const testTypes = [
+    { value: "naplan", label: "NAPLAN" },
+    { value: "edutest", label: "EduTest" },
+    { value: "selective", label: "Selective Entry" },
+    { value: "acer", label: "ACER Scholarship" }
+  ];
+
   return (
     <header className="bg-white border-b border-b-edu-teal/10 h-16 px-6 flex items-center justify-between">
       <div>
@@ -15,6 +29,20 @@ const Header = () => {
       </div>
       
       <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-edu-navy/70">Test Type:</span>
+          <Select defaultValue="naplan">
+            <SelectTrigger className="w-[180px] h-8 text-sm border-edu-teal/20">
+              <SelectValue placeholder="Select test type" />
+            </SelectTrigger>
+            <SelectContent>
+              {testTypes.map((type) => (
+                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <button className="relative">
           <Bell size={20} className="text-edu-navy/70" />
           <span className="absolute -top-1 -right-1 bg-edu-coral text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">

@@ -6,8 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import Diagnostic from "./pages/Diagnostic";
 import Drill from "./pages/Drill";
-import MockTests from "./pages/MockTests";
+import PracticeTests from "./pages/MockTests"; // We'll keep the file name but change the component name
 import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 
@@ -22,8 +23,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="diagnostic" element={<Diagnostic />} />
             <Route path="drill" element={<Drill />} />
-            <Route path="mock-tests" element={<MockTests />} />
+            <Route path="practice-tests" element={<PracticeTests />} />
             <Route path="insights" element={<Insights />} />
           </Route>
           <Route path="*" element={<NotFound />} />
