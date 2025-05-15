@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,35 +23,37 @@ import { AuthProvider } from "./context/AuthContext";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <UserProvider>
-          <TestTypeProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/course/:slug" element={<CourseDetail />} />
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<Layout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="diagnostic" element={<Diagnostic />} />
-                    <Route path="drill" element={<Drill />} />
-                    <Route path="practice-tests" element={<PracticeTests />} />
-                    <Route path="insights" element={<Insights />} />
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <UserProvider>
+            <TestTypeProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/course/:slug" element={<CourseDetail />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/dashboard" element={<Layout />}>
+                      <Route index element={<Dashboard />} />
+                      <Route path="diagnostic" element={<Diagnostic />} />
+                      <Route path="drill" element={<Drill />} />
+                      <Route path="practice-tests" element={<PracticeTests />} />
+                      <Route path="insights" element={<Insights />} />
+                    </Route>
                   </Route>
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TestTypeProvider>
-        </UserProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TestTypeProvider>
+          </UserProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
