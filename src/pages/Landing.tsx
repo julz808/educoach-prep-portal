@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -41,57 +40,43 @@ const Landing = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Centered */}
       <section className="container mx-auto px-6 pt-20 pb-24 lg:pt-32 lg:pb-32">
-        <div className="flex flex-col lg:flex-row items-center">
-          <motion.div 
-            className="lg:w-1/2 lg:pr-12"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.3
-                }
+        <motion.div 
+          className="flex flex-col items-center text-center max-w-3xl mx-auto"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.3
               }
-            }}
+            }
+          }}
+        >
+          <motion.h1 
+            className="text-4xl lg:text-5xl font-bold text-edu-navy mb-6"
+            variants={fadeIn}
           >
-            <motion.h1 
-              className="text-4xl lg:text-5xl font-bold text-edu-navy mb-6"
-              variants={fadeIn}
-            >
-              We're here to help you ace your next test!
-            </motion.h1>
-            <motion.p 
-              className="text-lg lg:text-xl text-edu-navy/70 mb-8"
-              variants={fadeIn}
-            >
-              Australia's best-in-class test preparation platform designed to help students excel in standardized tests with personalized learning paths.
-            </motion.p>
-            <motion.div variants={fadeIn}>
-              <Button 
-                className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-6 rounded-full text-lg"
-                onClick={() => document.getElementById('supported-tests')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Find your test
-              </Button>
-            </motion.div>
-          </motion.div>
-          <motion.div 
-            className="lg:w-1/2 mt-12 lg:mt-0"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            We're here to help you ace your next test!
+          </motion.h1>
+          <motion.p 
+            className="text-lg lg:text-xl text-edu-navy/70 mb-8 max-w-2xl"
+            variants={fadeIn}
           >
-            <img 
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" 
-              alt="Student using tablet" 
-              className="rounded-lg shadow-xl w-full"
-            />
+            Australia's best-in-class test preparation platform designed to help students excel in standardized tests with personalized learning paths.
+          </motion.p>
+          <motion.div variants={fadeIn}>
+            <Button 
+              className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-6 rounded-full text-lg"
+              onClick={() => document.getElementById('supported-tests')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Find your test
+            </Button>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Supported Tests */}
