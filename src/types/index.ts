@@ -69,3 +69,20 @@ export type DrillCategory = {
     [topic: string]: string[];
   };
 };
+
+export type Course = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+  price: number;
+  target: string;
+  skills: string[];
+  image: string;
+  slug: string;
+};
+
+export type FAQ = {
+  question: string;
+  answer: string;
+};

@@ -4,6 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { BookOpen, BarChart2, PenTool, Award, ArrowRight } from 'lucide-react';
+import { courses } from '@/data/courses';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -15,6 +19,24 @@ const Landing = () => {
       navigate('/dashboard');
     }
   }, [user, isLoading, navigate]);
+
+  const handleBuyNow = async (courseId: string) => {
+    try {
+      // This is a mock function that would normally create a Stripe checkout session
+      // For now, we'll just show a toast
+      toast({
+        title: "Checkout initiated",
+        description: "This would normally redirect to Stripe Checkout. Feature coming soon!",
+      });
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        title: "Checkout Error",
+        description: "There was a problem initiating checkout.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-edu-light-blue">
@@ -36,8 +58,40 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Courses Section */}
       <div className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Our Test Preparation Courses</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map(course => (
+              <Card key={course.id} className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle>{course.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <div className="h-32 bg-gray-100 rounded-md mb-4 flex items-center justify-center text-gray-400">
+                    Course Image
+                  </div>
+                  <p className="text-gray-600 mb-4">{course.shortDescription}</p>
+                  <p className="font-semibold text-lg">${course.price}</p>
+                  <p className="text-sm text-gray-500">Target: {course.target}</p>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button variant="outline" asChild>
+                    <Link to={`/course/${course.slug}`}>Learn More</Link>
+                  </Button>
+                  <Button onClick={() => handleBuyNow(course.id)}>
+                    Buy Now
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-gray-50 py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose EduCourse?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

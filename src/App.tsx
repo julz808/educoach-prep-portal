@@ -13,6 +13,7 @@ import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import CourseDetail from "./pages/CourseDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
@@ -32,6 +33,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/course/:slug" element={<CourseDetail />} />
                 <Route element={<ProtectedRoute />}>
                   <Route path="/dashboard" element={<Layout />}>
                     <Route index element={<Dashboard />} />
