@@ -11,6 +11,7 @@ import Drill from "./pages/Drill";
 import PracticeTests from "./pages/MockTests"; // We'll keep the file name but change the component name
 import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="diagnostic" element={<Diagnostic />} />
             <Route path="drill" element={<Drill />} />

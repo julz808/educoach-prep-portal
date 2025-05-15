@@ -33,7 +33,7 @@ export const Navigation = () => {
         <ul className="space-y-2">
           <li>
             <NavLink 
-              to="/" 
+              to="/dashboard" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
@@ -44,7 +44,7 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
-              to="/diagnostic" 
+              to="/dashboard/diagnostic" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
@@ -55,7 +55,7 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
-              to="/drill" 
+              to="/dashboard/drill" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
@@ -66,7 +66,7 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
-              to="/practice-tests" 
+              to="/dashboard/practice-tests" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
@@ -77,7 +77,7 @@ export const Navigation = () => {
           </li>
           <li>
             <NavLink 
-              to="/insights" 
+              to="/dashboard/insights" 
               className={({ isActive }) => 
                 `nav-item ${isActive ? "active" : ""}`
               }
