@@ -12,27 +12,33 @@ import PracticeTests from "./pages/MockTests"; // We'll keep the file name but c
 import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
+import { UserProvider } from "./context/UserContext";
+import { TestTypeProvider } from "./context/TestTypeContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="diagnostic" element={<Diagnostic />} />
-            <Route path="drill" element={<Drill />} />
-            <Route path="practice-tests" element={<PracticeTests />} />
-            <Route path="insights" element={<Insights />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <UserProvider>
+        <TestTypeProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/dashboard" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="diagnostic" element={<Diagnostic />} />
+                <Route path="drill" element={<Drill />} />
+                <Route path="practice-tests" element={<PracticeTests />} />
+                <Route path="insights" element={<Insights />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TestTypeProvider>
+      </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,34 +1,21 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
-import { Flag, Clock, ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
+import { Flag, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-
-// Mock question data
-const subjects = ['Mathematics', 'English', 'Science'];
-const topics = {
-  'Mathematics': ['Numbers', 'Algebra', 'Geometry', 'Statistics'],
-  'English': ['Reading', 'Writing', 'Grammar', 'Vocabulary'],
-  'Science': ['Biology', 'Chemistry', 'Physics', 'Earth Science']
-};
-const subSkills = {
-  'Numbers': ['Fractions', 'Decimals', 'Percentages', 'Ratios'],
-  'Reading': ['Comprehension', 'Analysis', 'Inference', 'Main Idea'],
-  'Biology': ['Cells', 'Systems', 'Ecology', 'Genetics']
-};
-
-// Mock question
-const mockQuestion = {
-  id: 1,
-  text: "What is 3/4 of 28?",
-  options: ["18", "21", "24", "27"],
-  correctAnswer: 1,
-  explanation: "To find 3/4 of 28, multiply 3/4 × 28 = 3 × 7 = 21."
-};
+import { Button } from "@/components/ui/button";
+import { useUser } from "../context/UserContext";
+import { useTestType } from "../context/TestTypeContext";
+import { drillCategories, drillQuestions } from "../data/dummyData";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Drill = () => {
+  const navigate = useNavigate();
+  const { updateAfterDrill } = useUser();
+  const { testType } = useTestType();
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
   const [subSkill, setSubSkill] = useState('');
@@ -37,10 +24,42 @@ const Drill = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [immediateFeedback, setImmediateFeedback] = useState(true);
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds per question
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  
+  // Reset states when test type changes
+  useEffect(() => {
+    setSubject('');
+    setTopic('');
+    setSubSkill('');
+    setShowQuestion(false);
+  }, [testType]);
+  
+  // Reset timer when starting a drill or moving to a new question
+  useEffect(() => {
+    if (showQuestion) {
+      setTimeLeft(60);
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    }
+  }, [showQuestion, currentQuestionIndex]);
   
   const handleStartDrill = () => {
     if (subject && topic && subSkill) {
       setShowQuestion(true);
+      setCurrentQuestionIndex(0);
+      setCorrectAnswers(0);
+      setStartTime(new Date());
     }
   };
   
@@ -48,20 +67,109 @@ const Drill = () => {
     setSelectedOption(index);
     if (immediateFeedback) {
       setShowFeedback(true);
+      
+      // Check if answer is correct
+      if (currentQuestions && currentQuestions[currentQuestionIndex]) {
+        const currentQuestion = currentQuestions[currentQuestionIndex];
+        if (index === currentQuestion.correctAnswer) {
+          setCorrectAnswers(prev => prev + 1);
+        }
+      }
     }
   };
   
   const handleSubmit = () => {
     if (!immediateFeedback && selectedOption !== null) {
       setShowFeedback(true);
+      
+      // Check if answer is correct
+      if (currentQuestions && currentQuestions[currentQuestionIndex]) {
+        const currentQuestion = currentQuestions[currentQuestionIndex];
+        if (selectedOption === currentQuestion.correctAnswer) {
+          setCorrectAnswers(prev => prev + 1);
+        }
+      }
     }
   };
   
   const handleNext = () => {
     setSelectedOption(null);
     setShowFeedback(false);
-    // In a real app, you'd fetch the next question
+    
+    if (currentQuestionIndex < currentQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      // Drill is complete
+      finishDrill();
+    }
   };
+  
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+      setSelectedOption(null);
+      setShowFeedback(false);
+    }
+  };
+  
+  const finishDrill = () => {
+    if (!startTime) return;
+    
+    // Calculate time spent
+    const endTime = new Date();
+    const timeSpentMinutes = Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60));
+    
+    // Update user performance
+    updateAfterDrill(
+      topic,
+      subSkill,
+      correctAnswers,
+      currentQuestions.length,
+      timeSpentMinutes
+    );
+    
+    // Show toast and reset state
+    const score = Math.round((correctAnswers / currentQuestions.length) * 100);
+    toast({
+      title: "Drill Completed!",
+      description: `You scored ${score}% on the ${subSkill} drill. Great job!`,
+    });
+    
+    // Reset state
+    setShowQuestion(false);
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setShowFeedback(false);
+    setCorrectAnswers(0);
+    
+    // Navigate to dashboard
+    navigate("/dashboard");
+  };
+  
+  // Filter drill categories based on test type
+  const filteredDrillCategories = drillCategories.filter(cat => {
+    if (testType === 'NAPLAN') return ['Mathematics', 'English'].includes(cat.subject);
+    if (testType === 'Selective Entry') return true; // All categories apply
+    if (testType === 'ACER Scholarship') return true; // All categories apply
+    if (testType === 'EduTest') return ['Mathematics', 'English', 'Science'].includes(cat.subject);
+    return true;
+  });
+  
+  // Get available topics for selected subject
+  const availableTopics = subject ? 
+    filteredDrillCategories.find(cat => cat.subject === subject)?.topics || {} : {};
+  
+  // Get available subskills for selected topic
+  const availableSubSkills = topic && subject ? 
+    availableTopics[topic] || [] : [];
+  
+  // Get questions for selected topic and subskill
+  const currentQuestions = topic && subSkill && drillQuestions[topic] && drillQuestions[topic][subSkill] ? 
+    drillQuestions[topic][subSkill] : [];
+  
+  // Current question
+  const currentQuestion = showQuestion && currentQuestions.length > 0 ? 
+    currentQuestions[currentQuestionIndex] : null;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -82,8 +190,8 @@ const Drill = () => {
                   <SelectValue placeholder="Select subject" />
                 </SelectTrigger>
                 <SelectContent>
-                  {subjects.map((sub) => (
-                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  {filteredDrillCategories.map((cat) => (
+                    <SelectItem key={cat.subject} value={cat.subject}>{cat.subject}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -97,7 +205,7 @@ const Drill = () => {
                     <SelectValue placeholder="Select topic" />
                   </SelectTrigger>
                   <SelectContent>
-                    {topics[subject as keyof typeof topics]?.map((t) => (
+                    {Object.keys(availableTopics).map((t) => (
                       <SelectItem key={t} value={t}>{t}</SelectItem>
                     ))}
                   </SelectContent>
@@ -113,7 +221,7 @@ const Drill = () => {
                     <SelectValue placeholder="Select sub-skill" />
                   </SelectTrigger>
                   <SelectContent>
-                    {subSkills[topic as keyof typeof subSkills]?.map((skill) => (
+                    {availableSubSkills.map((skill) => (
                       <SelectItem key={skill} value={skill}>{skill}</SelectItem>
                     ))}
                   </SelectContent>
@@ -121,16 +229,22 @@ const Drill = () => {
               </div>
             )}
             
-            <button 
+            <Button 
               onClick={handleStartDrill}
-              disabled={!subject || !topic || !subSkill}
-              className={`w-full btn-primary mt-4 ${(!subject || !topic || !subSkill) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={!subject || !topic || !subSkill || !currentQuestions.length}
+              className={`w-full btn-primary mt-4 ${(!subject || !topic || !subSkill || !currentQuestions.length) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Start Practice
-            </button>
+            </Button>
+            
+            {subSkill && !currentQuestions.length && (
+              <p className="text-sm text-red-500 text-center mt-2">
+                No questions available for this skill. Please select another sub-skill.
+              </p>
+            )}
           </div>
         </Card>
-      ) : (
+      ) : currentQuestion ? (
         <div className="max-w-4xl mx-auto">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-edu-navy/70">
@@ -162,7 +276,7 @@ const Drill = () => {
           
           <Card className="edu-card">
             <div className="flex justify-between mb-6">
-              <span className="text-sm text-edu-navy/70">Question 1 of 10</span>
+              <span className="text-sm text-edu-navy/70">Question {currentQuestionIndex + 1} of {currentQuestions.length}</span>
               <button className="text-edu-navy/70 hover:text-edu-navy flex items-center gap-1">
                 <Flag size={16} />
                 <span className="text-sm">Flag</span>
@@ -170,63 +284,81 @@ const Drill = () => {
             </div>
             
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">{mockQuestion.text}</h2>
+              <h2 className="text-xl font-semibold mb-4">{currentQuestion.text}</h2>
               {/* If there was an image for the question, it would go here */}
             </div>
             
-            <div className="space-y-3 mb-8">
-              {mockQuestion.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleOptionSelect(index)}
-                  className={`w-full p-4 text-left rounded-lg border transition-colors ${
-                    selectedOption === index
-                      ? 'border-edu-teal bg-edu-teal/10'
-                      : 'border-gray-200 hover:border-edu-teal/50'
-                  } ${
-                    showFeedback && index === mockQuestion.correctAnswer
-                      ? 'border-green-500 bg-green-50'
-                      : ''
-                  } ${
-                    showFeedback && selectedOption === index && index !== mockQuestion.correctAnswer
-                      ? 'border-red-500 bg-red-50'
-                      : ''
-                  }`}
-                >
-                  <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {option}
-                </button>
-              ))}
-            </div>
+            {currentQuestion.options && (
+              <div className="space-y-3 mb-8">
+                {currentQuestion.options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => !showFeedback && handleOptionSelect(index)}
+                    disabled={showFeedback}
+                    className={`w-full p-4 text-left rounded-lg border transition-colors ${
+                      selectedOption === index
+                        ? 'border-edu-teal bg-edu-teal/10'
+                        : 'border-gray-200 hover:border-edu-teal/50'
+                    } ${
+                      showFeedback && index === currentQuestion.correctAnswer
+                        ? 'border-green-500 bg-green-50'
+                        : ''
+                    } ${
+                      showFeedback && selectedOption === index && index !== currentQuestion.correctAnswer
+                        ? 'border-red-500 bg-red-50'
+                        : ''
+                    }`}
+                  >
+                    <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {option}
+                  </button>
+                ))}
+              </div>
+            )}
             
             {showFeedback && (
               <div className="mb-6 p-4 bg-edu-light-blue rounded-lg">
                 <h3 className="font-semibold mb-2">Explanation</h3>
-                <p>{mockQuestion.explanation}</p>
+                <p>{currentQuestion.explanation}</p>
               </div>
             )}
             
             <div className="flex justify-between">
-              <button className="btn-secondary bg-white border border-edu-teal/50 text-edu-navy hover:bg-edu-light-blue">
+              <Button 
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                className="btn-secondary bg-white border border-edu-teal/50 text-edu-navy hover:bg-edu-light-blue"
+              >
                 <ChevronLeft size={16} className="mr-1" />
-                Skip
-              </button>
+                Previous
+              </Button>
               
               {!showFeedback ? (
-                <button 
+                <Button 
                   onClick={handleSubmit}
                   disabled={selectedOption === null}
                   className={`btn-primary ${selectedOption === null ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Submit
-                </button>
+                </Button>
               ) : (
-                <button onClick={handleNext} className="btn-primary">
-                  Next
+                <Button onClick={handleNext} className="btn-primary">
+                  {currentQuestionIndex < currentQuestions.length - 1 ? 'Next' : 'Finish'}
                   <ChevronRight size={16} className="ml-1" />
-                </button>
+                </Button>
               )}
             </div>
           </Card>
+        </div>
+      ) : (
+        <div className="text-center py-10">
+          <p>No questions available for this drill.</p>
+          <Button 
+            className="mt-4"
+            onClick={() => setShowQuestion(false)}
+          >
+            Back to Drills
+          </Button>
         </div>
       )}
     </div>

@@ -1,48 +1,105 @@
 
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, TrendingDown } from "lucide-react";
-
-// Mock data
-const progressData = [
-  { date: 'Jan', score: 65 },
-  { date: 'Feb', score: 59 },
-  { date: 'Mar', score: 70 },
-  { date: 'Apr', score: 68 },
-  { date: 'May', score: 75 },
-  { date: 'Jun', score: 82 },
-];
-
-const topicData = [
-  { name: 'Reading', score: 82 },
-  { name: 'Writing', score: 64 },
-  { name: 'Numeracy', score: 76 },
-  { name: 'Grammar', score: 85 },
-];
-
-const subSkillData = [
-  { name: 'Main Idea', score: 88 },
-  { name: 'Inference', score: 72 },
-  { name: 'Vocabulary', score: 90 },
-  { name: 'Text Structure', score: 78 },
-  { name: 'Author Purpose', score: 65 },
-];
-
-const timeData = [
-  { name: 'Reading', value: 12 },
-  { name: 'Writing', value: 8 },
-  { name: 'Numeracy', value: 15 },
-  { name: 'Grammar', value: 5 },
-];
+import { TrendingUp } from "lucide-react";
+import { useUser } from "../context/UserContext";
+import { useTestType } from "../context/TestTypeContext";
+import { useMemo } from "react";
+import { TestResult } from "../types";
 
 const COLORS = ['#7accc8', '#f26c5a', '#8884d8', '#ffc658'];
 
 const Insights = () => {
+  const { userPerformance } = useUser();
+  const { testType } = useTestType();
+  
+  // Filter results by test type
+  const filteredResults = useMemo(() => {
+    return userPerformance.testResults.filter(result => result.testType === testType);
+  }, [userPerformance.testResults, testType]);
+  
+  // Format test results for the progress chart
+  const progressData = useMemo(() => {
+    return filteredResults.map(result => ({
+      date: result.date.split('-')[1], // Just use month for simplicity
+      score: result.score
+    }));
+  }, [filteredResults]);
+  
+  // Generate topic data from the most recent test
+  const topicData = useMemo(() => {
+    if (filteredResults.length === 0) {
+      return [
+        { name: 'Reading', score: 82 },
+        { name: 'Writing', score: 64 },
+        { name: 'Numeracy', score: 76 },
+        { name: 'Grammar', score: 85 }
+      ];
+    }
+    
+    const latestResult = filteredResults[filteredResults.length - 1];
+    return Object.entries(latestResult.topicResults).map(([name, score]) => ({
+      name,
+      score
+    }));
+  }, [filteredResults]);
+  
+  // Generate subskill data from the most recent test
+  const subSkillData = useMemo(() => {
+    if (filteredResults.length === 0) {
+      return [
+        { name: 'Main Idea', score: 88 },
+        { name: 'Inference', score: 72 },
+        { name: 'Vocabulary', score: 90 },
+        { name: 'Text Structure', score: 78 },
+        { name: 'Author Purpose', score: 65 }
+      ];
+    }
+    
+    const latestResult = filteredResults[filteredResults.length - 1];
+    return Object.entries(latestResult.subSkillResults).map(([name, score]) => ({
+      name,
+      score
+    }));
+  }, [filteredResults]);
+  
+  // Calculate average score from filtered tests
+  const averageScore = useMemo(() => {
+    if (filteredResults.length === 0) return 73;
+    
+    const sum = filteredResults.reduce((acc, result) => acc + result.score, 0);
+    return Math.round(sum / filteredResults.length);
+  }, [filteredResults]);
+  
+  // Calculate total study time
+  const totalStudyHours = Math.round(userPerformance.totalStudyTimeMinutes / 60);
+  
+  // Generate time distribution data
+  const timeData = useMemo(() => {
+    const topicTimes: {[key: string]: number} = {};
+    
+    filteredResults.forEach(result => {
+      Object.keys(result.topicResults).forEach(topic => {
+        if (!topicTimes[topic]) {
+          topicTimes[topic] = 0;
+        }
+        // Allocate time proportionally based on the topics in the test
+        const topicCount = Object.keys(result.topicResults).length;
+        topicTimes[topic] += result.timeSpentMinutes / topicCount;
+      });
+    });
+    
+    return Object.entries(topicTimes).map(([name, value]) => ({
+      name,
+      value: Math.round(value / 60) // Convert to hours
+    }));
+  }, [filteredResults]);
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
         <h1 className="text-3xl font-bold text-edu-navy mb-1">Insights</h1>
-        <p className="text-edu-navy/70">Track your progress and identify areas for improvement</p>
+        <p className="text-edu-navy/70">Track your {testType} test progress and identify areas for improvement</p>
       </div>
       
       {/* Overall Progress */}
@@ -66,7 +123,7 @@ const Insights = () => {
         <Card className="edu-card">
           <h3 className="text-sm text-edu-navy/70 mb-1">Average Score</h3>
           <div className="flex items-end gap-2">
-            <p className="text-3xl font-bold text-edu-navy">73%</p>
+            <p className="text-3xl font-bold text-edu-navy">{averageScore}%</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
               <TrendingUp size={12} className="mr-0.5" /> +5%
             </span>
@@ -76,9 +133,9 @@ const Insights = () => {
         <Card className="edu-card">
           <h3 className="text-sm text-edu-navy/70 mb-1">Tests Completed</h3>
           <div className="flex items-end gap-2">
-            <p className="text-3xl font-bold text-edu-navy">17</p>
+            <p className="text-3xl font-bold text-edu-navy">{filteredResults.length}</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
-              <TrendingUp size={12} className="mr-0.5" /> +3
+              <TrendingUp size={12} className="mr-0.5" /> +{Math.min(3, filteredResults.length)}
             </span>
           </div>
         </Card>
@@ -86,7 +143,7 @@ const Insights = () => {
         <Card className="edu-card">
           <h3 className="text-sm text-edu-navy/70 mb-1">Study Time</h3>
           <div className="flex items-end gap-2">
-            <p className="text-3xl font-bold text-edu-navy">38h</p>
+            <p className="text-3xl font-bold text-edu-navy">{totalStudyHours}h</p>
             <span className="text-xs text-edu-teal flex items-center pb-1">
               <TrendingUp size={12} className="mr-0.5" /> +7h
             </span>
