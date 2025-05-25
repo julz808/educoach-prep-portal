@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -52,6 +51,16 @@ const Landing = () => {
               <Link to="/auth">
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/question-generation-demo">
+                Try Demo
+              </Link>
+            </Button>
+            <Button size="lg" variant="secondary" asChild>
+              <Link to="/edutest-generator">
+                EduTest Generator
               </Link>
             </Button>
           </div>

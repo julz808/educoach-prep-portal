@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +14,8 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import CourseDetail from "./pages/CourseDetail";
+import QuestionGenerationDemo from "./pages/QuestionGenerationDemo";
+import EduTestGenerator from "./pages/EduTestGenerator";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
@@ -38,6 +39,8 @@ const App = () => {
                     <Route path="/" element={<Landing />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/course/:slug" element={<CourseDetail />} />
+                    <Route path="/question-generation-demo" element={<QuestionGenerationDemo />} />
+                    <Route path="/edutest-generator" element={<EduTestGenerator />} />
                     <Route element={<ProtectedRoute />}>
                       <Route path="/dashboard" element={<Layout />}>
                         <Route index element={<Dashboard />} />
