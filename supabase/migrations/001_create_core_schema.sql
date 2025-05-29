@@ -40,7 +40,7 @@ CREATE TABLE questions (
     year_level INTEGER NOT NULL, -- 5, 6, 7, 8
     section_name VARCHAR NOT NULL, -- 'Reading', 'Mathematics', 'Verbal_Reasoning', etc.
     sub_skill VARCHAR NOT NULL, -- Exact unified sub-skill names from mapping
-    difficulty INTEGER NOT NULL CHECK (difficulty >= 1 AND difficulty <= 5), -- 1-5 scale from curriculum mapping
+    difficulty INTEGER NOT NULL CHECK (difficulty >= 1 AND difficulty <= 3), -- 1-3 scale: 1=easy, 2=medium, 3=hard
     
     -- Question grouping (for reading passages)
     passage_id UUID REFERENCES passages(id) ON DELETE SET NULL,

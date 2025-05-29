@@ -1,7 +1,5 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { UserPerformance, TestResult } from '../types';
-import { initialTestResults } from '../data/dummyData';
 
 interface UserContextProps {
   userPerformance: UserPerformance;
@@ -17,31 +15,31 @@ interface UserContextProps {
 }
 
 const initialPerformance: UserPerformance = {
-  questionsAnswered: 342,
-  avgAccuracy: 76,
-  lastTestScore: 82,
-  streak: 5,
-  testResults: initialTestResults,
+  questionsAnswered: 0,
+  avgAccuracy: 0,
+  lastTestScore: 0,
+  streak: 0,
+  testResults: [], // Start with empty test results
   skillMastery: {
-    "Reading": 85,
-    "Writing": 64,
-    "Numeracy": 76,
-    "Language Conventions": 85
+    "Reading": 0,
+    "Writing": 0,
+    "Numeracy": 0,
+    "Language Conventions": 0
   },
   topicMastery: {
-    "Reading": 82,
-    "Writing": 64,
-    "Numeracy": 76,
-    "Grammar": 85
+    "Reading": 0,
+    "Writing": 0,
+    "Numeracy": 0,
+    "Grammar": 0
   },
   subSkillMastery: {
-    "Main Idea": 88,
-    "Inference": 72,
-    "Vocabulary": 90,
-    "Text Structure": 78,
-    "Author Purpose": 65
+    "Main Idea": 0,
+    "Inference": 0,
+    "Vocabulary": 0,
+    "Text Structure": 0,
+    "Author Purpose": 0
   },
-  totalStudyTimeMinutes: 580,
+  totalStudyTimeMinutes: 0,
 };
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);

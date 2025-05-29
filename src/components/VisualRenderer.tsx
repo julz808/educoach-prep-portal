@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { VisualData } from '../services/questionGenerationService';
 
@@ -7,11 +7,30 @@ interface VisualRendererProps {
   className?: string;
 }
 
-const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className = '' }) => {
-  const renderGeometry = () => {
-    const { shapes } = visualData.data;
-    const { width, height, style } = visualData.renderingSpecs;
+const VisualRenderer: React.FC<VisualRendererProps> = React.memo(({ visualData, className = '' }) => {
+  // Memoize expensive calculations
+  const { shapes, chartType, chartData, sequence, elements } = useMemo(() => ({
+    shapes: visualData.data.shapes,
+    chartType: visualData.data.chartType,
+    chartData: visualData.data.chartData,
+    sequence: visualData.data.sequence,
+    elements: visualData.data.elements
+  }), [visualData.data]);
 
+  const { width, height, style } = useMemo(() => visualData.renderingSpecs, [visualData.renderingSpecs]);
+
+  // Memoize color mapping for patterns
+  const getPatternColor = useCallback((color: string) => {
+    const colorMap: Record<string, string> = {
+      'blue': '#3b82f6',
+      'red': '#ef4444',
+      'green': '#10b981',
+      'yellow': '#fbbf24'
+    };
+    return colorMap[color] || '#6b7280';
+  }, []);
+
+  const renderGeometry = useCallback(() => {
     return (
       <div className={`relative ${className}`} style={{ width, height, ...style }}>
         <svg width={width} height={height} className="absolute inset-0">
@@ -107,12 +126,9 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
         </div>
       </div>
     );
-  };
+  }, [shapes, width, height, style]);
 
-  const renderChart = () => {
-    const { chartType, chartData, axes } = visualData.data;
-    const { width, height } = visualData.renderingSpecs;
-
+  const renderChart = useCallback(() => {
     if (chartType === 'bar') {
       return (
         <div className={className} style={{ width, height }}>
@@ -144,12 +160,9 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
     }
 
     return <div className={className}>Unsupported chart type: {chartType}</div>;
-  };
+  }, [chartType, chartData, width, height, className]);
 
-  const renderPattern = () => {
-    const { sequence } = visualData.data;
-    const { width, height, style } = visualData.renderingSpecs;
-
+  const renderPattern = useCallback(() => {
     return (
       <div 
         className={`flex items-center justify-center gap-3 ${className}`} 
@@ -162,9 +175,7 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
             style={{
               width: 40,
               height: 40,
-              backgroundColor: item.color === 'blue' ? '#3b82f6' : 
-                              item.color === 'red' ? '#ef4444' : 
-                              item.color === 'green' ? '#10b981' : '#6b7280',
+              backgroundColor: getPatternColor(item.color),
               borderRadius: item.shape === 'circle' ? '50%' : 
                           item.shape === 'triangle' ? '0' : '4px',
               clipPath: item.shape === 'triangle' ? 'polygon(50% 0%, 0% 100%, 100% 100%)' : 'none'
@@ -176,12 +187,9 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
         </div>
       </div>
     );
-  };
+  }, [sequence, width, height, style, getPatternColor]);
 
-  const renderDiagram = () => {
-    const { elements } = visualData.data;
-    const { width, height, style } = visualData.renderingSpecs;
-
+  const renderDiagram = useCallback(() => {
     return (
       <div className={`relative ${className}`} style={{ width, height, ...style }}>
         {elements?.map((element, index) => {
@@ -249,9 +257,9 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
         })}
       </div>
     );
-  };
+  }, [elements, width, height, style]);
 
-  const renderVisual = () => {
+  const renderVisual = useCallback(() => {
     switch (visualData.type) {
       case 'geometry':
         return renderGeometry();
@@ -268,7 +276,7 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
           </div>
         );
     }
-  };
+  }, [visualData.type, renderGeometry, renderChart, renderPattern, renderDiagram]);
 
   return (
     <div className="visual-renderer">
@@ -279,6 +287,6 @@ const VisualRenderer: React.FC<VisualRendererProps> = ({ visualData, className =
       </div>
     </div>
   );
-};
+});
 
 export default VisualRenderer; 

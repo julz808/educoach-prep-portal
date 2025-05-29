@@ -9,13 +9,350 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      passages: {
+        Row: {
+          australian_context: boolean | null
+          content: string
+          created_at: string | null
+          id: string
+          passage_type: string
+          section_name: string
+          test_type: string
+          title: string
+          updated_at: string | null
+          word_count: number | null
+          year_level: number
+        }
+        Insert: {
+          australian_context?: boolean | null
+          content: string
+          created_at?: string | null
+          id?: string
+          passage_type: string
+          section_name: string
+          test_type: string
+          title: string
+          updated_at?: string | null
+          word_count?: number | null
+          year_level: number
+        }
+        Update: {
+          australian_context?: boolean | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          passage_type?: string
+          section_name?: string
+          test_type?: string
+          title?: string
+          updated_at?: string | null
+          word_count?: number | null
+          year_level?: number
+        }
+        Relationships: []
+      }
+      question_responses: {
+        Row: {
+          attempt_id: string | null
+          created_at: string | null
+          id: string
+          is_correct: boolean | null
+          question_id: string | null
+          time_spent_seconds: number | null
+          user_answer: string | null
+        }
+        Insert: {
+          attempt_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean | null
+          question_id?: string | null
+          time_spent_seconds?: number | null
+          user_answer?: string | null
+        }
+        Update: {
+          attempt_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean | null
+          question_id?: string | null
+          time_spent_seconds?: number | null
+          user_answer?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_responses_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "test_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          answer_options: Json | null
+          correct_answer: string | null
+          created_at: string | null
+          curriculum_aligned: boolean | null
+          difficulty: number
+          generated_by: string | null
+          has_visual: boolean | null
+          id: string
+          passage_id: string | null
+          performance_data: Json | null
+          question_sequence: number | null
+          question_text: string
+          response_type: string
+          reviewed: boolean | null
+          section_name: string
+          solution: string
+          sub_skill: string
+          test_mode: string
+          test_type: string
+          updated_at: string | null
+          visual_data: Json | null
+          visual_svg: string | null
+          visual_type: string | null
+          visual_url: string | null
+          year_level: number
+        }
+        Insert: {
+          answer_options?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          curriculum_aligned?: boolean | null
+          difficulty: number
+          generated_by?: string | null
+          has_visual?: boolean | null
+          id?: string
+          passage_id?: string | null
+          performance_data?: Json | null
+          question_sequence?: number | null
+          question_text: string
+          response_type: string
+          reviewed?: boolean | null
+          section_name: string
+          solution: string
+          sub_skill: string
+          test_mode?: string
+          test_type: string
+          updated_at?: string | null
+          visual_data?: Json | null
+          visual_svg?: string | null
+          visual_type?: string | null
+          visual_url?: string | null
+          year_level: number
+        }
+        Update: {
+          answer_options?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          curriculum_aligned?: boolean | null
+          difficulty?: number
+          generated_by?: string | null
+          has_visual?: boolean | null
+          id?: string
+          passage_id?: string | null
+          performance_data?: Json | null
+          question_sequence?: number | null
+          question_text?: string
+          response_type?: string
+          reviewed?: boolean | null
+          section_name?: string
+          solution?: string
+          sub_skill?: string
+          test_mode?: string
+          test_type?: string
+          updated_at?: string | null
+          visual_data?: Json | null
+          visual_svg?: string | null
+          visual_type?: string | null
+          visual_url?: string | null
+          year_level?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_attempts: {
+        Row: {
+          completed_at: string | null
+          correct_answers: number | null
+          created_at: string | null
+          id: string
+          product_type: string
+          section_name: string | null
+          started_at: string | null
+          test_mode: string
+          test_number: number | null
+          time_spent_minutes: number | null
+          total_questions: number | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          correct_answers?: number | null
+          created_at?: string | null
+          id?: string
+          product_type: string
+          section_name?: string | null
+          started_at?: string | null
+          test_mode: string
+          test_number?: number | null
+          time_spent_minutes?: number | null
+          total_questions?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          correct_answers?: number | null
+          created_at?: string | null
+          id?: string
+          product_type?: string
+          section_name?: string | null
+          started_at?: string | null
+          test_mode?: string
+          test_number?: number | null
+          time_spent_minutes?: number | null
+          total_questions?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      test_structure_compliance: {
+        Row: {
+          answer_format: string | null
+          compliance_percentage: number | null
+          created_at: string | null
+          generated_questions: number | null
+          id: string
+          section_name: string
+          target_questions: number | null
+          test_type: string
+          time_allocation: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer_format?: string | null
+          compliance_percentage?: number | null
+          created_at?: string | null
+          generated_questions?: number | null
+          id?: string
+          section_name: string
+          target_questions?: number | null
+          test_type: string
+          time_allocation?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer_format?: string | null
+          compliance_percentage?: number | null
+          created_at?: string | null
+          generated_questions?: number | null
+          id?: string
+          section_name?: string
+          target_questions?: number | null
+          test_type?: string
+          time_allocation?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_products: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          product_type: string
+          purchased_at: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          product_type: string
+          purchased_at?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          product_type?: string
+          purchased_at?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_sub_skill_progress: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_practiced: string | null
+          mastery_level: number | null
+          product_type: string
+          questions_attempted: number | null
+          questions_correct: number | null
+          sub_skill: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_practiced?: string | null
+          mastery_level?: number | null
+          product_type: string
+          questions_attempted?: number | null
+          questions_correct?: number | null
+          sub_skill: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_practiced?: string | null
+          mastery_level?: number | null
+          product_type?: string
+          questions_attempted?: number | null
+          questions_correct?: number | null
+          sub_skill?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      test_column_exists: {
+        Args: { table_name: string; column_name: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

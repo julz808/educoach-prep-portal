@@ -808,7 +808,6 @@ const YEAR_7_LANGUAGE_SKILLS = [
 
 const EDUTEST_READING_SKILLS = [
   "Text interpretation",
-  "Reading comprehension",
   "Inference making",
   "Sentence completion",
   "Punctuation correction",
@@ -859,7 +858,7 @@ const NSW_WRITING_SKILLS = [
   "Imaginative writing"
 ];
 
-const VIC_MATH_SKILLS = [
+export const VIC_MATH_SKILLS = [
   "Mathematical problem solving",
   "Multi-step reasoning",
   "Complex mathematical concepts",

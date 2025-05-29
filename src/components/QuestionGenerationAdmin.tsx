@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
@@ -9,7 +9,8 @@ import {
   saveGeneratedQuestions, 
   getGenerationStats,
   type QuestionGenerationRequest,
-  type QuestionGenerationResponse 
+  type QuestionGenerationResponse,
+  testClaudeConnection
 } from '../services/questionGenerationService';
 import { 
   TEST_STRUCTURES, 
@@ -17,6 +18,11 @@ import {
   getCurriculumDifficulty,
   getSubSkillsForSection 
 } from '../data/curriculumData';
+import { Badge } from './ui/badge';
+import { Brain } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 const QuestionGenerationAdmin: React.FC = () => {
   const [selectedTestType, setSelectedTestType] = useState<string>('');
@@ -28,6 +34,13 @@ const QuestionGenerationAdmin: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<{
+    success: boolean;
+    model: string;
+    error?: string;
+  } | null>(null);
+  const [generationResult, setGenerationResult] = useState<any>(null);
 
   // Load generation statistics on component mount
   useEffect(() => {
@@ -136,18 +149,159 @@ const QuestionGenerationAdmin: React.FC = () => {
     }
   };
 
+  const testConnection = async () => {
+    setIsTestingConnection(true);
+    try {
+      const result = await testClaudeConnection();
+      setConnectionStatus(result);
+    } catch (error) {
+      setConnectionStatus({
+        success: false,
+        model: 'claude-4-sonnet-20241218',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
+  const generateSampleQuestions = async () => {
+    setIsGenerating(true);
+    try {
+      const request: QuestionGenerationRequest = {
+        testType: 'Year_5_NAPLAN',
+        yearLevel: 'Year 5',
+        sectionName: 'Numeracy',
+        subSkill: 'Number and Place Value',
+        difficulty: 2,
+        questionCount: 2,
+        australianContext: true
+      };
+
+      const result = await generateQuestions(request);
+      setGenerationResult(result);
+    } catch (error) {
+      console.error('Generation failed:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const testTypes = Object.keys(TEST_STRUCTURES);
   const sections = selectedTestType ? Object.keys(TEST_STRUCTURES[selectedTestType as keyof typeof TEST_STRUCTURES]) : [];
   const subSkills = selectedSection ? getSubSkillsForSection(selectedSection) : [];
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Question Generation System</h1>
-          <p className="text-gray-600">AI-powered question generation for Australian standardized tests</p>
-        </div>
+      <div className="flex items-center gap-2 mb-6">
+        <Brain className="h-6 w-6 text-blue-600" />
+        <h1 className="text-2xl font-bold">Question Generation Admin</h1>
+        <Badge variant="secondary" className="ml-2">
+          Claude 4 Sonnet
+        </Badge>
       </div>
+
+      {/* Claude API Connection Test */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            Claude 4 Sonnet API Connection
+          </CardTitle>
+          <CardDescription>
+            Test connection to Claude 4 Sonnet (model: claude-4-sonnet-20241218)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={testConnection} 
+            disabled={isTestingConnection}
+            className="flex items-center gap-2"
+          >
+            {isTestingConnection ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            Test Claude Connection
+          </Button>
+
+          {connectionStatus && (
+            <Alert className={connectionStatus.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
+              <div className="flex items-start gap-2">
+                {connectionStatus.success ? (
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                )}
+                <div>
+                  <div className="font-medium">
+                    {connectionStatus.success ? 'Connected Successfully!' : 'Connection Failed'}
+                  </div>
+                  <AlertDescription className="mt-1">
+                    <div>Model: <code className="text-sm bg-gray-100 px-1 rounded">{connectionStatus.model}</code></div>
+                    {connectionStatus.error && (
+                      <div className="mt-2 text-red-700">{connectionStatus.error}</div>
+                    )}
+                  </AlertDescription>
+                </div>
+              </div>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Sample Question Generation */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Generate Sample Questions</CardTitle>
+          <CardDescription>
+            Test question generation with Claude 4 Sonnet
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={generateSampleQuestions} 
+            disabled={isGenerating}
+            className="flex items-center gap-2"
+          >
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Brain className="h-4 w-4" />
+            )}
+            Generate Sample Questions
+          </Button>
+
+          {generationResult && (
+            <div className="space-y-4">
+              <Alert className="border-blue-200 bg-blue-50">
+                <CheckCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription>
+                  Successfully generated {generationResult.questions.length} questions using Claude 4 Sonnet!
+                </AlertDescription>
+              </Alert>
+              
+              <div className="space-y-3">
+                {generationResult.questions.map((question: any, index: number) => (
+                  <Card key={index} className="border-l-4 border-l-blue-500">
+                    <CardContent className="pt-4">
+                      <div className="space-y-2">
+                        <div className="font-medium">Question {index + 1}:</div>
+                        <div className="text-sm text-gray-700">{question.questionText}</div>
+                        <div className="text-xs text-gray-500">
+                          Sub-skill: {question.subSkill} | Difficulty: {question.difficulty}/3
+                          {question.hasVisual && " | Has Visual Component"}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Statistics Dashboard */}
       {stats && (
@@ -264,7 +418,7 @@ const QuestionGenerationAdmin: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                            Difficulty {difficulty}
+                            Difficulty {difficulty}/3
                           </span>
                           {skillInfo?.visual_required && (
                             <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
@@ -372,9 +526,12 @@ const QuestionGenerationAdmin: React.FC = () => {
                   <div className="flex items-start justify-between mb-3">
                     <h4 className="font-medium">Question {index + 1}</h4>
                     <div className="flex gap-2">
-                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                        Difficulty {question.difficulty}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Difficulty:</span>
+                        <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {question.difficulty}/3
+                        </span>
+                      </div>
                       {question.hasVisual && (
                         <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                           Visual
