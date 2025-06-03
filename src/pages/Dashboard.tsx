@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { HeroBanner } from '@/components/ui/hero-banner';
+import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
   BookOpen, Clock, Target, TrendingUp, Play, BarChart3, 
   Award, Zap, Calendar, Users, ArrowRight, Star,
@@ -315,134 +317,111 @@ const Dashboard: React.FC = () => {
   const totalQuestions = testData ? testData.testModes.reduce((sum, mode) => 
     sum + mode.sections.reduce((sectionSum, section) => sectionSum + section.totalQuestions, 0), 0) : 0;
 
+  // Hero banner configuration
+  const heroBannerProps = {
+    title: "Welcome back, Student! 👋",
+    subtitle: "Ready to continue your learning journey? You're doing great!",
+    metrics: [
+      {
+        icon: <Target size={16} />,
+        label: "7-day streak",
+        value: ""
+      },
+      {
+        icon: <TrendingUp size={16} />,
+        label: "+5% improvement",
+        value: ""
+      },
+      {
+        icon: <Award size={16} />,
+        label: `${totalQuestions} questions available`,
+        value: ""
+      }
+    ],
+    actions: [
+      {
+        label: totalQuestions > 0 ? 'Start Practice' : 'Coming Soon',
+        icon: <Play size={20} className="mr-2" />,
+        onClick: () => handleStartTest('1'),
+        disabled: totalQuestions === 0
+      },
+      {
+        label: 'View Insights',
+        icon: <BarChart3 size={20} className="mr-2" />,
+        onClick: () => setShowInsights(true),
+        variant: 'outline' as const
+      }
+    ],
+    ...(totalQuestions === 0 && {
+      warning: {
+        icon: <AlertCircle size={16} />,
+        message: `Questions for ${testData?.name || 'this test type'} are coming soon...`
+      }
+    })
+  };
+
+  // Metrics cards configuration
+  const metricsConfig = [
+    {
+      title: 'Total Questions',
+      value: totalQuestions.toString(),
+      icon: <BookOpen className="text-white" size={24} />,
+      badge: { text: 'Available', variant: 'default' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
+        iconBg: 'bg-blue-500',
+        text: 'text-blue-900'
+      }
+    },
+    {
+      title: 'Average Score',
+      value: '85%',
+      icon: <Target className="text-white" size={24} />,
+      badge: { text: '+15%', variant: 'success' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
+        iconBg: 'bg-green-500',
+        text: 'text-green-900'
+      }
+    },
+    {
+      title: 'Study Time',
+      value: '4.2h',
+      icon: <Clock className="text-white" size={24} />,
+      badge: { text: 'This week', variant: 'secondary' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
+        iconBg: 'bg-purple-500',
+        text: 'text-purple-900'
+      }
+    },
+    {
+      title: 'Day Streak',
+      value: '7',
+      icon: <TrendingUp className="text-white" size={24} />,
+      badge: { text: '7 days', variant: 'warning' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200',
+        iconBg: 'bg-orange-500',
+        text: 'text-orange-900'
+      }
+    }
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-edu-teal to-edu-navy rounded-2xl p-8 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="mb-6 lg:mb-0">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-              Welcome back, Student! 👋
-            </h1>
-            <p className="text-lg opacity-90 mb-4">
-              Ready to continue your learning journey? You're doing great!
-            </p>
-            <div className="flex flex-wrap gap-4 text-sm">
-              <div className="flex items-center space-x-2">
-                <Target size={16} />
-                <span>7-day streak</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <TrendingUp size={16} />
-                <span>+5% improvement</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Award size={16} />
-                <span>{totalQuestions} questions available</span>
-              </div>
-            </div>
-            {totalQuestions === 0 && (
-              <div className="mt-4 p-3 bg-yellow-500/20 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle size={16} />
-                  <span className="text-sm">Questions for {testData?.name || 'this test type'} are coming soon...</span>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              size="lg" 
-              className="bg-white text-edu-teal hover:bg-gray-100"
-              onClick={() => handleStartTest('1')}
-              disabled={totalQuestions === 0}
-            >
-              <Play size={20} className="mr-2" />
-              {totalQuestions > 0 ? 'Start Practice' : 'Coming Soon'}
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white text-white hover:bg-white/10"
-              onClick={() => setShowInsights(true)}
-            >
-              <BarChart3 size={20} className="mr-2" />
-              View Insights
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* Standardized Hero Banner */}
+      <HeroBanner {...heroBannerProps} />
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-500 rounded-lg">
-                <BookOpen className="text-white" size={24} />
-              </div>
-              <Badge variant="secondary" className="bg-blue-200 text-blue-700">
-                Available
-              </Badge>
-            </div>
-            <h3 className="text-2xl font-bold text-blue-900">{totalQuestions}</h3>
-            <p className="text-blue-700 text-sm">Total Questions</p>
-          </CardContent>
-        </Card>
+      {/* Standardized Metrics Cards */}
+      <MetricsCards metrics={metricsConfig} />
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-500 rounded-lg">
-                <Target className="text-white" size={24} />
-              </div>
-              <Badge variant="secondary" className="bg-green-200 text-green-700">
-                +15%
-              </Badge>
-            </div>
-            <h3 className="text-2xl font-bold text-green-900">85%</h3>
-            <p className="text-green-700 text-sm">Average Score</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-500 rounded-lg">
-                <Clock className="text-white" size={24} />
-              </div>
-              <Badge variant="secondary" className="bg-purple-200 text-purple-700">
-                This week
-              </Badge>
-            </div>
-            <h3 className="text-2xl font-bold text-purple-900">4.2h</h3>
-            <p className="text-purple-700 text-sm">Study Time</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-500 rounded-lg">
-                <TrendingUp className="text-white" size={24} />
-              </div>
-              <Badge variant="secondary" className="bg-orange-200 text-orange-700">
-                7 days
-              </Badge>
-            </div>
-            <h3 className="text-2xl font-bold text-orange-900">7</h3>
-            <p className="text-orange-700 text-sm">Day Streak</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Grid */}
+      {/* Main Content Grid - White Background */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Activity & Quick Practice */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Practice Section */}
-          <Card>
+          <Card className="bg-white">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
@@ -452,7 +431,7 @@ const Dashboard: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => navigate('/mock-tests')}
+                  onClick={() => navigate('/dashboard/practice-tests')}
                 >
                   View All
                 </Button>
@@ -490,7 +469,7 @@ const Dashboard: React.FC = () => {
                   <p className="text-gray-600 mb-4">
                     We're preparing practice questions for {testData?.name || 'this test type'}.
                   </p>
-                  <Button variant="outline" onClick={() => navigate('/mock-tests')}>
+                  <Button variant="outline" onClick={() => navigate('/dashboard/practice-tests')}>
                     Explore Other Tests
                   </Button>
                 </div>

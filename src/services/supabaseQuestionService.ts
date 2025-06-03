@@ -46,6 +46,8 @@ export interface TestType {
   id: string;
   name: string;
   testModes: TestMode[];
+  drillModes?: TestMode[];
+  diagnosticModes?: TestMode[];
 }
 
 export interface OrganizedTestData {
@@ -170,7 +172,12 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
 
     // Transform grouped data into the frontend structure
     const testTypes: TestType[] = Object.entries(groupedData).map(([testTypeName, testModes]) => {
-      const testModeEntries: TestMode[] = Object.entries(testModes).map(([testModeName, sections]) => {
+      // Separate test modes by type
+      const practiceTestModes: TestMode[] = [];
+      const drillModes: TestMode[] = [];
+      const diagnosticModes: TestMode[] = [];
+
+      Object.entries(testModes).forEach(([testModeName, sections]) => {
         const sectionEntries: TestSection[] = Object.entries(sections).map(([sectionName, sectionQuestions]) => {
           const transformedQuestions = sectionQuestions.map(q => {
             const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
@@ -190,7 +197,7 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
         const modeInfo = TEST_MODE_MAPPING[testModeName] || { name: testModeName, type: 'practice' as const };
         const totalQuestions = sectionEntries.reduce((sum, section) => sum + section.totalQuestions, 0);
 
-        return {
+        const testMode: TestMode = {
           id: testModeName,
           name: modeInfo.name,
           type: modeInfo.type,
@@ -200,6 +207,15 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
           difficulty: 'Medium', // Default difficulty
           description: getTestModeDescription(modeInfo.type, sectionEntries.length),
         };
+
+        // Categorize by test mode type
+        if (modeInfo.type === 'practice') {
+          practiceTestModes.push(testMode);
+        } else if (modeInfo.type === 'drill') {
+          drillModes.push(testMode);
+        } else if (modeInfo.type === 'diagnostic') {
+          diagnosticModes.push(testMode);
+        }
       });
 
       const frontendId = TEST_TYPE_MAPPING[testTypeName] || testTypeName.toLowerCase().replace(/\s+/g, '-');
@@ -207,7 +223,9 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
       return {
         id: frontendId,
         name: testTypeName,
-        testModes: testModeEntries,
+        testModes: practiceTestModes, // Only include practice test modes in the main structure
+        drillModes: drillModes, // Add separate property for drill modes
+        diagnosticModes: diagnosticModes, // Add separate property for diagnostic modes
       };
     });
 
@@ -274,68 +292,248 @@ export function getPlaceholderTestStructure(testTypeId: string): TestType {
     'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
   };
 
-  const placeholderSections: Record<string, string[]> = {
-    'year-5-naplan': ['Reading', 'Writing', 'Language Conventions', 'Numeracy'],
-    'year-7-naplan': ['Reading', 'Writing', 'Language Conventions', 'Numeracy'],
-    'acer-scholarship': ['Reading Comprehension', 'Mathematics', 'Written Expression', 'Thinking Skills'],
-    'edutest-scholarship': ['Reading Comprehension', 'Mathematics', 'Verbal Reasoning', 'Numerical Reasoning', 'Written Expression'],
-    'vic-selective': ['Reading Reasoning', 'Mathematical Reasoning', 'Verbal Reasoning', 'Quantitative Reasoning', 'Written Expression'],
-    'nsw-selective': ['Reading', 'Mathematical Reasoning', 'Thinking Skills', 'Writing'],
-  };
-
-  const sections = placeholderSections[testTypeId] || ['Section 1'];
-  
-  const placeholderTestModes: TestMode[] = [
-    {
-      id: 'diagnostic',
-      name: 'Diagnostic Test',
-      type: 'diagnostic',
-      sections: sections.map(sectionName => ({
-        id: sectionName.toLowerCase().replace(/\s+/g, '-'),
-        name: sectionName,
-        questions: [],
-        totalQuestions: 0,
-        status: 'not-started' as const,
-      })),
-      totalQuestions: 0,
-      estimatedTime: 0,
-      description: 'Questions coming soon...',
-    },
-    {
-      id: 'practice_1',
-      name: 'Practice Test 1',
-      type: 'practice',
-      sections: sections.map(sectionName => ({
-        id: sectionName.toLowerCase().replace(/\s+/g, '-'),
-        name: sectionName,
-        questions: [],
-        totalQuestions: 0,
-        status: 'not-started' as const,
-      })),
-      totalQuestions: 0,
-      estimatedTime: 0,
-      description: 'Questions coming soon...',
-    },
-    {
-      id: 'drill',
-      name: 'Skill Drills',
-      type: 'drill',
-      sections: sections.map(sectionName => ({
-        id: sectionName.toLowerCase().replace(/\s+/g, '-'),
-        name: sectionName,
-        questions: [],
-        totalQuestions: 0,
-        status: 'not-started' as const,
-      })),
-      totalQuestions: 0,
-      estimatedTime: 0,
-      description: 'Questions coming soon...',
-    },
-  ];
+  const name = testTypeNames[testTypeId] || 'Unknown Test Type';
 
   return {
     id: testTypeId,
-    name: testTypeNames[testTypeId] || testTypeId,
-    testModes: placeholderTestModes,
+    name,
+    testModes: [
+      {
+        id: 'practice_1',
+        name: 'Practice Test 1',
+        type: 'practice',
+        sections: [],
+        totalQuestions: 0,
+        estimatedTime: 0,
+        difficulty: 'Medium',
+        description: 'Coming soon',
+      }
+    ],
+    drillModes: [],
+    diagnosticModes: [],
   };
+}
+
+export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
+  try {
+    console.log('🔧 DEBUG: Fetching drill questions for test type:', testTypeId);
+    
+    // Map frontend testTypeId to database test_type
+    const dbTestType = Object.keys(TEST_TYPE_MAPPING).find(
+      key => TEST_TYPE_MAPPING[key] === testTypeId
+    );
+    
+    if (!dbTestType) {
+      console.warn('🔧 DEBUG: No database test type found for:', testTypeId);
+      return [];
+    }
+    
+    console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
+    
+    // Fetch all drill questions for this test type
+    const { data: drillQuestions, error } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('test_type', dbTestType)
+      .eq('test_mode', 'drill');
+      
+    if (error) {
+      console.error('🔧 DEBUG: Error fetching drill questions:', error);
+      return [];
+    }
+    
+    if (!drillQuestions || drillQuestions.length === 0) {
+      console.log('🔧 DEBUG: No drill questions found for test type:', dbTestType);
+      return [];
+    }
+    
+    console.log('🔧 DEBUG: Found', drillQuestions.length, 'drill questions');
+    
+    // Fetch passages for questions that have passage_id
+    const passageIds = drillQuestions
+      .filter(q => q.passage_id)
+      .map(q => q.passage_id);
+      
+    let passages: Passage[] = [];
+    if (passageIds.length > 0) {
+      const { data: passageData } = await supabase
+        .from('passages')
+        .select('*')
+        .in('id', passageIds);
+      passages = passageData || [];
+    }
+    
+    const passageMap = new Map(passages.map(p => [p.id, p]));
+    
+    // Group questions by section_name (skill areas) and then by sub_skill
+    const skillAreaMap = new Map<string, Map<string, Question[]>>();
+    
+    drillQuestions.forEach(question => {
+      const sectionName = question.section_name;
+      const subSkill = question.sub_skill || 'General';
+      
+      if (!skillAreaMap.has(sectionName)) {
+        skillAreaMap.set(sectionName, new Map());
+      }
+      
+      const subSkillMap = skillAreaMap.get(sectionName)!;
+      if (!subSkillMap.has(subSkill)) {
+        subSkillMap.set(subSkill, []);
+      }
+      
+      subSkillMap.get(subSkill)!.push(question);
+    });
+    
+    console.log('🔧 DEBUG: Grouped into skill areas:', Array.from(skillAreaMap.keys()));
+    
+    // Transform into TestMode structure
+    const drillModes: TestMode[] = Array.from(skillAreaMap.entries()).map(([sectionName, subSkillMap]) => {
+      const sections: TestSection[] = Array.from(subSkillMap.entries()).map(([subSkillName, questions]) => {
+        const transformedQuestions = questions.map(q => {
+          const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
+          return transformQuestion(q, passage);
+        });
+        
+        return {
+          id: `${sectionName}-${subSkillName}`.toLowerCase().replace(/\s+/g, '-'),
+          name: subSkillName,
+          questions: transformedQuestions,
+          totalQuestions: transformedQuestions.length,
+          timeLimit: Math.ceil(transformedQuestions.length * 1.5),
+          status: 'not-started' as const,
+        };
+      });
+      
+      const totalQuestions = sections.reduce((sum, section) => sum + section.totalQuestions, 0);
+      
+      console.log('🔧 DEBUG: Skill area:', sectionName, 'has', sections.length, 'sub-skills with', totalQuestions, 'total questions');
+      
+      return {
+        id: sectionName.toLowerCase().replace(/\s+/g, '-'),
+        name: sectionName,
+        type: 'drill' as const,
+        sections,
+        totalQuestions,
+        estimatedTime: Math.ceil(totalQuestions * 1.5),
+        description: `Practice ${sectionName} skills through targeted drill exercises`,
+      };
+    });
+    
+    console.log('🔧 DEBUG: Created', drillModes.length, 'drill modes');
+    drillModes.forEach(mode => {
+      console.log(`🔧 DEBUG: - ${mode.name}: ${mode.sections.length} sub-skills, ${mode.totalQuestions} questions`);
+    });
+    
+    return drillModes;
+  } catch (error) {
+    console.error('🔧 DEBUG: Error in fetchDrillModes:', error);
+    return [];
+  }
+}
+
+export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode[]> {
+  try {
+    console.log('🔧 DEBUG: Fetching diagnostic modes for test type:', testTypeId);
+    
+    // Map frontend testTypeId to database test_type
+    const dbTestType = Object.keys(TEST_TYPE_MAPPING).find(
+      key => TEST_TYPE_MAPPING[key] === testTypeId
+    );
+    
+    if (!dbTestType) {
+      console.warn('🔧 DEBUG: No database test type found for:', testTypeId);
+      return [];
+    }
+    
+    console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
+    
+    // Fetch all diagnostic questions for this test type
+    const { data: diagnosticQuestions, error } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('test_type', dbTestType)
+      .eq('test_mode', 'diagnostic');
+      
+    if (error) {
+      console.error('🔧 DEBUG: Error fetching diagnostic questions:', error);
+      return [];
+    }
+    
+    if (!diagnosticQuestions || diagnosticQuestions.length === 0) {
+      console.log('🔧 DEBUG: No diagnostic questions found for test type:', dbTestType);
+      return [];
+    }
+    
+    console.log('🔧 DEBUG: Found', diagnosticQuestions.length, 'diagnostic questions');
+    
+    // Fetch passages for questions that have passage_id
+    const passageIds = diagnosticQuestions
+      .filter(q => q.passage_id)
+      .map(q => q.passage_id);
+      
+    let passages: Passage[] = [];
+    if (passageIds.length > 0) {
+      const { data: passageData } = await supabase
+        .from('passages')
+        .select('*')
+        .in('id', passageIds);
+      passages = passageData || [];
+    }
+    
+    const passageMap = new Map(passages.map(p => [p.id, p]));
+    
+    // Group questions by section_name
+    const sectionMap = new Map<string, Question[]>();
+    
+    diagnosticQuestions.forEach(question => {
+      const sectionName = question.section_name;
+      
+      if (!sectionMap.has(sectionName)) {
+        sectionMap.set(sectionName, []);
+      }
+      
+      sectionMap.get(sectionName)!.push(question);
+    });
+    
+    console.log('🔧 DEBUG: Grouped into sections:', Array.from(sectionMap.keys()));
+    
+    // Transform into TestSection structure
+    const diagnosticSections: TestSection[] = Array.from(sectionMap.entries()).map(([sectionName, questions]) => {
+      const transformedQuestions = questions.map(q => {
+        const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
+        return transformQuestion(q, passage);
+      });
+      
+      return {
+        id: sectionName.toLowerCase().replace(/\s+/g, '-'),
+        name: sectionName,
+        questions: transformedQuestions,
+        totalQuestions: transformedQuestions.length,
+        timeLimit: Math.ceil(transformedQuestions.length * 1.5),
+        status: 'not-started' as const,
+      };
+    });
+    
+    const totalQuestions = diagnosticSections.reduce((sum, section) => sum + section.totalQuestions, 0);
+    
+    console.log('🔧 DEBUG: Created diagnostic sections:');
+    diagnosticSections.forEach(section => {
+      console.log(`🔧 DEBUG: - ${section.name}: ${section.totalQuestions} questions`);
+    });
+    
+    return [{
+      id: 'diagnostic',
+      name: 'Diagnostic Test',
+      type: 'diagnostic' as const,
+      sections: diagnosticSections,
+      totalQuestions,
+      estimatedTime: Math.ceil(totalQuestions * 1.5),
+      difficulty: 'Medium',
+      description: `Comprehensive assessment covering ${diagnosticSections.length} areas with ${totalQuestions} questions to identify your strengths and areas for improvement.`
+    }];
+    
+  } catch (error) {
+    console.error('Error fetching diagnostic modes:', error);
+    return [];
+  }
 } 

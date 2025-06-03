@@ -710,6 +710,11 @@ export async function generateReadingComprehensionSection(
       // Assign passage difficulty - cycle through 1, 2, 3 for variety
       const passageDifficulty = (i % 3) + 1;
       
+      const yearLevel = testType.includes('Year 5') ? 'Year 5' : 
+                        testType.includes('Year 7') ? 'Year 7' :
+                        testType.includes('Year 6') ? 'Year 6' : 
+                        testType.includes('Year 9') ? 'Year 9' : 'Year 8';
+      
       const passageResponse = await generatePassageWithMultipleQuestions(
         testType,
         yearLevel,
@@ -1297,7 +1302,8 @@ export async function generateFullDrillSet(testType: string): Promise<FullTestRe
 
             const yearLevel = testType.includes('Year 5') ? 'Year 5' : 
                               testType.includes('Year 7') ? 'Year 7' :
-                              testType.includes('Year 6') ? 'Year 6' : 'Year 8';
+                              testType.includes('Year 6') ? 'Year 6' : 
+                              testType.includes('Year 9') ? 'Year 9' : 'Year 8';
 
             const passageResponse = await generatePassageWithMultipleQuestions(
               testType,
@@ -1335,21 +1341,22 @@ export async function generateFullDrillSet(testType: string): Promise<FullTestRe
         totalQuestions += allQuestions.length;
 
       } else if (sectionName === 'Written Expression' || sectionName === 'Writing') {
-        // Writing drills: 10 tasks per difficulty level (30 total)
+        // Writing drills: 2 prompts per sub-skill (4 total for VIC Selective Entry)
         const yearLevel = testType.includes('Year 5') ? 'Year 5' : 
                           testType.includes('Year 7') ? 'Year 7' :
-                          testType.includes('Year 6') ? 'Year 6' : 'Year 8';
+                          testType.includes('Year 6') ? 'Year 6' : 
+                          testType.includes('Year 9') ? 'Year 9' : 'Year 8';
 
         const allQuestions = [];
 
-        for (let difficulty = 1; difficulty <= 3; difficulty++) {
+        for (const subSkill of subSkills) {
           const writingRequest: QuestionGenerationRequest = {
             testType,
             yearLevel,
             sectionName,
-            subSkill: subSkills[0],
-            difficulty,
-            questionCount: 10, // 10 tasks per difficulty
+            subSkill,
+            difficulty: 2, // Standard difficulty for writing prompts
+            questionCount: 2, // 2 prompts per sub-skill
             testMode
           };
 
@@ -1371,7 +1378,8 @@ export async function generateFullDrillSet(testType: string): Promise<FullTestRe
         // Other sections: 30 questions per sub-skill (10 per difficulty level)
         const yearLevel = testType.includes('Year 5') ? 'Year 5' : 
                           testType.includes('Year 7') ? 'Year 7' :
-                          testType.includes('Year 6') ? 'Year 6' : 'Year 8';
+                          testType.includes('Year 6') ? 'Year 6' : 
+                          testType.includes('Year 9') ? 'Year 9' : 'Year 8';
 
         const allQuestions = [];
 
@@ -1468,7 +1476,7 @@ async function callClaudeAPI(prompt: string): Promise<ClaudeAPIResponse> {
     },
     body: JSON.stringify({
       model: CLAUDE_MODEL,
-      max_tokens: 4000,
+      max_tokens: 8000,
       messages: [
         {
           role: 'user',
@@ -2137,8 +2145,10 @@ export async function generateStandaloneQuestions(
     // Check if visual is required for this sub-skill (not applicable for writing sections)
     const visualRequired = !isWritingSection && isSubSkillVisualRequired(subSkill);
     
-    // Enhanced instruction for Claude about visual authenticity and generation
-    const visualInstruction = visualRequired ? `
+    // Temporarily disable visuals for spatial problem solving to prevent token overflow
+    const actualVisualRequired = subSkill === "Spatial problem solving" ? false : visualRequired;
+    
+    const visualInstruction = actualVisualRequired ? `
     VISUAL REQUIREMENTS:
     - This sub-skill requires a visual that should be very close / similar to what appears in real ${testType} tests
     - Visuals should be simple and clean in design
@@ -2244,7 +2254,7 @@ SECTION: ${sectionName}
 SUB-SKILL: ${subSkill}
 DIFFICULTY: ${difficulty} (${difficultyGuidance})
 YEAR LEVEL: ${yearLevel}
-VISUAL REQUIRED: ${visualRequired}
+VISUAL REQUIRED: ${actualVisualRequired}
 
 ${authenticityGuidance}
 
@@ -2262,10 +2272,12 @@ CRITICAL AUTHENTICITY REQUIREMENTS:
 - Each question must contain ALL necessary information
 - Exactly 4 multiple choice options (A, B, C, D)
 - One clearly correct answer
-- Detailed explanation for the correct answer
+- **Keep explanations BRIEF (1-2 sentences maximum)** - Do NOT write lengthy explanations
+- **Do NOT include quotes or complex punctuation in explanations**
 - Australian educational standards compliance
 - Age-appropriate content for ${yearLevel} students
-${visualRequired ? '- Include authentic test-appropriate visual matching real test standards' : ''}
+${actualVisualRequired ? '- Include authentic test-appropriate visual matching real test standards' : ''}
+${subSkill === "Spatial problem solving" ? '- DO NOT include any visualSpecification object - questions must be purely text-based' : ''}
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -2274,10 +2286,10 @@ Return ONLY a valid JSON object with this exact structure:
       "questionText": "Self-contained question with all necessary information",
       "options": ["A) First option", "B) Second option", "C) Third option", "D) Fourth option"],
       "correctAnswer": "A",
-      "explanation": "Clear explanation of why A is correct",
+      "explanation": "Brief explanation of why A is correct",
       "difficulty": ${difficulty},
       "subSkill": "${subSkill}",
-      "hasVisual": ${visualRequired}
+      "hasVisual": ${actualVisualRequired}${subSkill === "Spatial problem solving" ? '' : actualVisualRequired ? ',\n      "visualSpecification": { /* visual spec here */ }' : ''}
     }
   ],
   "metadata": {
@@ -2302,13 +2314,80 @@ Return ONLY a valid JSON object with this exact structure:
     let parsedResponse;
     try {
       const content = response.content?.[0]?.text || (response as unknown as string);
-      const jsonMatch = typeof content === 'string' ? content.match(/\{[\s\S]*\}/) : null;
+      let jsonMatch = typeof content === 'string' ? content.match(/\{[\s\S]*\}/) : null;
       
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }
+
+      let jsonString = jsonMatch[0];
       
-      parsedResponse = JSON.parse(jsonMatch[0]);
+      // Try to parse the JSON, but if it fails due to malformed content (like embedded quotes),
+      // attempt to fix common issues
+      try {
+        parsedResponse = JSON.parse(jsonString);
+      } catch (firstParseError) {
+        console.warn('🔧 Initial JSON parse failed, attempting to fix malformed JSON...');
+        
+        // Common fix: if the explanation field contains unescaped quotes, try to fix them
+        // This is a simplified fix for the most common case
+        const fixedJsonString = jsonString.replace(
+          /"explanation":\s*"([^"]*(?:"[^"]*)*[^"]*)"/g, 
+          (match, explanation) => {
+            // If the explanation contains quotes, escape them properly
+            const escapedExplanation = explanation
+              .replace(/\\"/g, '\\"')  // Keep already escaped quotes
+              .replace(/(?<!\\)"/g, '\\"'); // Escape unescaped quotes
+            return `"explanation": "${escapedExplanation}"`;
+          }
+        );
+        
+        try {
+          parsedResponse = JSON.parse(fixedJsonString);
+          console.log('✅ Successfully fixed malformed JSON');
+        } catch (secondParseError) {
+          console.warn('🔧 Advanced JSON fix attempt...');
+          
+          // If that doesn't work, try to extract key components manually
+          try {
+            // Extract the essential parts using regex
+            const questionTextMatch = jsonString.match(/"questionText":\s*"([^"]+(?:\\.[^"]*)*)"/);
+            const optionsMatch = jsonString.match(/"options":\s*(\[[^\]]*\])/);
+            const correctAnswerMatch = jsonString.match(/"correctAnswer":\s*"([^"]+)"/);
+            const difficultyMatch = jsonString.match(/"difficulty":\s*(\d+)/);
+            const subSkillMatch = jsonString.match(/"subSkill":\s*"([^"]+)"/);
+            
+            if (questionTextMatch && optionsMatch && correctAnswerMatch && difficultyMatch && subSkillMatch) {
+              console.log('✅ Manually extracted question components');
+              parsedResponse = {
+                questions: [{
+                  questionText: questionTextMatch[1].replace(/\\"/g, '"'),
+                  options: JSON.parse(optionsMatch[1]),
+                  correctAnswer: correctAnswerMatch[1],
+                  explanation: "Explanation extracted but was malformed. This question needs manual review.",
+                  difficulty: parseInt(difficultyMatch[1]),
+                  subSkill: subSkillMatch[1],
+                  hasVisual: false
+                }],
+                metadata: {
+                  testType,
+                  sectionName,
+                  subSkill,
+                  difficulty,
+                  generatedAt: new Date().toISOString(),
+                  complianceChecked: false // Mark as needing review
+                }
+              };
+            } else {
+              throw new Error('Could not extract essential question components');
+            }
+          } catch (extractionError) {
+            console.error('❌ All JSON parsing attempts failed');
+            console.error('Original response content:', content);
+            throw new Error('Invalid JSON response from Claude API - all parsing attempts failed');
+          }
+        }
+      }
     } catch (parseError) {
       console.error('Failed to parse Claude response:', response);
       throw new Error('Invalid JSON response from Claude API');
@@ -2322,7 +2401,7 @@ Return ONLY a valid JSON object with this exact structure:
     // Process each question to add visuals if needed (only for non-writing sections)
     if (!isWritingSection) {
     for (const question of parsedResponse.questions) {
-      if (visualRequired) {
+      if (actualVisualRequired) {
         // Now we pass the actual question text to the visual generator
         // This ensures the visual is tailored to the specific question
         const visualSpec = await generateEducationalVisualSpec(
@@ -2342,7 +2421,28 @@ Return ONLY a valid JSON object with this exact structure:
       }
     }
 
-    console.log(`✅ Successfully generated ${parsedResponse.questions.length} ${isWritingSection ? 'writing prompts' : 'standalone questions'}${!isWritingSection && visualRequired ? ' (with visuals)' : ''}`);
+    // 🔧 CRITICAL FIX: Ensure all questions have proper difficulty values
+    parsedResponse.questions.forEach((question: any, index: number) => {
+      // If difficulty is missing or invalid, assign the requested difficulty
+      if (question.difficulty === undefined || question.difficulty === null || 
+          typeof question.difficulty !== 'number' || 
+          question.difficulty < 1 || question.difficulty > 3) {
+        console.warn(`⚠️ Question ${index + 1} missing/invalid difficulty (${question.difficulty}), assigning ${difficulty}`);
+        question.difficulty = difficulty;
+      }
+      
+      // Ensure subSkill is properly assigned
+      if (!question.subSkill) {
+        question.subSkill = subSkill;
+      }
+      
+      // Ensure hasVisual is boolean
+      if (typeof question.hasVisual !== 'boolean') {
+        question.hasVisual = actualVisualRequired || false;
+      }
+    });
+
+    console.log(`✅ Successfully generated ${parsedResponse.questions.length} ${isWritingSection ? 'writing prompts' : 'standalone questions'}${!isWritingSection && actualVisualRequired ? ' (with visuals)' : ''}`);
 
     return {
       questions: parsedResponse.questions,
@@ -2472,7 +2572,7 @@ export async function saveGeneratedQuestions(
         // 🔥 CRITICAL FIX: Handle writing sections with null values
         answer_options: isWritingSection ? null : question.options,  
         correct_answer: isWritingSection ? null : question.correctAnswer,
-        solution: isWritingSection ? null : question.explanation,
+        solution: isWritingSection ? question.explanation : question.explanation,
         test_mode: testMode || 'practice',
         created_at: new Date().toISOString()
       };

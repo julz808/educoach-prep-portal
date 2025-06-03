@@ -29,6 +29,7 @@ interface QuickStat {
   trendValue?: string;
 }
 
+// Reordered navigation to match user flow: Dashboard, Diagnostic, Drill, Practice Tests, Performance Insights
 const navigationItems: NavigationItem[] = [
   {
     id: 'dashboard',
@@ -45,19 +46,19 @@ const navigationItems: NavigationItem[] = [
     description: 'Assess your current level'
   },
   {
+    id: 'drill',
+    label: 'Drill',
+    icon: <Brain size={20} />,
+    path: '/dashboard/drill',
+    description: 'Practice specific skills'
+  },
+  {
     id: 'practice-tests',
     label: 'Practice Tests',
     icon: <BookOpen size={20} />,
     path: '/dashboard/practice-tests',
     badge: '5 tests',
     description: 'Full practice examinations'
-  },
-  {
-    id: 'drill',
-    label: 'Drill',
-    icon: <Brain size={20} />,
-    path: '/dashboard/drill',
-    description: 'Practice specific skills'
   },
   {
     id: 'insights',
@@ -148,7 +149,7 @@ const Layout: React.FC = () => {
               {!sidebarCollapsed && (
                 <div>
                   <h1 className="text-2xl font-bold text-edu-navy">EduCourse</h1>
-                  <p className="text-sm text-edu-navy/60">{currentProduct?.name || 'Learning Platform'}</p>
+                  <p className="text-sm text-edu-navy/60">Learning Platform</p>
                 </div>
               )}
               <Button
@@ -161,6 +162,28 @@ const Layout: React.FC = () => {
               </Button>
             </div>
           </div>
+
+          {/* Test Product Selector - Moved to Sidebar */}
+          {!sidebarCollapsed && (
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Test Product</h3>
+              <Select value={selectedProduct} onValueChange={handleProductChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select test product" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allProducts.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{product.name}</span>
+                        <span className="text-xs text-muted-foreground">{product.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Quick Stats - Desktop Only */}
           {!sidebarCollapsed && (
@@ -313,6 +336,23 @@ const Layout: React.FC = () => {
                 </Button>
               </div>
               
+              {/* Mobile Test Selector */}
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Test Product</h3>
+                <Select value={selectedProduct} onValueChange={handleProductChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allProducts.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        {product.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <nav className="flex-1 p-6">
                 <div className="space-y-2">
                   {navigationItems.map((item) => (
@@ -342,49 +382,14 @@ const Layout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - Removed Page Header */}
       <main className={cn(
         "transition-all duration-300",
         "lg:ml-80 lg:pl-0 pt-20 lg:pt-0",
         sidebarCollapsed && "lg:ml-20"
       )}>
         <div className="min-h-screen">
-          {/* Page Header - Desktop */}
-          <div className="hidden lg:block bg-white border-b border-gray-100 px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-edu-navy">
-                  {currentItem?.label || 'Dashboard'}
-                </h2>
-                <p className="text-edu-navy/60 mt-1">
-                  {currentProduct?.description || 'Welcome back to your learning journey'}
-                </p>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <Select value={selectedProduct} onValueChange={handleProductChange}>
-                  <SelectTrigger className="w-64">
-                    <SelectValue placeholder="Select test product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allProducts.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{product.name}</span>
-                          <span className="text-xs text-muted-foreground">{product.description}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button variant="ghost" size="sm">
-                  <Bell size={16} />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Page Content */}
+          {/* Page Content - No more page header */}
           <div className="p-4 lg:p-8">
             <Outlet />
           </div>

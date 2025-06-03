@@ -279,7 +279,7 @@ const TestTaking: React.FC = () => {
     const accuracy = Math.round((correctAnswers / answeredQuestions) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50 p-8">
+      <div className="min-h-screen bg-white p-8">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Results Header */}
           <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white">
@@ -344,7 +344,7 @@ const TestTaking: React.FC = () => {
     const isCorrect = userAnswer === question.correctAnswer;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50 p-8">
+      <div className="min-h-screen bg-white p-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Review Header */}
           <Card>
@@ -451,7 +451,7 @@ const TestTaking: React.FC = () => {
 
   // Test taking interface
   return (
-    <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50 p-8">
+    <div className="min-h-screen bg-white p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Test Header */}
         <Card>

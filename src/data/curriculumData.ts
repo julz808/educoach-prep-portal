@@ -895,7 +895,10 @@ export const getSubSkillsForSection = (sectionName: string, testType?: string): 
   }
 
   if (testType === "VIC Selective Entry (Year 9 Entry)") {
+    if (sectionName === "Reading Reasoning") return SECTION_TO_SUB_SKILLS["Reading Reasoning"];
     if (sectionName === "Mathematical Reasoning") return VIC_MATH_SKILLS;
+    if (sectionName === "Verbal Reasoning") return SECTION_TO_SUB_SKILLS["Verbal Reasoning"];
+    if (sectionName === "Quantitative Reasoning") return SECTION_TO_SUB_SKILLS["Quantitative Reasoning"];
     if (sectionName === "Written Expression") return VIC_WRITING_SKILLS;
   }
 

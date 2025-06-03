@@ -1,934 +1,948 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { HeroBanner } from '@/components/ui/hero-banner';
+import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
   BookOpen, Clock, Target, Play, Trophy, BarChart3, 
-  ArrowRight, ChevronLeft, Zap, Star, CheckCircle, 
-  Brain, Calculator, PenTool, Globe
+  ArrowRight, ChevronLeft, ChevronDown, ChevronRight,
+  CheckCircle, AlertCircle, Brain, Star, Zap, Flag,
+  RotateCcw, ArrowLeft, Award, TrendingUp, Users,
+  Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
+import { 
+  fetchDrillModes, 
+  type TestMode, 
+  type TestSection,
+  type OrganizedQuestion
+} from '@/services/supabaseQuestionService';
 
-interface DrillSkill {
+interface SubSkillProgress {
+  easy: { completed: number; total: number; bestScore?: number };
+  medium: { completed: number; total: number; bestScore?: number };
+  hard: { completed: number; total: number; bestScore?: number };
+}
+
+interface SubSkill {
+  id: string;
+  name: string;
+  description?: string;
+  questions: OrganizedQuestion[];
+  progress: SubSkillProgress;
+  isRecommended?: boolean;
+  totalQuestions: number;
+  completedQuestions: number;
+}
+
+interface SkillArea {
   id: string;
   name: string;
   description: string;
-  questions: number;
-  timePerQuestion: number;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  mastery: number; // 0-100
-  status: 'locked' | 'available' | 'in-progress' | 'mastered';
-  streak: number;
-  lastPracticed?: string;
-  sampleQuestions?: {
-    id: number;
-    text: string;
-    options: string[];
-    correctAnswer: string;
-    explanation: string;
-  }[];
-}
-
-interface DrillSubject {
-  id: string;
-  name: string;
-  icon: React.ComponentType<any>;
+  icon: string;
   color: string;
-  skills: DrillSkill[];
-  totalMastery: number;
+  subSkills: SubSkill[];
+  totalQuestions: number;
+  completedQuestions: number;
+  isExpanded: boolean;
 }
 
-interface ProductDrills {
-  [key: string]: DrillSubject[];
+interface QuestionState {
+  question: OrganizedQuestion;
+  skillAreaId: string;
+  skillAreaName: string;
+  subSkillId: string;
+  subSkillName: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  questionNumber: number;
+  totalInDifficulty: number;
 }
-
-const productDrills: ProductDrills = {
-  'year-7-naplan': [
-    {
-      id: 'reading',
-      name: 'Reading & Comprehension',
-      icon: BookOpen,
-      color: 'from-blue-500 to-blue-600',
-      totalMastery: 72,
-      skills: [
-        {
-          id: 'main-idea',
-          name: 'Main Ideas',
-          description: 'Identify the central theme and main ideas in texts',
-          questions: 25,
-          timePerQuestion: 90,
-          difficulty: 'Beginner',
-          mastery: 85,
-          status: 'mastered',
-          streak: 7,
-          lastPracticed: '2024-01-18'
-        },
-        {
-          id: 'inference',
-          name: 'Making Inferences',
-          description: 'Draw logical conclusions from text evidence',
-          questions: 30,
-          timePerQuestion: 120,
-          difficulty: 'Intermediate',
-          mastery: 68,
-          status: 'in-progress',
-          streak: 3,
-          lastPracticed: '2024-01-17'
-        },
-        {
-          id: 'vocabulary',
-          name: 'Vocabulary in Context',
-          description: 'Determine word meanings using context clues',
-          questions: 20,
-          timePerQuestion: 60,
-          difficulty: 'Beginner',
-          mastery: 92,
-          status: 'mastered',
-          streak: 12,
-          lastPracticed: '2024-01-16'
-        },
-        {
-          id: 'text-structure',
-          name: 'Text Structure',
-          description: 'Analyze how texts are organized and structured',
-          questions: 25,
-          timePerQuestion: 100,
-          difficulty: 'Advanced',
-          mastery: 45,
-          status: 'available',
-          streak: 0
-        }
-      ]
-    }
-    // ... other NAPLAN subjects
-  ],
-  'edutest-year-7': [
-    {
-      id: 'english-comprehension',
-      name: 'English Comprehension',
-      icon: BookOpen,
-      color: 'from-emerald-500 to-emerald-600',
-      totalMastery: 78,
-      skills: [
-        {
-          id: 'reading-comprehension',
-          name: 'Reading Comprehension',
-          description: 'Understand and analyze written texts',
-          questions: 15,
-          timePerQuestion: 120,
-          difficulty: 'Intermediate',
-          mastery: 82,
-          status: 'in-progress',
-          streak: 4,
-          lastPracticed: '2024-01-18',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "Read the passage:\n\n\"Marine biologists have discovered that dolphins use a complex system of clicks and whistles to communicate. Each dolphin has a unique 'signature whistle' that functions like a name. When dolphins meet, they often exchange these signature whistles as a form of greeting.\"\n\nWhat is the main purpose of signature whistles in dolphin communication?",
-              options: [
-                "A) To locate food sources",
-                "B) To function like names for identification",
-                "C) To warn of predators",
-                "D) To navigate underwater"
-              ],
-              correctAnswer: "B",
-              explanation: "The passage states that signature whistles 'function like a name' and are used when dolphins 'exchange these signature whistles as a form of greeting.'"
-            },
-            {
-              id: 2,
-              text: "Choose the best meaning for the word 'complex' in the context: 'dolphins use a complex system of clicks and whistles'",
-              options: [
-                "A) Simple",
-                "B) Loud", 
-                "C) Complicated",
-                "D) Musical"
-              ],
-              correctAnswer: "C",
-              explanation: "In this context, 'complex' means complicated or intricate, referring to the sophisticated nature of dolphin communication."
-            },
-            {
-              id: 3,
-              text: "Based on the passage, what can you infer about dolphin intelligence?",
-              options: [
-                "A) Dolphins are not very smart",
-                "B) Dolphins have advanced communication abilities",
-                "C) Dolphins only make random sounds",
-                "D) Dolphins cannot recognize each other"
-              ],
-              correctAnswer: "B",
-              explanation: "The passage describes a sophisticated communication system with individual signatures, suggesting advanced intelligence and social behavior."
-            }
-          ]
-        },
-        {
-          id: 'vocabulary-skills',
-          name: 'Vocabulary Skills',
-          description: 'Build and apply vocabulary knowledge',
-          questions: 20,
-          timePerQuestion: 90,
-          difficulty: 'Beginner',
-          mastery: 88,
-          status: 'mastered',
-          streak: 8,
-          lastPracticed: '2024-01-17',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "Which word is most similar in meaning to 'cautious'?",
-              options: [
-                "A) Reckless",
-                "B) Careful",
-                "C) Speedy",
-                "D) Confused"
-              ],
-              correctAnswer: "B",
-              explanation: "'Cautious' means being careful and avoiding risks, so 'careful' is the most similar meaning."
-            },
-            {
-              id: 2,
-              text: "Complete the analogy: Hot is to Cold as Tall is to ____",
-              options: [
-                "A) High",
-                "B) Short",
-                "C) Wide",
-                "D) Thin"
-              ],
-              correctAnswer: "B",
-              explanation: "Hot and cold are opposites, just as tall and short are opposites."
-            },
-            {
-              id: 3,
-              text: "What does the prefix 'un-' mean in the word 'unhappy'?",
-              options: [
-                "A) Very",
-                "B) Not",
-                "C) Again", 
-                "D) Before"
-              ],
-              correctAnswer: "B",
-              explanation: "The prefix 'un-' means 'not', so 'unhappy' means 'not happy'."
-            }
-          ]
-        },
-        {
-          id: 'grammar-usage',
-          name: 'Grammar & Usage',
-          description: 'Apply proper grammar and language conventions',
-          questions: 18,
-          timePerQuestion: 75,
-          difficulty: 'Intermediate',
-          mastery: 65,
-          status: 'available',
-          streak: 2,
-          lastPracticed: '2024-01-15',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "Choose the correct sentence:",
-              options: [
-                "A) Me and Sarah went to the store",
-                "B) Sarah and I went to the store",
-                "C) Sarah and me went to the store",
-                "D) I and Sarah went to the store"
-              ],
-              correctAnswer: "B",
-              explanation: "When using pronouns with another person, use 'Sarah and I' as the subject of the sentence."
-            },
-            {
-              id: 2,
-              text: "Which sentence uses the apostrophe correctly?",
-              options: [
-                "A) The dogs bone was buried",
-                "B) The dog's bone was buried",
-                "C) The dogs' bone was buried",
-                "D) The dog's bone's was buried"
-              ],
-              correctAnswer: "B",
-              explanation: "Since there is one dog owning one bone, use 'dog's' with an apostrophe before the 's'."
-            },
-            {
-              id: 3,
-              text: "Identify the verb in this sentence: 'The quick brown fox jumps over the lazy dog.'",
-              options: [
-                "A) quick",
-                "B) fox",
-                "C) jumps",
-                "D) lazy"
-              ],
-              correctAnswer: "C",
-              explanation: "'Jumps' is the action word (verb) that tells us what the fox is doing."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'mathematics',
-      name: 'Mathematics',
-      icon: Calculator,
-      color: 'from-blue-500 to-purple-600',
-      totalMastery: 74,
-      skills: [
-        {
-          id: 'number-operations',
-          name: 'Number Operations',
-          description: 'Master basic arithmetic and number sense',
-          questions: 25,
-          timePerQuestion: 90,
-          difficulty: 'Beginner',
-          mastery: 85,
-          status: 'mastered',
-          streak: 12,
-          lastPracticed: '2024-01-18',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "What is 8 × 7 + 15?",
-              options: [
-                "A) 71",
-                "B) 176",
-                "C) 61",
-                "D) 121"
-              ],
-              correctAnswer: "A",
-              explanation: "Following order of operations: 8 × 7 = 56, then 56 + 15 = 71."
-            },
-            {
-              id: 2,
-              text: "Which number is closest to 247?",
-              options: [
-                "A) 200",
-                "B) 240",
-                "C) 250", 
-                "D) 300"
-              ],
-              correctAnswer: "C",
-              explanation: "247 is only 3 away from 250, making 250 the closest option."
-            },
-            {
-              id: 3,
-              text: "If 3/4 of a pizza has 12 slices, how many slices are in the whole pizza?",
-              options: [
-                "A) 9",
-                "B) 15",
-                "C) 16",
-                "D) 18"
-              ],
-              correctAnswer: "C",
-              explanation: "If 3/4 = 12 slices, then 1/4 = 4 slices, so the whole pizza = 4 × 4 = 16 slices."
-            }
-          ]
-        },
-        {
-          id: 'problem-solving',
-          name: 'Problem Solving',
-          description: 'Apply mathematical thinking to real-world problems',
-          questions: 20,
-          timePerQuestion: 150,
-          difficulty: 'Intermediate',
-          mastery: 72,
-          status: 'in-progress',
-          streak: 5,
-          lastPracticed: '2024-01-17',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "A school has 450 students. If 2/5 of them participate in sports, how many students participate in sports?",
-              options: [
-                "A) 180",
-                "B) 225",
-                "C) 270",
-                "D) 90"
-              ],
-              correctAnswer: "A",
-              explanation: "2/5 of 450 = (2 × 450) ÷ 5 = 900 ÷ 5 = 180 students."
-            },
-            {
-              id: 2,
-              text: "A train travels 240 km in 3 hours. At this rate, how far will it travel in 5 hours?",
-              options: [
-                "A) 300 km",
-                "B) 360 km",
-                "C) 400 km",
-                "D) 480 km"
-              ],
-              correctAnswer: "C",
-              explanation: "Speed = 240 ÷ 3 = 80 km/hour. In 5 hours: 80 × 5 = 400 km."
-            },
-            {
-              id: 3,
-              text: "Emma saves $15 each week. After how many weeks will she have saved at least $200?",
-              options: [
-                "A) 13 weeks",
-                "B) 14 weeks", 
-                "C) 15 weeks",
-                "D) 16 weeks"
-              ],
-              correctAnswer: "B",
-              explanation: "$200 ÷ $15 = 13.33 weeks. Since she can't save partial weeks, she needs 14 weeks to have at least $200."
-            }
-          ]
-        },
-        {
-          id: 'patterns-algebra',
-          name: 'Patterns & Basic Algebra',
-          description: 'Recognize patterns and solve simple equations',
-          questions: 15,
-          timePerQuestion: 120,
-          difficulty: 'Advanced',
-          mastery: 58,
-          status: 'available',
-          streak: 1,
-          lastPracticed: '2024-01-14',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "What is the next number in the sequence: 5, 11, 17, 23, ?",
-              options: [
-                "A) 27",
-                "B) 29",
-                "C) 31",
-                "D) 35"
-              ],
-              correctAnswer: "B",
-              explanation: "The pattern adds 6 each time: 5+6=11, 11+6=17, 17+6=23, 23+6=29."
-            },
-            {
-              id: 2,
-              text: "If x + 8 = 15, what is the value of x?",
-              options: [
-                "A) 7",
-                "B) 23",
-                "C) 8",
-                "D) 15"
-              ],
-              correctAnswer: "A",
-              explanation: "To solve x + 8 = 15, subtract 8 from both sides: x = 15 - 8 = 7."
-            },
-            {
-              id: 3,
-              text: "In the pattern below, what shape comes next?\n\n⭐ ⭐ 🔺 ⭐ ⭐ 🔺 ⭐ ⭐ ?",
-              options: [
-                "A) ⭐",
-                "B) 🔺",
-                "C) ⭐ 🔺",
-                "D) 🔺 ⭐"
-              ],
-              correctAnswer: "B",
-              explanation: "The pattern is: star, star, triangle, repeating. After two stars, the next shape is a triangle."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'general-ability',
-      name: 'General Ability', 
-      icon: Brain,
-      color: 'from-purple-500 to-pink-600',
-      totalMastery: 69,
-      skills: [
-        {
-          id: 'logical-reasoning',
-          name: 'Logical Reasoning',
-          description: 'Apply logical thinking to solve problems',
-          questions: 20,
-          timePerQuestion: 105,
-          difficulty: 'Intermediate',
-          mastery: 75,
-          status: 'in-progress',
-          streak: 6,
-          lastPracticed: '2024-01-18',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "All birds can fly. Penguins are birds. Therefore:",
-              options: [
-                "A) All penguins can fly",
-                "B) Some penguins can fly",
-                "C) No penguins can fly",
-                "D) The statement is illogical"
-              ],
-              correctAnswer: "D",
-              explanation: "The first statement is false because not all birds can fly (like penguins), making the logical conclusion impossible."
-            },
-            {
-              id: 2,
-              text: "If Tom is taller than Sam, and Sam is taller than Pete, who is the shortest?",
-              options: [
-                "A) Tom",
-                "B) Sam", 
-                "C) Pete",
-                "D) Cannot determine"
-              ],
-              correctAnswer: "C",
-              explanation: "Tom > Sam > Pete, so Pete is the shortest of the three."
-            },
-            {
-              id: 3,
-              text: "Which number doesn't belong in this group: 8, 15, 24, 35, 42?",
-              options: [
-                "A) 8",
-                "B) 15",
-                "C) 24",
-                "D) 35"
-              ],
-              correctAnswer: "A",
-              explanation: "All numbers except 8 are odd. The pattern appears to be odd numbers, making 8 the one that doesn't belong."
-            }
-          ]
-        },
-        {
-          id: 'pattern-recognition',
-          name: 'Pattern Recognition',
-          description: 'Identify and complete visual and numerical patterns',
-          questions: 18,
-          timePerQuestion: 90,
-          difficulty: 'Intermediate',
-          mastery: 71,
-          status: 'mastered',
-          streak: 9,
-          lastPracticed: '2024-01-17',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "What comes next in the sequence?\n\n🔴 🔵 🔴 🔴 🔵 🔴 🔴 🔴 ?",
-              options: [
-                "A) 🔴",
-                "B) 🔵",
-                "C) 🔴 🔵",
-                "D) 🔵 🔴"
-              ],
-              correctAnswer: "B",
-              explanation: "Pattern: 1 red, 1 blue, 2 red, 1 blue, 3 red, next should be 1 blue."
-            },
-            {
-              id: 2,
-              text: "Complete the number pattern: 2, 6, 18, 54, ?",
-              options: [
-                "A) 108",
-                "B) 150",
-                "C) 162",
-                "D) 216"
-              ],
-              correctAnswer: "C",
-              explanation: "Each number is multiplied by 3: 2×3=6, 6×3=18, 18×3=54, 54×3=162."
-            },
-            {
-              id: 3,
-              text: "Which shape completes the pattern?\n\n▢ ◯ ▢ ▢ ◯ ▢ ▢ ▢ ?",
-              options: [
-                "A) ▢",
-                "B) ◯",
-                "C) ▢ ◯",
-                "D) ◯ ▢"
-              ],
-              correctAnswer: "B",
-              explanation: "Pattern: 1 square, 1 circle, 2 squares, 1 circle, 3 squares, next is 1 circle."
-            }
-          ]
-        },
-        {
-          id: 'spatial-reasoning',
-          name: 'Spatial Reasoning',
-          description: 'Visualize and manipulate shapes and space',
-          questions: 12,
-          timePerQuestion: 120,
-          difficulty: 'Advanced',
-          mastery: 61,
-          status: 'available',
-          streak: 3,
-          lastPracticed: '2024-01-16',
-          sampleQuestions: [
-            {
-              id: 1,
-              text: "If you fold this shape along the dotted line, which option shows the result?\n\n[Imagine a square with a diagonal dotted line]",
-              options: [
-                "A) Triangle pointing up",
-                "B) Triangle pointing down", 
-                "C) Rectangle",
-                "D) Circle"
-              ],
-              correctAnswer: "A",
-              explanation: "Folding a square along its diagonal creates a triangle pointing upward."
-            },
-            {
-              id: 2,
-              text: "How many faces does a cube have?",
-              options: [
-                "A) 4",
-                "B) 6",
-                "C) 8", 
-                "D) 12"
-              ],
-              correctAnswer: "B",
-              explanation: "A cube has 6 square faces: top, bottom, front, back, left, and right."
-            },
-            {
-              id: 3,
-              text: "Which net would fold into a cube?",
-              options: [
-                "A) 6 squares in a straight line",
-                "B) 6 squares in a T-shape",
-                "C) 6 squares in a plus (+) shape",
-                "D) All of the above"
-              ],
-              correctAnswer: "C",
-              explanation: "A plus (+) shape with 6 squares can fold into a cube, while a straight line cannot."
-            }
-          ]
-        }
-      ]
-    }
-  ]
-};
 
 const Drill: React.FC = () => {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'skill-area' | 'sub-skill' | 'question'>('dashboard');
+  const [skillAreas, setSkillAreas] = useState<SkillArea[]>([]);
+  const [selectedSkillArea, setSelectedSkillArea] = useState<SkillArea | null>(null);
+  const [selectedSubSkill, setSelectedSubSkill] = useState<SubSkill | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionState | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
 
-  const drillSubjects = productDrills[selectedProduct] || [];
-
-  const totalSkills = drillSubjects.reduce((acc, subject) => acc + subject.skills.length, 0);
-  const masteredSkills = drillSubjects.reduce((acc, subject) => 
-    acc + subject.skills.filter(skill => skill.status === 'mastered').length, 0
-  );
-  const inProgressSkills = drillSubjects.reduce((acc, subject) => 
-    acc + subject.skills.filter(skill => skill.status === 'in-progress').length, 0
-  );
-  const overallMastery = Math.round(
-    drillSubjects.reduce((acc, subject) => acc + subject.totalMastery, 0) / drillSubjects.length
-  );
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Beginner':
-        return 'bg-green-100 text-green-700';
-      case 'Intermediate':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'Advanced':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'mastered':
-        return <CheckCircle size={16} className="text-green-600" />;
-      case 'in-progress':
-        return <Target size={16} className="text-orange-500" />;
-      case 'available':
-        return <Play size={16} className="text-blue-500" />;
-      case 'locked':
-        return <div className="w-4 h-4 bg-gray-300 rounded-full" />;
-      default:
-        return null;
-    }
-  };
-
-  const handleSubjectSelect = (subjectId: string) => {
-    setSelectedSubject(subjectId);
-  };
-
-  const handleStartDrill = (subjectId: string, skillId: string) => {
-    const subject = drillSubjects.find(s => s.id === subjectId);
-    const skill = subject?.skills.find(sk => sk.id === skillId);
-    
-    if (skill) {
-      navigate(`/test/drill/${subjectId}?skillId=${skillId}&skillName=${encodeURIComponent(skill.name)}`);
-    }
-  };
-
-  const selectedSubjectData = drillSubjects.find(subject => subject.id === selectedSubject);
-
-  if (selectedSubject && selectedSubjectData) {
-    return (
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => setSelectedSubject(null)}
-            className="flex items-center space-x-2"
-          >
-            <ChevronLeft size={16} />
-            <span>Back to Subjects</span>
-          </Button>
-        </div>
-
-        {/* Subject Overview */}
-        <div className={cn(
-          "bg-gradient-to-r rounded-2xl p-8 text-white",
-          selectedSubjectData.color
-        )}>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="mb-6 lg:mb-0">
-              <div className="flex items-center space-x-3 mb-2">
-                <selectedSubjectData.icon size={32} />
-                <h1 className="text-3xl lg:text-4xl font-bold">
-                  {selectedSubjectData.name}
-                </h1>
-              </div>
-              <p className="text-lg opacity-90 mb-4">
-                Master individual skills through focused practice
-              </p>
-              <div className="flex items-center space-x-6 text-sm">
-                <div className="flex items-center space-x-2">
-                  <Target size={16} />
-                  <span>{selectedSubjectData.skills.length} skills</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Trophy size={16} />
-                  <span>{selectedSubjectData.skills.filter(s => s.status === 'mastered').length} mastered</span>
-                </div>
-              </div>
-            </div>
+  useEffect(() => {
+    const loadDrillData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        console.log('🔧 DEBUG: Fetching drill modes for product:', selectedProduct);
+        const modes = await fetchDrillModes(selectedProduct);
+        console.log('🔧 DEBUG: Received drill modes:', modes);
+        console.log('🔧 DEBUG: Number of modes:', modes?.length);
+        
+        // Detailed logging of the data structure
+        if (modes && modes.length > 0) {
+          modes.forEach((mode, modeIndex) => {
+            console.log(`🔧 DEBUG: Mode ${modeIndex}:`, {
+              name: mode.name,
+              sections: mode.sections?.length || 0,
+              sectionNames: mode.sections?.map(s => s.name) || []
+            });
             
-            <div className="text-center">
-              <div className="text-4xl font-bold mb-2">{selectedSubjectData.totalMastery}%</div>
-              <div className="text-sm opacity-80">Subject Mastery</div>
-            </div>
-          </div>
-        </div>
+            if (mode.sections) {
+              mode.sections.forEach((section, sectionIndex) => {
+                console.log(`🔧 DEBUG: Mode "${mode.name}" -> Section ${sectionIndex}:`, {
+                  name: section.name,
+                  questionsCount: section.questions?.length || 0
+                });
+              });
+            }
+          });
+        }
+        
+        // Check if we have real data from the database
+        if (!modes || modes.length === 0) {
+          console.log('🔧 DEBUG: No drill modes found, using fallback message');
+          setSkillAreas([]);
+          return;
+        }
+        
+        // Transform real Supabase data into hierarchical structure
+        const skillAreasMap = new Map<string, SkillArea>();
+        
+        modes.forEach(mode => {
+          console.log('🔧 DEBUG: Processing mode:', mode.name, 'with sections:', mode.sections);
+          
+          // Each mode represents a skill area (section_name from database)
+          const skillAreaName = mode.name;
+          
+          if (!skillAreasMap.has(skillAreaName)) {
+            skillAreasMap.set(skillAreaName, {
+              id: skillAreaName.toLowerCase().replace(/\s+/g, '-'),
+              name: skillAreaName,
+              description: mode.description || `Practice ${skillAreaName.toLowerCase()} skills`,
+              icon: getSkillAreaIcon(skillAreaName),
+              color: getSkillAreaColor(skillAreaName),
+              subSkills: [],
+              totalQuestions: 0,
+              completedQuestions: 0,
+              isExpanded: false
+            });
+          }
 
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {selectedSubjectData.skills.map((skill) => (
-            <Card 
-              key={skill.id} 
-              className={cn(
-                "transition-all duration-200 hover:shadow-lg",
-                skill.status === 'mastered' ? 'border-green-200 bg-green-50' :
-                skill.status === 'in-progress' ? 'border-orange-200 bg-orange-50' :
-                skill.status === 'locked' ? 'border-gray-200 bg-gray-50 opacity-60' :
-                'border-gray-200 bg-white'
-              )}
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    {getStatusIcon(skill.status)}
-                    <CardTitle className="text-lg">{skill.name}</CardTitle>
-                  </div>
-                  <Badge className={getDifficultyColor(skill.difficulty)}>
-                    {skill.difficulty}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">{skill.description}</p>
-              </CardHeader>
-              
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Mastery Progress */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Mastery</span>
-                      <span className="text-sm font-bold">{skill.mastery}%</span>
-                    </div>
-                    <Progress value={skill.mastery} className="h-2" />
-                  </div>
+          const skillArea = skillAreasMap.get(skillAreaName)!;
+          
+          // Each section within the mode represents a sub-skill
+          mode.sections.forEach(section => {
+            const subSkillName = section.name;
+            
+            console.log('🔧 DEBUG: Processing sub-skill:', subSkillName, 'in skill area:', skillAreaName);
+            
+            // Calculate questions per difficulty (distribute evenly with some randomness for demo)
+            const totalQuestions = section.questions.length;
+            const questionsPerDifficulty = Math.floor(totalQuestions / 3);
+            const remainder = totalQuestions % 3;
+            
+            const easyTotal = questionsPerDifficulty + (remainder > 0 ? 1 : 0);
+            const mediumTotal = questionsPerDifficulty + (remainder > 1 ? 1 : 0);
+            const hardTotal = questionsPerDifficulty;
+            
+            // Mock progress data (in real app, fetch from user progress API)
+            const easyCompleted = Math.floor(Math.random() * (easyTotal + 1));
+            const mediumCompleted = Math.floor(Math.random() * (mediumTotal + 1));
+            const hardCompleted = Math.floor(Math.random() * (hardTotal + 1));
+            
+            const subSkill: SubSkill = {
+              id: section.id,
+              name: subSkillName,
+              description: `Master ${subSkillName.toLowerCase()} through targeted practice`,
+              questions: section.questions,
+              progress: {
+                easy: { 
+                  completed: easyCompleted, 
+                  total: easyTotal,
+                  bestScore: easyCompleted > 0 ? Math.floor(Math.random() * 40) + 60 : undefined
+                },
+                medium: { 
+                  completed: mediumCompleted, 
+                  total: mediumTotal,
+                  bestScore: mediumCompleted > 0 ? Math.floor(Math.random() * 30) + 70 : undefined
+                },
+                hard: { 
+                  completed: hardCompleted, 
+                  total: hardTotal,
+                  bestScore: hardCompleted > 0 ? Math.floor(Math.random() * 20) + 80 : undefined
+                }
+              },
+              isRecommended: Math.random() > 0.7, // Mock recommendation (30% chance)
+              totalQuestions: totalQuestions,
+              completedQuestions: easyCompleted + mediumCompleted + hardCompleted
+            };
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{skill.questions}</div>
-                      <div className="text-muted-foreground">Questions</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{skill.streak}</div>
-                      <div className="text-muted-foreground">Streak</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{Math.round(skill.timePerQuestion / 60)}</div>
-                      <div className="text-muted-foreground">Min/Q</div>
-                    </div>
-                  </div>
+            skillArea.subSkills.push(subSkill);
+            skillArea.totalQuestions += totalQuestions;
+            skillArea.completedQuestions += subSkill.completedQuestions;
+            
+            console.log('🔧 DEBUG: Added sub-skill:', subSkillName, 'to skill area:', skillAreaName, 'with', totalQuestions, 'questions');
+          });
+        });
+        
+        const finalSkillAreas = Array.from(skillAreasMap.values());
+        console.log('🔧 DEBUG: Final skill areas:', finalSkillAreas.map(sa => ({
+          name: sa.name,
+          subSkills: sa.subSkills.length,
+          totalQuestions: sa.totalQuestions
+        })));
+        setSkillAreas(finalSkillAreas);
+      } catch (err) {
+        console.error('Error loading drill data:', err);
+        setError('Failed to load drill data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                  {skill.lastPracticed && (
-                    <div className="text-xs text-muted-foreground">
-                      Last practiced: {skill.lastPracticed}
-                    </div>
-                  )}
+    loadDrillData();
+  }, [selectedProduct]);
 
-                  <Button 
-                    className={cn(
-                      "w-full",
-                      skill.status === 'mastered' ? "bg-green-600 hover:bg-green-700" :
-                      skill.status === 'in-progress' ? "bg-orange-500 hover:bg-orange-600" :
-                      skill.status === 'locked' ? "bg-gray-400 cursor-not-allowed" :
-                      "bg-edu-teal hover:bg-edu-teal/90"
-                    )}
-                    onClick={() => handleStartDrill(selectedSubjectData.id, skill.id)}
-                    disabled={skill.status === 'locked'}
-                  >
-                    <Zap size={16} className="mr-2" />
-                    {skill.status === 'mastered' ? 'Practice Again' :
-                     skill.status === 'in-progress' ? 'Continue' :
-                     skill.status === 'locked' ? 'Locked' :
-                     'Start Drill'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+  const getSkillAreaIcon = (skillAreaName: string): string => {
+    const name = skillAreaName.toLowerCase();
+    if (name.includes('verbal')) return '💬';
+    if (name.includes('reading')) return '📖';
+    if (name.includes('mathematical')) return '🔢';
+    if (name.includes('quantitative')) return '📊';
+    if (name.includes('written') || name.includes('expression')) return '✍️';
+    if (name.includes('numerical')) return '📊';
+    if (name.includes('abstract')) return '🎨';
+    return '🧠';
+  };
+
+  const getSkillAreaColor = (skillAreaName: string): string => {
+    const name = skillAreaName.toLowerCase();
+    if (name.includes('verbal')) return 'from-blue-500 to-blue-600';
+    if (name.includes('reading')) return 'from-green-500 to-green-600';
+    if (name.includes('mathematical')) return 'from-purple-500 to-purple-600';
+    if (name.includes('quantitative')) return 'from-orange-500 to-orange-600';
+    if (name.includes('written') || name.includes('expression')) return 'from-pink-500 to-pink-600';
+    if (name.includes('numerical')) return 'from-orange-500 to-orange-600';
+    if (name.includes('abstract')) return 'from-pink-500 to-pink-600';
+    return 'from-gray-500 to-gray-600';
+  };
+
+  const toggleSkillArea = (skillArea: SkillArea) => {
+    setSkillAreas(prev => prev.map(sa => 
+      sa.id === skillArea.id 
+        ? { ...sa, isExpanded: !sa.isExpanded }
+        : sa
+    ));
+  };
+
+  const selectSubSkill = (skillArea: SkillArea, subSkill: SubSkill) => {
+    setSelectedSkillArea(skillArea);
+    setSelectedSubSkill(subSkill);
+    setCurrentView('sub-skill');
+  };
+
+  const startDrill = (difficulty: 'easy' | 'medium' | 'hard') => {
+    if (!selectedSubSkill || !selectedSkillArea) return;
+    
+    const questions = selectedSubSkill.questions;
+    if (questions.length === 0) return;
+    
+    // In real app, filter questions by difficulty
+    const availableQuestions = questions.slice(0, 10); // Mock: use first 10 questions
+    
+    if (availableQuestions.length > 0) {
+      const questionState: QuestionState = {
+        question: availableQuestions[0],
+        skillAreaId: selectedSkillArea.id,
+        skillAreaName: selectedSkillArea.name,
+        subSkillId: selectedSubSkill.id,
+        subSkillName: selectedSubSkill.name,
+        difficulty,
+        questionNumber: 1,
+        totalInDifficulty: Math.min(10, availableQuestions.length)
+      };
+      
+      setCurrentQuestion(questionState);
+      setCurrentView('question');
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+    }
+  };
+
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (!showFeedback) {
+      setSelectedAnswer(answerIndex);
+    }
+  };
+
+  const submitAnswer = async () => {
+    if (selectedAnswer === null || !currentQuestion) return;
+    
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setShowFeedback(true);
+    setIsSubmitting(false);
+  };
+
+  const nextQuestion = () => {
+    setCurrentView('sub-skill'); // For demo, go back to sub-skill view
+  };
+
+  const getDifficultyConfig = (difficulty: 'easy' | 'medium' | 'hard') => {
+    switch (difficulty) {
+      case 'easy':
+        return {
+          color: 'green',
+          bgClass: 'bg-green-50 border-green-200 hover:bg-green-100',
+          textClass: 'text-green-700',
+          buttonClass: 'bg-green-500 hover:bg-green-600 text-white',
+          badgeClass: 'bg-green-100 text-green-700'
+        };
+      case 'medium':
+        return {
+          color: 'amber',
+          bgClass: 'bg-amber-50 border-amber-200 hover:bg-amber-100',
+          textClass: 'text-amber-700',
+          buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white',
+          badgeClass: 'bg-amber-100 text-amber-700'
+        };
+      case 'hard':
+        return {
+          color: 'red',
+          bgClass: 'bg-red-50 border-red-200 hover:bg-red-100',
+          textClass: 'text-red-700',
+          buttonClass: 'bg-red-500 hover:bg-red-600 text-white',
+          badgeClass: 'bg-red-100 text-red-700'
+        };
+    }
+  };
+
+  const getProgressPercentage = (completed: number, total: number) => {
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  };
+
+  const getTotalCompleted = () => {
+    return skillAreas.reduce((sum, area) => sum + area.completedQuestions, 0);
+  };
+
+  const getTotalQuestions = () => {
+    return skillAreas.reduce((sum, area) => sum + area.totalQuestions, 0);
+  };
+
+  const getRecommendedSubSkills = () => {
+    const recommended: { skillArea: SkillArea; subSkill: SubSkill }[] = [];
+    skillAreas.forEach(skillArea => {
+      skillArea.subSkills.forEach(subSkill => {
+        if (subSkill.isRecommended) {
+          recommended.push({ skillArea, subSkill });
+        }
+      });
+    });
+    return recommended.slice(0, 3);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading skill drills...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-2xl p-8 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="mb-6 lg:mb-0">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-              Skill Drills ⚡
-            </h1>
-            <p className="text-lg opacity-90 mb-4">
-              Practice specific skills with targeted exercises to build mastery
-            </p>
-            <div className="flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-2">
-                <Target size={16} />
-                <span>{masteredSkills}/{totalSkills} skills mastered</span>
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Question View
+  if (currentView === 'question' && currentQuestion) {
+    const difficultyConfig = getDifficultyConfig(currentQuestion.difficulty);
+    const isCorrect = selectedAnswer === currentQuestion.question.correctAnswer;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        {/* Enhanced Header with Breadcrumb */}
+        <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => setCurrentView('sub-skill')}
+                  className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+                >
+                  <ArrowLeft size={18} className="mr-2" />
+                  Back
+                </Button>
+                <div className="hidden sm:block text-sm text-gray-500">
+                  <span className="flex items-center">
+                    <Home size={14} className="mr-1" />
+                    {currentQuestion.skillAreaName}
+                    <ChevronRight size={14} className="mx-2" />
+                    {currentQuestion.subSkillName}
+                    <ChevronRight size={14} className="mx-2" />
+                    {currentQuestion.difficulty.charAt(0).toUpperCase() + currentQuestion.difficulty.slice(1)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <BarChart3 size={16} />
-                <span>{overallMastery}% overall mastery</span>
+              <div className="flex items-center space-x-4">
+                <Badge className={difficultyConfig.badgeClass}>
+                  {currentQuestion.difficulty.charAt(0).toUpperCase() + currentQuestion.difficulty.slice(1)}
+                </Badge>
+                <div className="text-sm text-gray-600 hidden sm:block">
+                  Question {currentQuestion.questionNumber} of {currentQuestion.totalInDifficulty}
+                </div>
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-500">Progress</span>
+                <span className="text-xs font-medium text-gray-500">
+                  {Math.round((currentQuestion.questionNumber / currentQuestion.totalInDifficulty) * 100)}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-edu-teal to-edu-teal/80 h-2 rounded-full transition-all duration-500 ease-out" 
+                  style={{ width: `${(currentQuestion.questionNumber / currentQuestion.totalInDifficulty) * 100}%` }}
+                />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Question Content */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Question {currentQuestion.questionNumber}
+                  </h2>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="outline" className="text-xs">
+                      {currentQuestion.question.topic}
+                    </Badge>
+                  </div>
+                </div>
+                <p className="text-gray-800 leading-relaxed text-lg">
+                  {currentQuestion.question.text}
+                </p>
+              </div>
+
+              <div className="space-y-3 mb-8">
+                {currentQuestion.question.options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswerSelect(index)}
+                    disabled={showFeedback}
+                    className={cn(
+                      "w-full p-4 text-left border-2 rounded-xl transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99]",
+                      selectedAnswer === index 
+                        ? "border-edu-teal bg-edu-teal/5 shadow-md" 
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
+                      showFeedback && index === currentQuestion.question.correctAnswer && "border-green-500 bg-green-50 shadow-md",
+                      showFeedback && selectedAnswer === index && index !== currentQuestion.question.correctAnswer && "border-red-500 bg-red-50"
+                    )}
+                  >
+                    <div className="flex items-center">
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-medium text-gray-700 mr-4">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span className="flex-1">{option}</span>
+                      {showFeedback && index === currentQuestion.question.correctAnswer && (
+                        <CheckCircle className="text-green-600 ml-2" size={20} />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {!showFeedback ? (
+                <div className="flex justify-between items-center">
+                  <Button variant="outline" className="flex items-center">
+                    <Flag size={16} className="mr-2" />
+                    Flag for Review
+                  </Button>
+                  <Button
+                    onClick={submitAnswer}
+                    disabled={selectedAnswer === null || isSubmitting}
+                    className="px-8 py-3 bg-edu-teal hover:bg-edu-teal/90 text-white disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Answer'
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-t pt-6 animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      {isCorrect ? (
+                        <div className="flex items-center text-green-600">
+                          <CheckCircle className="mr-2" size={24} />
+                          <span className="font-semibold text-lg">Excellent!</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center text-red-600">
+                          <AlertCircle className="mr-2" size={24} />
+                          <span className="font-semibold text-lg">Not quite right</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <p className="text-gray-700 mb-3 font-medium">Explanation:</p>
+                      <p className="text-gray-600 leading-relaxed">{currentQuestion.question.explanation}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex space-x-3">
+                      <Button variant="outline" size="sm">
+                        <Flag size={16} className="mr-2" />
+                        Still Confused
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <RotateCcw size={16} className="mr-2" />
+                        More Like This
+                      </Button>
+                    </div>
+                    <div className="flex space-x-3">
+                      <Button variant="outline" onClick={() => setCurrentView('sub-skill')}>
+                        Switch Difficulty
+                      </Button>
+                      <Button onClick={nextQuestion} className="bg-edu-teal hover:bg-edu-teal/90 text-white">
+                        <ArrowRight size={16} className="mr-2" />
+                        Next Question
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
+    );
+  }
 
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-500 rounded-lg">
-                <CheckCircle className="text-white" size={24} />
+  // Sub-Skill View (Difficulty Selection)
+  if (currentView === 'sub-skill' && selectedSubSkill && selectedSkillArea) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentView('dashboard')}
+              className="flex items-center"
+            >
+              <ChevronLeft size={16} className="mr-2" />
+              Back to Skills
+            </Button>
+            <div className="text-sm text-gray-500">
+              {selectedSkillArea.name} → {selectedSubSkill.name}
+            </div>
+          </div>
+
+          {/* Sub-Skill Overview */}
+          <div className={cn("bg-gradient-to-r rounded-2xl p-8 text-white mb-8", selectedSkillArea.color)}>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div className="mb-6 lg:mb-0">
+                <div className="flex items-center space-x-3 mb-2">
+                  <span className="text-3xl">{selectedSkillArea.icon}</span>
+                  <h1 className="text-3xl lg:text-4xl font-bold">
+                    {selectedSubSkill.name}
+                  </h1>
+                </div>
+                <p className="text-lg opacity-90 mb-4">
+                  {selectedSubSkill.description}
+                </p>
+                <div className="flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <BookOpen size={16} />
+                    <span>{selectedSubSkill.totalQuestions} total questions</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle size={16} />
+                    <span>{selectedSubSkill.completedQuestions} completed</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2">
+                  {getProgressPercentage(selectedSubSkill.completedQuestions, selectedSubSkill.totalQuestions)}%
+                </div>
+                <div className="text-sm opacity-80">Complete</div>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-green-900">{masteredSkills}</h3>
-            <p className="text-green-700 text-sm">Skills Mastered</p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-500 rounded-lg">
-                <Target className="text-white" size={24} />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-orange-900">{inProgressSkills}</h3>
-            <p className="text-orange-700 text-sm">In Progress</p>
-          </CardContent>
-        </Card>
+          {/* Difficulty Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { level: 'easy' as const, data: selectedSubSkill.progress.easy },
+              { level: 'medium' as const, data: selectedSubSkill.progress.medium },
+              { level: 'hard' as const, data: selectedSubSkill.progress.hard }
+            ].map(({ level, data }) => {
+              const config = getDifficultyConfig(level);
+              
+              return (
+                <Card key={level} className={cn("transition-all duration-200 hover:shadow-lg cursor-pointer", config.bgClass)}
+                      onClick={() => startDrill(level)}>
+                  <CardContent className="p-8 text-center">
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-bold capitalize mb-2">{level}</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        {data.completed}/{data.total} questions completed
+                      </p>
+                      
+                      {/* Progress Circle */}
+                      <div className="relative w-24 h-24 mx-auto mb-4">
+                        <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            className="stroke-current text-gray-200"
+                            strokeWidth="3"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path
+                            className={`stroke-current text-${config.color}-500`}
+                            strokeWidth="3"
+                            strokeDasharray={`${getProgressPercentage(data.completed, data.total)}, 100`}
+                            strokeLinecap="round"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xl font-bold">
+                            {getProgressPercentage(data.completed, data.total)}%
+                          </span>
+                        </div>
+                      </div>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-500 rounded-lg">
-                <Trophy className="text-white" size={24} />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-blue-900">{overallMastery}%</h3>
-            <p className="text-blue-700 text-sm">Overall Mastery</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-500 rounded-lg">
-                <Zap className="text-white" size={24} />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-purple-900">{totalSkills}</h3>
-            <p className="text-purple-700 text-sm">Total Skills</p>
-          </CardContent>
-        </Card>
+                      {data.bestScore && (
+                        <Badge variant="outline" className="mb-4">
+                          Best Score: {data.bestScore}%
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <Button
+                      className={cn("w-full", config.buttonClass)}
+                      disabled={data.total === 0}
+                    >
+                      <Play size={16} className="mr-2" />
+                      {data.completed === 0 ? 'Start Practice' : 
+                       data.completed < data.total ? 'Continue Practice' : 'Review Questions'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      {/* Subjects Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {drillSubjects.map((subject) => (
-          <Card 
-            key={subject.id} 
-            className="transition-all duration-200 hover:shadow-lg cursor-pointer border-gray-200 bg-white"
-            onClick={() => handleSubjectSelect(subject.id)}
-          >
-            <CardHeader>
+  // Dashboard View
+  const recommendedSubSkills = getRecommendedSubSkills();
+
+  // Calculate metrics for hero banner and metrics cards
+  const totalSkillAreas = skillAreas.length;
+  const totalCompleted = getTotalCompleted();
+  const totalQuestions = getTotalQuestions();
+  const totalSubSkills = skillAreas.reduce((sum, area) => sum + area.subSkills.length, 0);
+  const overallProgress = Math.round((totalCompleted / totalQuestions) * 100) || 0;
+
+  const heroBannerProps = {
+    title: "Skill Drills",
+    subtitle: "Master specific skills through targeted practice",
+    metrics: [
+      { 
+        icon: <Target size={16} />,
+        label: "Skill Areas", 
+        value: totalSkillAreas.toString() 
+      },
+      { 
+        icon: <CheckCircle size={16} />,
+        label: "Questions Completed", 
+        value: totalCompleted.toString() 
+      },
+      { 
+        icon: <TrendingUp size={16} />,
+        label: "Overall Progress", 
+        value: `${overallProgress}%` 
+      }
+    ],
+    actions: totalQuestions > 0 ? [
+      {
+        label: "Continue Practice",
+        icon: <Play size={20} className="mr-2" />,
+        onClick: () => {
+          if (recommendedSubSkills.length > 0) {
+            const { skillArea, subSkill } = recommendedSubSkills[0];
+            selectSubSkill(skillArea, subSkill);
+          }
+        }
+      }
+    ] : [],
+    ...(totalQuestions === 0 && {
+      warning: {
+        icon: <AlertCircle size={16} />,
+        message: "No drill questions available for this test type yet."
+      }
+    })
+  };
+
+  const metricsConfig = [
+    {
+      title: "Skill Areas",
+      value: totalSkillAreas.toString(),
+      icon: <Target className="text-white" size={24} />,
+      badge: { text: "Available", variant: "default" as const },
+      color: {
+        bg: "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200",
+        iconBg: "bg-blue-500",
+        text: "text-blue-900"
+      }
+    },
+    {
+      title: "Questions Completed",
+      value: totalCompleted.toString(),
+      icon: <CheckCircle className="text-white" size={24} />,
+      badge: { text: "Progress", variant: "success" as const },
+      color: {
+        bg: "bg-gradient-to-br from-green-50 to-green-100 border-green-200",
+        iconBg: "bg-green-500",
+        text: "text-green-900"
+      }
+    },
+    {
+      title: "Sub-Skills",
+      value: totalSubSkills.toString(),
+      icon: <Brain className="text-white" size={24} />,
+      badge: { text: "Topics", variant: "secondary" as const },
+      color: {
+        bg: "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200",
+        iconBg: "bg-purple-500",
+        text: "text-purple-900"
+      }
+    },
+    {
+      title: "Overall Progress",
+      value: `${overallProgress}%`,
+      icon: <TrendingUp className="text-white" size={24} />,
+      badge: { text: "Complete", variant: "warning" as const },
+      color: {
+        bg: "bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200",
+        iconBg: "bg-orange-500",
+        text: "text-orange-900"
+      }
+    }
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Hero Banner */}
+      <HeroBanner {...heroBannerProps} />
+
+      {/* Metrics Cards */}
+      <MetricsCards metrics={metricsConfig} />
+
+      {/* Recommendations */}
+      {recommendedSubSkills.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white mr-3 px-3 py-1">
+              <Star size={14} className="mr-1" />
+              Recommended
+            </Badge>
+            Based on your diagnostic results
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {recommendedSubSkills.map(({ skillArea, subSkill }) => (
+              <Card key={subSkill.id} className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-200 cursor-pointer"
+                    onClick={() => selectSubSkill(skillArea, subSkill)}>
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-3 mb-4">
+                    <span className="text-2xl">{skillArea.icon}</span>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{subSkill.name}</h3>
+                      <p className="text-sm text-gray-600">{skillArea.name}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span>Progress</span>
+                      <span>{getProgressPercentage(subSkill.completedQuestions, subSkill.totalQuestions)}%</span>
+                    </div>
+                    <Progress value={getProgressPercentage(subSkill.completedQuestions, subSkill.totalQuestions)} className="h-2" />
+                  </div>
+                  <Button size="sm" className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white">
+                    <Play size={14} className="mr-2" />
+                    Practice Now
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Skill Areas with Sub-Skills */}
+      <div className="space-y-6">
+        {skillAreas.map((skillArea) => (
+          <Card key={skillArea.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
+            <div 
+              className="p-6 cursor-pointer hover:bg-gray-50/50 transition-colors duration-200"
+              onClick={() => toggleSkillArea(skillArea)}
+            >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={cn(
-                    "p-3 rounded-lg bg-gradient-to-r",
-                    subject.color
-                  )}>
-                    <subject.icon size={24} className="text-white" />
+                <div className="flex items-center">
+                  <div className={cn("w-14 h-14 bg-gradient-to-br rounded-xl flex items-center justify-center text-white text-xl mr-6 shadow-md", skillArea.color)}>
+                    <span className="text-2xl">{skillArea.icon}</span>
                   </div>
                   <div>
-                    <CardTitle className="text-xl">{subject.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      {subject.skills.length} skills available
-                    </p>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">{skillArea.name}</h3>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <span className="flex items-center">
+                        <CheckCircle size={14} className="mr-1 text-green-500" />
+                        {skillArea.completedQuestions} of {skillArea.totalQuestions} questions completed
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center">
+                        <Users size={14} className="mr-1 text-blue-500" />
+                        {skillArea.subSkills.length} sub-skills
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-gray-700">
+                      {getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}%
+                    </div>
+                    <div className="w-24 bg-gray-200 rounded-full h-2 mt-1 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-edu-teal to-edu-teal/80 h-2 rounded-full transition-all duration-500" 
+                        style={{ width: `${getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="transition-transform duration-200">
+                    {skillArea.isExpanded ? 
+                      <ChevronDown size={20} className="text-gray-500" /> : 
+                      <ChevronRight size={20} className="text-gray-500" />
+                    }
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="space-y-4">
-                {/* Mastery Progress */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Subject Mastery</span>
-                    <span className="text-sm font-bold">{subject.totalMastery}%</span>
-                  </div>
-                  <Progress value={subject.totalMastery} className="h-2" />
-                </div>
+            </div>
 
-                {/* Skills Summary */}
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div className="text-center">
-                    <div className="font-bold text-lg text-green-600">
-                      {subject.skills.filter(s => s.status === 'mastered').length}
-                    </div>
-                    <div className="text-muted-foreground">Mastered</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-lg text-orange-500">
-                      {subject.skills.filter(s => s.status === 'in-progress').length}
-                    </div>
-                    <div className="text-muted-foreground">In Progress</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-lg text-blue-500">
-                      {subject.skills.filter(s => s.status === 'available').length}
-                    </div>
-                    <div className="text-muted-foreground">Available</div>
-                  </div>
+            {skillArea.isExpanded && (
+              <div className="px-6 pb-6 bg-gradient-to-br from-gray-50/50 to-gray-100/30 animate-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                  {skillArea.subSkills.map((subSkill) => (
+                    <Card key={subSkill.id} className="border shadow-sm hover:shadow-md transition-all duration-200 bg-white cursor-pointer"
+                          onClick={() => selectSubSkill(skillArea, subSkill)}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h4 className="font-semibold text-gray-900">{subSkill.name}</h4>
+                              {subSkill.isRecommended && (
+                                <Badge className="bg-orange-100 text-orange-700 text-xs">
+                                  <Star size={12} className="mr-1" />
+                                  Recommended
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mb-3">
+                              {subSkill.completedQuestions} of {subSkill.totalQuestions} questions completed
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Mini Progress Bars for Each Difficulty */}
+                        <div className="space-y-2 mb-4">
+                          {[
+                            { level: 'Easy', data: subSkill.progress.easy, color: 'green' },
+                            { level: 'Medium', data: subSkill.progress.medium, color: 'amber' },
+                            { level: 'Hard', data: subSkill.progress.hard, color: 'red' }
+                          ].map(({ level, data, color }) => (
+                            <div key={level} className="flex items-center justify-between text-xs">
+                              <span className="text-gray-600 w-16">{level}</span>
+                              <div className="flex-1 mx-2">
+                                <div className="w-full bg-gray-200 rounded-full h-1">
+                                  <div 
+                                    className={`bg-${color}-500 h-1 rounded-full transition-all duration-300`}
+                                    style={{ width: `${getProgressPercentage(data.completed, data.total)}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-gray-500 w-12 text-right">{data.completed}/{data.total}</span>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <Button size="sm" className="w-full bg-edu-teal hover:bg-edu-teal/90 text-white">
+                          <Play size={14} className="mr-2" />
+                          Practice
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-
-                <Button className="w-full bg-edu-teal hover:bg-edu-teal/90">
-                  <Play size={16} className="mr-2" />
-                  Practice Skills
-                  <ArrowRight size={16} className="ml-2" />
-                </Button>
               </div>
-            </CardContent>
+            )}
           </Card>
         ))}
       </div>
+
+      {/* Empty State */}
+      {skillAreas.length === 0 && (
+        <Card className="p-12 text-center bg-white/80 backdrop-blur-sm shadow-lg">
+          <Target className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+          <h3 className="text-xl font-semibold mb-3">No Drill Questions Available</h3>
+          <p className="text-gray-600 max-w-md mx-auto">
+            Drill questions for this test type are coming soon. Check back later for targeted skill practice.
+          </p>
+        </Card>
+      )}
     </div>
   );
 };

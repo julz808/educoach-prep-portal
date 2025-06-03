@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { HeroBanner } from '@/components/ui/hero-banner';
+import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
   BookOpen, Clock, Target, Brain, Play, CheckCircle, 
   AlertCircle, BarChart3, ArrowRight, Info
@@ -11,102 +13,42 @@ import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
 import { 
-  fetchQuestionsFromSupabase, 
-  getPlaceholderTestStructure,
-  type TestType,
-  type TestMode,
-  type TestSection as SupabaseTestSection
+  fetchDiagnosticModes, 
+  type TestMode, 
+  type TestSection 
 } from '@/services/supabaseQuestionService';
 
-interface TestSection {
-  id: string;
-  name: string;
-  description: string;
-  questions: number;
-  timeLimit: number;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  status: 'not-started' | 'in-progress' | 'completed';
-  score?: number;
-  subSkills: string[];
-  sampleQuestions?: {
-    id: number;
-    text: string;
-    options: string[];
-    correctAnswer: string;
-    explanation: string;
-  }[];
-}
-
 const DiagnosticTests: React.FC = () => {
-  const [testData, setTestData] = useState<TestType | null>(null);
+  const [diagnosticModes, setDiagnosticModes] = useState<TestMode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadTestData = async () => {
+    const loadDiagnosticData = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Fetch questions from Supabase
-        const organizedData = await fetchQuestionsFromSupabase();
-        
-        // Find the test type for the selected product
-        const currentTestType = organizedData.testTypes.find(
-          testType => testType.id === selectedProduct
-        );
-
-        if (currentTestType && currentTestType.testModes.length > 0) {
-          // Use real data from Supabase
-          setTestData(currentTestType);
-        } else {
-          // Use placeholder structure if no questions found
-          const placeholder = getPlaceholderTestStructure(selectedProduct);
-          setTestData(placeholder);
-        }
+        const modes = await fetchDiagnosticModes(selectedProduct);
+        setDiagnosticModes(modes);
       } catch (err) {
-        console.error('Error loading test data:', err);
-        setError('Failed to load test data');
-        // Fallback to placeholder
-        const placeholder = getPlaceholderTestStructure(selectedProduct);
-        setTestData(placeholder);
+        console.error('Error loading diagnostic data:', err);
+        setError('Failed to load diagnostic data');
       } finally {
         setLoading(false);
       }
     };
 
-    loadTestData();
+    loadDiagnosticData();
   }, [selectedProduct]);
 
-  // Transform Supabase data to component format - find diagnostic test mode
-  const diagnosticTestMode = testData?.testModes.find(mode => mode.type === 'diagnostic');
-  
-  const transformedSections: TestSection[] = diagnosticTestMode ? diagnosticTestMode.sections.map(section => {
-    // Extract unique sub-skills from questions
-    const subSkills = Array.from(new Set(section.questions.map(q => q.subSkill)));
-    
-    return {
-      id: section.id,
-      name: section.name,
-      description: `Assessment covering ${subSkills.length} key skills`,
-      questions: section.totalQuestions,
-      timeLimit: section.timeLimit || Math.ceil(section.totalQuestions * 1.5),
-      difficulty: 'Medium' as const,
-      status: section.status,
-      score: section.score,
-      subSkills,
-      // Convert first few questions to sample format for preview
-      sampleQuestions: section.questions.slice(0, 2).map((q, index) => ({
-        id: index + 1,
-        text: q.text,
-        options: q.options,
-        correctAnswer: q.options[q.correctAnswer] || 'A',
-        explanation: q.explanation,
-      }))
-    };
-  }) : [];
+  // Get all sections from all diagnostic modes
+  const allSections: TestSection[] = [];
+  diagnosticModes.forEach(mode => {
+    allSections.push(...mode.sections);
+  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -147,20 +89,104 @@ const DiagnosticTests: React.FC = () => {
     }
   };
 
-  const handleStartSection = (sectionId: string) => {
-    const section = transformedSections.find(s => s.id === sectionId);
+  const handleStartSection = (sectionId: string, sectionName: string) => {
+    const section = allSections.find(s => s.id === sectionId);
     
-    if (section && section.questions > 0) {
-      navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+    if (section && section.totalQuestions > 0) {
+      navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(sectionName)}`);
     }
   };
 
-  const totalQuestions = transformedSections.reduce((sum, section) => sum + section.questions, 0);
-  const completedSections = transformedSections.filter(s => s.status === 'completed').length;
-  const averageScore = transformedSections
+  const totalQuestions = allSections.reduce((sum, section) => sum + section.totalQuestions, 0);
+  const completedSections = allSections.filter(s => s.status === 'completed').length;
+  const averageScore = allSections
     .filter(s => s.score)
     .reduce((acc, s) => acc + (s.score || 0), 0) / 
-    transformedSections.filter(s => s.score).length || 0;
+    allSections.filter(s => s.score).length || 0;
+
+  // Hero banner configuration
+  const heroBannerProps = {
+    title: "Diagnostic Assessment 🎯",
+    subtitle: "Identify your strengths and areas for improvement with comprehensive diagnostic tests",
+    metrics: [
+      {
+        icon: <Target size={16} />,
+        label: `${completedSections}/${allSections.length} sections completed`,
+        value: ""
+      },
+      {
+        icon: <BarChart3 size={16} />,
+        label: isNaN(averageScore) ? 'No scores yet' : `${Math.round(averageScore)}% average`,
+        value: ""
+      },
+      {
+        icon: <Brain size={16} />,
+        label: `${allSections.length} assessment areas`,
+        value: ""
+      }
+    ],
+    actions: [
+      {
+        label: 'Start Assessment',
+        icon: <Play size={20} className="mr-2" />,
+        onClick: () => {
+          const firstIncomplete = allSections.find(s => s.status !== 'completed' && s.totalQuestions > 0);
+          if (firstIncomplete) {
+            handleStartSection(firstIncomplete.id, firstIncomplete.name);
+          }
+        },
+        disabled: !allSections.some(s => s.totalQuestions > 0)
+      }
+    ]
+  };
+
+  // Metrics cards configuration
+  const metricsConfig = [
+    {
+      title: 'Assessment Areas',
+      value: allSections.length.toString(),
+      icon: <Brain className="text-white" size={24} />,
+      badge: { text: 'Available', variant: 'default' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
+        iconBg: 'bg-blue-500',
+        text: 'text-blue-900'
+      }
+    },
+    {
+      title: 'Total Questions',
+      value: totalQuestions.toString(),
+      icon: <BookOpen className="text-white" size={24} />,
+      badge: { text: 'Ready', variant: 'secondary' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
+        iconBg: 'bg-green-500',
+        text: 'text-green-900'
+      }
+    },
+    {
+      title: 'Completed',
+      value: completedSections.toString(),
+      icon: <CheckCircle className="text-white" size={24} />,
+      badge: { text: 'Done', variant: 'success' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
+        iconBg: 'bg-purple-500',
+        text: 'text-purple-900'
+      }
+    },
+    {
+      title: 'Average Score',
+      value: isNaN(averageScore) ? '--' : `${Math.round(averageScore)}%`,
+      icon: <Target className="text-white" size={24} />,
+      badge: { text: 'Score', variant: 'warning' as const },
+      color: {
+        bg: 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200',
+        iconBg: 'bg-orange-500',
+        text: 'text-orange-900'
+      }
+    }
+  ];
 
   if (loading) {
     return (
@@ -185,237 +211,144 @@ const DiagnosticTests: React.FC = () => {
     );
   }
 
+  if (diagnosticModes.length === 0) {
+    return (
+      <div className="space-y-8">
+        <HeroBanner 
+          title="Diagnostic Assessment 🎯"
+          subtitle="Diagnostic tests for this test type are coming soon."
+          metrics={[]}
+          warning={{
+            icon: <AlertCircle size={16} />,
+            message: "No diagnostic tests available yet."
+          }}
+        />
+        
+        <Card className="p-8 text-center bg-white">
+          <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No Diagnostic Tests Available</h3>
+          <p className="text-gray-600">Diagnostic tests for this test type are coming soon.</p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl p-8 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="mb-6 lg:mb-0">
-            <div className="flex items-center space-x-3 mb-4">
-              <Brain size={40} />
-              <h1 className="text-3xl lg:text-4xl font-bold">
-                Diagnostic Assessment
-              </h1>
-            </div>
-            <p className="text-lg opacity-90 mb-4">
-              Identify your strengths and areas for improvement with our comprehensive diagnostic tests
-            </p>
-            <div className="flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-2">
-                <BookOpen size={16} />
-                <span>{totalQuestions} questions</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Target size={16} />
-                <span>{transformedSections.length} sections</span>
-              </div>
-            </div>
-            {totalQuestions === 0 && (
-              <div className="mt-4 p-3 bg-yellow-500/20 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle size={16} />
-                  <span className="text-sm">Diagnostic questions coming soon...</span>
+      {/* Standardized Hero Banner */}
+      <HeroBanner {...heroBannerProps} />
+
+      {/* Standardized Metrics Cards */}
+      <MetricsCards metrics={metricsConfig} />
+
+      {/* Diagnostic Modes - White Background */}
+      <div className="space-y-6">
+        {diagnosticModes.map((mode) => (
+          <Card key={mode.id} className="bg-white">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Brain size={20} />
+                    <span>{mode.name}</span>
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">{mode.description}</p>
                 </div>
+                <Badge className="bg-purple-100 text-purple-700">
+                  {mode.sections.length} areas
+                </Badge>
               </div>
-            )}
-          </div>
-          
-          <div className="text-center">
-            {completedSections > 0 && (
-              <>
-                <div className="text-4xl font-bold mb-2">{Math.round(averageScore)}%</div>
-                <div className="text-sm opacity-80">Average Score</div>
-                <div className="text-xs opacity-70 mt-1">
-                  {completedSections}/{transformedSections.length} sections completed
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Brain className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{transformedSections.length}</p>
-                <p className="text-sm text-muted-foreground">Test Sections</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{completedSections}</p>
-                <p className="text-sm text-muted-foreground">Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {isNaN(averageScore) ? '0' : Math.round(averageScore)}%
-                </p>
-                <p className="text-sm text-muted-foreground">Average Score</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Test Sections */}
-      <div>
-        <h2 className="text-2xl font-bold mb-6">
-          {testData?.name ? `${testData.name} - Diagnostic Sections` : 'Diagnostic Sections'}
-        </h2>
-        
-        {transformedSections.length === 0 ? (
-          <Card className="p-8 text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Diagnostic Test Available</h3>
-            <p className="text-gray-600">Diagnostic questions for this test type are coming soon.</p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {transformedSections.map((section) => (
-              <Card 
-                key={section.id} 
-                className={cn(
-                  "transition-all duration-200",
-                  section.questions > 0 ? "hover:shadow-lg" : "opacity-60",
-                  getStatusColor(section.status)
-                )}
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {getStatusIcon(section.status)}
-                      <div>
-                        <CardTitle className="text-xl">{section.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{section.description}</p>
-                      </div>
-                    </div>
-                    <Badge className={getDifficultyColor(section.difficulty)}>
-                      {section.difficulty}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <BookOpen size={14} />
-                          <span>{section.questions} questions</span>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {mode.sections.map((section) => (
+                  <Card 
+                    key={section.id} 
+                    className={cn(
+                      "transition-all duration-200 hover:shadow-md bg-white",
+                      getStatusColor(section.status),
+                      section.totalQuestions > 0 ? "cursor-pointer hover:border-purple-300" : "opacity-60"
+                    )}
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {getStatusIcon(section.status)}
+                          <div>
+                            <CardTitle className="text-base">{section.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {section.totalQuestions} questions
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Clock size={14} />
-                          <span>{section.timeLimit} min</span>
-                        </div>
+                        <ArrowRight size={16} className="text-gray-400" />
                       </div>
-                      {section.score && (
-                        <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          {section.score}%
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Sub-skills */}
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Skills Assessed:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {section.subSkills.slice(0, 4).map((skill, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {section.subSkills.length > 4 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{section.subSkills.length - 4} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {section.questions === 0 ? (
-                      <div className="text-center py-4">
-                        <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Questions coming soon</p>
-                      </div>
-                    ) : (
-                      <>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0">
+                      <div className="space-y-3">
+                        {/* Progress if completed */}
                         {section.status === 'completed' && section.score && (
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span>Score: {section.score}%</span>
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium">Score</span>
+                              <span className="text-sm font-bold">{section.score}%</span>
                             </div>
                             <Progress value={section.score} className="h-2" />
                           </div>
                         )}
 
+                        {/* Time and Question info */}
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                          <span>{section.totalQuestions} questions</span>
+                          {section.timeLimit && (
+                            <span>{section.timeLimit} min</span>
+                          )}
+                        </div>
+
+                        {/* Sample questions preview */}
+                        {section.questions.length > 0 && (
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <div className="text-sm font-medium mb-2">Sample topics:</div>
+                            <div className="text-xs text-gray-600">
+                              {section.questions.slice(0, 2).map((q, idx) => (
+                                <div key={idx} className="truncate">{q.text.substring(0, 80)}...</div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
                         <Button 
-                          className="w-full" 
-                          variant={section.status === 'not-started' ? 'default' : 'outline'}
-                          onClick={() => handleStartSection(section.id)}
+                          className="w-full"
+                          onClick={() => handleStartSection(section.id, section.name)}
+                          disabled={section.totalQuestions === 0}
                         >
-                          <Play size={16} className="mr-2" />
-                          {section.status === 'not-started' ? 'Start Assessment' : 
-                           section.status === 'in-progress' ? 'Continue' : 'Review Results'}
+                          <Play size={14} className="mr-2" />
+                          {section.status === 'completed' ? 'Retake Assessment' :
+                           section.status === 'in-progress' ? 'Continue Assessment' :
+                           section.totalQuestions > 0 ? 'Start Assessment' : 'Coming Soon'}
                         </Button>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Information Section */}
+      {/* Info Box - White Background */}
       <Card className="bg-blue-50 border-blue-200">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Info className="text-blue-600" size={24} />
-            <CardTitle className="text-blue-900">How Diagnostic Tests Work</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-blue-800">
+        <CardContent className="p-6">
+          <div className="flex items-start space-x-3">
+            <Info className="text-blue-600 mt-0.5" size={20} />
             <div>
-              <h4 className="font-semibold mb-2">📊 Assessment</h4>
-              <p>Our diagnostic tests evaluate your current knowledge and identify areas where you need more practice.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">🎯 Personalized</h4>
-              <p>Based on your results, we'll create a personalized study plan focusing on your weakest areas.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">📈 Progress Tracking</h4>
-              <p>Monitor your improvement over time as you work through targeted practice questions.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">🏆 Adaptive Learning</h4>
-              <p>Our system adapts to your learning pace and adjusts difficulty based on your performance.</p>
+              <h3 className="font-semibold text-blue-900 mb-2">How Diagnostic Tests Work</h3>
+              <p className="text-blue-800 text-sm">
+                These assessments help identify your current skill level and knowledge gaps. 
+                Complete all sections to get a comprehensive understanding of your strengths and areas for improvement.
+              </p>
             </div>
           </div>
         </CardContent>

@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { HeroBanner } from '@/components/ui/hero-banner';
+import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
   BookOpen, Clock, Target, Play, Trophy, BarChart3, 
   ArrowRight, ChevronLeft, Calendar, User, Award, AlertCircle
@@ -92,7 +94,7 @@ const PracticeTests: React.FC = () => {
     loadTestData();
   }, [selectedProduct]);
 
-  // Transform Supabase data to component format
+  // Transform Supabase data to component format - exclude drill and diagnostic modes
   const transformTestMode = (testMode: TestMode): PracticeTest => {
     const sections: TestSection[] = testMode.sections.map(section => ({
       id: section.id,
@@ -124,7 +126,11 @@ const PracticeTests: React.FC = () => {
     };
   };
 
-  const practiceTests: PracticeTest[] = testData ? testData.testModes.map(transformTestMode) : [];
+  // Filter out drill and diagnostic modes since they have their own dedicated pages
+  const practiceTests: PracticeTest[] = testData ? 
+    testData.testModes
+      .filter(mode => mode.type !== 'drill' && mode.type !== 'diagnostic')
+      .map(transformTestMode) : [];
 
   const completedTests = practiceTests.filter(test => test.status === 'completed').length;
   const inProgressTests = practiceTests.filter(test => test.status === 'in-progress').length;
@@ -209,6 +215,25 @@ const PracticeTests: React.FC = () => {
           <p className="text-red-600 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
+      </div>
+    );
+  }
+
+  if (practiceTests.length === 0) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-6">Practice Tests</h2>
+        </div>
+        
+        <Card className="p-8 text-center">
+          <Play className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No Practice Tests Available</h3>
+          <p className="text-gray-600">Practice tests for this test type are coming soon.</p>
+          <div className="mt-4 text-sm text-gray-500">
+            Note: Drill exercises and diagnostic tests are available in their dedicated sections.
+          </div>
+        </Card>
       </div>
     );
   }
@@ -386,52 +411,96 @@ const PracticeTests: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Trophy className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{completedTests}</p>
-                <p className="text-sm text-muted-foreground">Tests Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Hero Banner */}
+      <HeroBanner 
+        title="Practice Tests 📝"
+        subtitle="Take full-length practice tests to simulate the real exam experience"
+        metrics={[
+          {
+            icon: <Trophy size={16} />,
+            label: "Tests Completed",
+            value: completedTests.toString()
+          },
+          {
+            icon: <Clock size={16} />,
+            label: "In Progress",
+            value: inProgressTests.toString()
+          },
+          {
+            icon: <BarChart3 size={16} />,
+            label: "Average Score",
+            value: isNaN(averageScore) ? '0%' : `${Math.round(averageScore)}%`
+          }
+        ]}
+        actions={practiceTests.length > 0 && practiceTests.some(t => t.totalQuestions > 0) ? [
+          {
+            label: "Start Practice Test",
+            icon: <Play size={20} className="mr-2" />,
+            onClick: () => {
+              const firstAvailableTest = practiceTests.find(t => t.totalQuestions > 0);
+              if (firstAvailableTest) {
+                handleTestSelect(firstAvailableTest.id);
+              }
+            }
+          }
+        ] : []}
+        {...(practiceTests.length === 0 || !practiceTests.some(t => t.totalQuestions > 0)) && {
+          warning: {
+            icon: <AlertCircle size={16} />,
+            message: "Practice tests for this test type are coming soon..."
+          }
+        }}
+      />
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <Clock className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{inProgressTests}</p>
-                <p className="text-sm text-muted-foreground">In Progress</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {isNaN(averageScore) ? '0' : Math.round(averageScore)}%
-                </p>
-                <p className="text-sm text-muted-foreground">Average Score</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Metrics Cards */}
+      <MetricsCards 
+        metrics={[
+          {
+            title: "Tests Completed",
+            value: completedTests.toString(),
+            icon: <Trophy className="text-white" size={24} />,
+            badge: { text: "Finished", variant: "success" as const },
+            color: {
+              bg: "bg-gradient-to-br from-green-50 to-green-100 border-green-200",
+              iconBg: "bg-green-500",
+              text: "text-green-900"
+            }
+          },
+          {
+            title: "In Progress",
+            value: inProgressTests.toString(),
+            icon: <Clock className="text-white" size={24} />,
+            badge: { text: "Active", variant: "warning" as const },
+            color: {
+              bg: "bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200",
+              iconBg: "bg-orange-500",
+              text: "text-orange-900"
+            }
+          },
+          {
+            title: "Average Score",
+            value: isNaN(averageScore) ? '0%' : `${Math.round(averageScore)}%`,
+            icon: <BarChart3 className="text-white" size={24} />,
+            badge: { text: "Performance", variant: "secondary" as const },
+            color: {
+              bg: "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200",
+              iconBg: "bg-blue-500",
+              text: "text-blue-900"
+            }
+          },
+          {
+            title: "Available Tests",
+            value: practiceTests.length.toString(),
+            icon: <BookOpen className="text-white" size={24} />,
+            badge: { text: "Ready", variant: "default" as const },
+            color: {
+              bg: "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200",
+              iconBg: "bg-purple-500",
+              text: "text-purple-900"
+            }
+          }
+        ]}
+      />
 
       {/* Practice Tests Grid */}
       <div>
@@ -440,7 +509,7 @@ const PracticeTests: React.FC = () => {
         </h2>
         
         {practiceTests.length === 0 ? (
-          <Card className="p-8 text-center">
+          <Card className="p-8 text-center bg-white">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Tests Available</h3>
             <p className="text-gray-600">Questions for this test type are coming soon.</p>
@@ -451,7 +520,7 @@ const PracticeTests: React.FC = () => {
               <Card 
                 key={test.id} 
                 className={cn(
-                  "transition-all duration-200",
+                  "transition-all duration-200 bg-white",
                   test.totalQuestions > 0 ? "hover:shadow-lg cursor-pointer" : "opacity-60",
                   getStatusColor(test.status)
                 )}
