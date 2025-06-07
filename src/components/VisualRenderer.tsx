@@ -1,6 +1,51 @@
 import React, { useMemo, useCallback } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { VisualData } from '../services/questionGenerationService';
+
+// Define VisualData interface locally since the service is no longer available
+interface VisualData {
+  type: 'geometry' | 'chart' | 'pattern' | 'diagram';
+  description: string;
+  data: {
+    shapes?: Array<{
+      type: string;
+      coordinates?: [number, number];
+      properties: {
+        width?: number;
+        height?: number;
+        radius?: number;
+        size?: number;
+        x2?: number;
+        y2?: number;
+        fill?: string;
+        stroke?: string;
+        strokeWidth?: number;
+        label?: string;
+        labelOffsetX?: number;
+        labelOffsetY?: number;
+      };
+    }>;
+    chartType?: 'bar' | 'line';
+    chartData?: Array<{ label: string; value: number }>;
+    sequence?: Array<{ color: string; shape: string }>;
+    elements?: Array<{
+      type: string;
+      properties: {
+        fontSize?: string;
+        color?: string;
+        expression?: string;
+        min?: number;
+        max?: number;
+        step?: number;
+        highlighted?: number[];
+      };
+    }>;
+  };
+  renderingSpecs: {
+    width: number;
+    height: number;
+    style?: React.CSSProperties;
+  };
+}
 
 interface VisualRendererProps {
   visualData: VisualData;
