@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Clock, Flag, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatQuestionText, cleanOptionText, formatExplanationText } from '@/utils/textFormatting';
 
 interface Question {
   id: string;
@@ -14,6 +15,7 @@ interface Question {
   topic: string;
   subSkill: string;
   difficulty: number;
+  passageContent?: string;
 }
 
 interface QuestionInterfaceProps {
@@ -21,7 +23,7 @@ interface QuestionInterfaceProps {
   questionNumber: number;
   totalQuestions: number;
   timeRemaining?: number;
-  onAnswer: (answerIndex: number, confidence: number) => void;
+  onAnswer: (answerIndex: number, confidence?: number) => void;
   onNext: () => void;
   onPrevious: () => void;
   onFlag: () => void;
@@ -51,6 +53,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const progressPercentage = (questionNumber / totalQuestions) * 100;
+  const hasPassage = question?.passageContent && question.passageContent.trim().length > 0;
 
   const handleOptionSelect = (index: number) => {
     if (showFeedback && !isReviewMode) return;
@@ -58,6 +61,9 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     setSelectedAnswer(index);
     setIsConfirmed(false);
     setShowConfirmation(false);
+    
+    // For backward compatibility, immediately call onAnswer
+    onAnswer(index, confidence);
   };
 
   const handleConfirmAnswer = () => {
@@ -97,6 +103,171 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     return cn(baseClass, "border-gray-200 hover:border-edu-teal/40 hover:bg-edu-teal/5");
   };
 
+  // Dual panel layout for reading questions
+  if (hasPassage) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header with Progress and Time */}
+        <div className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm border">
+          <div className="flex items-center space-x-4">
+            <div className="text-sm font-medium text-edu-navy">
+              Question {questionNumber} of {totalQuestions}
+            </div>
+            <div className="w-48">
+              <Progress value={progressPercentage} className="h-2" />
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            {timeRemaining && (
+              <div className={cn(
+                "flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium",
+                timeRemaining < 30 ? "bg-red-100 text-red-700" : "bg-edu-light-blue text-edu-navy"
+              )}>
+                <Clock size={16} />
+                <span>{formatTime(timeRemaining)}</span>
+              </div>
+            )}
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onFlag}
+              className="flex items-center space-x-1"
+            >
+              <Flag size={16} />
+              <span>Flag</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Dual Panel Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Reading Passage Panel */}
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-edu-navy mb-4">Reading Passage</h3>
+              <div className="max-h-[500px] overflow-y-auto prose prose-gray max-w-none text-sm leading-relaxed">
+                {question.passageContent?.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4 text-gray-800">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Question Panel */}
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {/* Question Metadata */}
+                <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                  <div className="flex items-center space-x-4 text-sm text-edu-navy/70">
+                    <span className="bg-edu-teal/10 px-3 py-1 rounded-full">{question.topic}</span>
+                    <span className="bg-edu-coral/10 px-3 py-1 rounded-full">{question.subSkill}</span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-sm text-edu-navy/70">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "w-2 h-2 rounded-full",
+                          i < question.difficulty ? "bg-edu-coral" : "bg-gray-200"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Question Text */}
+                <div>
+                  <h2 className="text-xl font-semibold leading-relaxed text-edu-navy mb-4 whitespace-pre-line">
+                    {formatQuestionText(question.text)}
+                  </h2>
+                </div>
+
+                {/* Answer Options */}
+                {question.options && (
+                  <div className="space-y-3">
+                    {question.options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleOptionSelect(index)}
+                        disabled={showFeedback && !isReviewMode}
+                        className={getOptionClassName(index)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 mt-0.5",
+                            selectedAnswer === index 
+                              ? "bg-edu-teal text-white" 
+                              : "bg-gray-100 text-gray-600 group-hover:bg-edu-teal/20"
+                          )}>
+                            {String.fromCharCode(65 + index)}
+                          </div>
+                          <div className="text-left leading-relaxed">{cleanOptionText(option)}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Feedback Section */}
+                {showFeedback && question.explanation && (
+                  <div className="p-6 bg-gradient-to-r from-edu-light-blue to-white rounded-xl border-l-4 border-edu-teal">
+                    <div className="flex items-start space-x-3">
+                      <div className="shrink-0 mt-0.5">
+                        {selectedAnswer === question.correctAnswer ? (
+                          <CheckCircle size={20} className="text-green-600" />
+                        ) : (
+                          <AlertCircle size={20} className="text-red-600" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-edu-navy mb-2">
+                          {selectedAnswer === question.correctAnswer ? "Correct!" : "Not quite right"}
+                        </h3>
+                        <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(question.explanation)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={onPrevious}
+            disabled={!canGoBack}
+            className="flex items-center space-x-2 px-6 py-2"
+          >
+            <ChevronLeft size={18} />
+            <span>Previous</span>
+          </Button>
+
+          <div className="flex items-center space-x-3">
+            {(isConfirmed || showFeedback || selectedAnswer !== null) && (
+              <Button
+                onClick={onNext}
+                disabled={!canGoNext}
+                className="bg-edu-coral hover:bg-edu-coral/90 text-white px-8 py-2 flex items-center space-x-2"
+              >
+                <span>{questionNumber === totalQuestions ? "Finish" : "Next"}</span>
+                <ChevronRight size={18} />
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Single panel layout for non-reading questions
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header with Progress and Time */}
@@ -157,8 +328,8 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
 
           {/* Question Text */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold leading-relaxed text-edu-navy mb-4">
-              {question.text}
+            <h2 className="text-xl font-semibold leading-relaxed text-edu-navy mb-4 whitespace-pre-line">
+              {formatQuestionText(question.text)}
             </h2>
           </div>
 
@@ -181,7 +352,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
                     )}>
                       {String.fromCharCode(65 + index)}
                     </div>
-                    <div className="text-left leading-relaxed">{option}</div>
+                    <div className="text-left leading-relaxed">{cleanOptionText(option)}</div>
                   </div>
                 </button>
               ))}
@@ -233,7 +404,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
                   <h3 className="font-semibold text-edu-navy mb-2">
                     {selectedAnswer === question.correctAnswer ? "Correct!" : "Not quite right"}
                   </h3>
-                  <p className="text-edu-navy/80 leading-relaxed">{question.explanation}</p>
+                  <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(question.explanation)}</p>
                 </div>
               </div>
             </div>

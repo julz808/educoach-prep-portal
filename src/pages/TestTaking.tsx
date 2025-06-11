@@ -10,10 +10,15 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
+import { EnhancedTestInterface } from '@/components/EnhancedTestInterface';
 import { 
   fetchQuestionsForTest, 
+  fetchDiagnosticModes,
+  fetchQuestionsFromSupabase,
+  fetchDrillModes,
   type OrganizedQuestion 
 } from '@/services/supabaseQuestionService';
+import { TEST_STRUCTURES } from '@/data/curriculumData';
 
 interface Question {
   id: string;
@@ -21,6 +26,9 @@ interface Question {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  topic: string;
+  subSkill: string;
+  difficulty: number;
   userAnswer?: number;
   flagged?: boolean;
   passageContent?: string;
@@ -40,7 +48,8 @@ interface TestSession {
   answers: Record<number, number>;
   flaggedQuestions: Set<number>;
   startTime: Date;
-  status: 'in-progress' | 'completed' | 'review';
+  pausedTime?: number; // Time remaining when paused (in seconds)
+  status: 'in-progress' | 'completed' | 'review' | 'paused';
 }
 
 // Test type mapping for Supabase
@@ -53,76 +62,281 @@ const TEST_TYPE_MAPPING: Record<string, string> = {
   'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
 };
 
+// Function to get time limit from curriculum data
+const getTimeLimit = (testTypeName: string, sectionName: string): number => {
+  const testStructure = TEST_STRUCTURES[testTypeName as keyof typeof TEST_STRUCTURES];
+  if (!testStructure) {
+    console.warn('No test structure found for:', testTypeName);
+    return 30; // Default 30 minutes
+  }
+
+  // Try to find exact match first
+  const exactMatch = (testStructure as any)[sectionName];
+  if (exactMatch && typeof exactMatch === 'object' && exactMatch.time) {
+    return exactMatch.time;
+  }
+
+  // Try to find partial match (case-insensitive)
+  const sectionKeys = Object.keys(testStructure);
+  const partialMatch = sectionKeys.find(key => 
+    key.toLowerCase().includes(sectionName.toLowerCase()) ||
+    sectionName.toLowerCase().includes(key.toLowerCase())
+  );
+
+  if (partialMatch) {
+    const matchedSection = (testStructure as any)[partialMatch];
+    if (matchedSection && typeof matchedSection === 'object' && matchedSection.time) {
+      return matchedSection.time;
+    }
+  }
+
+  console.warn('No time limit found for section:', sectionName, 'in test:', testTypeName);
+  return 30; // Default 30 minutes
+};
+
+// Function to randomize questions with special handling for reading comprehension
+const randomizeQuestions = (questions: Question[], sectionName: string): Question[] => {
+  // Check if this is a reading comprehension section
+  const isReadingSection = sectionName.toLowerCase().includes('reading') || 
+                          sectionName.toLowerCase().includes('comprehension');
+  
+  if (!isReadingSection) {
+    // For non-reading sections, simple randomization
+    const shuffled = [...questions];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+  
+  // For reading sections, group questions by passage and randomize groups
+  const passageGroups = new Map<string, Question[]>();
+  const questionsWithoutPassage: Question[] = [];
+  
+  // Group questions by passage content
+  questions.forEach(question => {
+    if (question.passageContent && question.passageContent.trim()) {
+      const passageKey = question.passageContent.substring(0, 100); // Use first 100 chars as key
+      if (!passageGroups.has(passageKey)) {
+        passageGroups.set(passageKey, []);
+      }
+      passageGroups.get(passageKey)!.push(question);
+    } else {
+      questionsWithoutPassage.push(question);
+    }
+  });
+  
+  // Convert groups to array and randomize the order of groups
+  const groupsArray = Array.from(passageGroups.values());
+  for (let i = groupsArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [groupsArray[i], groupsArray[j]] = [groupsArray[j], groupsArray[i]];
+  }
+  
+  // Randomize questions without passages
+  const shuffledWithoutPassage = [...questionsWithoutPassage];
+  for (let i = shuffledWithoutPassage.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledWithoutPassage[i], shuffledWithoutPassage[j]] = [shuffledWithoutPassage[j], shuffledWithoutPassage[i]];
+  }
+  
+  // Combine: randomized groups + randomized individual questions
+  const result = [...groupsArray.flat(), ...shuffledWithoutPassage];
+  
+  console.log('🎲 Question randomization for', sectionName, ':', {
+    isReadingSection,
+    originalCount: questions.length,
+    passageGroups: passageGroups.size,
+    questionsWithoutPassage: questionsWithoutPassage.length,
+    finalCount: result.length
+  });
+  
+  return result;
+};
+
 const TestTaking: React.FC = () => {
-  const { testType, subjectId, sectionId } = useParams();
+  const { testType, subjectId, sectionId } = useParams<{ 
+    testType: string; 
+    subjectId: string; 
+    sectionId?: string; 
+  }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { selectedProduct } = useProduct();
-  
-  const skillId = searchParams.get('skillId');
-  const skillName = searchParams.get('skillName');
-  const sectionName = searchParams.get('sectionName');
-  
   const [session, setSession] = useState<TestSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
-  // Load questions from Supabase
+  // Initialize test session
   useEffect(() => {
     const loadQuestions = async () => {
-      setLoading(true);
-      setError(null);
-      
+      if (!subjectId || !testType) {
+        setError('Missing test parameters');
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Map frontend test type to Supabase test type
-        const supabaseTestType = TEST_TYPE_MAPPING[selectedProduct] || selectedProduct;
+        setLoading(true);
         
-        // Map test mode
-        let testMode = 'practice_1'; // default
-        if (testType === 'diagnostic') {
-          testMode = 'diagnostic';
-        } else if (testType === 'drill') {
-          testMode = 'drill';
-        } else if (testType === 'practice') {
-          testMode = 'practice_1';
-        }
+        // Get test parameters from URL
+        const sectionName = searchParams.get('sectionName') || '';
+        const skillId = searchParams.get('skill') || '';
+        
+        console.log('🔧 Loading questions for:', {
+          testType,
+          subjectId,
+          sectionId,
+          sectionName,
+          selectedProduct
+        });
 
-        // Fetch questions for the specific test and section
-        const questions = await fetchQuestionsForTest(
-          supabaseTestType, 
-          testMode, 
-          sectionName || undefined
-        );
-
-        if (questions.length === 0) {
-          setError(`No questions found for ${sectionName || 'this section'}. Questions may not be available yet.`);
+        // Map frontend product to database test type
+        const dbTestType = TEST_TYPE_MAPPING[selectedProduct];
+        if (!dbTestType) {
+          console.error('No database test type found for product:', selectedProduct);
+          setError(`Unsupported test type: ${selectedProduct}`);
+          setLoading(false);
           return;
         }
 
-        // Transform questions to match component interface
-        const transformedQuestions: Question[] = questions.map(q => ({
-          id: q.id,
+        console.log('🔧 Mapped to database test type:', dbTestType);
+
+        let questions: OrganizedQuestion[] = [];
+
+        if (testType === 'diagnostic') {
+          // For diagnostic tests, load questions by section
+          console.log('🔧 Loading diagnostic questions...');
+          const diagnosticModes = await fetchDiagnosticModes(selectedProduct);
+          
+          // Find the section containing questions
+          let foundSection = null;
+          for (const mode of diagnosticModes) {
+            foundSection = mode.sections.find(section => 
+              section.id === subjectId || 
+              section.name.toLowerCase().includes(subjectId.toLowerCase())
+            );
+            if (foundSection) break;
+          }
+
+          if (foundSection && foundSection.questions.length > 0) {
+            questions = foundSection.questions;
+            console.log('🔧 Found diagnostic questions:', questions.length);
+          }
+        } else if (testType === 'practice') {
+          // For practice tests, load questions by test mode and section
+          console.log('🔧 Loading practice questions...');
+          
+          // Try to find the right practice mode (practice_1, practice_2, etc.)
+          const organizedData = await fetchQuestionsFromSupabase();
+          const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
+          
+          if (currentTestType) {
+            // Find the section by ID across all practice modes
+            let foundSection = null;
+            for (const testMode of currentTestType.testModes) {
+              foundSection = testMode.sections.find(section => 
+                section.id === subjectId || 
+                section.name.toLowerCase().includes(subjectId.toLowerCase())
+              );
+              if (foundSection && foundSection.questions.length > 0) {
+                questions = foundSection.questions;
+                console.log('🔧 Found practice questions from mode:', testMode.name, '- Count:', questions.length);
+                break;
+              }
+            }
+          }
+        } else if (testType === 'drill') {
+          // For drill tests, load questions by sub-skill and filter by difficulty
+          console.log('🔧 Loading drill questions...');
+          
+          const difficulty = searchParams.get('difficulty') || 'easy';
+          const skillArea = searchParams.get('skillArea') || '';
+          const skillName = searchParams.get('skill') || '';
+          
+          console.log('🔧 Drill parameters:', { difficulty, skillArea, skillName, subjectId });
+          
+          // Load drill modes and find the sub-skill questions
+          const drillModes = await fetchDrillModes(selectedProduct);
+          console.log('🔧 Available drill modes:', drillModes.length);
+          
+          // Find the skill area and sub-skill
+          let foundQuestions: OrganizedQuestion[] = [];
+          for (const mode of drillModes) {
+            if (mode.name.toLowerCase().includes(skillArea.toLowerCase()) || 
+                skillArea.toLowerCase().includes(mode.name.toLowerCase())) {
+              for (const section of mode.sections) {
+                if (section.id === subjectId || 
+                    section.name.toLowerCase().includes(skillName.toLowerCase()) ||
+                    skillName.toLowerCase().includes(section.name.toLowerCase())) {
+                  foundQuestions = section.questions;
+                  console.log('🔧 Found drill section:', section.name, 'with', foundQuestions.length, 'questions');
+                  break;
+                }
+              }
+              if (foundQuestions.length > 0) break;
+            }
+          }
+          
+          if (foundQuestions.length > 0) {
+            // Filter by difficulty level
+            const difficultyMap = { easy: 1, medium: 2, hard: 3 };
+            const targetDifficulty = difficultyMap[difficulty as keyof typeof difficultyMap] || 1;
+            
+            const filteredQuestions = foundQuestions.filter(q => q.difficulty === targetDifficulty);
+            console.log(`🔧 Filtered ${difficulty} questions:`, filteredQuestions.length, 'out of', foundQuestions.length);
+            
+            questions = filteredQuestions;
+          }
+        }
+
+        // Transform OrganizedQuestion[] to Question[] with formatted text
+        const transformedQuestions: Question[] = questions.map((q, index) => ({
+          id: q.id || `question-${index}`,
           text: q.text,
           options: q.options,
           correctAnswer: q.correctAnswer,
           explanation: q.explanation,
-          passageContent: q.passageContent,
+          topic: q.topic || 'General',
+          subSkill: q.subSkill || 'General',
+          difficulty: q.difficulty || 1,
+          passageContent: q.passageContent
         }));
 
-        // Calculate time limit based on number of questions
-        const timeLimit = Math.max(Math.ceil(questions.length * 1.5), 10); // minimum 10 minutes
+        console.log('🔧 Transformed questions:', transformedQuestions.length);
+
+        if (transformedQuestions.length === 0) {
+          setError(`No questions found for this ${testType} section. Questions may be coming soon.`);
+          setLoading(false);
+          return;
+        }
+
+        // Randomize questions (with special handling for reading comprehension)
+        const randomizedQuestions = randomizeQuestions(transformedQuestions, sectionName || subjectId);
+
+        // Get actual time limit from curriculum data
+        let actualTimeLimit: number;
+        if (testType === 'drill') {
+          // For drill tests, use a shorter time limit (1.5 minutes per question)
+          actualTimeLimit = Math.max(transformedQuestions.length * 1.5, 5); // Minimum 5 minutes
+          console.log('🔧 Drill time limit calculated:', actualTimeLimit, 'minutes for', transformedQuestions.length, 'questions');
+        } else {
+          actualTimeLimit = getTimeLimit(dbTestType, sectionName || subjectId);
+          console.log('🔧 Time limit from curriculum data:', actualTimeLimit, 'minutes for section:', sectionName || subjectId);
+        }
 
         const newSession: TestSession = {
-          type: (testType as 'diagnostic' | 'practice' | 'drill') || 'practice',
-          subjectId: subjectId || '',
-          subjectName: sectionName || subjectId || '',
-          sectionId: sectionId,
-          sectionName: sectionName || '',
-          skillId: skillId,
-          skillName: skillName || '',
-          questions: transformedQuestions,
-          timeLimit: timeLimit,
+          type: testType as 'diagnostic' | 'practice' | 'drill',
+          subjectId,
+          subjectName: dbTestType,
+          sectionId,
+          sectionName: sectionName || subjectId,
+          skillId,
+          skillName: skillId,
+          questions: randomizedQuestions,
+          timeLimit: actualTimeLimit,
           currentQuestion: 0,
           answers: {},
           flaggedQuestions: new Set(),
@@ -131,34 +345,183 @@ const TestTaking: React.FC = () => {
         };
 
         setSession(newSession);
-        setTimeRemaining(timeLimit * 60); // convert to seconds
+        setTimeRemaining(newSession.timeLimit * 60); // Convert to seconds
+        
+        console.log('🔧 Test session created:', {
+          type: newSession.type,
+          subject: newSession.subjectName,
+          section: newSession.sectionName,
+          questionCount: newSession.questions.length,
+          timeLimit: newSession.timeLimit
+        });
+        
       } catch (err) {
-        console.error('Error loading questions:', err);
-        setError('Failed to load questions. Please try again.');
+        console.error('Error loading test:', err);
+        setError('Failed to load test questions. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
     loadQuestions();
-  }, [selectedProduct, testType, subjectId, sectionId, sectionName]);
+  }, [subjectId, testType, sectionId, searchParams, selectedProduct]);
 
-  // Timer effect
+  // Timer effect with auto-finish when reaching 0
   useEffect(() => {
-    if (session?.status === 'in-progress' && timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            handleTimeUp();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (!session || session.status !== 'in-progress') return;
 
-      return () => clearInterval(timer);
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Auto-finish test when timer reaches 0
+          console.log('⏰ Time is up! Auto-finishing test...');
+          setSession(prevSession => 
+            prevSession ? { ...prevSession, status: 'completed' } : prevSession
+          );
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [session]);
+
+  // Check for paused session on load and resume if needed
+  useEffect(() => {
+    if (session && session.status === 'paused' && session.pausedTime !== undefined) {
+      console.log('🔄 Resuming paused test with', session.pausedTime, 'seconds remaining');
+      setTimeRemaining(session.pausedTime);
+      setSession(prev => prev ? { ...prev, status: 'in-progress', pausedTime: undefined } : prev);
     }
-  }, [session?.status, timeRemaining]);
+  }, [session]);
+
+  const handleAnswer = (questionIndex: number, answerIndex: number) => {
+    if (!session) return;
+    
+    setSession(prev => prev ? ({
+      ...prev,
+      answers: {
+        ...prev.answers,
+        [questionIndex]: answerIndex
+      }
+    }) : prev);
+  };
+
+  const handleNext = () => {
+    if (!session) return;
+    
+    if (session.currentQuestion < session.questions.length - 1) {
+      setSession(prev => prev ? ({
+        ...prev,
+        currentQuestion: prev.currentQuestion + 1
+      }) : prev);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (!session) return;
+    
+    if (session.currentQuestion > 0) {
+      setSession(prev => prev ? ({
+        ...prev,
+        currentQuestion: prev.currentQuestion - 1
+      }) : prev);
+    }
+  };
+
+  const handleJumpToQuestion = (questionIndex: number) => {
+    if (!session) return;
+    
+    setSession(prev => prev ? ({
+      ...prev,
+      currentQuestion: questionIndex
+    }) : prev);
+  };
+
+  const handleFlag = (questionIndex: number) => {
+    if (!session) return;
+    
+    setSession(prev => {
+      if (!prev) return prev;
+      const newFlagged = new Set(prev.flaggedQuestions);
+      if (newFlagged.has(questionIndex)) {
+        newFlagged.delete(questionIndex);
+      } else {
+        newFlagged.add(questionIndex);
+      }
+      return {
+        ...prev,
+        flaggedQuestions: newFlagged
+      };
+    });
+  };
+
+  const handleFinish = () => {
+    if (!session) return;
+    
+    setSession(prev => prev ? ({ ...prev, status: 'completed' }) : prev);
+  };
+
+  const handleExit = () => {
+    if (!session) return;
+    
+    console.log('🚪 Exiting test - saving progress with', timeRemaining, 'seconds remaining');
+    
+    // Save current state and pause the test
+    setSession(prev => prev ? ({ 
+      ...prev, 
+      status: 'paused',
+      pausedTime: timeRemaining
+    }) : prev);
+    
+    // Navigate back to appropriate dashboard
+    const basePath = session.type === 'diagnostic' ? '/dashboard/diagnostic' :
+                    session.type === 'practice' ? '/dashboard/practice-tests' :
+                    session.type === 'drill' ? '/dashboard/drill' :
+                    '/dashboard';
+    navigate(basePath);
+  };
+
+  const handleTimeUp = () => {
+    if (!session) return;
+    
+    setSession(prev => prev ? ({ ...prev, status: 'completed' }) : prev);
+  };
+
+  const handleReview = () => {
+    if (!session) return;
+    
+    setSession(prev => prev ? ({ ...prev, status: 'review' }) : prev);
+  };
+
+  const handleBackToDashboard = () => {
+    const basePath = session?.type === 'diagnostic' ? '/dashboard/diagnostic' :
+                    session?.type === 'practice' ? '/dashboard/practice-tests' :
+                    session?.type === 'drill' ? '/dashboard/drill' :
+                    '/dashboard';
+    navigate(basePath);
+  };
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const getTestTitle = () => {
+    if (!session) return 'Test';
+    
+    const sectionDisplay = session.sectionName || session.subjectId;
+    
+    if (session.type === 'drill') {
+      return `${session.subjectName} - ${session.skillName || sectionDisplay}`;
+    } else if (session.type === 'practice') {
+      return `Practice Test - ${sectionDisplay}`;
+    } else {
+      return `Diagnostic - ${sectionDisplay}`;
+    }
+  };
 
   // Loading state
   if (loading) {
@@ -166,7 +529,7 @@ const TestTaking: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading questions...</p>
+          <p className="text-edu-navy">Loading test questions...</p>
         </div>
       </div>
     );
@@ -179,156 +542,11 @@ const TestTaking: React.FC = () => {
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-600 mb-4">{error || 'Failed to load test session'}</p>
-          <Button onClick={() => navigate('/mock-tests')}>
-            Back to Tests
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const currentQuestion = session.questions[session.currentQuestion];
-  const progress = ((session.currentQuestion + 1) / session.questions.length) * 100;
-  const answeredQuestions = Object.keys(session.answers).length;
-
-  const handleAnswer = (answerIndex: number) => {
-    setSession(prev => prev ? ({
-      ...prev,
-      answers: {
-        ...prev.answers,
-        [prev.currentQuestion]: answerIndex
-      }
-    }) : prev);
-  };
-
-  const handleNext = () => {
-    if (session.currentQuestion < session.questions.length - 1) {
-      setSession(prev => prev ? ({
-        ...prev,
-        currentQuestion: prev.currentQuestion + 1
-      }) : prev);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (session.currentQuestion > 0) {
-      setSession(prev => prev ? ({
-        ...prev,
-        currentQuestion: prev.currentQuestion - 1
-      }) : prev);
-    }
-  };
-
-  const handleFlag = () => {
-    setSession(prev => {
-      if (!prev) return prev;
-      const newFlagged = new Set(prev.flaggedQuestions);
-      if (newFlagged.has(prev.currentQuestion)) {
-        newFlagged.delete(prev.currentQuestion);
-      } else {
-        newFlagged.add(prev.currentQuestion);
-      }
-      return {
-        ...prev,
-        flaggedQuestions: newFlagged
-      };
-    });
-  };
-
-  const handleFinish = () => {
-    setSession(prev => prev ? ({ ...prev, status: 'completed' }) : prev);
-  };
-
-  const handleTimeUp = () => {
-    setSession(prev => prev ? ({ ...prev, status: 'completed' }) : prev);
-  };
-
-  const handleReview = () => {
-    setSession(prev => prev ? ({ ...prev, status: 'review' }) : prev);
-  };
-
-  const handleBackToDashboard = () => {
-    const basePath = session.type === 'diagnostic' ? '/diagnostic' :
-                    session.type === 'practice' ? '/mock-tests' :
-                    '/dashboard';
-    navigate(basePath);
-  };
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const getTestTitle = () => {
-    if (session.type === 'drill') {
-      return `${session.subjectName} - ${session.skillName}`;
-    } else if (session.type === 'practice') {
-      return `Practice Test - ${session.subjectName}`;
-    } else {
-      return `Diagnostic - ${session.subjectName}`;
-    }
-  };
-
-  // Results view
-  if (session.status === 'completed') {
-    const score = Math.round((answeredQuestions / session.questions.length) * 100);
-    const correctAnswers = session.questions.filter((q, index) => 
-      session.answers[index] === q.correctAnswer
-    ).length;
-    const accuracy = Math.round((correctAnswers / answeredQuestions) * 100);
-
-    return (
-      <div className="min-h-screen bg-white p-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Results Header */}
-          <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <CheckCircle size={64} className="mx-auto mb-4" />
-                <h1 className="text-3xl font-bold mb-2">Test Completed!</h1>
-                <p className="text-lg opacity-90">{getTestTitle()}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Score Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{score}%</div>
-                <div className="text-sm text-muted-foreground">Completion Rate</div>
-                <div className="text-xs mt-1">{answeredQuestions}/{session.questions.length} questions answered</div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">{accuracy}%</div>
-                <div className="text-sm text-muted-foreground">Accuracy</div>
-                <div className="text-xs mt-1">{correctAnswers} correct answers</div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">
-                  {formatTime((session.timeLimit * 60) - timeRemaining)}
-                </div>
-                <div className="text-sm text-muted-foreground">Time Taken</div>
-                <div className="text-xs mt-1">out of {session.timeLimit} minutes</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-center space-x-4">
-            <Button onClick={handleReview} variant="outline" size="lg">
-              <BookOpen size={20} className="mr-2" />
-              Review Answers
+          <div className="space-y-2">
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
             </Button>
-            <Button onClick={handleBackToDashboard} size="lg">
-              <ArrowLeft size={20} className="mr-2" />
+            <Button onClick={() => navigate('/dashboard')}>
               Back to Dashboard
             </Button>
           </div>
@@ -337,228 +555,96 @@ const TestTaking: React.FC = () => {
     );
   }
 
-  // Review mode
-  if (session.status === 'review') {
-    const question = session.questions[session.currentQuestion];
-    const userAnswer = session.answers[session.currentQuestion];
-    const isCorrect = userAnswer === question.correctAnswer;
+  // Completed state - show results/review options
+  if (session.status === 'completed') {
+    const totalQuestions = session.questions.length;
+    const answeredQuestions = Object.keys(session.answers).length;
+    const score = Object.entries(session.answers).reduce((correct, [qIndex, answer]) => {
+      return session.questions[parseInt(qIndex)].correctAnswer === answer ? correct + 1 : correct;
+    }, 0);
+    const percentage = Math.round((score / totalQuestions) * 100);
 
     return (
-      <div className="min-h-screen bg-white p-8">
+      <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Review Header */}
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold">{getTestTitle()} - Review</h1>
-                  <p className="text-muted-foreground">Question {session.currentQuestion + 1} of {session.questions.length}</p>
+            <CardContent className="p-8 text-center">
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-edu-navy mb-2">
+                {timeRemaining === 0 ? 'Time is Up!' : 'Test Completed!'}
+              </h1>
+              <p className="text-edu-navy/70 mb-6">{getTestTitle()}</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-edu-teal">{score}/{totalQuestions}</div>
+                  <div className="text-sm text-gray-600">Questions Correct</div>
                 </div>
-                <Button onClick={handleBackToDashboard} variant="outline">
-                  <ArrowLeft size={16} className="mr-2" />
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-edu-coral">{percentage}%</div>
+                  <div className="text-sm text-gray-600">Score</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-edu-navy">{answeredQuestions}</div>
+                  <div className="text-sm text-gray-600">Answered</div>
+                </div>
+              </div>
+
+              <div className="flex justify-center space-x-4">
+                <Button onClick={handleReview} variant="outline">
+                  Review Answers
+                </Button>
+                <Button onClick={handleBackToDashboard}>
                   Back to Dashboard
                 </Button>
               </div>
             </CardContent>
           </Card>
-
-          {/* Question Review */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Question {session.currentQuestion + 1}</CardTitle>
-                <Badge className={isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
-                  {isCorrect ? 'Correct' : 'Incorrect'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-lg leading-relaxed whitespace-pre-line">
-                {question.text}
-              </div>
-
-              <div className="space-y-3">
-                {question.options.map((option, index) => {
-                  const letter = String.fromCharCode(65 + index);
-                  const isUserChoice = userAnswer === index;
-                  const isCorrectChoice = question.correctAnswer === index;
-                  
-                  return (
-                    <div
-                      key={index}
-                      className={cn(
-                        "p-4 rounded-lg border-2 transition-all",
-                        isCorrectChoice ? 'border-green-500 bg-green-50' :
-                        isUserChoice && !isCorrectChoice ? 'border-red-500 bg-red-50' :
-                        'border-gray-200 bg-gray-50'
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
-                          isCorrectChoice ? 'bg-green-500 text-white' :
-                          isUserChoice && !isCorrectChoice ? 'bg-red-500 text-white' :
-                          'bg-gray-300 text-gray-700'
-                        )}>
-                          {letter}
-                        </div>
-                        <span className="flex-1">{option}</span>
-                        {isUserChoice && (
-                          <Badge variant="outline">Your Answer</Badge>
-                        )}
-                        {isCorrectChoice && (
-                          <Badge className="bg-green-100 text-green-700">Correct</Badge>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Explanation */}
-              <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">Explanation:</h4>
-                  <p className="text-blue-800">{question.explanation}</p>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-
-          {/* Navigation */}
-          <div className="flex justify-between">
-            <Button 
-              onClick={handlePrevious} 
-              disabled={session.currentQuestion === 0}
-              variant="outline"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Previous
-            </Button>
-            
-            <Button 
-              onClick={handleNext} 
-              disabled={session.currentQuestion === session.questions.length - 1}
-            >
-              Next
-              <ArrowRight size={16} className="ml-2" />
-            </Button>
-          </div>
         </div>
       </div>
     );
   }
 
-  // Test taking interface
+  // Review mode - use enhanced interface with feedback
+  if (session.status === 'review') {
+    return (
+      <EnhancedTestInterface
+        questions={session.questions}
+        currentQuestionIndex={session.currentQuestion}
+        onAnswer={handleAnswer}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onJumpToQuestion={handleJumpToQuestion}
+        onFlag={handleFlag}
+        answers={session.answers}
+        flaggedQuestions={session.flaggedQuestions}
+        showFeedback={true}
+        isReviewMode={true}
+        testTitle={`${getTestTitle()} - Review`}
+        onFinish={handleBackToDashboard}
+      />
+    );
+  }
+
+  // Main test taking interface
   return (
-    <div className="min-h-screen bg-white p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Test Header */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">{getTestTitle()}</h1>
-                <p className="text-muted-foreground">Question {session.currentQuestion + 1} of {session.questions.length}</p>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className={cn(
-                  "flex items-center space-x-2 px-3 py-2 rounded-lg",
-                  timeRemaining < 300 ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
-                )}>
-                  <Clock size={16} />
-                  <span className="font-mono">{formatTime(timeRemaining)}</span>
-                </div>
-                
-                <Button onClick={handleFlag} variant="outline" size="sm">
-                  <Flag 
-                    size={16} 
-                    className={session.flaggedQuestions.has(session.currentQuestion) ? 'fill-current text-red-500' : ''} 
-                  />
-                </Button>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <Progress value={progress} className="h-2" />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>{answeredQuestions} answered</span>
-                <span>{session.flaggedQuestions.size} flagged</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Question */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Question {session.currentQuestion + 1}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-lg leading-relaxed whitespace-pre-line">
-              {currentQuestion.text}
-            </div>
-
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, index) => {
-                const letter = String.fromCharCode(65 + index);
-                const isSelected = session.answers[session.currentQuestion] === index;
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(index)}
-                    className={cn(
-                      "w-full p-4 rounded-lg border-2 text-left transition-all hover:border-edu-teal",
-                      isSelected 
-                        ? 'border-edu-teal bg-edu-light-blue/30' 
-                        : 'border-gray-200 bg-white'
-                    )}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
-                        isSelected ? 'bg-edu-teal text-white' : 'bg-gray-200 text-gray-700'
-                      )}>
-                        {letter}
-                      </div>
-                      <span className="flex-1">{option}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <Button 
-            onClick={handlePrevious} 
-            disabled={session.currentQuestion === 0}
-            variant="outline"
-          >
-            <ArrowLeft size={16} className="mr-2" />
-            Previous
-          </Button>
-          
-          <div className="space-x-3">
-            {session.currentQuestion === session.questions.length - 1 ? (
-              <Button onClick={handleFinish} className="bg-green-600 hover:bg-green-700">
-                <CheckCircle size={16} className="mr-2" />
-                Finish Test
-              </Button>
-            ) : (
-              <Button onClick={handleNext}>
-                Next
-                <ArrowRight size={16} className="ml-2" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <EnhancedTestInterface
+      questions={session.questions}
+      currentQuestionIndex={session.currentQuestion}
+      timeRemaining={timeRemaining}
+      onAnswer={handleAnswer}
+      onNext={handleNext}
+      onPrevious={handlePrevious}
+      onJumpToQuestion={handleJumpToQuestion}
+      onFlag={handleFlag}
+      answers={session.answers}
+      flaggedQuestions={session.flaggedQuestions}
+      showFeedback={false}
+      isReviewMode={false}
+      testTitle={getTestTitle()}
+      onFinish={handleFinish}
+      onExit={handleExit}
+    />
   );
 };
 

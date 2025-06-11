@@ -7,10 +7,11 @@ import { HeroBanner } from '@/components/ui/hero-banner';
 import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
   BookOpen, Clock, Target, Play, Trophy, BarChart3, 
-  ArrowRight, ChevronLeft, ChevronDown, ChevronRight,
-  CheckCircle, AlertCircle, Brain, Star, Zap, Flag,
-  RotateCcw, ArrowLeft, Award, TrendingUp, Users,
-  Home
+  ArrowRight, ChevronLeft, ChevronDown, ChevronRight, ChevronUp,
+  CheckCircle, CheckCircle2, AlertCircle, Brain, Star, Zap, Flag,
+  RotateCcw, ArrowLeft, Award, TrendingUp, Users, Timer,
+  Home, MessageSquare, Calculator, PieChart, 
+  PenTool, Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
@@ -43,7 +44,7 @@ interface SkillArea {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   color: string;
   subSkills: SubSkill[];
   totalQuestions: number;
@@ -51,28 +52,13 @@ interface SkillArea {
   isExpanded: boolean;
 }
 
-interface QuestionState {
-  question: OrganizedQuestion;
-  skillAreaId: string;
-  skillAreaName: string;
-  subSkillId: string;
-  subSkillName: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  questionNumber: number;
-  totalInDifficulty: number;
-}
-
 const Drill: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'skill-area' | 'sub-skill' | 'question'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'skill-area' | 'sub-skill'>('dashboard');
   const [skillAreas, setSkillAreas] = useState<SkillArea[]>([]);
   const [selectedSkillArea, setSelectedSkillArea] = useState<SkillArea | null>(null);
   const [selectedSubSkill, setSelectedSubSkill] = useState<SubSkill | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionState | null>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
@@ -146,19 +132,48 @@ const Drill: React.FC = () => {
             
             console.log('🔧 DEBUG: Processing sub-skill:', subSkillName, 'in skill area:', skillAreaName);
             
-            // Calculate questions per difficulty (distribute evenly with some randomness for demo)
+            // Count actual questions by difficulty level
             const totalQuestions = section.questions.length;
-            const questionsPerDifficulty = Math.floor(totalQuestions / 3);
-            const remainder = totalQuestions % 3;
+            const easyQuestions = section.questions.filter(q => q.difficulty === 1);
+            const mediumQuestions = section.questions.filter(q => q.difficulty === 2);
+            const hardQuestions = section.questions.filter(q => q.difficulty === 3);
             
-            const easyTotal = questionsPerDifficulty + (remainder > 0 ? 1 : 0);
-            const mediumTotal = questionsPerDifficulty + (remainder > 1 ? 1 : 0);
-            const hardTotal = questionsPerDifficulty;
+            const easyTotal = easyQuestions.length;
+            const mediumTotal = mediumQuestions.length;
+            const hardTotal = hardQuestions.length;
+            
+            console.log(`🔧 DEBUG: Question distribution for ${subSkillName}:`, {
+              easy: easyTotal,
+              medium: mediumTotal, 
+              hard: hardTotal,
+              total: totalQuestions
+            });
             
             // Mock progress data (in real app, fetch from user progress API)
             const easyCompleted = Math.floor(Math.random() * (easyTotal + 1));
             const mediumCompleted = Math.floor(Math.random() * (mediumTotal + 1));
             const hardCompleted = Math.floor(Math.random() * (hardTotal + 1));
+            
+            // Create varied completion states for demonstration
+            let finalEasyCompleted, finalMediumCompleted, finalHardCompleted;
+            const randomState = Math.random();
+            
+            if (randomState < 0.3) {
+              // Not started (30% chance)
+              finalEasyCompleted = 0;
+              finalMediumCompleted = 0;
+              finalHardCompleted = 0;
+            } else if (randomState < 0.7) {
+              // In progress (40% chance)
+              finalEasyCompleted = Math.floor(easyTotal * 0.3);
+              finalMediumCompleted = Math.floor(mediumTotal * 0.2);
+              finalHardCompleted = Math.floor(hardTotal * 0.1);
+            } else {
+              // Completed (30% chance)
+              finalEasyCompleted = easyTotal;
+              finalMediumCompleted = mediumTotal;
+              finalHardCompleted = hardTotal;
+            }
             
             const subSkill: SubSkill = {
               id: section.id,
@@ -167,24 +182,24 @@ const Drill: React.FC = () => {
               questions: section.questions,
               progress: {
                 easy: { 
-                  completed: easyCompleted, 
+                  completed: finalEasyCompleted, 
                   total: easyTotal,
-                  bestScore: easyCompleted > 0 ? Math.floor(Math.random() * 40) + 60 : undefined
+                  bestScore: finalEasyCompleted > 0 ? Math.floor(Math.random() * 40) + 60 : undefined
                 },
                 medium: { 
-                  completed: mediumCompleted, 
+                  completed: finalMediumCompleted, 
                   total: mediumTotal,
-                  bestScore: mediumCompleted > 0 ? Math.floor(Math.random() * 30) + 70 : undefined
+                  bestScore: finalMediumCompleted > 0 ? Math.floor(Math.random() * 30) + 70 : undefined
                 },
                 hard: { 
-                  completed: hardCompleted, 
+                  completed: finalHardCompleted, 
                   total: hardTotal,
-                  bestScore: hardCompleted > 0 ? Math.floor(Math.random() * 20) + 80 : undefined
+                  bestScore: finalHardCompleted > 0 ? Math.floor(Math.random() * 20) + 80 : undefined
                 }
               },
               isRecommended: Math.random() > 0.7, // Mock recommendation (30% chance)
               totalQuestions: totalQuestions,
-              completedQuestions: easyCompleted + mediumCompleted + hardCompleted
+              completedQuestions: finalEasyCompleted + finalMediumCompleted + finalHardCompleted
             };
 
             skillArea.subSkills.push(subSkill);
@@ -213,16 +228,16 @@ const Drill: React.FC = () => {
     loadDrillData();
   }, [selectedProduct]);
 
-  const getSkillAreaIcon = (skillAreaName: string): string => {
+  const getSkillAreaIcon = (skillAreaName: string): React.ReactNode => {
     const name = skillAreaName.toLowerCase();
-    if (name.includes('verbal')) return '💬';
-    if (name.includes('reading')) return '📖';
-    if (name.includes('mathematical')) return '🔢';
-    if (name.includes('quantitative')) return '📊';
-    if (name.includes('written') || name.includes('expression')) return '✍️';
-    if (name.includes('numerical')) return '📊';
-    if (name.includes('abstract')) return '🎨';
-    return '🧠';
+    if (name.includes('verbal')) return <MessageSquare size={20} className="text-white" />;
+    if (name.includes('reading')) return <BookOpen size={20} className="text-white" />;
+    if (name.includes('mathematical')) return <Calculator size={20} className="text-white" />;
+    if (name.includes('quantitative')) return <PieChart size={20} className="text-white" />;
+    if (name.includes('written') || name.includes('expression')) return <PenTool size={20} className="text-white" />;
+    if (name.includes('numerical')) return <PieChart size={20} className="text-white" />;
+    if (name.includes('abstract')) return <Palette size={20} className="text-white" />;
+    return <Brain size={20} className="text-white" />;
   };
 
   const getSkillAreaColor = (skillAreaName: string): string => {
@@ -257,45 +272,24 @@ const Drill: React.FC = () => {
     const questions = selectedSubSkill.questions;
     if (questions.length === 0) return;
     
-    // In real app, filter questions by difficulty
-    const availableQuestions = questions.slice(0, 10); // Mock: use first 10 questions
+    // Map difficulty names to numeric values
+    const difficultyMap = { easy: 1, medium: 2, hard: 3 };
+    const targetDifficulty = difficultyMap[difficulty];
+    
+    // Filter questions by actual difficulty level from database
+    const availableQuestions = questions.filter(q => q.difficulty === targetDifficulty);
+    
+    console.log(`🔧 DEBUG: Filtering ${difficulty} questions (difficulty=${targetDifficulty}):`, availableQuestions.length, 'found out of', questions.length, 'total');
     
     if (availableQuestions.length > 0) {
-      const questionState: QuestionState = {
-        question: availableQuestions[0],
-        skillAreaId: selectedSkillArea.id,
-        skillAreaName: selectedSkillArea.name,
-        subSkillId: selectedSubSkill.id,
-        subSkillName: selectedSubSkill.name,
-        difficulty,
-        questionNumber: 1,
-        totalInDifficulty: Math.min(10, availableQuestions.length)
-      };
-      
-      setCurrentQuestion(questionState);
-      setCurrentView('question');
-      setSelectedAnswer(null);
-      setShowFeedback(false);
+      // Navigate to the test-taking route for full-screen mode
+      const skillId = selectedSubSkill.id;
+      const skillName = selectedSubSkill.name;
+      navigate(`/test/drill/${skillId}?skill=${skillName}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`);
+    } else {
+      console.warn(`No ${difficulty} questions available for ${selectedSubSkill.name}`);
+      // Could show a message to the user here
     }
-  };
-
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (!showFeedback) {
-      setSelectedAnswer(answerIndex);
-    }
-  };
-
-  const submitAnswer = async () => {
-    if (selectedAnswer === null || !currentQuestion) return;
-    
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setShowFeedback(true);
-    setIsSubmitting(false);
-  };
-
-  const nextQuestion = () => {
-    setCurrentView('sub-skill'); // For demo, go back to sub-skill view
   };
 
   const getDifficultyConfig = (difficulty: 'easy' | 'medium' | 'hard') => {
@@ -369,187 +363,6 @@ const Drill: React.FC = () => {
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-600 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Question View
-  if (currentView === 'question' && currentQuestion) {
-    const difficultyConfig = getDifficultyConfig(currentQuestion.difficulty);
-    const isCorrect = selectedAnswer === currentQuestion.question.correctAnswer;
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Enhanced Header with Breadcrumb */}
-        <div className="bg-white shadow-sm border-b sticky top-0 z-10">
-          <div className="max-w-4xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => setCurrentView('sub-skill')}
-                  className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors"
-                >
-                  <ArrowLeft size={18} className="mr-2" />
-                  Back
-                </Button>
-                <div className="hidden sm:block text-sm text-gray-500">
-                  <span className="flex items-center">
-                    <Home size={14} className="mr-1" />
-                    {currentQuestion.skillAreaName}
-                    <ChevronRight size={14} className="mx-2" />
-                    {currentQuestion.subSkillName}
-                    <ChevronRight size={14} className="mx-2" />
-                    {currentQuestion.difficulty.charAt(0).toUpperCase() + currentQuestion.difficulty.slice(1)}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Badge className={difficultyConfig.badgeClass}>
-                  {currentQuestion.difficulty.charAt(0).toUpperCase() + currentQuestion.difficulty.slice(1)}
-                </Badge>
-                <div className="text-sm text-gray-600 hidden sm:block">
-                  Question {currentQuestion.questionNumber} of {currentQuestion.totalInDifficulty}
-                </div>
-              </div>
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-500">Progress</span>
-                <span className="text-xs font-medium text-gray-500">
-                  {Math.round((currentQuestion.questionNumber / currentQuestion.totalInDifficulty) * 100)}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-edu-teal to-edu-teal/80 h-2 rounded-full transition-all duration-500 ease-out" 
-                  style={{ width: `${(currentQuestion.questionNumber / currentQuestion.totalInDifficulty) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Question Content */}
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Question {currentQuestion.questionNumber}
-                  </h2>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="outline" className="text-xs">
-                      {currentQuestion.question.topic}
-                    </Badge>
-                  </div>
-                </div>
-                <p className="text-gray-800 leading-relaxed text-lg">
-                  {currentQuestion.question.text}
-                </p>
-              </div>
-
-              <div className="space-y-3 mb-8">
-                {currentQuestion.question.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswerSelect(index)}
-                    disabled={showFeedback}
-                    className={cn(
-                      "w-full p-4 text-left border-2 rounded-xl transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99]",
-                      selectedAnswer === index 
-                        ? "border-edu-teal bg-edu-teal/5 shadow-md" 
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
-                      showFeedback && index === currentQuestion.question.correctAnswer && "border-green-500 bg-green-50 shadow-md",
-                      showFeedback && selectedAnswer === index && index !== currentQuestion.question.correctAnswer && "border-red-500 bg-red-50"
-                    )}
-                  >
-                    <div className="flex items-center">
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-medium text-gray-700 mr-4">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span className="flex-1">{option}</span>
-                      {showFeedback && index === currentQuestion.question.correctAnswer && (
-                        <CheckCircle className="text-green-600 ml-2" size={20} />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {!showFeedback ? (
-                <div className="flex justify-between items-center">
-                  <Button variant="outline" className="flex items-center">
-                    <Flag size={16} className="mr-2" />
-                    Flag for Review
-                  </Button>
-                  <Button
-                    onClick={submitAnswer}
-                    disabled={selectedAnswer === null || isSubmitting}
-                    className="px-8 py-3 bg-edu-teal hover:bg-edu-teal/90 text-white disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                        Submitting...
-                      </>
-                    ) : (
-                      'Submit Answer'
-                    )}
-                  </Button>
-                </div>
-              ) : (
-                <div className="border-t pt-6 animate-in slide-in-from-bottom-4 duration-500">
-                  <div className="mb-6">
-                    <div className="flex items-center mb-3">
-                      {isCorrect ? (
-                        <div className="flex items-center text-green-600">
-                          <CheckCircle className="mr-2" size={24} />
-                          <span className="font-semibold text-lg">Excellent!</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-red-600">
-                          <AlertCircle className="mr-2" size={24} />
-                          <span className="font-semibold text-lg">Not quite right</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <p className="text-gray-700 mb-3 font-medium">Explanation:</p>
-                      <p className="text-gray-600 leading-relaxed">{currentQuestion.question.explanation}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div className="flex space-x-3">
-                      <Button variant="outline" size="sm">
-                        <Flag size={16} className="mr-2" />
-                        Still Confused
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <RotateCcw size={16} className="mr-2" />
-                        More Like This
-                      </Button>
-                    </div>
-                    <div className="flex space-x-3">
-                      <Button variant="outline" onClick={() => setCurrentView('sub-skill')}>
-                        Switch Difficulty
-                      </Button>
-                      <Button onClick={nextQuestion} className="bg-edu-teal hover:bg-edu-teal/90 text-white">
-                        <ArrowRight size={16} className="mr-2" />
-                        Next Question
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
       </div>
     );
@@ -708,241 +521,218 @@ const Drill: React.FC = () => {
         value: `${overallProgress}%` 
       }
     ],
-    actions: totalQuestions > 0 ? [
-      {
-        label: "Continue Practice",
-        icon: <Play size={20} className="mr-2" />,
-        onClick: () => {
-          if (recommendedSubSkills.length > 0) {
-            const { skillArea, subSkill } = recommendedSubSkills[0];
-            selectSubSkill(skillArea, subSkill);
-          }
-        }
-      }
-    ] : [],
     ...(totalQuestions === 0 && {
       warning: {
         icon: <AlertCircle size={16} />,
         message: "No drill questions available for this test type yet."
       }
-    })
+    }),
+    className: "bg-gradient-to-r from-orange-500 to-orange-700"
   };
 
-  const metricsConfig = [
-    {
-      title: "Skill Areas",
-      value: totalSkillAreas.toString(),
-      icon: <Target className="text-white" size={24} />,
-      badge: { text: "Available", variant: "default" as const },
-      color: {
-        bg: "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200",
-        iconBg: "bg-blue-500",
-        text: "text-blue-900"
-      }
-    },
-    {
-      title: "Questions Completed",
-      value: totalCompleted.toString(),
-      icon: <CheckCircle className="text-white" size={24} />,
-      badge: { text: "Progress", variant: "success" as const },
-      color: {
-        bg: "bg-gradient-to-br from-green-50 to-green-100 border-green-200",
-        iconBg: "bg-green-500",
-        text: "text-green-900"
-      }
-    },
-    {
-      title: "Sub-Skills",
-      value: totalSubSkills.toString(),
-      icon: <Brain className="text-white" size={24} />,
-      badge: { text: "Topics", variant: "secondary" as const },
-      color: {
-        bg: "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200",
-        iconBg: "bg-purple-500",
-        text: "text-purple-900"
-      }
-    },
-    {
-      title: "Overall Progress",
-      value: `${overallProgress}%`,
-      icon: <TrendingUp className="text-white" size={24} />,
-      badge: { text: "Complete", variant: "warning" as const },
-      color: {
-        bg: "bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200",
-        iconBg: "bg-orange-500",
-        text: "text-orange-900"
-      }
+  const getStatusColor = (completedQuestions: number, totalQuestions: number) => {
+    if (completedQuestions === totalQuestions && totalQuestions > 0) {
+      return 'border-emerald-200 bg-emerald-50/30';
+    } else if (completedQuestions > 0) {
+      return 'border-amber-200 bg-amber-50/30';
     }
-  ];
+    return 'border-slate-200 bg-white';
+  };
 
   return (
     <div className="space-y-8">
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
 
-      {/* Metrics Cards */}
-      <MetricsCards metrics={metricsConfig} />
+      {/* Skill Areas - Single Column */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6 text-slate-900">
+          Skill Areas
+        </h2>
+        
+        {skillAreas.length === 0 ? (
+          <Card className="p-12 text-center bg-white border border-slate-200">
+            <AlertCircle className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2 text-slate-700">No Skill Areas Available</h3>
+            <p className="text-slate-600">Drill questions for this test type are coming soon.</p>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {skillAreas.map((skillArea) => (
+              <Card 
+                key={skillArea.id} 
+                className={cn(
+                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-2xl overflow-hidden",
+                  skillArea.totalQuestions > 0 ? "hover:border-orange-300 hover:-translate-y-1" : "opacity-60",
+                  getStatusColor(skillArea.completedQuestions, skillArea.totalQuestions)
+                )}
+              >
+                <CardHeader className="pb-4 bg-gradient-to-r from-slate-50/30 to-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <CardTitle className="text-xl font-bold text-slate-900">{skillArea.name}</CardTitle>
+                        <div className="flex items-center space-x-3 mt-2">
+                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
+                            <Users size={14} />
+                            <span className="font-medium text-xs">{skillArea.subSkills.length} sub-skills</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
+                            <CheckCircle2 size={14} />
+                            <span className="font-medium text-xs">{skillArea.totalQuestions} questions available</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      {skillArea.completedQuestions === skillArea.totalQuestions && skillArea.totalQuestions > 0 && (
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full">
+                          <CheckCircle2 size={12} className="mr-1" />
+                          Completed
+                        </Badge>
+                      )}
+                      {skillArea.completedQuestions > 0 && skillArea.completedQuestions < skillArea.totalQuestions && (
+                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
+                          <Timer size={12} className="mr-1" />
+                          In Progress
+                        </Badge>
+                      )}
+                      {skillArea.completedQuestions === 0 && (
+                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full">
+                          Not Started
+                        </Badge>
+                      )}
+                      {skillArea.totalQuestions > 0 && (
+                        <Button 
+                          size="sm"
+                          variant="ghost"
+                          className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSkillArea(skillArea);
+                          }}
+                        >
+                          {skillArea.isExpanded ? 
+                            <ChevronUp size={20} className="text-slate-600" /> : 
+                            <ChevronDown size={20} className="text-slate-600" />
+                          }
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="bg-white">
+                  {skillArea.totalQuestions === 0 ? (
+                    <div className="text-center py-8">
+                      <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-slate-500 font-medium">Questions coming soon</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Collapsed View - Summary */}
+                      {!skillArea.isExpanded && (
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                          <div className="text-sm text-slate-600">
+                            <span>Progress: {getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}% complete</span>
+                          </div>
+                        </div>
+                      )}
 
-      {/* Recommendations */}
-      {recommendedSubSkills.length > 0 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white mr-3 px-3 py-1">
-              <Star size={14} className="mr-1" />
-              Recommended
-            </Badge>
-            Based on your diagnostic results
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recommendedSubSkills.map(({ skillArea, subSkill }) => (
-              <Card key={subSkill.id} className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-200 cursor-pointer"
-                    onClick={() => selectSubSkill(skillArea, subSkill)}>
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-3 mb-4">
-                    <span className="text-2xl">{skillArea.icon}</span>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{subSkill.name}</h3>
-                      <p className="text-sm text-gray-600">{skillArea.name}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span>Progress</span>
-                      <span>{getProgressPercentage(subSkill.completedQuestions, subSkill.totalQuestions)}%</span>
-                    </div>
-                    <Progress value={getProgressPercentage(subSkill.completedQuestions, subSkill.totalQuestions)} className="h-2" />
-                  </div>
-                  <Button size="sm" className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white">
-                    <Play size={14} className="mr-2" />
-                    Practice Now
-                  </Button>
+                      {/* Expanded View - Sub-Skills */}
+                      {skillArea.isExpanded && (
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                          <div className="space-y-4">
+                            <h4 className="font-semibold text-slate-900">Sub-Skills</h4>
+                            <div className="grid gap-4">
+                              {skillArea.subSkills.map((subSkill, index) => (
+                                <div 
+                                  key={subSkill.id}
+                                  className={cn(
+                                    "p-4 rounded-lg border-2 transition-all duration-200 relative",
+                                    subSkill.totalQuestions > 0 ? "hover:shadow-md cursor-pointer" : "opacity-60",
+                                    subSkill.completedQuestions === subSkill.totalQuestions && subSkill.totalQuestions > 0
+                                      ? "border-emerald-200 bg-emerald-50/30"
+                                      : subSkill.completedQuestions > 0
+                                      ? "border-amber-200 bg-amber-50/30"
+                                      : "border-slate-200 bg-white"
+                                  )}
+                                  onClick={() => selectSubSkill(skillArea, subSkill)}
+                                >
+                                  {subSkill.isRecommended && (
+                                    <Badge className="absolute top-2 left-2 bg-rose-100 text-rose-700 border-rose-200 text-xs">
+                                      Recommended
+                                    </Badge>
+                                  )}
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <div className={cn("mb-2", subSkill.isRecommended && "mt-8")}>
+                                        <div>
+                                          <h5 className="font-semibold text-slate-900">{subSkill.name}</h5>
+                                          <div className="flex items-center space-x-2 text-sm text-slate-600">
+                                            <CheckCircle2 size={12} className="text-emerald-500" />
+                                            <span>{subSkill.completedQuestions} of {subSkill.totalQuestions} questions completed</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="ml-4 flex items-center space-x-3">
+                                      {subSkill.completedQuestions === subSkill.totalQuestions && subSkill.totalQuestions > 0 && (
+                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                                          <CheckCircle2 size={12} className="mr-1" />
+                                          Complete
+                                        </Badge>
+                                      )}
+                                      {subSkill.completedQuestions > 0 && subSkill.completedQuestions < subSkill.totalQuestions && (
+                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                                          In Progress
+                                        </Badge>
+                                      )}
+                                      
+                                      {subSkill.totalQuestions === 0 ? (
+                                        <div className="text-center py-2">
+                                          <AlertCircle className="h-5 w-5 text-slate-400 mx-auto mb-1" />
+                                          <p className="text-xs text-slate-500">Coming soon</p>
+                                        </div>
+                                      ) : (
+                                        <Button 
+                                          size="sm"
+                                          className={cn(
+                                            "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
+                                            subSkill.completedQuestions === 0 
+                                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
+                                              : subSkill.completedQuestions < subSkill.totalQuestions
+                                              ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
+                                              : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
+                                          )}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            selectSubSkill(skillArea, subSkill);
+                                          }}
+                                        >
+                                          <Play size={14} className="mr-1" />
+                                          {subSkill.completedQuestions === 0 ? 'Start Practice' : 
+                                           subSkill.completedQuestions < subSkill.totalQuestions ? 'Resume Practice' : 'Review'}
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Skill Areas with Sub-Skills */}
-      <div className="space-y-6">
-        {skillAreas.map((skillArea) => (
-          <Card key={skillArea.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
-            <div 
-              className="p-6 cursor-pointer hover:bg-gray-50/50 transition-colors duration-200"
-              onClick={() => toggleSkillArea(skillArea)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className={cn("w-14 h-14 bg-gradient-to-br rounded-xl flex items-center justify-center text-white text-xl mr-6 shadow-md", skillArea.color)}>
-                    <span className="text-2xl">{skillArea.icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-1">{skillArea.name}</h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span className="flex items-center">
-                        <CheckCircle size={14} className="mr-1 text-green-500" />
-                        {skillArea.completedQuestions} of {skillArea.totalQuestions} questions completed
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center">
-                        <Users size={14} className="mr-1 text-blue-500" />
-                        {skillArea.subSkills.length} sub-skills
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-gray-700">
-                      {getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}%
-                    </div>
-                    <div className="w-24 bg-gray-200 rounded-full h-2 mt-1 overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-edu-teal to-edu-teal/80 h-2 rounded-full transition-all duration-500" 
-                        style={{ width: `${getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="transition-transform duration-200">
-                    {skillArea.isExpanded ? 
-                      <ChevronDown size={20} className="text-gray-500" /> : 
-                      <ChevronRight size={20} className="text-gray-500" />
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {skillArea.isExpanded && (
-              <div className="px-6 pb-6 bg-gradient-to-br from-gray-50/50 to-gray-100/30 animate-in slide-in-from-top-2 duration-300">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                  {skillArea.subSkills.map((subSkill) => (
-                    <Card key={subSkill.id} className="border shadow-sm hover:shadow-md transition-all duration-200 bg-white cursor-pointer"
-                          onClick={() => selectSubSkill(skillArea, subSkill)}>
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h4 className="font-semibold text-gray-900">{subSkill.name}</h4>
-                              {subSkill.isRecommended && (
-                                <Badge className="bg-orange-100 text-orange-700 text-xs">
-                                  <Star size={12} className="mr-1" />
-                                  Recommended
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-3">
-                              {subSkill.completedQuestions} of {subSkill.totalQuestions} questions completed
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Mini Progress Bars for Each Difficulty */}
-                        <div className="space-y-2 mb-4">
-                          {[
-                            { level: 'Easy', data: subSkill.progress.easy, color: 'green' },
-                            { level: 'Medium', data: subSkill.progress.medium, color: 'amber' },
-                            { level: 'Hard', data: subSkill.progress.hard, color: 'red' }
-                          ].map(({ level, data, color }) => (
-                            <div key={level} className="flex items-center justify-between text-xs">
-                              <span className="text-gray-600 w-16">{level}</span>
-                              <div className="flex-1 mx-2">
-                                <div className="w-full bg-gray-200 rounded-full h-1">
-                                  <div 
-                                    className={`bg-${color}-500 h-1 rounded-full transition-all duration-300`}
-                                    style={{ width: `${getProgressPercentage(data.completed, data.total)}%` }}
-                                  />
-                                </div>
-                              </div>
-                              <span className="text-gray-500 w-12 text-right">{data.completed}/{data.total}</span>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <Button size="sm" className="w-full bg-edu-teal hover:bg-edu-teal/90 text-white">
-                          <Play size={14} className="mr-2" />
-                          Practice
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </Card>
-        ))}
+        )}
       </div>
-
-      {/* Empty State */}
-      {skillAreas.length === 0 && (
-        <Card className="p-12 text-center bg-white/80 backdrop-blur-sm shadow-lg">
-          <Target className="h-16 w-16 text-gray-400 mx-auto mb-6" />
-          <h3 className="text-xl font-semibold mb-3">No Drill Questions Available</h3>
-          <p className="text-gray-600 max-w-md mx-auto">
-            Drill questions for this test type are coming soon. Check back later for targeted skill practice.
-          </p>
-        </Card>
-      )}
     </div>
   );
 };

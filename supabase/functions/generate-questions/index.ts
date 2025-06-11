@@ -19,6 +19,7 @@ interface QuestionGenerationRequest {
   passageId?: string;
   visualRequired?: boolean;
   australianContext?: boolean;
+  testMode?: string;
 }
 
 serve(async (req) => {
@@ -140,7 +141,7 @@ Return as JSON array with this structure:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', // Updated to latest Claude 4 Sonnet
-        max_tokens: 4000,
+        max_tokens: 6000,
         messages: [
           {
             role: 'user',
@@ -197,7 +198,8 @@ Return as JSON array with this structure:
           solution: question.explanation,
           curriculum_aligned: true,
           generated_by: 'claude',
-          reviewed: true
+          reviewed: true,
+          test_mode: requestData.testMode || null
         })
         .select()
         .single();

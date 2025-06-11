@@ -38,7 +38,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 }) => {
   return (
     <div className={cn(
-      "bg-gradient-to-r from-edu-teal to-edu-navy rounded-2xl p-8 text-white",
+      "rounded-2xl p-8 text-white",
+      !className?.includes('bg-gradient') && "bg-gradient-to-r from-edu-teal to-edu-navy",
       className
     )}>
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -76,7 +77,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 className={cn(
                   action.variant === 'outline' 
                     ? "border-white text-white hover:bg-white/10" 
-                    : "bg-white text-edu-teal hover:bg-gray-100"
+                    : "bg-white hover:bg-gray-100",
+                  // Handle text color for blue background
+                  className?.includes('text-blue-900') && action.variant !== 'outline' 
+                    ? "text-blue-900" 
+                    : action.variant !== 'outline' 
+                    ? "text-edu-teal" 
+                    : ""
                 )}
                 variant={action.variant || 'default'}
                 onClick={action.onClick}

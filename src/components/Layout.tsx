@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Home, BookOpen, BarChart3, Brain, Activity, 
   Menu, X, ChevronRight, Bell, ChevronDown,
-  Target, Clock, TrendingUp, Award, User, Settings, Search
+  Target as TargetIcon, Clock, TrendingUp, Award, User, Settings, Search, FileText, LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavigationItem {
   id: string;
@@ -19,14 +20,6 @@ interface NavigationItem {
   path: string;
   badge?: string;
   description?: string;
-}
-
-interface QuickStat {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  trend?: 'up' | 'down' | 'neutral';
-  trendValue?: string;
 }
 
 // Reordered navigation to match user flow: Dashboard, Diagnostic, Drill, Practice Tests, Performance Insights
@@ -47,18 +40,17 @@ const navigationItems: NavigationItem[] = [
   },
   {
     id: 'drill',
-    label: 'Drill',
-    icon: <Brain size={20} />,
+    label: 'Skill Drills',
+    icon: <TargetIcon size={20} />,
     path: '/dashboard/drill',
-    description: 'Practice specific skills'
+    description: 'Practise specific skills'
   },
   {
     id: 'practice-tests',
     label: 'Practice Tests',
-    icon: <BookOpen size={20} />,
+    icon: <FileText size={20} />,
     path: '/dashboard/practice-tests',
-    badge: '5 tests',
-    description: 'Full practice examinations'
+    description: 'Sit full practice tests'
   },
   {
     id: 'insights',
@@ -69,40 +61,12 @@ const navigationItems: NavigationItem[] = [
   }
 ];
 
-const quickStats: QuickStat[] = [
-  {
-    label: 'Current Streak',
-    value: '7 days',
-    icon: <Target size={16} />,
-    trend: 'up',
-    trendValue: '+2'
-  },
-  {
-    label: 'Study Time',
-    value: '2.5h',
-    icon: <Clock size={16} />,
-    trend: 'up',
-    trendValue: '+15min'
-  },
-  {
-    label: 'Avg Score',
-    value: '78%',
-    icon: <TrendingUp size={16} />,
-    trend: 'up',
-    trendValue: '+5%'
-  },
-  {
-    label: 'Tests Done',
-    value: '12',
-    icon: <Award size={16} />,
-    trend: 'neutral'
-  }
-];
-
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userProgress, setUserProgress] = useState<any>(null);
   const { selectedProduct, setSelectedProduct, currentProduct, allProducts } = useProduct();
+  const { signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,6 +85,20 @@ const Layout: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Mock user progress data to determine if diagnostic is completed
+  useEffect(() => {
+    // This would normally come from your user context or API
+    // For now, using mock data to simulate first-time user or incomplete diagnostic
+    const mockProgress = {
+      diagnostic: {
+        isComplete: false,
+        sectionsCompleted: 0,
+        totalSections: 4,
+      }
+    };
+    setUserProgress(mockProgress);
+  }, []);
+
   const currentItem = navigationItems.find(item => item.path === location.pathname);
 
   const handleNavigation = (path: string) => {
@@ -132,6 +110,11 @@ const Layout: React.FC = () => {
 
   const handleProductChange = (productId: string) => {
     setSelectedProduct(productId);
+  };
+
+  // Helper function to determine if we should show "Start here" pill
+  const shouldShowStartHerePill = () => {
+    return !userProgress?.diagnostic?.isComplete && userProgress?.diagnostic?.sectionsCompleted === 0;
   };
 
   return (
@@ -185,56 +168,51 @@ const Layout: React.FC = () => {
             </div>
           )}
 
-          {/* Quick Stats - Desktop Only */}
-          {!sidebarCollapsed && (
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-edu-navy/70 mb-4">Quick Stats</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {quickStats.map((stat, index) => (
-                  <Card key={index} className="bg-gradient-to-br from-edu-light-blue/30 to-white border-0">
-                    <CardContent className="p-3">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <div className="text-edu-teal">{stat.icon}</div>
-                        <span className="text-xs font-medium text-edu-navy/70">{stat.label}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-edu-navy">{stat.value}</span>
-                        {stat.trend && stat.trend !== 'neutral' && (
-                          <Badge 
-                            variant="secondary" 
-                            className={cn(
-                              "text-xs px-1.5 py-0.5",
-                              stat.trend === 'up' ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                            )}
-                          >
-                            {stat.trendValue}
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Navigation */}
-          <nav className="flex-1 p-6">
+          <nav className={cn("flex-1", sidebarCollapsed ? "p-2" : "p-6")}>
             <div className="space-y-2">
               {navigationItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleNavigation(item.path)}
                   className={cn(
-                    "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                    "w-full flex items-center rounded-xl transition-all duration-200 group",
+                    sidebarCollapsed 
+                      ? "justify-center p-3" 
+                      : "space-x-3 px-4 py-3",
                     location.pathname === item.path
-                      ? "bg-edu-teal text-white shadow-lg"
+                      ? (() => {
+                          switch (item.id) {
+                            case 'diagnostic':
+                              return 'bg-purple-500 text-white shadow-lg';
+                            case 'drill':
+                              return 'bg-orange-500 text-white shadow-lg';
+                            case 'practice-tests':
+                              return 'bg-rose-500 text-white shadow-lg';
+                            default:
+                              return 'bg-edu-teal text-white shadow-lg';
+                          }
+                        })()
                       : "text-edu-navy/70 hover:bg-edu-light-blue/50 hover:text-edu-navy"
                   )}
+                  title={sidebarCollapsed ? item.label : undefined}
                 >
                   <div className={cn(
                     "flex-shrink-0",
-                    location.pathname === item.path ? "text-white" : "text-edu-teal"
+                    location.pathname === item.path 
+                      ? "text-white" 
+                      : (() => {
+                          switch (item.id) {
+                            case 'diagnostic':
+                              return 'text-purple-500';
+                            case 'drill':
+                              return 'text-orange-500';
+                            case 'practice-tests':
+                              return 'text-rose-500';
+                            default:
+                              return 'text-edu-teal';
+                          }
+                        })()
                   )}>
                     {item.icon}
                   </div>
@@ -255,6 +233,14 @@ const Layout: React.FC = () => {
                             {item.badge}
                           </Badge>
                         )}
+                        {item.id === 'diagnostic' && shouldShowStartHerePill() && (
+                          <Badge 
+                            variant="secondary" 
+                            className="text-xs bg-green-100 text-green-700 border-green-200 font-medium"
+                          >
+                            Start here
+                          </Badge>
+                        )}
                         <ChevronRight 
                           size={16} 
                           className={cn(
@@ -273,7 +259,7 @@ const Layout: React.FC = () => {
           {/* User Profile - Desktop */}
           {!sidebarCollapsed && (
             <div className="p-6 border-t border-gray-100">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
                   <User size={20} className="text-white" />
                 </div>
@@ -281,6 +267,35 @@ const Layout: React.FC = () => {
                   <div className="font-medium text-edu-navy">Student Name</div>
                   <div className="text-xs text-edu-navy/60">Grade 10</div>
                 </div>
+              </div>
+              <Button
+                onClick={signOut}
+                variant="outline"
+                size="sm"
+                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
+              >
+                <LogOut size={16} />
+                <span>Sign Out</span>
+              </Button>
+            </div>
+          )}
+
+          {/* Collapsed User Profile - Desktop */}
+          {sidebarCollapsed && (
+            <div className="p-4 border-t border-gray-100">
+              <div className="space-y-2">
+                <div className="w-12 h-12 bg-edu-teal rounded-full flex items-center justify-center mx-auto">
+                  <User size={20} className="text-white" />
+                </div>
+                <Button
+                  onClick={signOut}
+                  variant="outline"
+                  size="sm"
+                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
+                  title="Sign Out"
+                >
+                  <LogOut size={16} />
+                </Button>
               </div>
             </div>
           )}
@@ -362,21 +377,79 @@ const Layout: React.FC = () => {
                       className={cn(
                         "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200",
                         location.pathname === item.path
-                          ? "bg-edu-teal text-white"
+                          ? (() => {
+                              switch (item.id) {
+                                case 'diagnostic':
+                                  return 'bg-purple-500 text-white';
+                                case 'drill':
+                                  return 'bg-orange-500 text-white';
+                                case 'practice-tests':
+                                  return 'bg-rose-500 text-white';
+                                default:
+                                  return 'bg-edu-teal text-white';
+                              }
+                            })()
                           : "text-edu-navy/70 hover:bg-edu-light-blue/50"
                       )}
                     >
-                      {item.icon}
+                      <div className={cn(
+                        location.pathname === item.path 
+                          ? "text-white" 
+                          : (() => {
+                              switch (item.id) {
+                                case 'diagnostic':
+                                  return 'text-purple-500';
+                                case 'drill':
+                                  return 'text-orange-500';
+                                case 'practice-tests':
+                                  return 'text-rose-500';
+                                default:
+                                  return 'text-edu-teal';
+                              }
+                            })()
+                      )}>
+                        {item.icon}
+                      </div>
                       <span className="font-medium">{item.label}</span>
                       {item.badge && (
                         <Badge variant="secondary" className="ml-auto text-xs">
                           {item.badge}
                         </Badge>
                       )}
+                      {item.id === 'diagnostic' && shouldShowStartHerePill() && (
+                        <Badge 
+                          variant="secondary" 
+                          className="ml-auto text-xs bg-green-100 text-green-700 border-green-200 font-medium"
+                        >
+                          Start here
+                        </Badge>
+                      )}
                     </button>
                   ))}
                 </div>
               </nav>
+              
+              {/* Mobile User Profile */}
+              <div className="p-6 border-t border-gray-100">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
+                    <User size={20} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-edu-navy">Student Name</div>
+                    <div className="text-xs text-edu-navy/60">Grade 10</div>
+                  </div>
+                </div>
+                <Button
+                  onClick={signOut}
+                  variant="outline"
+                  size="sm"
+                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </Button>
+              </div>
             </div>
           </aside>
         </div>

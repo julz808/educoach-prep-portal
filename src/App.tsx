@@ -8,7 +8,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Diagnostic from "./pages/Diagnostic";
 import Drill from "./pages/Drill";
-import PracticeTests from "./pages/MockTests"; // We'll keep the file name but change the component name
+import PracticeTests from "./pages/PracticeTests";
 import Insights from "./pages/Insights";
 import TestTaking from "./pages/TestTaking";
 import NotFound from "./pages/NotFound";

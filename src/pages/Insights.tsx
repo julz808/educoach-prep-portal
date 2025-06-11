@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus, Sparkles, Target, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus, Sparkles, Target, Trophy, Calendar, Clock, BarChart3, PieChart, CheckCircle, AlertCircle, ArrowUp, ArrowDown, Star, Award, Zap, BookOpen, Users, Play, ChevronUp, Home, Brain, Activity, MessageSquare, Calculator, PenTool, PartyPopper } from 'lucide-react';
 
 const PerformanceDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,40 +34,31 @@ const PerformanceDashboard = () => {
         'Inferential reasoning': 80,
         'Text analysis': 78,
         'Critical interpretation': 84,
-        'Implicit meaning understanding': 82,
         'Deductive reasoning from text': 81,
-        'Academic knowledge application': 83
       },
       'Mathematical Reasoning': {
         'Mathematical problem solving': 70,
         'Multi-step reasoning': 65,
-        'Complex mathematical concepts': 60,
         'Mathematical modeling': 72,
         'Advanced numerical reasoning': 68,
-        'Spatial problem solving': 55,
         'Mathematical application': 75
       },
       'Verbal Reasoning': {
         'Pattern detection with words': 78,
         'Vocabulary reasoning': 80,
         'Word relationships': 75,
-        'Odd word identification': 72,
-        'Word meaning analysis': 78,
         'Letter manipulation': 70,
         'Logical word consequences': 74
       },
       'Quantitative Reasoning': {
         'Number pattern recognition': 68,
-        'Quantitative problem solving': 62,
         'Mathematical sequence analysis': 58,
         'Numerical relationships': 70,
         'Word problem solving': 60,
-        'Mathematical reasoning': 65,
         'Quantitative analysis': 67
       },
       'Written Expression': {
         'Creative writing': 80,
-        'Analytical writing': 76
       }
     }
   };
@@ -89,18 +80,12 @@ const PerformanceDashboard = () => {
           'Reading comprehension': 78,
           'Inferential reasoning': 72,
           'Text analysis': 74,
-          'Critical interpretation': 76,
-          'Implicit meaning understanding': 75,
           'Deductive reasoning from text': 73,
-          'Academic knowledge application': 77
         },
         'Mathematical Reasoning': {
           'Mathematical problem solving': 65,
-          'Multi-step reasoning': 58,
-          'Complex mathematical concepts': 55,
           'Mathematical modeling': 68,
           'Advanced numerical reasoning': 62,
-          'Spatial problem solving': 50,
           'Mathematical application': 70
         }
       }
@@ -119,20 +104,14 @@ const PerformanceDashboard = () => {
       subSkills: {
         'Reading Reasoning': {
           'Reading comprehension': 82,
-          'Inferential reasoning': 76,
           'Text analysis': 78,
           'Critical interpretation': 80,
-          'Implicit meaning understanding': 79,
           'Deductive reasoning from text': 77,
-          'Academic knowledge application': 81
         },
         'Mathematical Reasoning': {
           'Mathematical problem solving': 68,
           'Multi-step reasoning': 62,
-          'Complex mathematical concepts': 58,
           'Mathematical modeling': 70,
-          'Advanced numerical reasoning': 65,
-          'Spatial problem solving': 53,
           'Mathematical application': 73
         }
       }
@@ -151,12 +130,8 @@ const PerformanceDashboard = () => {
       subSkills: {
         'Reading Reasoning': {
           'Reading comprehension': 84,
-          'Inferential reasoning': 79,
-          'Text analysis': 80,
           'Critical interpretation': 82,
-          'Implicit meaning understanding': 81,
           'Deductive reasoning from text': 80,
-          'Academic knowledge application': 83
         }
       }
     }
@@ -166,56 +141,73 @@ const PerformanceDashboard = () => {
   const enhancedDrillData = {
     'Reading Reasoning': {
       'Reading comprehension': { completed: 15, accuracy: 82 },
-      'Inferential reasoning': { completed: 8, accuracy: 75 },
+      'Inferential reasoning': { completed: 0, accuracy: 0 },
       'Text analysis': { completed: 12, accuracy: 78 },
       'Critical interpretation': { completed: 6, accuracy: 80 },
-      'Academic knowledge application': { completed: 4, accuracy: 85 }
+      'Implicit meaning understanding': { completed: 0, accuracy: 0 },
+      'Deductive reasoning from text': { completed: 3, accuracy: 79 },
+      'Academic knowledge application': { completed: 0, accuracy: 0 }
     },
     'Mathematical Reasoning': {
-      'Spatial problem solving': { completed: 24, accuracy: 58 },
+      'Mathematical problem solving': { completed: 8, accuracy: 72 },
       'Multi-step reasoning': { completed: 12, accuracy: 68 },
-      'Complex mathematical concepts': { completed: 18, accuracy: 62 },
+      'Complex mathematical concepts': { completed: 0, accuracy: 0 },
       'Mathematical modeling': { completed: 9, accuracy: 71 },
-      'Advanced numerical reasoning': { completed: 15, accuracy: 65 }
+      'Advanced numerical reasoning': { completed: 15, accuracy: 65 },
+      'Spatial problem solving': { completed: 0, accuracy: 0 },
+      'Mathematical application': { completed: 0, accuracy: 0 }
     },
     'Verbal Reasoning': {
       'Pattern detection with words': { completed: 10, accuracy: 76 },
       'Word relationships': { completed: 8, accuracy: 73 },
-      'Vocabulary reasoning': { completed: 6, accuracy: 82 }
+      'Vocabulary reasoning': { completed: 6, accuracy: 82 },
+      'Odd word identification': { completed: 0, accuracy: 0 },
+      'Word meaning analysis': { completed: 0, accuracy: 0 },
+      'Letter manipulation': { completed: 4, accuracy: 68 },
+      'Logical word consequences': { completed: 0, accuracy: 0 }
     },
     'Quantitative Reasoning': {
-      'Mathematical sequence analysis': { completed: 18, accuracy: 62 },
-      'Word problem solving': { completed: 15, accuracy: 65 },
       'Number pattern recognition': { completed: 12, accuracy: 70 },
+      'Quantitative problem solving': { completed: 0, accuracy: 0 },
+      'Mathematical sequence analysis': { completed: 18, accuracy: 62 },
+      'Numerical relationships': { completed: 5, accuracy: 74 },
+      'Word problem solving': { completed: 15, accuracy: 65 },
+      'Mathematical reasoning': { completed: 0, accuracy: 0 },
       'Quantitative analysis': { completed: 8, accuracy: 63 }
     },
     'Written Expression': {
       'Creative writing': { completed: 3, accuracy: 78 },
-      'Analytical writing': { completed: 2, accuracy: 74 }
+      'Analytical writing': { completed: 0, accuracy: 0 }
     }
   };
 
   const getScoreColor = (score) => {
-    if (score >= 75) return 'text-emerald-600';
-    if (score >= 65) return 'text-slate-600';
+    if (score >= 80) return 'text-emerald-600';
+    if (score >= 60) return 'text-orange-600';
     return 'text-red-500';
   };
 
+  const getScoreColorSVG = (score) => {
+    if (score >= 80) return '#059669'; // emerald-600
+    if (score >= 60) return '#ea580c'; // orange-600
+    return '#ef4444'; // red-500
+  };
+
   const getScoreBg = (score) => {
-    if (score >= 75) return 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-emerald-100';
-    if (score >= 65) return 'bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200 shadow-slate-100';
+    if (score >= 80) return 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-emerald-100';
+    if (score >= 60) return 'bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200 shadow-orange-100';
     return 'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-red-100';
   };
 
   const getBarColor = (score) => {
-    if (score >= 75) return 'bg-gradient-to-r from-emerald-500 to-teal-500';
-    if (score >= 65) return 'bg-gradient-to-r from-slate-400 to-gray-400';
+    if (score >= 80) return 'bg-gradient-to-r from-emerald-500 to-teal-500';
+    if (score >= 60) return 'bg-gradient-to-r from-orange-500 to-amber-500';
     return 'bg-gradient-to-r from-red-500 to-rose-500';
   };
 
   const getBadgeStyle = (score) => {
-    if (score >= 75) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-    if (score >= 65) return 'bg-slate-100 text-slate-700 border-slate-200';
+    if (score >= 80) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+    if (score >= 60) return 'bg-orange-100 text-orange-700 border-orange-200';
     return 'bg-red-100 text-red-700 border-red-200';
   };
 
@@ -248,7 +240,7 @@ const PerformanceDashboard = () => {
       onClick={onClick}
       className={`px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-out transform hover:scale-105 hover:shadow-lg ${
         active
-          ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg shadow-teal-200'
+          ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-200'
           : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
       }`}
     >
@@ -299,11 +291,21 @@ const PerformanceDashboard = () => {
   };
 
   const getPriorityAreas = () => {
-    return getAllSubSkillsRanked().filter(item => item.score < 70).slice(0, 3);
+    return getAllSubSkillsRanked().filter(item => item.score < 60).slice(0, 3);
   };
 
   const getStrengths = () => {
     return getAllSubSkillsRanked().filter(item => item.score >= 80).slice(0, 3);
+  };
+
+  // New helper functions for Sub-skill Overview
+  const getTopSubSkills = () => {
+    return getAllSubSkillsRanked().slice(0, 5);
+  };
+
+  const getBottomSubSkills = () => {
+    const allSkills = getAllSubSkillsRanked();
+    return allSkills.slice(-5).reverse(); // Get bottom 5 and reverse to show lowest first
   };
 
   const getTotalDrillsCompleted = () => {
@@ -314,6 +316,18 @@ const PerformanceDashboard = () => {
       });
     });
     return total;
+  };
+
+  const getOverallDrillAccuracy = () => {
+    let totalAccuracy = 0;
+    let skillCount = 0;
+    Object.values(enhancedDrillData).forEach(section => {
+      Object.values(section).forEach(skill => {
+        totalAccuracy += skill.accuracy;
+        skillCount++;
+      });
+    });
+    return skillCount > 0 ? Math.round(totalAccuracy / skillCount) : 0;
   };
 
   const getFilteredDrills = () => {
@@ -398,7 +412,7 @@ const PerformanceDashboard = () => {
 
   const getCombinedSectionPerformance = () => {
     const sectionNames = Object.keys(diagnosticData.sections);
-    const combinedPerformance = {};
+    const combinedPerformance: Record<string, { averageScore: number; totalQuestions: number; trend: string }> = {};
     
     sectionNames.forEach(section => {
       const scores = [];
@@ -415,8 +429,9 @@ const PerformanceDashboard = () => {
       });
       
       if (enhancedDrillData[section]) {
-        const drillScores = Object.values(enhancedDrillData[section]).map(skill => skill.accuracy);
-        const drillQuestions = Object.values(enhancedDrillData[section]).reduce((sum, skill) => sum + skill.completed, 0);
+        const drillSkills = enhancedDrillData[section];
+        const drillScores = Object.values(drillSkills).map((skill: any) => skill.accuracy);
+        const drillQuestions = Object.values(drillSkills).reduce((sum: number, skill: any) => sum + skill.completed, 0) as number;
         
         scores.push(...drillScores);
         totalQuestions += drillQuestions;
@@ -455,7 +470,7 @@ const PerformanceDashboard = () => {
   const getOverviewStrengths = () => {
     const combinedPerformance = getCombinedSectionPerformance();
     return Object.entries(combinedPerformance)
-      .filter(([_, data]) => data.averageScore >= 75)
+      .filter(([_, data]) => data.averageScore >= 80)
       .sort((a, b) => b[1].averageScore - a[1].averageScore)
       .slice(0, 3);
   };
@@ -463,7 +478,7 @@ const PerformanceDashboard = () => {
   const getOverviewWeaknesses = () => {
     const combinedPerformance = getCombinedSectionPerformance();
     return Object.entries(combinedPerformance)
-      .filter(([_, data]) => data.averageScore < 70)
+      .filter(([_, data]) => data.averageScore < 60)
       .sort((a, b) => a[1].averageScore - b[1].averageScore)
       .slice(0, 3);
   };
@@ -471,21 +486,16 @@ const PerformanceDashboard = () => {
   const renderOverview = () => {
     const metrics = getOverviewMetrics();
     const sectionPerformance = getCombinedSectionPerformance();
-    const strengths = getOverviewStrengths();
-    const weaknesses = getOverviewWeaknesses();
     
     return (
       <div className="space-y-8" key={`overview-${animationKey}`}>
         {/* Hero Metrics */}
         <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-8 bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 border-teal-200" glow>
+          <Card className="p-8 bg-gradient-to-br from-teal-50 via-teal-50 to-cyan-50 border-teal-200" glow>
             <div className="flex justify-between items-center">
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Target className="w-5 h-5 text-teal-600" />
-                  <h3 className="text-lg font-bold text-teal-900">Total Questions Completed</h3>
-                </div>
-                <p className="text-sm text-teal-700 opacity-80">Across all activities</p>
+                <h3 className="text-lg font-bold text-teal-900">Total Questions Completed</h3>
+                <p className="text-sm text-teal-700 opacity-80">Across Diagnostic, Drills & Practice Tests</p>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-black text-teal-600 mb-1">{metrics.totalQuestions}</div>
@@ -497,200 +507,145 @@ const PerformanceDashboard = () => {
           <Card className={`p-8 ${getScoreBg(metrics.averagePerformance)} shadow-xl`}>
             <div className="flex justify-between items-center">
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="w-5 h-5 text-slate-600" />
-                  <h3 className="text-lg font-bold text-slate-900">Average Performance</h3>
-                </div>
-                <p className="text-sm text-slate-600 opacity-80">All sections combined</p>
+                <h3 className="text-lg font-bold text-slate-900">Overall Accuracy</h3>
+                <p className="text-sm text-slate-600 opacity-80">Across Diagnostic, Drills & Practice Tests</p>
               </div>
               <div className="text-right">
                 <div className={`text-4xl font-black ${getScoreColor(metrics.averagePerformance)} mb-1`}>
                   {metrics.averagePerformance}%
                 </div>
-                <div className={`text-sm font-medium px-3 py-1 rounded-full ${getBadgeStyle(metrics.averagePerformance)}`}>
-                  {metrics.averagePerformance >= 75 ? 'Excellent' : metrics.averagePerformance >= 65 ? 'Good' : 'Needs Work'}
-                </div>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Section Performance Summary */}
+        {/* Section Performance Spider Chart */}
         <Card className="p-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <Sparkles className="w-6 h-6 text-teal-500" />
-            <h3 className="text-xl font-bold text-slate-900">Section Performance Summary</h3>
-          </div>
-          <div className="space-y-4">
-            {Object.entries(sectionPerformance).map(([section, data], index) => (
-              <div key={section} 
-                   className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200 hover:border-slate-300 transition-all duration-300 transform hover:scale-[1.02]"
-                   style={{ animationDelay: `${index * 100}ms` }}>
-                <div className="flex items-center space-x-4">
-                  <div className={`w-3 h-3 rounded-full ${getBarColor(data.averageScore)}`}></div>
-                  <div>
-                    <h4 className="font-bold text-slate-900">{section}</h4>
-                    <p className="text-sm text-slate-600">{data.totalQuestions} questions practiced</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-6">
-                  <div className="w-40">
-                    <AnimatedProgressBar value={data.averageScore} delay={index * 200} />
-                  </div>
-                  <div className={`text-xl font-bold ${getScoreColor(data.averageScore)} w-16 text-right`}>
-                    {data.averageScore}%
-                  </div>
-                  <div className="w-6 h-6 flex justify-center">
-                    {getTrendIcon(data.trend)}
-                  </div>
-                </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Performance by Test Section</h3>
+          <SpiderChart data={Object.fromEntries(
+            Object.entries(sectionPerformance).map(([section, data]) => [section, data.averageScore])
+          )} size={400} />
+        </Card>
+
+        {/* Sub-skill Overview */}
+        <Card className="p-8">
+          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Sub-Skill Strengths & Weaknesses</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200" hover={false}>
+              <div className="flex items-center space-x-3 mb-6">
+                <h4 className="text-lg font-bold text-teal-900 mb-6">Top 5 Sub-skills</h4>
               </div>
-            ))}
+              <div className="space-y-3">
+                {getCombinedTopSubSkills().map((item, index) => (
+                  <div key={index} 
+                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-teal-200/50 hover:bg-white/80 transition-all duration-300"
+                       style={{ animationDelay: `${index * 150}ms` }}>
+                    <div>
+                      <div className="text-sm font-bold text-teal-800">{item.skill}</div>
+                      <div className="text-xs text-teal-600">{item.section}</div>
+                    </div>
+                    <span className={`font-black text-lg ${getScoreColorWithDash(item.averageScore, item.skill, item.section)}`}>
+                      {formatScoreDisplay(item.averageScore, item.skill, item.section)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
+              <div className="flex items-center space-x-3 mb-6">
+                <h4 className="text-lg font-bold text-red-900 mb-6">Bottom 5 Sub-skills</h4>
+              </div>
+              <div className="space-y-3">
+                {getCombinedBottomSubSkills().map((item, index) => (
+                  <div key={index} 
+                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
+                       style={{ animationDelay: `${index * 150}ms` }}>
+                    <div>
+                      <div className="text-sm font-bold text-red-800">{item.skill}</div>
+                      <div className="text-xs text-red-600">{item.section}</div>
+                    </div>
+                    <span className={`font-black text-lg ${getScoreColorWithDash(item.averageScore, item.skill, item.section)}`}>
+                      {formatScoreDisplay(item.averageScore, item.skill, item.section)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </div>
         </Card>
 
-        {/* Key Insights */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-8 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200" hover={false}>
-            <div className="flex items-center space-x-3 mb-6">
-              <Trophy className="w-6 h-6 text-emerald-600" />
-              <h3 className="text-xl font-bold text-emerald-900">Top Strengths</h3>
-            </div>
-            {strengths.length > 0 ? (
-              <div className="space-y-4">
-                {strengths.map(([section, data], index) => (
-                  <div key={index} 
-                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-emerald-200/50"
-                       style={{ animationDelay: `${index * 150}ms` }}>
-                    <div>
-                      <div className="font-bold text-emerald-800">{section}</div>
-                      <div className="text-sm text-emerald-600">{data.totalQuestions} questions practiced</div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="text-right">
-                        <div className="font-black text-emerald-900 text-lg">{data.averageScore}%</div>
-                        {getTrendIcon(data.trend)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-emerald-700 text-sm">Complete more practice to identify strengths</p>
-              </div>
-            )}
-          </Card>
-
-          <Card className="p-8 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
-            <div className="flex items-center space-x-3 mb-6">
-              <Target className="w-6 h-6 text-red-500" />
-              <h3 className="text-xl font-bold text-red-900">Priority Focus Areas</h3>
-            </div>
-            {weaknesses.length > 0 ? (
-              <div className="space-y-4">
-                {weaknesses.map(([section, data], index) => (
-                  <div key={index} 
-                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50"
-                       style={{ animationDelay: `${index * 150}ms` }}>
-                    <div>
-                      <div className="font-bold text-red-800">{section}</div>
-                      <div className="text-sm text-red-600">{data.totalQuestions} questions practiced</div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="text-right">
-                        <div className="font-black text-red-900 text-lg">{data.averageScore}%</div>
-                        {getTrendIcon(data.trend)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="text-6xl mb-3">🎉</div>
-                <p className="text-red-700 text-sm font-medium">Great job! No major weak areas identified</p>
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Activity Summary */}
+        {/* Skills Performance with Enhanced Filters */}
         <Card className="p-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">Activity Summary</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Diagnostic Summary */}
-            <div className="p-6 border border-slate-200 rounded-xl bg-gradient-to-br from-slate-50 to-gray-50 hover:shadow-lg transition-all duration-300">
-              <h4 className="font-bold text-slate-900 mb-4">Diagnostic Test</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Overall Score</span>
-                  <span className={`font-bold ${getScoreColor(diagnosticData.overall)}`}>
-                    {diagnosticData.overall}%
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Completed</span>
-                  <span className="text-emerald-600 font-medium">✓ Yes</span>
-                </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Sub-Skill Performance</h3>
+          <div className="flex flex-wrap gap-2 mb-6">
+            <FilterButton 
+              active={skillFilter === 'all'} 
+              onClick={() => setSkillFilter('all')}
+              count={getCombinedFilteredSkills().length}
+            >
+              All Skills
+            </FilterButton>
+            {Object.keys(diagnosticData.sections).map((section) => (
+              <FilterButton
+                key={section}
+                active={skillFilter === section}
+                onClick={() => setSkillFilter(section)}
+                count={getCombinedFilteredSkills().filter(skill => skill.section === section).length}
+              >
+                {section.split(' ')[0]}
+              </FilterButton>
+            ))}
+          </div>
+          
+          {/* Show section score if filtered */}
+          {skillFilter !== 'all' && sectionPerformance[skillFilter] && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-slate-900">{skillFilter}</span>
+                <span className={`text-xl font-black ${getScoreColor(sectionPerformance[skillFilter].averageScore)}`}>
+                  {sectionPerformance[skillFilter].averageScore}%
+                </span>
               </div>
             </div>
-
-            {/* Practice Tests Summary */}
-            <div className="p-6 border border-slate-200 rounded-xl bg-gradient-to-br from-slate-50 to-gray-50 hover:shadow-lg transition-all duration-300">
-              <h4 className="font-bold text-slate-900 mb-4">Practice Tests</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Completed</span>
-                  <span className="text-slate-900 font-medium">{practiceTestData.length}/5</span>
+          )}
+          
+          <div className="space-y-3">
+            {getCombinedFilteredSkills().map((item, index) => (
+              <div key={index} 
+                   className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
+                   style={{ animationDelay: `${index * 50}ms` }}>
+                <div className="w-64 text-sm text-slate-700 font-medium truncate" title={item.skill}>
+                  {item.skill}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Latest Score</span>
-                  <span className={`font-bold ${getScoreColor(practiceTestData[practiceTestData.length - 1]?.overall || 0)}`}>
-                    {practiceTestData[practiceTestData.length - 1]?.overall || 0}%
-                  </span>
+                {skillFilter === 'all' && (
+                  <div className="w-36 text-xs text-slate-500 truncate font-medium">
+                    {item.section}
+                  </div>
+                )}
+                <div className="w-32 text-xs text-slate-400 font-medium">
+                  {getDiagnosticQuestionsCompleted(item.skill, item.section)} questions completed
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Improvement</span>
-                  <span className={`font-bold ${
-                    practiceTestData.length > 1 && 
-                    practiceTestData[practiceTestData.length - 1].overall > practiceTestData[0].overall
-                      ? 'text-emerald-600' 
-                      : 'text-slate-600'
-                  }`}>
-                    {practiceTestData.length > 1 
-                      ? `+${practiceTestData[practiceTestData.length - 1].overall - practiceTestData[0].overall}%`
-                      : 'N/A'
-                    }
-                  </span>
+                <div className="flex-1">
+                  {shouldShowProgressBar(item.skill, item.section) ? (
+                    <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
+                  ) : (
+                    <div className="bg-slate-100 rounded-full h-3">
+                      <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                    </div>
+                  )}
                 </div>
+                <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
+                  {formatScoreDisplay(item.score, item.skill, item.section)}
+                </div>
+                <button 
+                  className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                  onClick={() => {/* Handle drill start */}}
+                >
+                  Drill
+                </button>
               </div>
-            </div>
-
-            {/* Drills Summary */}
-            <div className="p-6 border border-slate-200 rounded-xl bg-gradient-to-br from-slate-50 to-gray-50 hover:shadow-lg transition-all duration-300">
-              <h4 className="font-bold text-slate-900 mb-4">Skill Drills</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Total Questions</span>
-                  <span className="text-slate-900 font-medium">{getTotalDrillsCompleted()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Most Practiced</span>
-                  <span className="text-slate-900 font-medium">
-                    {getFilteredDrills()[0]?.skill?.split(' ').slice(0, 2).join(' ') || 'None'}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Skills Drilled</span>
-                  <span className="text-slate-900 font-medium">
-                    {Object.values(enhancedDrillData).reduce((total, section) => 
-                      total + Object.keys(section).length, 0
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </Card>
       </div>
@@ -701,7 +656,7 @@ const PerformanceDashboard = () => {
   const SpiderChart = ({ data, size = 300 }) => {
     const [animationProgress, setAnimationProgress] = useState(0);
     const sections = Object.keys(data);
-    const scores = Object.values(data);
+    const scores = Object.values(data).map(score => Number(score));
     const center = size / 2;
     const radius = size / 2 - 50;
     
@@ -792,9 +747,10 @@ const PerformanceDashboard = () => {
           {/* Labels with enhanced styling */}
           {sections.map((section, index) => {
             const angle = (index * 2 * Math.PI) / sections.length - Math.PI / 2;
-            const labelRadius = radius + 30;
+            const labelRadius = radius + 35;
             const x = center + labelRadius * Math.cos(angle);
             const y = center + labelRadius * Math.sin(angle);
+            const scoreValue = scores[index];
             
             return (
               <g key={index} className="transition-all duration-300 ease-out">
@@ -803,36 +759,37 @@ const PerformanceDashboard = () => {
                   y={y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="text-xs font-bold fill-slate-700"
+                  className="text-sm font-bold fill-slate-700"
                   style={{
-                    transform: `translate(${x < center ? '-25px' : x > center ? '25px' : '0'}, 0)`
+                    transform: `translate(${x < center ? '-30px' : x > center ? '30px' : '0'}, 0)`
                   }}
                 >
                   {section.split(' ')[0]}
                 </text>
                 <text
                   x={x}
-                  y={y + 14}
+                  y={y + 16}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="text-xs font-medium fill-slate-600"
+                  className="text-sm font-medium fill-slate-600"
                   style={{
-                    transform: `translate(${x < center ? '-25px' : x > center ? '25px' : '0'}, 0)`
+                    transform: `translate(${x < center ? '-30px' : x > center ? '30px' : '0'}, 0)`
                   }}
                 >
                   {section.split(' ').slice(1).join(' ')}
                 </text>
                 <text
                   x={x}
-                  y={y + 28}
+                  y={y + 34}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className={`text-sm font-black ${getScoreColor(scores[index])}`}
+                  className="text-lg font-black"
+                  fill={getScoreColorSVG(scoreValue)}
                   style={{
-                    transform: `translate(${x < center ? '-25px' : x > center ? '25px' : '0'}, 0)`
+                    transform: `translate(${x < center ? '-30px' : x > center ? '30px' : '0'}, 0)`
                   }}
                 >
-                  {scores[index]}%
+                  {scoreValue}%
                 </text>
               </g>
             );
@@ -848,15 +805,12 @@ const PerformanceDashboard = () => {
       <Card className={`p-8 ${getScoreBg(diagnosticData.overall)} shadow-xl`}>
         <div className="flex justify-between items-center">
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-slate-900">Overall Performance</h3>
+            <h3 className="text-xl font-bold text-slate-900">Diagnostic Test Performance</h3>
             <p className="text-sm text-slate-600 opacity-80">VIC Selective Entry Diagnostic</p>
           </div>
           <div className="text-right">
-            <div className={`text-5xl font-black ${getScoreColor(diagnosticData.overall)} mb-2`}>
+            <div className={`text-4xl font-black ${getScoreColor(diagnosticData.overall)} mb-1`}>
               {diagnosticData.overall}%
-            </div>
-            <div className={`text-sm font-medium px-4 py-2 rounded-full ${getBadgeStyle(diagnosticData.overall)}`}>
-              {diagnosticData.overall >= 75 ? 'Excellent' : diagnosticData.overall >= 65 ? 'Good' : 'Needs Work'}
             </div>
           </div>
         </div>
@@ -864,36 +818,79 @@ const PerformanceDashboard = () => {
 
       {/* Spider Chart */}
       <Card className="p-8">
-        <div className="flex items-center space-x-3 mb-6">
-          <Target className="w-6 h-6 text-teal-500" />
-          <h3 className="text-xl font-bold text-slate-900">Section Performance Overview</h3>
-        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Performance by Test Section</h3>
         <SpiderChart data={diagnosticData.sections} size={400} />
+      </Card>
+
+      {/* Sub-skill Overview */}
+      <Card className="p-8">
+        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Sub-Skill Strengths & Weaknesses</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200" hover={false}>
+            <div className="flex items-center space-x-3 mb-6">
+              <h4 className="text-lg font-bold text-teal-900 mb-6">Top 5 Sub-skills</h4>
+            </div>
+            <div className="space-y-3">
+              {getTopSubSkills().map((item, index) => (
+                <div key={index} 
+                     className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-teal-200/50 hover:bg-white/80 transition-all duration-300"
+                     style={{ animationDelay: `${index * 150}ms` }}>
+                  <div>
+                    <div className="text-sm font-bold text-teal-800">{item.skill}</div>
+                    <div className="text-xs text-teal-600">{item.section}</div>
+                  </div>
+                  <span className={`font-black text-lg ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
+                    {formatScoreDisplay(item.score, item.skill, item.section)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
+            <div className="flex items-center space-x-3 mb-6">
+              <h4 className="text-lg font-bold text-red-900 mb-6">Bottom 5 Sub-skills</h4>
+            </div>
+            <div className="space-y-3">
+              {getBottomSubSkills().map((item, index) => (
+                <div key={index} 
+                     className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
+                     style={{ animationDelay: `${index * 150}ms` }}>
+                  <div>
+                    <div className="text-sm font-bold text-red-800">{item.skill}</div>
+                    <div className="text-xs text-red-600">{item.section}</div>
+                  </div>
+                  <span className={`font-black text-lg ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
+                    {formatScoreDisplay(item.score, item.skill, item.section)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </Card>
 
       {/* Skills Performance with Enhanced Filters */}
       <Card className="p-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
-          <h3 className="text-xl font-bold text-slate-900">Skills Performance</h3>
-          <div className="flex flex-wrap gap-2">
-            <FilterButton 
-              active={skillFilter === 'all'} 
-              onClick={() => setSkillFilter('all')}
-              count={getAllSubSkillsRanked().length}
+        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Sub-Skill Performance</h3>
+        <div className="flex flex-wrap gap-2 mb-6">
+          <FilterButton 
+            active={skillFilter === 'all'} 
+            onClick={() => setSkillFilter('all')}
+            count={getAllSubSkillsRanked().length}
+          >
+            All Skills
+          </FilterButton>
+          {Object.keys(diagnosticData.sections).map((section) => (
+            <FilterButton
+              key={section}
+              active={skillFilter === section}
+              onClick={() => setSkillFilter(section)}
+              count={Object.keys(diagnosticData.subSkills[section] || {}).length}
             >
-              All Skills
+              {section.split(' ')[0]}
             </FilterButton>
-            {Object.keys(diagnosticData.sections).map((section) => (
-              <FilterButton
-                key={section}
-                active={skillFilter === section}
-                onClick={() => setSkillFilter(section)}
-                count={Object.keys(diagnosticData.subSkills[section] || {}).length}
-              >
-                {section.split(' ')[0]}
-              </FilterButton>
-            ))}
-          </div>
+          ))}
         </div>
         
         {/* Show section score if filtered */}
@@ -921,11 +918,20 @@ const PerformanceDashboard = () => {
                   {item.section}
                 </div>
               )}
-              <div className="flex-1">
-                <AnimatedProgressBar value={item.score} delay={index * 100} />
+              <div className="w-32 text-xs text-slate-400 font-medium">
+                {getDiagnosticQuestionsCompleted(item.skill, item.section)} questions completed
               </div>
-              <div className={`w-16 text-sm font-bold text-right ${getScoreColor(item.score)}`}>
-                {item.score}%
+              <div className="flex-1">
+                {shouldShowProgressBar(item.skill, item.section) ? (
+                  <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
+                ) : (
+                  <div className="bg-slate-100 rounded-full h-3">
+                    <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                  </div>
+                )}
+              </div>
+              <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
+                {formatScoreDisplay(item.score, item.skill, item.section)}
               </div>
               <button 
                 className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
@@ -937,51 +943,6 @@ const PerformanceDashboard = () => {
           ))}
         </div>
       </Card>
-
-      {/* Strengths and Weaknesses */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="p-8 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200" hover={false}>
-          <div className="flex items-center space-x-3 mb-6">
-            <Trophy className="w-6 h-6 text-emerald-600" />
-            <h3 className="text-xl font-bold text-emerald-900">Top Strengths</h3>
-          </div>
-          <div className="space-y-3">
-            {getStrengths().map((item, index) => (
-              <div key={index} 
-                   className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-emerald-200/50 hover:bg-white/80 transition-all duration-300"
-                   style={{ animationDelay: `${index * 150}ms` }}>
-                <span className="text-sm font-bold text-emerald-800">{item.skill}</span>
-                <span className="font-black text-emerald-900 text-lg">{item.score}%</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-8 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
-          <div className="flex items-center space-x-3 mb-6">
-            <Target className="w-6 h-6 text-red-500" />
-            <h3 className="text-xl font-bold text-red-900">Priority Areas</h3>
-          </div>
-          <div className="space-y-4">
-            {getPriorityAreas().map((item, index) => (
-              <div key={index} 
-                   className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
-                   style={{ animationDelay: `${index * 150}ms` }}>
-                <div>
-                  <div className="text-sm font-bold text-red-800">{item.skill}</div>
-                  <div className="text-xs text-red-600">{item.section}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-black text-red-900 text-lg">{item.score}%</div>
-                  <button className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-3 py-1 text-xs rounded-lg mt-1 hover:from-red-700 hover:to-rose-700 transition-all duration-200 transform hover:scale-105">
-                    Start Drill
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
     </div>
   );
 
@@ -1044,7 +1005,7 @@ const PerformanceDashboard = () => {
                   className={`p-6 rounded-2xl border-2 text-center transition-all duration-300 transform hover:scale-105 ${
                     test 
                       ? selectedTest === testNum
-                        ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-200'
+                        ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-teal-100 shadow-lg shadow-teal-200'
                         : `${getScoreBg(test.overall)} hover:border-teal-300 hover:shadow-lg`
                       : 'bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200 cursor-not-allowed opacity-60'
                   }`}
@@ -1066,43 +1027,6 @@ const PerformanceDashboard = () => {
           </div>
         </Card>
 
-        {/* Progress Trend Chart */}
-        <Card className="p-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <TrendingUp className="w-6 h-6 text-teal-500" />
-            <h3 className="text-xl font-bold text-slate-900">Overall Progress Trend</h3>
-          </div>
-          <div className="h-80 bg-gradient-to-br from-slate-50 to-gray-50 rounded-2xl p-6 relative border border-slate-200">
-            <div className="flex items-end justify-between h-full">
-              {practiceTestData.map((test, index) => (
-                <div key={test.id} 
-                     className="flex flex-col items-center space-y-3 transition-all duration-300 hover:scale-110"
-                     style={{ animationDelay: `${index * 200}ms` }}>
-                  <div 
-                    className={`w-20 rounded-t-xl flex items-end justify-center pb-3 transition-all duration-1000 ease-out shadow-lg ${
-                      selectedTest === test.id 
-                        ? 'bg-gradient-to-t from-teal-600 to-emerald-500 shadow-teal-300' 
-                        : 'bg-gradient-to-t from-teal-500 to-emerald-400 shadow-teal-200'
-                    }`}
-                    style={{ 
-                      height: `${Math.max((test.overall / 100) * 240, 60)}px`,
-                      animationDelay: `${index * 300}ms`
-                    }}
-                  >
-                    <span className="text-white text-sm font-black">{test.overall}%</span>
-                  </div>
-                  <div className={`text-sm font-bold transition-colors duration-200 ${
-                    selectedTest === test.id ? 'text-teal-600' : 'text-slate-600'
-                  }`}>
-                    Test {test.id}
-                  </div>
-                  <div className="text-xs text-slate-500 font-medium">{test.date}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-
         {/* Selected Test Analysis */}
         {selectedTestData && (
           <>
@@ -1114,11 +1038,8 @@ const PerformanceDashboard = () => {
                   <p className="text-sm text-slate-600 opacity-80">Completed on {selectedTestData.date}</p>
                 </div>
                 <div className="text-right">
-                  <div className={`text-5xl font-black ${getScoreColor(selectedTestData.overall)} mb-2`}>
+                  <div className={`text-4xl font-black ${getScoreColor(selectedTestData.overall)} mb-2`}>
                     {selectedTestData.overall}%
-                  </div>
-                  <div className={`text-sm font-medium px-4 py-2 rounded-full ${getBadgeStyle(selectedTestData.overall)}`}>
-                    {selectedTestData.overall >= 75 ? 'Excellent' : selectedTestData.overall >= 65 ? 'Good' : 'Needs Work'}
                   </div>
                 </div>
               </div>
@@ -1126,32 +1047,36 @@ const PerformanceDashboard = () => {
 
             {/* Section Spider Chart */}
             <Card className="p-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Section Performance</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-6">
+                Practice Test {selectedTestData.id}: Performance by Test Section
+              </h3>
               <SpiderChart data={selectedTestData.sections} size={400} />
             </Card>
 
             {/* Skills Performance with Filters */}
             {selectedTestData.subSkills && Object.keys(selectedTestData.subSkills).length > 0 && (
               <Card className="p-8">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
-                  <h3 className="text-xl font-bold text-slate-900">Skills Performance</h3>
-                  <div className="flex flex-wrap gap-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">
+                  Practice Test {selectedTestData.id}: Sub-Skill Performance
+                </h3>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <FilterButton
+                    active={practiceSkillFilter === 'all'}
+                    onClick={() => setPracticeSkillFilter('all')}
+                    count={getPracticeFilteredSkills(selectedTestData).length}
+                  >
+                    All Skills
+                  </FilterButton>
+                  {Object.keys(selectedTestData.subSkills).map((section) => (
                     <FilterButton
-                      active={practiceSkillFilter === 'all'}
-                      onClick={() => setPracticeSkillFilter('all')}
+                      key={section}
+                      active={practiceSkillFilter === section}
+                      onClick={() => setPracticeSkillFilter(section)}
+                      count={Object.keys(selectedTestData.subSkills[section] || {}).length}
                     >
-                      All Skills
+                      {section.split(' ')[0]}
                     </FilterButton>
-                    {Object.keys(selectedTestData.subSkills).map((section) => (
-                      <FilterButton
-                        key={section}
-                        active={practiceSkillFilter === section}
-                        onClick={() => setPracticeSkillFilter(section)}
-                      >
-                        {section.split(' ')[0]}
-                      </FilterButton>
-                    ))}
-                  </div>
+                  ))}
                 </div>
                 
                 {/* Show section score if filtered */}
@@ -1179,11 +1104,20 @@ const PerformanceDashboard = () => {
                           {item.section}
                         </div>
                       )}
-                      <div className="flex-1">
-                        <AnimatedProgressBar value={item.score} delay={index * 100} />
+                      <div className="w-32 text-xs text-slate-400 font-medium">
+                        8 questions completed
                       </div>
-                      <div className={`w-16 text-sm font-bold text-right ${getScoreColor(item.score)}`}>
-                        {item.score}%
+                      <div className="flex-1">
+                        {shouldShowProgressBar(item.skill, item.section) ? (
+                          <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
+                        ) : (
+                          <div className="bg-slate-100 rounded-full h-3">
+                            <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                          </div>
+                        )}
+                      </div>
+                      <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
+                        {formatScoreDisplay(item.score, item.skill, item.section)}
                       </div>
                       <button 
                         className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
@@ -1196,91 +1130,6 @@ const PerformanceDashboard = () => {
                 </div>
               </Card>
             )}
-
-            {/* Combined Section Progress & Trends */}
-            <Card className="p-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Section Performance Over Time</h3>
-              <div className="space-y-8">
-                {/* Overall Progress Chart */}
-                <div>
-                  <h4 className="font-bold text-slate-700 mb-4">Overall Test Scores</h4>
-                  <div className="h-40 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-4 border border-slate-200">
-                    <div className="flex items-end justify-between h-full">
-                      {practiceTestData.map((test, index) => (
-                        <div key={test.id} 
-                             className="flex flex-col items-center space-y-2 transition-all duration-300 hover:scale-110"
-                             style={{ animationDelay: `${index * 150}ms` }}>
-                          <div 
-                            className={`w-16 rounded-t-lg flex items-end justify-center pb-2 transition-all duration-1000 ease-out ${
-                              selectedTest === test.id 
-                                ? 'bg-gradient-to-t from-teal-600 to-emerald-500' 
-                                : 'bg-gradient-to-t from-teal-400 to-emerald-300'
-                            }`}
-                            style={{ height: `${Math.max((test.overall / 100) * 100, 20)}px` }}
-                          >
-                            <span className="text-white text-xs font-bold">{test.overall}%</span>
-                          </div>
-                          <span className="text-xs text-slate-500 font-medium">T{test.id}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section Trends */}
-                <div>
-                  <h4 className="font-bold text-slate-700 mb-4">By Section</h4>
-                  <div className="space-y-6">
-                    {Object.entries(trendData).map(([sectionName, sectionTrend], sectionIndex) => (
-                      <div key={sectionName} 
-                           className="p-6 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200 hover:border-slate-300 transition-all duration-300"
-                           style={{ animationDelay: `${sectionIndex * 100}ms` }}>
-                        <div className="flex justify-between items-center mb-4">
-                          <h5 className="font-bold text-slate-900">{sectionName}</h5>
-                          <div className="flex items-center space-x-3">
-                            {sectionTrend.length > 1 && (
-                              <span className={`text-sm font-bold flex items-center space-x-1 ${
-                                sectionTrend[sectionTrend.length - 1].score > sectionTrend[0].score 
-                                  ? 'text-emerald-600' 
-                                  : sectionTrend[sectionTrend.length - 1].score < sectionTrend[0].score
-                                    ? 'text-red-500'
-                                    : 'text-slate-600'
-                              }`}>
-                                <span>
-                                  {sectionTrend[sectionTrend.length - 1].score > sectionTrend[0].score ? '↗' : 
-                                   sectionTrend[sectionTrend.length - 1].score < sectionTrend[0].score ? '↘' : '→'}
-                                </span>
-                                <span>{Math.abs(sectionTrend[sectionTrend.length - 1].score - sectionTrend[0].score)}%</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-end space-x-4 h-20">
-                          {sectionTrend.map((point, pointIndex) => (
-                            <div key={point.testId} 
-                                 className="flex flex-col items-center space-y-2 transition-all duration-300 hover:scale-110"
-                                 style={{ animationDelay: `${pointIndex * 100}ms` }}>
-                              <div 
-                                className={`w-12 rounded-t-lg transition-all duration-1000 ease-out ${
-                                  selectedTest === point.testId 
-                                    ? 'bg-gradient-to-t from-teal-600 to-emerald-500' 
-                                    : 'bg-gradient-to-t from-teal-400 to-emerald-300'
-                                }`}
-                                style={{ height: `${Math.max((point.score / 100) * 60, 12)}px` }}
-                              ></div>
-                              <span className="text-xs text-slate-500 font-medium">T{point.testId}</span>
-                              <span className={`text-xs font-bold ${getScoreColor(point.score)}`}>
-                                {point.score}%
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
           </>
         )}
 
@@ -1288,7 +1137,7 @@ const PerformanceDashboard = () => {
         {!selectedTestData && (
           <Card className="p-16 text-center border-2 border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-gray-50">
             <div className="text-slate-500">
-              <div className="text-6xl mb-4">📊</div>
+              <BarChart3 className="h-16 w-16 mx-auto mb-4" />
               <h3 className="text-lg font-bold mb-2">Select a Practice Test</h3>
               <p className="text-sm">Choose a completed practice test above to view detailed performance analysis</p>
             </div>
@@ -1299,104 +1148,106 @@ const PerformanceDashboard = () => {
   };
 
   const renderDrills = () => {
-    const totalDrills = getTotalDrillsCompleted();
-    const sectionTotals = getSectionDrillTotals();
-    
     return (
       <div className="space-y-8" key={`drills-${animationKey}`}>
-        {/* Total Drills Banner */}
-        <Card className="p-8 bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 border-teal-200 shadow-xl shadow-teal-100">
-          <div className="flex justify-between items-center">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <Target className="w-6 h-6 text-teal-600" />
-                <h3 className="text-xl font-bold text-teal-900">Total Practice Completed</h3>
+        {/* Drill Metrics */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="p-8 bg-gradient-to-br from-teal-50 via-teal-50 to-cyan-50 border-teal-200" glow>
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-teal-900">Total Questions Completed</h3>
+                <p className="text-sm text-teal-700 opacity-80">Drill questions only</p>
               </div>
-              <p className="text-sm text-teal-700 opacity-80">Questions drilled across all skills</p>
+              <div className="text-right">
+                <div className="text-4xl font-black text-teal-600 mb-1">{getTotalDrillsCompleted()}</div>
+                <div className="text-sm text-teal-600 font-medium">questions</div>
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-5xl font-black text-teal-600 mb-1">{totalDrills}</div>
-              <div className="text-sm text-teal-600 font-medium">questions</div>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Drill Performance with Enhanced Filters */}
-        <Card className="p-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
-            <h3 className="text-xl font-bold text-slate-900">Drill Performance</h3>
-            <div className="flex flex-wrap gap-2">
-              <FilterButton
-                active={drillFilter === 'all'}
-                onClick={() => setDrillFilter('all')}
-                count={getFilteredDrills().length}
-              >
-                All Skills
-              </FilterButton>
-              {Object.keys(enhancedDrillData).map((section) => (
-                <FilterButton
-                  key={section}
-                  active={drillFilter === section}
-                  onClick={() => setDrillFilter(section)}
-                  count={Object.keys(enhancedDrillData[section]).length}
-                >
-                  {section.split(' ')[0]}
-                </FilterButton>
-              ))}
+          <Card className={`p-8 ${getScoreBg(getOverallDrillAccuracy())} shadow-xl`}>
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-slate-900">Overall Accuracy</h3>
+                <p className="text-sm text-slate-600 opacity-80">Drill questions only</p>
+              </div>
+              <div className="text-right">
+                <div className={`text-4xl font-black ${getScoreColor(getOverallDrillAccuracy())} mb-1`}>
+                  {getOverallDrillAccuracy()}%
+                </div>
+              </div>
             </div>
+          </Card>
+        </div>
+
+        {/* Drill Performance */}
+        <Card className="p-8">
+          <h3 className="text-xl font-bold text-slate-900 mb-6">Drill Sub-Skill Performance</h3>
+          <div className="flex flex-wrap gap-2 mb-6">
+            <FilterButton
+              active={drillFilter === 'all'}
+              onClick={() => setDrillFilter('all')}
+              count={getFilteredDrills().length}
+            >
+              All Skills
+            </FilterButton>
+            {Object.keys(getSectionDrillTotals()).map((section) => (
+              <FilterButton
+                key={section}
+                active={drillFilter === section}
+                onClick={() => setDrillFilter(section)}
+                count={getFilteredDrills().filter(drill => drill.section === section).length}
+              >
+                {section.split(' ')[0]}
+              </FilterButton>
+            ))}
           </div>
           
-          {/* Show section totals if filtered */}
-          {drillFilter !== 'all' && sectionTotals[drillFilter] && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+          {/* Show section score if filtered */}
+          {drillFilter !== 'all' && getSectionDrillTotals()[drillFilter] && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-slate-900 text-lg">{drillFilter}</span>
-                <div className="flex items-center space-x-6">
-                  <div className="text-right">
-                    <div className="text-2xl font-black text-slate-900">
-                      {sectionTotals[drillFilter].completed}
-                    </div>
-                    <div className="text-xs text-slate-500 font-medium">questions</div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-2xl font-black ${getScoreColor(sectionTotals[drillFilter].averageAccuracy)}`}>
-                      {sectionTotals[drillFilter].averageAccuracy}%
-                    </div>
-                    <div className="text-xs text-slate-500 font-medium">avg accuracy</div>
-                  </div>
-                </div>
+                <span className="font-bold text-slate-900">{drillFilter}</span>
+                <span className={`text-xl font-black ${getScoreColor(getSectionDrillTotals()[drillFilter])}`}>
+                  {getSectionDrillTotals()[drillFilter]}%
+                </span>
               </div>
             </div>
           )}
           
           <div className="space-y-3">
-            {getFilteredDrills().map((item, index) => (
+            {getFilteredDrills().map((drill, index) => (
               <div key={index} 
-                   className="flex items-center space-x-4 p-5 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
+                   className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
                    style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="w-64 text-sm text-slate-700 font-medium truncate" title={item.skill}>
-                  {item.skill}
+                <div className="w-64 text-sm text-slate-700 font-medium truncate" title={drill.skill}>
+                  {drill.skill}
                 </div>
                 {drillFilter === 'all' && (
                   <div className="w-36 text-xs text-slate-500 truncate font-medium">
-                    {item.section}
+                    {drill.section}
                   </div>
                 )}
-                <div className="w-24 text-center">
-                  <div className="text-lg font-black text-slate-900">{item.completed}</div>
-                  <div className="text-xs text-slate-500 font-medium">questions</div>
+                <div className="w-32 text-xs text-slate-400 font-medium">
+                  {drill.completed} questions completed
                 </div>
                 <div className="flex-1">
-                  <AnimatedProgressBar value={item.accuracy} delay={index * 100} />
+                  {shouldShowDrillProgressBar(drill) ? (
+                    <AnimatedProgressBar value={drill.accuracy} delay={index * 100} />
+                  ) : (
+                    <div className="bg-slate-100 rounded-full h-3">
+                      <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                    </div>
+                  )}
                 </div>
-                <div className={`w-20 text-sm font-bold text-right ${getScoreColor(item.accuracy)}`}>
-                  {item.accuracy}%
+                <div className={`w-16 text-sm font-bold text-right ${getDrillScoreColorWithDash(drill)}`}>
+                  {formatDrillScoreDisplay(drill)}
                 </div>
                 <button 
-                  className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-6 py-3 text-sm font-medium rounded-xl hover:from-teal-700 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                  onClick={() => {/* Handle continue drilling */}}
+                  className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                  onClick={() => {/* Handle drill start */}}
                 >
-                  Continue
+                  Drill
                 </button>
               </div>
             ))}
@@ -1404,38 +1255,187 @@ const PerformanceDashboard = () => {
         </Card>
 
         {/* Priority Recommendations */}
-        <Card className="p-8 bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-xl shadow-red-100">
-          <div className="flex items-center space-x-3 mb-6">
-            <Target className="w-6 h-6 text-red-500" />
-            <h3 className="text-xl font-bold text-red-900">Recommended Focus Areas</h3>
-          </div>
-          <div className="space-y-4">
-            {getPriorityAreas().slice(0, 3).map((item, index) => {
-              const drillData = getFilteredDrills().find(drill => drill.skill === item.skill);
-              return (
-                <div key={index} 
-                     className="flex justify-between items-center p-6 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
-                     style={{ animationDelay: `${index * 150}ms` }}>
+        <Card className="p-8 bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
+          <h3 className="text-xl font-bold text-slate-900 mb-6">Priority Recommendations</h3>
+          <p className="text-slate-600 mb-6">Focus on these areas to improve your performance most effectively.</p>
+          <div className="space-y-3">
+            {getPriorityAreas().map((area, index) => (
+              <div key={index} 
+                   className="flex items-center justify-between p-4 bg-white rounded-xl border border-teal-200 hover:border-teal-300 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <div className="w-3 h-3 bg-teal-400 rounded-full"></div>
                   <div>
-                    <div className="font-bold text-red-800 text-lg">{item.skill}</div>
-                    <div className="text-sm text-red-600 mt-1">
-                      <span className="font-medium">Diagnostic:</span> {item.score}% • 
-                      {drillData 
-                        ? ` Drilled: ${drillData.completed} questions (${drillData.accuracy}% accuracy)`
-                        : ' Not drilled yet'
-                      }
-                    </div>
+                    <div className="font-medium text-slate-900">{area.skill}</div>
+                    <div className="text-sm text-slate-600">{area.section}</div>
                   </div>
-                  <button className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-3 font-medium rounded-xl hover:from-red-700 hover:to-rose-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
-                    {drillData ? 'Continue' : 'Start'} Drilling
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className={`text-sm font-bold ${getScoreColor(area.score)}`}>
+                    {area.score}% accuracy
+                  </div>
+                  <button 
+                    className="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-2 text-sm rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                    onClick={() => {/* Handle drill start */}}
+                  >
+                    Drill
                   </button>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </Card>
       </div>
     );
+  };
+
+  const getCombinedSubSkillsRanked = () => {
+    const allSkills = [];
+    
+    // Add diagnostic sub-skills
+    Object.entries(diagnosticData.subSkills).forEach(([section, skills]) => {
+      Object.entries(skills).forEach(([skill, score]) => {
+        allSkills.push({ 
+          skill, 
+          scores: [score], 
+          section,
+          sources: ['diagnostic']
+        });
+      });
+    });
+    
+    // Add practice test sub-skills
+    practiceTestData.forEach(test => {
+      if (test.subSkills) {
+        Object.entries(test.subSkills).forEach(([section, skills]) => {
+          Object.entries(skills).forEach(([skill, score]) => {
+            const existingSkill = allSkills.find(item => item.skill === skill && item.section === section);
+            if (existingSkill) {
+              existingSkill.scores.push(score);
+              if (!existingSkill.sources.includes('practice')) {
+                existingSkill.sources.push('practice');
+              }
+            } else {
+              allSkills.push({ 
+                skill, 
+                scores: [score], 
+                section,
+                sources: ['practice']
+              });
+            }
+          });
+        });
+      }
+    });
+    
+    // Add drill sub-skills
+    Object.entries(enhancedDrillData).forEach(([section, skills]) => {
+      Object.entries(skills).forEach(([skill, data]) => {
+        const existingSkill = allSkills.find(item => item.skill === skill && item.section === section);
+        if (existingSkill) {
+          existingSkill.scores.push(data.accuracy);
+          if (!existingSkill.sources.includes('drill')) {
+            existingSkill.sources.push('drill');
+          }
+        } else {
+          allSkills.push({ 
+            skill, 
+            scores: [data.accuracy], 
+            section,
+            sources: ['drill']
+          });
+        }
+      });
+    });
+    
+    // Calculate average score for each skill
+    const skillsWithAverage = allSkills.map(skill => ({
+      ...skill,
+      averageScore: Math.round(skill.scores.reduce((sum, score) => sum + score, 0) / skill.scores.length)
+    }));
+    
+    return skillsWithAverage.sort((a, b) => b.averageScore - a.averageScore);
+  };
+
+  const getCombinedTopSubSkills = () => {
+    return getCombinedSubSkillsRanked().slice(0, 5);
+  };
+
+  const getCombinedBottomSubSkills = () => {
+    const allSkills = getCombinedSubSkillsRanked();
+    return allSkills.slice(-5).reverse();
+  };
+
+  const getCombinedFilteredSkills = () => {
+    const allSkills = getCombinedSubSkillsRanked();
+    
+    if (skillFilter === 'all') {
+      return allSkills;
+    }
+    
+    return allSkills.filter(item => item.section === skillFilter);
+  };
+
+  // Helper functions to get questions completed for each sub-skill
+  const getDiagnosticQuestionsCompleted = (skill, section) => {
+    // Each diagnostic sub-skill has 5 questions
+    return diagnosticData.subSkills[section] && diagnosticData.subSkills[section][skill] ? 5 : 0;
+  };
+
+  const getPracticeQuestionsCompleted = (skill, section) => {
+    // Count questions from practice tests where this sub-skill appears
+    let totalQuestions = 0;
+    practiceTestData.forEach(test => {
+      if (test.subSkills && test.subSkills[section] && test.subSkills[section][skill]) {
+        totalQuestions += 8; // 8 questions per sub-skill per practice test
+      }
+    });
+    return totalQuestions;
+  };
+
+  const getDrillQuestionsCompleted = (skill, section) => {
+    return enhancedDrillData[section] && enhancedDrillData[section][skill] 
+      ? enhancedDrillData[section][skill].completed 
+      : 0;
+  };
+
+  const getTotalQuestionsCompleted = (skill, section) => {
+    return getDiagnosticQuestionsCompleted(skill, section) + 
+           getPracticeQuestionsCompleted(skill, section) + 
+           getDrillQuestionsCompleted(skill, section);
+  };
+
+  // Helper function to format score display - shows dash if no questions completed
+  const formatScoreDisplay = (score, skill, section) => {
+    const totalQuestions = getTotalQuestionsCompleted(skill, section);
+    return totalQuestions === 0 ? '-' : `${score}%`;
+  };
+
+  // Helper function to determine if we should show progress bar
+  const shouldShowProgressBar = (skill, section) => {
+    return getTotalQuestionsCompleted(skill, section) > 0;
+  };
+
+  // Helper function to get appropriate score color, using neutral color for no data
+  const getScoreColorWithDash = (score, skill, section) => {
+    const totalQuestions = getTotalQuestionsCompleted(skill, section);
+    if (totalQuestions === 0) return 'text-slate-400';
+    return getScoreColor(score);
+  };
+
+  // Helper function to get appropriate score color for drills, using neutral color for no data
+  const getDrillScoreColorWithDash = (drill) => {
+    if (drill.completed === 0) return 'text-slate-400';
+    return getScoreColor(drill.accuracy);
+  };
+
+  // Helper function to format drill score display - shows dash if no questions completed
+  const formatDrillScoreDisplay = (drill) => {
+    return drill.completed === 0 ? '-' : `${drill.accuracy}%`;
+  };
+
+  // Helper function to determine if we should show progress bar for drills
+  const shouldShowDrillProgressBar = (drill) => {
+    return drill.completed > 0;
   };
 
   return (
@@ -1443,7 +1443,7 @@ const PerformanceDashboard = () => {
       <div className="max-w-7xl mx-auto p-6">
         {/* Enhanced Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-black text-slate-900 mb-3 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-black text-slate-900 mb-3 bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
             Performance Insights
           </h1>
           <p className="text-slate-600 text-lg font-medium">VIC Selective Entry (Year 9)</p>
@@ -1453,22 +1453,22 @@ const PerformanceDashboard = () => {
         <div className="flex justify-center mb-8">
           <div className="flex space-x-2 bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
             {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'diagnostic', label: 'Diagnostic', icon: '🎯' },
-              { id: 'practice', label: 'Practice Tests', icon: '📝' },
-              { id: 'drills', label: 'Drills', icon: '💪' }
+              { id: 'overview', label: 'Overall', icon: <BarChart3 size={18} /> },
+              { id: 'diagnostic', label: 'Diagnostic', icon: <Target size={18} /> },
+              { id: 'practice', label: 'Practice Tests', icon: <BookOpen size={18} /> },
+              { id: 'drills', label: 'Drills', icon: <Activity size={18} /> }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-8 py-4 rounded-xl font-bold transition-all duration-200 ease-out transform hover:scale-105 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg shadow-teal-200'
+                    ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center space-x-2">
-                  <span className="text-lg">{tab.icon}</span>
+                  {tab.icon}
                   <span>{tab.label}</span>
                 </div>
               </button>

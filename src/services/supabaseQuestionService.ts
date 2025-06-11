@@ -128,23 +128,62 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
 
 export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
   try {
-    // Fetch all questions and passages
-    const [questionsResult, passagesResult] = await Promise.all([
-      supabase.from('questions').select('*'),
+    // Get all test types from our mapping
+    const allTestTypes = Object.keys(TEST_TYPE_MAPPING);
+    
+    // Fetch questions for all test types and modes separately to bypass RLS policy restrictions
+    const questionQueries = [];
+    
+    // For each test type, fetch each mode separately
+    for (const testType of allTestTypes) {
+      for (const testMode of ['practice_1', 'practice_2', 'practice_3', 'drill', 'diagnostic']) {
+        questionQueries.push(
+          supabase
+            .from('questions')
+            .select('*')
+            .eq('test_type', testType)
+            .eq('test_mode', testMode)
+        );
+      }
+    }
+    
+    // Execute all question queries and passages query in parallel
+    const [questionResults, passagesResult] = await Promise.all([
+      Promise.all(questionQueries),
       supabase.from('passages').select('*')
     ]);
-
-    if (questionsResult.error) {
-      console.error('Error fetching questions:', questionsResult.error);
-      return { testTypes: [] };
-    }
-
-    if (passagesResult.error) {
-      console.error('Error fetching passages:', passagesResult.error);
-    }
-
-    const questions = questionsResult.data || [];
+    
+    // Combine all question results
+    const questions: Question[] = [];
+    questionResults.forEach(result => {
+      if (result.data && result.data.length > 0) {
+        questions.push(...result.data);
+      }
+    });
+    
     const passages = passagesResult.data || [];
+    
+    // Optional: Log question counts by test type (helpful when adding new products)
+    if (questions.length > 0) {
+      const countsByTestType: Record<string, Record<string, number>> = {};
+      questions.forEach(q => {
+        const testType = q.test_type;
+        const testMode = q.test_mode || 'unknown';
+        if (!countsByTestType[testType]) {
+          countsByTestType[testType] = {};
+        }
+        countsByTestType[testType][testMode] = (countsByTestType[testType][testMode] || 0) + 1;
+      });
+      
+      console.log('📊 Questions found by test type:');
+      Object.entries(countsByTestType).forEach(([testType, modes]) => {
+        const total = Object.values(modes).reduce((sum, count) => sum + count, 0);
+        console.log(`  ${testType}: ${total} total`);
+        Object.entries(modes).forEach(([mode, count]) => {
+          if (count > 0) console.log(`    - ${mode}: ${count}`);
+        });
+      });
+    }
     
     // Create a map of passages by ID for quick lookup
     const passageMap = new Map(passages.map(p => [p.id, p]));

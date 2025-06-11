@@ -76,14 +76,12 @@ export const CelebrationModal: React.FC<CelebrationModalProps> = ({
     return "text-red-500";
   };
 
-  const getEncouragementMessage = (score?: number) => {
-    if (!score) return "";
-    
-    if (score >= 90) return "Outstanding work! 🌟";
-    if (score >= 80) return "Great job! Keep it up! 💪";
-    if (score >= 70) return "Well done! You're improving! 📈";
-    if (score >= 60) return "Good effort! Keep practicing! 💡";
-    return "Every step counts! Keep going! 🚀";
+  const getEncouragementMessage = (score: number): string => {
+    if (score >= 90) return "Outstanding work!";
+    if (score >= 80) return "Great job! Keep it up!";
+    if (score >= 70) return "Well done! You're improving!";
+    if (score >= 60) return "Good effort! Keep practicing!";
+    return "Every step counts! Keep going!";
   };
 
   return (

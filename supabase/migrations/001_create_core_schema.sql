@@ -26,6 +26,7 @@ CREATE TABLE passages (
     content TEXT NOT NULL,
     passage_type VARCHAR NOT NULL, -- 'narrative', 'informational', 'persuasive'
     word_count INTEGER,
+    difficulty INTEGER DEFAULT 2 CHECK (difficulty >= 1 AND difficulty <= 3), -- 1=easy, 2=medium, 3=hard
     australian_context BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()

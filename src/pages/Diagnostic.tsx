@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { HeroBanner } from '@/components/ui/hero-banner';
-import { MetricsCards } from '@/components/ui/metrics-cards';
 import { 
-  BookOpen, Clock, Target, Brain, Play, CheckCircle, 
-  AlertCircle, BarChart3, ArrowRight, Info
+  BookOpen, Clock, Target, Trophy, BarChart3, 
+  ArrowRight, ChevronLeft, Calendar, User, Award, AlertCircle,
+  CheckCircle2, Timer, Users, FileText, ChevronDown, ChevronUp, Play, RotateCcw, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
@@ -17,13 +17,103 @@ import {
   type TestMode, 
   type TestSection 
 } from '@/services/supabaseQuestionService';
+import { TEST_STRUCTURES } from '@/data/curriculumData';
+
+interface DiagnosticSection {
+  id: string;
+  name: string;
+  questions: number;
+  timeLimit: number;
+  status: 'not-started' | 'in-progress' | 'completed';
+  score?: number;
+  sampleQuestions?: {
+    id: number;
+    text: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+  }[];
+}
+
+interface DiagnosticTest {
+  id: string;
+  name: string;
+  description: string;
+  sections: DiagnosticSection[];
+  totalQuestions: number;
+  estimatedTime: number;
+  status: 'not-started' | 'in-progress' | 'completed';
+  bestScore?: number;
+  lastAttempt?: string;
+}
 
 const DiagnosticTests: React.FC = () => {
+  const navigate = useNavigate();
   const [diagnosticModes, setDiagnosticModes] = useState<TestMode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedTest, setExpandedTest] = useState<string | null>(null);
   const { selectedProduct } = useProduct();
-  const navigate = useNavigate();
+
+  // Helper function to get individual section time from curriculum data
+  const getSectionTimeLimit = (testType: string, sectionName: string): number => {
+    const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
+    if (!testStructure) return 30; // Default fallback
+
+    // Try exact match first
+    const exactMatch = (testStructure as any)[sectionName];
+    if (exactMatch && typeof exactMatch === 'object' && exactMatch.time) {
+      return exactMatch.time;
+    }
+
+    // Try partial match (case-insensitive)
+    const sectionKeys = Object.keys(testStructure);
+    const partialMatch = sectionKeys.find(key => 
+      key.toLowerCase().includes(sectionName.toLowerCase()) ||
+      sectionName.toLowerCase().includes(key.toLowerCase())
+    );
+
+    if (partialMatch) {
+      const matchedSection = (testStructure as any)[partialMatch];
+      if (matchedSection && typeof matchedSection === 'object' && matchedSection.time) {
+        return matchedSection.time;
+      }
+    }
+
+    return 30; // Default fallback
+  };
+
+  // Helper function to calculate total time from curriculum data
+  const calculateTotalTime = (testType: string, sections: DiagnosticSection[]): number => {
+    const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
+    if (!testStructure) return 0;
+
+    let totalMinutes = 0;
+    sections.forEach(section => {
+      const sectionStructure = testStructure[section.name as keyof typeof testStructure] as any;
+      if (sectionStructure && typeof sectionStructure === 'object' && sectionStructure.time) {
+        totalMinutes += sectionStructure.time;
+      }
+    });
+
+    return totalMinutes;
+  };
+
+  // Helper function to round time to nearest 0.5 hours
+  const formatTimeToHours = (minutes: number): string => {
+    const hours = minutes / 60;
+    const roundedHours = Math.round(hours * 2) / 2; // Round to nearest 0.5
+    
+    if (roundedHours < 1) {
+      return `${minutes} min`;
+    } else if (roundedHours === 1) {
+      return '1 hour';
+    } else if (roundedHours % 1 === 0) {
+      return `${roundedHours} hours`;
+    } else {
+      return `${roundedHours} hours`;
+    }
+  };
 
   useEffect(() => {
     const loadDiagnosticData = async () => {
@@ -33,6 +123,11 @@ const DiagnosticTests: React.FC = () => {
       try {
         const modes = await fetchDiagnosticModes(selectedProduct);
         setDiagnosticModes(modes);
+        
+        // Set the diagnostic card to be expanded by default if there's data
+        if (modes.length > 0 && modes[0].sections.length > 0) {
+          setExpandedTest(modes[0].id);
+        }
       } catch (err) {
         console.error('Error loading diagnostic data:', err);
         setError('Failed to load diagnostic data');
@@ -44,149 +139,142 @@ const DiagnosticTests: React.FC = () => {
     loadDiagnosticData();
   }, [selectedProduct]);
 
-  // Get all sections from all diagnostic modes
-  const allSections: TestSection[] = [];
-  diagnosticModes.forEach(mode => {
-    allSections.push(...mode.sections);
-  });
+  // Transform diagnostic modes to match our new structure
+  const transformDiagnosticMode = (mode: TestMode): DiagnosticTest => {
+    const sections: DiagnosticSection[] = mode.sections.map((section, index) => {
+      // Add mock completion data for some sections
+      let mockStatus: 'not-started' | 'in-progress' | 'completed' = 'not-started';
+      let mockScore: number | undefined = undefined;
+      
+      // Mock data pattern for diagnostic
+      if (index === 0) {
+        mockStatus = 'completed';
+        mockScore = 88;
+      } else if (index === 1) {
+        mockStatus = 'in-progress';
+      }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Easy':
-        return 'bg-green-100 text-green-700';
-      case 'Medium':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'Hard':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
+      return {
+        id: section.id,
+        name: section.name,
+        questions: section.totalQuestions,
+        timeLimit: getSectionTimeLimit(selectedProduct, section.name),
+        status: mockStatus,
+        score: mockScore,
+        // Convert first few questions to sample format for preview
+        sampleQuestions: section.questions.slice(0, 3).map((q, index) => ({
+          id: index + 1,
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.options[q.correctAnswer] || 'A',
+          explanation: q.explanation,
+        }))
+      };
+    });
+
+    // Calculate proper timing from curriculum data
+    const calculatedTime = calculateTotalTime(selectedProduct, sections);
+    const finalTime = calculatedTime > 0 ? calculatedTime : mode.estimatedTime;
+
+    // Determine overall test status and best score based on sections
+    let testStatus: 'not-started' | 'in-progress' | 'completed' = 'not-started';
+    let bestScore: number | undefined = undefined;
+    let lastAttempt: string | undefined = undefined;
+
+    const completedSections = sections.filter(s => s.status === 'completed');
+    const inProgressSections = sections.filter(s => s.status === 'in-progress');
+    
+    if (completedSections.length === sections.length && sections.length > 0) {
+      testStatus = 'completed';
+      const scoresWithValues = completedSections.filter(s => s.score).map(s => s.score!);
+      if (scoresWithValues.length > 0) {
+        bestScore = Math.round(scoresWithValues.reduce((a, b) => a + b, 0) / scoresWithValues.length);
+      }
+    } else if (completedSections.length > 0 || inProgressSections.length > 0) {
+      testStatus = 'in-progress';
+      const scoresWithValues = completedSections.filter(s => s.score).map(s => s.score!);
+      if (scoresWithValues.length > 0) {
+        bestScore = Math.round(scoresWithValues.reduce((a, b) => a + b, 0) / scoresWithValues.length);
+      }
     }
+
+    // Add mock last attempt date for tests with progress
+    if (testStatus !== 'not-started') {
+      lastAttempt = 'Dec 18, 2024';
+    }
+
+    return {
+      id: mode.id,
+      name: 'Diagnostic Assessment',
+      description: mode.description || 'Comprehensive diagnostic test to identify strengths and areas for improvement',
+      sections,
+      totalQuestions: mode.totalQuestions,
+      estimatedTime: finalTime,
+      status: testStatus,
+      bestScore,
+      lastAttempt,
+    };
   };
+
+  const diagnosticTests: DiagnosticTest[] = diagnosticModes.map(transformDiagnosticMode);
+  const diagnosticTest = diagnosticTests.length > 0 ? diagnosticTests[0] : null; // Single test
+
+  const completedSections = diagnosticTest ? diagnosticTest.sections.filter(s => s.status === 'completed').length : 0;
+  const inProgressSections = diagnosticTest ? diagnosticTest.sections.filter(s => s.status === 'in-progress').length : 0;
+  const averageScore = diagnosticTest && diagnosticTest.bestScore ? diagnosticTest.bestScore : 0;
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'border-green-200 bg-green-50';
+        return 'border-emerald-200 bg-emerald-50/30';
       case 'in-progress':
-        return 'border-orange-200 bg-orange-50';
+        return 'border-amber-200 bg-amber-50/30';
       case 'not-started':
-        return 'border-gray-200 bg-white';
+        return 'border-slate-200 bg-white';
       default:
-        return 'border-gray-200 bg-white';
+        return 'border-slate-200 bg-white';
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="text-green-600" size={20} />;
-      case 'in-progress':
-        return <Clock className="text-orange-600" size={20} />;
-      case 'not-started':
-        return <Brain className="text-gray-400" size={20} />;
-      default:
-        return <Brain className="text-gray-400" size={20} />;
+  const handleTestExpand = () => {
+    if (diagnosticTest) {
+      setExpandedTest(expandedTest === diagnosticTest.id ? null : diagnosticTest.id);
     }
   };
 
   const handleStartSection = (sectionId: string, sectionName: string) => {
-    const section = allSections.find(s => s.id === sectionId);
+    const section = diagnosticTest?.sections.find(s => s.id === sectionId);
     
-    if (section && section.totalQuestions > 0) {
-      navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(sectionName)}`);
+    if (section && section.questions > 0) {
+      navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
     }
   };
 
-  const totalQuestions = allSections.reduce((sum, section) => sum + section.totalQuestions, 0);
-  const completedSections = allSections.filter(s => s.status === 'completed').length;
-  const averageScore = allSections
-    .filter(s => s.score)
-    .reduce((acc, s) => acc + (s.score || 0), 0) / 
-    allSections.filter(s => s.score).length || 0;
-
-  // Hero banner configuration
-  const heroBannerProps = {
-    title: "Diagnostic Assessment 🎯",
-    subtitle: "Identify your strengths and areas for improvement with comprehensive diagnostic tests",
-    metrics: [
-      {
-        icon: <Target size={16} />,
-        label: `${completedSections}/${allSections.length} sections completed`,
-        value: ""
-      },
-      {
-        icon: <BarChart3 size={16} />,
-        label: isNaN(averageScore) ? 'No scores yet' : `${Math.round(averageScore)}% average`,
-        value: ""
-      },
-      {
-        icon: <Brain size={16} />,
-        label: `${allSections.length} assessment areas`,
-        value: ""
-      }
-    ],
-    actions: [
-      {
-        label: 'Start Assessment',
-        icon: <Play size={20} className="mr-2" />,
-        onClick: () => {
-          const firstIncomplete = allSections.find(s => s.status !== 'completed' && s.totalQuestions > 0);
-          if (firstIncomplete) {
-            handleStartSection(firstIncomplete.id, firstIncomplete.name);
-          }
-        },
-        disabled: !allSections.some(s => s.totalQuestions > 0)
-      }
-    ]
+  const getSectionButtonText = (status: string) => {
+    switch (status) {
+      case 'not-started':
+        return 'Start Section';
+      case 'in-progress':
+        return 'Resume Section';
+      case 'completed':
+        return 'View Results';
+      default:
+        return 'Start Section';
+    }
   };
 
-  // Metrics cards configuration
-  const metricsConfig = [
-    {
-      title: 'Assessment Areas',
-      value: allSections.length.toString(),
-      icon: <Brain className="text-white" size={24} />,
-      badge: { text: 'Available', variant: 'default' as const },
-      color: {
-        bg: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
-        iconBg: 'bg-blue-500',
-        text: 'text-blue-900'
-      }
-    },
-    {
-      title: 'Total Questions',
-      value: totalQuestions.toString(),
-      icon: <BookOpen className="text-white" size={24} />,
-      badge: { text: 'Ready', variant: 'secondary' as const },
-      color: {
-        bg: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
-        iconBg: 'bg-green-500',
-        text: 'text-green-900'
-      }
-    },
-    {
-      title: 'Completed',
-      value: completedSections.toString(),
-      icon: <CheckCircle className="text-white" size={24} />,
-      badge: { text: 'Done', variant: 'success' as const },
-      color: {
-        bg: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
-        iconBg: 'bg-purple-500',
-        text: 'text-purple-900'
-      }
-    },
-    {
-      title: 'Average Score',
-      value: isNaN(averageScore) ? '--' : `${Math.round(averageScore)}%`,
-      icon: <Target className="text-white" size={24} />,
-      badge: { text: 'Score', variant: 'warning' as const },
-      color: {
-        bg: 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200',
-        iconBg: 'bg-orange-500',
-        text: 'text-orange-900'
-      }
+  const getSectionButtonIcon = (status: string) => {
+    switch (status) {
+      case 'not-started':
+        return <Play size={14} className="mr-1" />;
+      case 'in-progress':
+        return <ArrowRight size={14} className="mr-1" />;
+      case 'completed':
+        return <RotateCcw size={14} className="mr-1" />;
+      default:
+        return <Play size={14} className="mr-1" />;
     }
-  ];
+  };
 
   if (loading) {
     return (
@@ -211,23 +299,40 @@ const DiagnosticTests: React.FC = () => {
     );
   }
 
-  if (diagnosticModes.length === 0) {
+  if (!diagnosticTest || diagnosticTest.sections.length === 0) {
     return (
       <div className="space-y-8">
         <HeroBanner 
-          title="Diagnostic Assessment 🎯"
-          subtitle="Diagnostic tests for this test type are coming soon."
-          metrics={[]}
+          title="Diagnostic Assessment"
+          subtitle="Comprehensive diagnostic test to identify your strengths and areas for improvement"
+          metrics={[
+            {
+              icon: <Target size={16} />,
+              label: "Sections Completed",
+              value: "0"
+            },
+            {
+              icon: <Clock size={16} />,
+              label: "In Progress",
+              value: "0"
+            },
+            {
+              icon: <BarChart3 size={16} />,
+              label: "Average Score",
+              value: "0%"
+            }
+          ]}
           warning={{
             icon: <AlertCircle size={16} />,
-            message: "No diagnostic tests available yet."
+            message: "Diagnostic test for this test type is coming soon..."
           }}
+          className="bg-gradient-to-r from-purple-500 to-purple-700"
         />
         
-        <Card className="p-8 text-center bg-white">
-          <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No Diagnostic Tests Available</h3>
-          <p className="text-gray-600">Diagnostic tests for this test type are coming soon.</p>
+        <Card className="p-12 text-center bg-white border border-slate-200">
+          <Activity className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2 text-slate-700">No Diagnostic Test Available</h3>
+          <p className="text-slate-600">Diagnostic test for this test type is coming soon.</p>
         </Card>
       </div>
     );
@@ -235,124 +340,238 @@ const DiagnosticTests: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Standardized Hero Banner */}
-      <HeroBanner {...heroBannerProps} />
+      {/* Hero Banner */}
+      <HeroBanner 
+        title="Diagnostic Assessment"
+        subtitle="Comprehensive diagnostic test to identify your strengths and areas for improvement"
+        metrics={[
+          {
+            icon: <Target size={16} />,
+            label: "Sections Completed",
+            value: completedSections.toString()
+          },
+          {
+            icon: <Clock size={16} />,
+            label: "In Progress",
+            value: inProgressSections.toString()
+          },
+          {
+            icon: <BarChart3 size={16} />,
+            label: "Average Score",
+            value: isNaN(averageScore) ? '0%' : `${Math.round(averageScore)}%`
+          }
+        ]}
+        {...(!diagnosticTest.totalQuestions && {
+          warning: {
+            icon: <AlertCircle size={16} />,
+            message: "Diagnostic test for this test type is coming soon..."
+          }
+        })}
+        className="bg-gradient-to-r from-purple-400 to-purple-900"
+      />
 
-      {/* Standardized Metrics Cards */}
-      <MetricsCards metrics={metricsConfig} />
-
-      {/* Diagnostic Modes - White Background */}
-      <div className="space-y-6">
-        {diagnosticModes.map((mode) => (
-          <Card key={mode.id} className="bg-white">
-            <CardHeader>
+      {/* Diagnostic Test - Single Column */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6 text-slate-900">
+          Diagnostic Assessment
+        </h2>
+        
+        <div className="space-y-6">
+          <Card 
+            className={cn(
+              "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-2xl overflow-hidden",
+              diagnosticTest.totalQuestions > 0 ? "hover:border-edu-teal/30 hover:-translate-y-1" : "opacity-60"
+            )}
+          >
+            <CardHeader className="pb-4 bg-gradient-to-r from-slate-50/30 to-white">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Brain size={20} />
-                    <span>{mode.name}</span>
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">{mode.description}</p>
+                <div className="flex items-center space-x-4">
+                  <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg">
+                    <Activity size={28} className="text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold text-slate-900">{diagnosticTest.name}</CardTitle>
+                    <div className="flex items-center space-x-3 mt-2">
+                      <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
+                        <Users size={14} />
+                        <span className="font-medium text-xs">{diagnosticTest.sections.length} sections</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
+                        <Clock size={14} />
+                        <span className="font-medium text-xs">{formatTimeToHours(diagnosticTest.estimatedTime)}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Badge className="bg-purple-100 text-purple-700">
-                  {mode.sections.length} areas
-                </Badge>
+                
+                <div className="flex items-center space-x-3">
+                  {diagnosticTest.status === 'completed' && (
+                    <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full">
+                      <CheckCircle2 size={12} className="mr-1" />
+                      Completed
+                    </Badge>
+                  )}
+                  {diagnosticTest.status === 'in-progress' && (
+                    <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
+                      <Timer size={12} className="mr-1" />
+                      In Progress
+                    </Badge>
+                  )}
+                  {diagnosticTest.status === 'not-started' && (
+                    <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full">
+                      Not Started
+                    </Badge>
+                  )}
+                  {diagnosticTest.totalQuestions > 0 && (
+                    <Button 
+                      size="sm"
+                      variant="ghost"
+                      className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTestExpand();
+                      }}
+                    >
+                      {expandedTest === diagnosticTest.id ? 
+                        <ChevronUp size={20} className="text-slate-600" /> : 
+                        <ChevronDown size={20} className="text-slate-600" />
+                      }
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {mode.sections.map((section) => (
-                  <Card 
-                    key={section.id} 
-                    className={cn(
-                      "transition-all duration-200 hover:shadow-md bg-white",
-                      getStatusColor(section.status),
-                      section.totalQuestions > 0 ? "cursor-pointer hover:border-purple-300" : "opacity-60"
-                    )}
-                  >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          {getStatusIcon(section.status)}
-                          <div>
-                            <CardTitle className="text-base">{section.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground">
-                              {section.totalQuestions} questions
-                            </p>
+            
+            <CardContent className="bg-white">
+              {diagnosticTest.totalQuestions === 0 ? (
+                <div className="text-center py-8">
+                  <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-500 font-medium">Questions coming soon</p>
+                </div>
+              ) : (
+                <>
+                  {/* Collapsed View - Summary */}
+                  {expandedTest !== diagnosticTest.id && (
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <div className="text-sm text-slate-600">
+                        {diagnosticTest.lastAttempt ? (
+                          <div className="flex items-center space-x-2">
+                            <Calendar size={12} />
+                            <span>Last attempt: {diagnosticTest.lastAttempt}</span>
                           </div>
-                        </div>
-                        <ArrowRight size={16} className="text-gray-400" />
+                        ) : (
+                          <span>Ready to start</span>
+                        )}
                       </div>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0">
-                      <div className="space-y-3">
-                        {/* Progress if completed */}
-                        {section.status === 'completed' && section.score && (
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium">Score</span>
-                              <span className="text-sm font-bold">{section.score}%</span>
-                            </div>
-                            <Progress value={section.score} className="h-2" />
-                          </div>
-                        )}
-
-                        {/* Time and Question info */}
-                        <div className="flex items-center justify-between text-sm text-gray-600">
-                          <span>{section.totalQuestions} questions</span>
-                          {section.timeLimit && (
-                            <span>{section.timeLimit} min</span>
-                          )}
-                        </div>
-
-                        {/* Sample questions preview */}
-                        {section.questions.length > 0 && (
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <div className="text-sm font-medium mb-2">Sample topics:</div>
-                            <div className="text-xs text-gray-600">
-                              {section.questions.slice(0, 2).map((q, idx) => (
-                                <div key={idx} className="truncate">{q.text.substring(0, 80)}...</div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
+                      {diagnosticTest.status === 'completed' && (
                         <Button 
-                          className="w-full"
-                          onClick={() => handleStartSection(section.id, section.name)}
-                          disabled={section.totalQuestions === 0}
+                          size="sm"
+                          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                          onClick={() => {
+                            // Navigate to results page - you can implement this
+                            console.log('View Results clicked for diagnostic test');
+                          }}
                         >
-                          <Play size={14} className="mr-2" />
-                          {section.status === 'completed' ? 'Retake Assessment' :
-                           section.status === 'in-progress' ? 'Continue Assessment' :
-                           section.totalQuestions > 0 ? 'Start Assessment' : 'Coming Soon'}
+                          <BarChart3 size={14} className="mr-1" />
+                          View Results
                         </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Expanded View - Sections */}
+                  {expandedTest === diagnosticTest.id && (
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      {/* Sections List */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-slate-900">Assessment Sections</h4>
+                        <div className="grid gap-4">
+                          {diagnosticTest.sections.map((section, index) => (
+                            <div 
+                              key={section.id}
+                              className={cn(
+                                "p-4 rounded-lg border-2 transition-all duration-200",
+                                section.questions > 0 ? "hover:shadow-md" : "opacity-60",
+                                getStatusColor(section.status)
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-3 mb-2">
+                                    <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
+                                      <span className="text-sm font-bold text-purple-600">{index + 1}</span>
+                                    </div>
+                                    <div>
+                                      <h5 className="font-semibold text-slate-900">{section.name}</h5>
+                                      <div className="flex items-center space-x-3 text-sm text-slate-600">
+                                        <div className="flex items-center space-x-1">
+                                          <BookOpen size={12} />
+                                          <span>{section.questions} questions</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                          <Timer size={12} />
+                                          <span>{section.timeLimit} min</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {section.score && (
+                                    <div className="mt-2">
+                                      {/* Removed tick and 'section completed' text */}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="ml-4 flex items-center space-x-3">
+                                  {section.status === 'completed' && (
+                                    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                                      <CheckCircle2 size={12} className="mr-1" />
+                                      Complete
+                                    </Badge>
+                                  )}
+                                  {section.status === 'in-progress' && (
+                                    <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                                      In Progress
+                                    </Badge>
+                                  )}
+                                  
+                                  {section.questions === 0 ? (
+                                    <div className="text-center py-2">
+                                      <AlertCircle className="h-5 w-5 text-slate-400 mx-auto mb-1" />
+                                      <p className="text-xs text-slate-500">Coming soon</p>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      className={cn(
+                                        "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
+                                        section.status === 'completed' 
+                                          ? "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300" 
+                                          : section.status === 'in-progress'
+                                          ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                                          : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                                      )}
+                                      onClick={() => handleStartSection(section.id, section.name)}
+                                    >
+                                      {getSectionButtonIcon(section.status)}
+                                      <span className="ml-1">{getSectionButtonText(section.status)}</span>
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
-        ))}
+        </div>
       </div>
-
-      {/* Info Box - White Background */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="p-6">
-          <div className="flex items-start space-x-3">
-            <Info className="text-blue-600 mt-0.5" size={20} />
-            <div>
-              <h3 className="font-semibold text-blue-900 mb-2">How Diagnostic Tests Work</h3>
-              <p className="text-blue-800 text-sm">
-                These assessments help identify your current skill level and knowledge gaps. 
-                Complete all sections to get a comprehensive understanding of your strengths and areas for improvement.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

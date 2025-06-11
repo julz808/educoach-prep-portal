@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuestionsWithSVG } from '../hooks/useQuestionWithSVG';
 import SVGRenderer from './SVGRenderer';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BarChart3, ArrowRight, ArrowLeft, Play, RotateCcw, Check, X } from 'lucide-react';
+import { formatQuestionText, cleanOptionText } from '@/utils/textFormatting';
 
 interface SVGQuestionDemoProps {
   testType?: string;
@@ -100,8 +105,8 @@ const SVGQuestionDemo: React.FC<SVGQuestionDemoProps> = ({
 
       {questions.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-400 text-xl mb-2">📊</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No Visual Questions Found</h3>
+          <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <div className="text-gray-600 text-lg font-medium mb-2">Question Preview</div>
           <p className="text-gray-600">
             No questions with SVG visuals found for {testType}.
             <br />
@@ -136,7 +141,7 @@ const SVGQuestionDemo: React.FC<SVGQuestionDemoProps> = ({
               <div className="p-6">
                 <div className="mb-6">
                   <p className="text-gray-900 text-lg leading-relaxed">
-                    {question.question_text}
+                    {formatQuestionText(question.question_text)}
                   </p>
                 </div>
 
@@ -173,7 +178,7 @@ const SVGQuestionDemo: React.FC<SVGQuestionDemoProps> = ({
                                   : 'bg-gray-50 border-gray-200'
                               }`}
                             >
-                              <span className="text-gray-900">{option}</span>
+                              <span className="text-gray-900">{cleanOptionText(option)}</span>
                               {option.includes(question.correct_answer) && (
                                 <span className="text-green-600 text-sm ml-2">✓ Correct</span>
                               )}
