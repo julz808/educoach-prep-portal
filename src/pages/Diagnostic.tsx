@@ -18,6 +18,8 @@ import {
   type TestSection 
 } from '@/services/supabaseQuestionService';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
+import { SessionPersistenceService, SectionProgress } from '@/services/sessionPersistenceService';
+import { useAuth } from '@/context/AuthContext';
 
 interface DiagnosticSection {
   id: string;
@@ -48,12 +50,17 @@ interface DiagnosticTest {
 }
 
 const DiagnosticTests: React.FC = () => {
+  console.log('🔥 DiagnosticTests component is rendering!');
+  
+  const { selectedProduct } = useProduct();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
   const [diagnosticModes, setDiagnosticModes] = useState<TestMode[]>([]);
+  const [sectionProgress, setSectionProgress] = useState<Record<string, SectionProgress>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
-  const { selectedProduct } = useProduct();
 
   // Helper function to get individual section time from curriculum data
   const getSectionTimeLimit = (testType: string, sectionName: string): number => {
@@ -115,14 +122,31 @@ const DiagnosticTests: React.FC = () => {
     }
   };
 
+  // Load diagnostic data and user progress
   useEffect(() => {
     const loadDiagnosticData = async () => {
+      console.log('🚀 loadDiagnosticData called with:', { selectedProduct, user: user ? { id: user.id, email: user.email } : null });
+      
       setLoading(true);
       setError(null);
       
       try {
         const modes = await fetchDiagnosticModes(selectedProduct);
         setDiagnosticModes(modes);
+        console.log('📋 Diagnostic modes loaded:', modes.length, 'modes');
+        
+        // Load user progress if authenticated
+        if (user) {
+          console.log('👤 User is authenticated, loading progress for:', user.id);
+          const progressData = await SessionPersistenceService.getDiagnosticProgress(
+            user.id, 
+            selectedProduct
+          );
+          setSectionProgress(progressData);
+          console.log('📊 Progress data loaded:', progressData);
+        } else {
+          console.log('❌ No user found, skipping progress load');
+        }
         
         // Set the diagnostic card to be expanded by default if there's data
         if (modes.length > 0 && modes[0].sections.length > 0) {
@@ -137,21 +161,68 @@ const DiagnosticTests: React.FC = () => {
     };
 
     loadDiagnosticData();
-  }, [selectedProduct]);
+  }, [selectedProduct, user]);
 
-  // Transform diagnostic modes to match our new structure
-  const transformDiagnosticMode = (mode: TestMode): DiagnosticTest => {
-    const sections: DiagnosticSection[] = mode.sections.map((section, index) => {
-      // Add mock completion data for some sections
-      let mockStatus: 'not-started' | 'in-progress' | 'completed' = 'not-started';
-      let mockScore: number | undefined = undefined;
+  // Transform diagnostic modes to match our new structure with real progress data
+  const transformDiagnosticMode = (mode: TestMode, progressData: Record<string, SectionProgress> = {}): DiagnosticTest => {
+    console.log('🔍 Transform diagnostic mode called with:', {
+      mode: mode.name,
+      sections: mode.sections.map(s => ({ id: s.id, name: s.name })),
+      progressData: Object.keys(progressData),
+      progressDetails: progressData
+    });
+
+    const sections: DiagnosticSection[] = mode.sections.map((section) => {
+      // Get real progress data for this section with improved matching
+      let sectionProgressData = progressData[section.name] || progressData[section.id];
       
-      // Mock data pattern for diagnostic
-      if (index === 0) {
-        mockStatus = 'completed';
-        mockScore = 88;
-      } else if (index === 1) {
-        mockStatus = 'in-progress';
+      // If no exact match, try partial matching for section names
+      if (!sectionProgressData) {
+        const progressKeys = Object.keys(progressData);
+        
+        // Look for partial matches (case-insensitive)
+        const partialMatch = progressKeys.find(key => {
+          const keyLower = key.toLowerCase();
+          const sectionLower = section.name.toLowerCase();
+          
+          // Check if either contains the other (for cases like "General Ability - Quantitative" vs "General Ability")
+          return keyLower.includes(sectionLower) || 
+                 sectionLower.includes(keyLower) ||
+                 // Check for common words (but exclude very short words)
+                 keyLower.split(/[\s-]+/).some(word => 
+                   word.length > 3 && sectionLower.includes(word)
+                 ) ||
+                 sectionLower.split(/[\s-]+/).some(word => 
+                   word.length > 3 && keyLower.includes(word)
+                 );
+        });
+        
+        if (partialMatch) {
+          sectionProgressData = progressData[partialMatch];
+          console.log(`🔄 Found partial match for "${section.name}": using progress from "${partialMatch}"`);
+        }
+      }
+      
+      console.log(`🔍 Section "${section.name}" (id: ${section.id}):`, {
+        progressByName: progressData[section.name],
+        progressById: progressData[section.id],
+        finalProgressData: sectionProgressData,
+        availableProgressKeys: Object.keys(progressData)
+      });
+      
+      let status: 'not-started' | 'in-progress' | 'completed' = 'not-started';
+      let score: number | undefined = undefined;
+      
+      if (sectionProgressData) {
+        status = sectionProgressData.status;
+        console.log(`✅ Found progress for "${section.name}": ${status}`);
+        // Calculate score if completed (this would come from actual test results)
+        if (status === 'completed' && sectionProgressData.questionsCompleted > 0) {
+          // This is a placeholder - in real implementation, score would come from test results
+          score = Math.floor(Math.random() * 20) + 80; // Mock score between 80-100
+        }
+      } else {
+        console.log(`❌ No progress found for "${section.name}"`);
       }
 
       return {
@@ -159,8 +230,8 @@ const DiagnosticTests: React.FC = () => {
         name: section.name,
         questions: section.totalQuestions,
         timeLimit: getSectionTimeLimit(selectedProduct, section.name),
-        status: mockStatus,
-        score: mockScore,
+        status,
+        score,
         // Convert first few questions to sample format for preview
         sampleQuestions: section.questions.slice(0, 3).map((q, index) => ({
           id: index + 1,
@@ -198,9 +269,16 @@ const DiagnosticTests: React.FC = () => {
       }
     }
 
-    // Add mock last attempt date for tests with progress
-    if (testStatus !== 'not-started') {
-      lastAttempt = 'Dec 18, 2024';
+    // Add real last attempt date if there's progress
+    if (testStatus !== 'not-started' && Object.keys(progressData).length > 0) {
+      const latestProgress = Object.values(progressData).reduce((latest, current) => {
+        return new Date(current.lastUpdated) > new Date(latest.lastUpdated) ? current : latest;
+      });
+      lastAttempt = new Date(latestProgress.lastUpdated).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
     }
 
     return {
@@ -216,7 +294,7 @@ const DiagnosticTests: React.FC = () => {
     };
   };
 
-  const diagnosticTests: DiagnosticTest[] = diagnosticModes.map(transformDiagnosticMode);
+  const diagnosticTests: DiagnosticTest[] = diagnosticModes.map(mode => transformDiagnosticMode(mode, sectionProgress));
   const diagnosticTest = diagnosticTests.length > 0 ? diagnosticTests[0] : null; // Single test
 
   const completedSections = diagnosticTest ? diagnosticTest.sections.filter(s => s.status === 'completed').length : 0;
@@ -245,8 +323,80 @@ const DiagnosticTests: React.FC = () => {
   const handleStartSection = (sectionId: string, sectionName: string) => {
     const section = diagnosticTest?.sections.find(s => s.id === sectionId);
     
+    console.log('🎯 handleStartSection called:', {
+      sectionId,
+      sectionName,
+      section: section ? { id: section.id, name: section.name, status: section.status } : null,
+      availableProgress: Object.keys(sectionProgress),
+      sectionProgressDetails: sectionProgress
+    });
+    
     if (section && section.questions > 0) {
-      navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+      // Check if this section has an in-progress session with improved matching
+      let sectionProgressData = sectionProgress[section.name] || sectionProgress[section.id];
+      
+      // If no exact match, try partial matching for section names
+      if (!sectionProgressData) {
+        const progressKeys = Object.keys(sectionProgress);
+        
+        // Look for partial matches (case-insensitive)
+        const partialMatch = progressKeys.find(key => {
+          const keyLower = key.toLowerCase();
+          const sectionLower = section.name.toLowerCase();
+          
+          // Check if either contains the other (for cases like "General Ability - Quantitative" vs "General Ability")
+          return keyLower.includes(sectionLower) || 
+                 sectionLower.includes(keyLower) ||
+                 // Check for common words (but exclude very short words)
+                 keyLower.split(/[\s-]+/).some(word => 
+                   word.length > 3 && sectionLower.includes(word)
+                 ) ||
+                 sectionLower.split(/[\s-]+/).some(word => 
+                   word.length > 3 && keyLower.includes(word)
+                 );
+        });
+        
+        if (partialMatch) {
+          sectionProgressData = sectionProgress[partialMatch];
+          console.log(`🔄 Found partial match for "${section.name}": using progress from "${partialMatch}"`);
+        }
+      }
+      
+      console.log('🔍 Section progress lookup:', {
+        sectionName: section.name,
+        sectionId: section.id,
+        progressByName: sectionProgress[section.name],
+        progressById: sectionProgress[section.id],
+        finalProgressData: sectionProgressData,
+        availableProgressKeys: Object.keys(sectionProgress),
+        sessionIdFromProgress: sectionProgressData?.sessionId,
+        statusFromProgress: sectionProgressData?.status,
+        hasSessionId: !!sectionProgressData?.sessionId,
+        sessionIdType: typeof sectionProgressData?.sessionId,
+        fullSectionProgress: sectionProgress,
+        sectionProgressDataStructure: sectionProgressData ? Object.keys(sectionProgressData) : 'No data'
+      });
+      
+      if (sectionProgressData && sectionProgressData.status === 'in-progress' && sectionProgressData.sessionId) {
+        // Resume existing session
+        console.log('🔄 Resuming session:', {
+          sessionId: sectionProgressData.sessionId,
+          sectionName: section.name,
+          navigateUrl: `/test/diagnostic/${sectionId}/${sectionProgressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`
+        });
+        navigate(`/test/diagnostic/${sectionId}/${sectionProgressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`);
+      } else {
+        // Start new session
+        console.log('🆕 Starting new session for section:', {
+          sectionName: section.name,
+          reason: !sectionProgressData ? 'No progress data' : 
+                  sectionProgressData.status !== 'in-progress' ? `Status is ${sectionProgressData.status}` :
+                  !sectionProgressData.sessionId ? 'No session ID' : 'Unknown',
+          progressData: sectionProgressData,
+          navigateUrl: `/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`
+        });
+        navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+      }
     }
   };
 

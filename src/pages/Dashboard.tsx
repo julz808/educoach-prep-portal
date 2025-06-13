@@ -27,6 +27,8 @@ import {
   type OrganizedQuestion
 } from '@/services/supabaseQuestionService';
 import { SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '../data/curriculumData';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mock data for demonstration
 const mockUserPerformance = {
@@ -224,211 +226,132 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [testData, setTestData] = useState<TestType | null>(null);
   const [recentQuestions, setRecentQuestions] = useState<OrganizedQuestion[]>([]);
-  const [userProgress, setUserProgress] = useState(mockUserProgress);
+  const [userProgress, setUserProgress] = useState({
+    diagnostic: { isComplete: false, sectionsCompleted: 0, totalSections: 0, results: null },
+    drills: { questionsCompleted: 0, totalQuestions: 0, subSkillsDrilled: 0, totalSubSkills: 0, skillAreasProgress: 0, currentFocus: null },
+    practiceTests: { testsCompleted: 0, totalTests: 0, averageScore: 0, lastTest: null }
+  });
+  const [realUserStats, setRealUserStats] = useState({
+    totalQuestionsCompleted: 0,
+    overallAccuracy: 0,
+    totalStudyTimeHours: 0,
+    currentStreak: 0
+  });
   const [animationKey, setAnimationKey] = useState(0);
   
   const { selectedProduct } = useProduct();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadDashboardData = async () => {
+      if (!selectedProduct || !user) return;
+      
       setLoading(true);
       
       try {
-        // Fetch questions from Supabase
-        const organizedData = await fetchQuestionsFromSupabase();
+        console.log('🔧 DEBUG: Loading dashboard data for product:', selectedProduct);
         
-        // Also fetch drill and diagnostic modes separately for accurate counts
-        const [drillModes, diagnosticModes] = await Promise.all([
-          fetchDrillModes(selectedProduct),
-          fetchDiagnosticModes(selectedProduct)
-        ]);
-        
-        // Find the test type for the selected product
-        const currentTestType = organizedData.testTypes.find(
-          testType => testType.id === selectedProduct
-        );
+        // Fetch user progress
+        const { data: userProgress } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .single();
 
-        if (currentTestType || drillModes.length > 0 || diagnosticModes.length > 0) {
-          // Add the separately fetched modes to the test type
-          if (currentTestType) {
-            currentTestType.drillModes = drillModes;
-            currentTestType.diagnosticModes = diagnosticModes;
-            setTestData(currentTestType);
-          } else {
-            // Create a basic test type if none exists but we have drill/diagnostic data
-            const basicTestType: TestType = {
-              id: selectedProduct,
-              name: selectedProduct,
-              testModes: [],
-              drillModes: drillModes,
-              diagnosticModes: diagnosticModes
-            };
-            setTestData(basicTestType);
+        // Fetch test attempts
+        const { data: testAttempts } = await supabase
+          .from('test_attempts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct);
+
+        // Fetch question responses
+        const { data: questionResponses } = await supabase
+          .from('user_question_responses')
+          .select('*')
+          .eq('user_id', user.id);
+
+        // Fetch questions for recent questions display
+        const { data: questions } = await supabase
+          .from('questions')
+          .select('id, question_text, answer_options, correct_answer, solution, sub_skill, section_name, difficulty, passage_id')
+          .eq('test_type', selectedProduct)
+          .limit(10);
+
+        // Calculate real user stats
+        const realStats = {
+          totalQuestionsCompleted: userProgress?.questions_attempted || 0,
+          overallAccuracy: userProgress?.accuracy_rate || 0,
+          totalStudyTimeHours: userProgress?.total_time_minutes ? Math.round(userProgress.total_time_minutes / 60 * 10) / 10 : 0,
+          currentStreak: userProgress?.current_streak || 0
+        };
+
+        setRealUserStats(realStats);
+
+        // Transform questions to OrganizedQuestion format
+        const transformedQuestions: OrganizedQuestion[] = (questions || []).map(q => ({
+          id: q.id,
+          text: q.question_text,
+          options: Array.isArray(q.answer_options) ? q.answer_options as string[] : [],
+          correctAnswer: 0, // Index of correct answer, defaulting to 0
+          explanation: q.solution || '',
+          subSkill: q.sub_skill,
+          section: q.section_name,
+          difficulty: q.difficulty,
+          passageContent: '',
+          type: 'multiple-choice',
+          topic: q.section_name,
+          hasVisual: false
+        }));
+
+        setRecentQuestions(transformedQuestions);
+
+        // Create test structure from questions
+        const testStructure = createBasicTestStructure(questions || [], selectedProduct);
+        setTestData(testStructure);
+
+        // Calculate progress for different test modes
+        const diagnosticProgress = testAttempts?.filter(attempt => attempt.test_mode === 'diagnostic').length || 0;
+        const drillsProgress = testAttempts?.filter(attempt => attempt.test_mode === 'drill').length || 0;
+        const practiceProgress = testAttempts?.filter(attempt => attempt.test_mode === 'practice').length || 0;
+
+        setUserProgress({
+          diagnostic: {
+            isComplete: diagnosticProgress > 0,
+            sectionsCompleted: diagnosticProgress,
+            totalSections: 10, // Default estimate
+            results: null
+          },
+          drills: {
+            questionsCompleted: questionResponses?.length || 0,
+            totalQuestions: 100, // Default estimate
+            subSkillsDrilled: drillsProgress,
+            totalSubSkills: 20, // Default estimate
+            skillAreasProgress: drillsProgress,
+            currentFocus: null
+          },
+          practiceTests: {
+            testsCompleted: practiceProgress,
+            totalTests: 5, // Default estimate
+            averageScore: 0,
+            lastTest: null
           }
-          
-          // Get recent questions from different test modes for preview
-          const allQuestions: OrganizedQuestion[] = [];
-          const testTypeToUse = currentTestType || {
-            id: selectedProduct,
-            name: selectedProduct,
-            testModes: [],
-            drillModes: drillModes,
-            diagnosticModes: diagnosticModes
-          };
-          
-          // Add questions from practice test modes
-          testTypeToUse.testModes.forEach(mode => {
-            mode.sections.forEach(section => {
-              allQuestions.push(...section.questions);
-            });
-          });
-          
-          // Add questions from drill modes
-          if (testTypeToUse.drillModes) {
-            testTypeToUse.drillModes.forEach(mode => {
-              mode.sections.forEach(section => {
-                allQuestions.push(...section.questions);
-              });
-            });
-          }
-          
-          // Add questions from diagnostic modes
-          if (testTypeToUse.diagnosticModes) {
-            testTypeToUse.diagnosticModes.forEach(mode => {
-              mode.sections.forEach(section => {
-                allQuestions.push(...section.questions);
-              });
-            });
-          }
-          
-          // Take first 5 questions for preview
-          setRecentQuestions(allQuestions.slice(0, 5));
-          
-          // Calculate totals from Supabase data structure
-          let diagnosticSections = 0;
-          let totalSubSkills = 0;
-          let totalPracticeTests = 0;
-          
-          console.log('🔧 DEBUG: Current test type:', testTypeToUse.id);
-          console.log('🔧 DEBUG: Practice test modes:', testTypeToUse.testModes.map(m => ({ name: m.name, sections: m.sections.length })));
-          console.log('🔧 DEBUG: Drill modes:', testTypeToUse.drillModes?.map(m => ({ name: m.name, sections: m.sections.length })) || 'None');
-          console.log('🔧 DEBUG: Diagnostic modes:', testTypeToUse.diagnosticModes?.map(m => ({ name: m.name, sections: m.sections.length })) || 'None');
-          
-          // Count diagnostic sections from diagnosticModes
-          if (testTypeToUse.diagnosticModes) {
-            testTypeToUse.diagnosticModes.forEach(mode => {
-              diagnosticSections += mode.sections.length;
-              console.log(`🔧 DEBUG: Found diagnostic mode "${mode.name}" with ${mode.sections.length} sections`);
-            });
-          }
-          
-          // Count sub-skills from drillModes (each section in drill mode = one sub-skill)
-          if (testTypeToUse.drillModes) {
-            testTypeToUse.drillModes.forEach(mode => {
-              totalSubSkills += mode.sections.length;
-              console.log(`🔧 DEBUG: Found drill mode "${mode.name}" with ${mode.sections.length} sub-skills`);
-            });
-          }
-          
-          // Count practice tests from testModes (each testMode = 1 practice test)
-          totalPracticeTests = testTypeToUse.testModes.length;
-          console.log(`🔧 DEBUG: Found ${testTypeToUse.testModes.length} practice test modes`);
-          testTypeToUse.testModes.forEach(mode => {
-            console.log(`🔧 DEBUG: - Practice test: "${mode.name}" with ${mode.sections.length} sections`);
-          });
-          
-          console.log('🔧 DEBUG: Final totals:', { diagnosticSections, totalSubSkills, totalPracticeTests });
-          
-          // Use mock progress but real totals
-          const updatedProgress = {
-            diagnostic: {
-              isComplete: false,
-              sectionsCompleted: Math.floor(Math.random() * (diagnosticSections + 1)), // Mock progress
-              totalSections: diagnosticSections, // Real total from Supabase
-              results: null
-            },
-            drills: {
-              questionsCompleted: 150,
-              totalQuestions: 500,
-              subSkillsDrilled: Math.floor(Math.random() * (totalSubSkills + 1)), // Mock progress
-              totalSubSkills: totalSubSkills, // Real total from Supabase
-              skillAreasProgress: 5,
-              currentFocus: null
-            },
-            practiceTests: {
-              testsCompleted: Math.floor(Math.random() * (totalPracticeTests + 1)), // Mock progress
-              totalTests: totalPracticeTests, // Real total from Supabase
-              averageScore: 0,
-              lastTest: null
-            }
-          };
-          
-          console.log('🔧 DEBUG: Updated progress:', updatedProgress);
-          setUserProgress(updatedProgress);
-        } else {
-          // Use placeholder structure if no questions found
-          const placeholder = getPlaceholderTestStructure(selectedProduct);
-          setTestData(placeholder);
-          setRecentQuestions([]);
-          
-          // Set default values when no data available
-          setUserProgress({
-            diagnostic: {
-              isComplete: false,
-              sectionsCompleted: 0,
-              totalSections: 4, // Fallback
-              results: null
-            },
-            drills: {
-              questionsCompleted: 0,
-              totalQuestions: 500,
-              subSkillsDrilled: 0,
-              totalSubSkills: 8, // Fallback
-              skillAreasProgress: 0,
-              currentFocus: null
-            },
-            practiceTests: {
-              testsCompleted: 0,
-              totalTests: 5, // Fallback
-              averageScore: 0,
-              lastTest: null
-            }
-          });
-        }
+        });
         
-        // Trigger animation
         setAnimationKey(prev => prev + 1);
         
       } catch (err) {
         console.error('Error loading dashboard data:', err);
-        // Fallback to placeholder
         const placeholder = getPlaceholderTestStructure(selectedProduct);
         setTestData(placeholder);
         setRecentQuestions([]);
         
-        // Set default values when no data available
         setUserProgress({
-          diagnostic: {
-            isComplete: false,
-            sectionsCompleted: 0,
-            totalSections: 4, // Fallback
-            results: null
-          },
-          drills: {
-            questionsCompleted: 0,
-            totalQuestions: 500,
-            subSkillsDrilled: 0,
-            totalSubSkills: 8, // Fallback
-            skillAreasProgress: 0,
-            currentFocus: null
-          },
-          practiceTests: {
-            testsCompleted: 0,
-            totalTests: 5, // Fallback
-            averageScore: 0,
-            lastTest: null
-          }
+          diagnostic: { isComplete: false, sectionsCompleted: 0, totalSections: 0, results: null },
+          drills: { questionsCompleted: 0, totalQuestions: 0, subSkillsDrilled: 0, totalSubSkills: 0, skillAreasProgress: 0, currentFocus: null },
+          practiceTests: { testsCompleted: 0, totalTests: 0, averageScore: 0, lastTest: null }
         });
       } finally {
         setLoading(false);
@@ -436,7 +359,7 @@ const Dashboard: React.FC = () => {
     };
 
     loadDashboardData();
-  }, [selectedProduct]);
+  }, [selectedProduct, user]);
 
   // Transform Supabase questions for QuestionInterface component
   const transformedQuestions = recentQuestions.map((q, index) => ({
@@ -546,11 +469,11 @@ const Dashboard: React.FC = () => {
     })
   };
 
-  // Metrics cards configuration
+  // Metrics cards configuration - NOW USING REAL DATA
   const metricsConfig = [
     {
       title: 'Questions Completed',
-      value: '247',
+      value: realUserStats.totalQuestionsCompleted.toString(),
       icon: <BookOpen className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -560,7 +483,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Overall Average Score',
-      value: '85%',
+      value: `${realUserStats.overallAccuracy}%`,
       icon: <Target className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -570,7 +493,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Total Study Time',
-      value: '24.8h',
+      value: `${realUserStats.totalStudyTimeHours}h`,
       icon: <Clock className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -580,7 +503,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Day Streak',
-      value: '7',
+      value: realUserStats.currentStreak.toString(),
       icon: <TrendingUp className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -796,6 +719,59 @@ const Dashboard: React.FC = () => {
       />
     </div>
   );
+};
+
+// Helper function to create basic test structure
+const createBasicTestStructure = (questions: any[], productType: string): TestType => {
+  const sections = [...new Set(questions.map(q => q.section_name))];
+  const testModes = [...new Set(questions.map(q => q.test_mode))];
+  
+  return {
+    id: productType,
+    name: productType,
+    testModes: testModes.map(mode => ({
+      id: mode,
+      name: mode,
+      type: mode,
+      totalQuestions: questions.filter(q => q.section_name === mode).length,
+      estimatedTime: 60, // Default 60 minutes
+      sections: sections.map(section => ({
+        id: section,
+        name: section,
+        totalQuestions: questions.filter(q => q.section_name === section && q.test_mode === mode).length,
+        status: 'not-started' as const,
+        questions: []
+      }))
+    })),
+    drillModes: [{
+      id: 'drill',
+      name: 'Skill Drills',
+      type: 'drill',
+      totalQuestions: questions.length,
+      estimatedTime: 30,
+      sections: sections.map(section => ({
+        id: section,
+        name: section,
+        totalQuestions: questions.filter(q => q.section_name === section).length,
+        status: 'not-started' as const,
+        questions: []
+      }))
+    }],
+    diagnosticModes: [{
+      id: 'diagnostic',
+      name: 'Diagnostic Test',
+      type: 'diagnostic',
+      totalQuestions: questions.filter(q => q.test_mode === 'diagnostic').length,
+      estimatedTime: 90,
+      sections: sections.map(section => ({
+        id: section,
+        name: section,
+        totalQuestions: questions.filter(q => q.section_name === section && q.test_mode === 'diagnostic').length,
+        status: 'not-started' as const,
+        questions: []
+      }))
+    }]
+  };
 };
 
 export default Dashboard;

@@ -23,7 +23,7 @@ interface EnhancedTestInterfaceProps {
   questions: Question[];
   currentQuestionIndex: number;
   timeRemaining?: number;
-  onAnswer: (questionIndex: number, answerIndex: number) => void;
+  onAnswer: (answerIndex: number) => void;
   onNext: () => void;
   onPrevious: () => void;
   onJumpToQuestion: (questionIndex: number) => void;
@@ -110,7 +110,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   const handleAnswerSelect = (answerIndex: number) => {
     if (showFeedback && !isReviewMode) return;
     setSelectedAnswer(answerIndex);
-    onAnswer(currentQuestionIndex, answerIndex);
+    onAnswer(answerIndex);
   };
 
   const getQuestionStatus = (questionIndex: number) => {

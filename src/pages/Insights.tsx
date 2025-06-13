@@ -1,22 +1,187 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus, Sparkles, Target, Trophy, Calendar, Clock, BarChart3, PieChart, CheckCircle, AlertCircle, ArrowUp, ArrowDown, Star, Award, Zap, BookOpen, Users, Play, ChevronUp, Home, Brain, Activity, MessageSquare, Calculator, PenTool, PartyPopper } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { SessionPersistenceService } from '@/services/sessionPersistenceService';
+import { supabase } from '@/integrations/supabase/client';
+
+// Simplified interfaces that work with existing data
+interface DashboardStats {
+  total_questions_completed: number;
+  total_study_time_seconds: number;
+  overall_accuracy: number;
+  streak_days: number;
+  diagnostic_completed: boolean;
+  diagnostic_score: number | null;
+  practice_tests_completed: number[];
+  last_activity_at: string;
+}
+
+interface SubSkillPerformance {
+  section_name: string;
+  sub_skill_name: string;
+  questions_attempted: number;
+  questions_correct: number;
+  accuracy_percentage: number;
+  last_updated: string;
+}
 
 const PerformanceDashboard = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [skillFilter, setSkillFilter] = useState('all');
   const [selectedTest, setSelectedTest] = useState(null);
   const [practiceSkillFilter, setPracticeSkillFilter] = useState('all');
   const [drillFilter, setDrillFilter] = useState('all');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [animationKey, setAnimationKey] = useState(0);
+  
+  // Real data state
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [subSkillPerformance, setSubSkillPerformance] = useState<SubSkillPerformance[]>([]);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [productType] = useState('vic_selective'); // TODO: Make this dynamic based on user selection
+
+  // Load real data with fallback to simple queries
+  useEffect(() => {
+    const loadPerformanceData = async () => {
+      if (!user) return;
+      
+      setIsLoading(true);
+      setDataError(null);
+      
+      try {
+        // Try to get basic statistics from existing tables
+        const [userProgressResult, testAttemptsResult, responsesResult] = await Promise.all([
+          supabase
+            .from('user_progress')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('product_type', productType)
+            .single(),
+          
+          supabase
+            .from('test_attempts')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('product_type', productType),
+            
+          supabase
+            .from('user_question_responses')
+            .select('*')
+            .eq('user_id', user.id)
+            .limit(100)
+        ]);
+
+        // Calculate dashboard stats from available data
+        const stats: DashboardStats = {
+          total_questions_completed: userProgressResult.data?.questions_attempted || 0,
+          total_study_time_seconds: (userProgressResult.data?.total_time_minutes || 0) * 60,
+          overall_accuracy: userProgressResult.data?.accuracy_rate || 0,
+          streak_days: userProgressResult.data?.current_streak || 0,
+          diagnostic_completed: (testAttemptsResult.data?.filter(a => a.test_mode === 'diagnostic').length || 0) > 0,
+          diagnostic_score: null,
+          practice_tests_completed: testAttemptsResult.data?.map(a => a.test_number).filter(Boolean) || [],
+          last_activity_at: userProgressResult.data?.last_activity || ''
+        };
+
+        // Calculate sub-skill performance from responses
+        const skillPerformance: SubSkillPerformance[] = [];
+        if (responsesResult.data) {
+          const skillGroups = responsesResult.data.reduce((acc, response) => {
+            const skill = response.sub_skill || 'Unknown';
+            if (!acc[skill]) {
+              acc[skill] = { attempted: 0, correct: 0, responses: [] };
+            }
+            acc[skill].attempted++;
+            if (response.is_correct) acc[skill].correct++;
+            acc[skill].responses.push(response);
+            return acc;
+          }, {} as Record<string, any>);
+
+          Object.entries(skillGroups).forEach(([skill, data]: [string, any]) => {
+            skillPerformance.push({
+              section_name: getSkillSection(skill),
+              sub_skill_name: skill,
+              questions_attempted: data.attempted,
+              questions_correct: data.correct,
+              accuracy_percentage: data.attempted > 0 ? Math.round((data.correct / data.attempted) * 100) : 0,
+              last_updated: data.responses[data.responses.length - 1]?.created_at || ''
+            });
+          });
+        }
+        
+        setDashboardStats(stats);
+        setSubSkillPerformance(skillPerformance);
+      } catch (error) {
+        console.error('Error loading performance data:', error);
+        setDataError('Failed to load performance data. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPerformanceData();
+  }, [user, productType]);
 
   // Animation trigger when tab changes
   useEffect(() => {
-    setIsLoading(true);
     setAnimationKey(prev => prev + 1);
     const timer = setTimeout(() => setIsLoading(false), 300);
     return () => clearTimeout(timer);
   }, [activeTab]);
+
+  // Transform sub-skill performance data to match existing UI structure
+  const transformedSubSkillData = React.useMemo(() => {
+    if (!subSkillPerformance.length) return {};
+    
+    const grouped: Record<string, Record<string, { completed: number; accuracy: number }>> = {};
+    
+    subSkillPerformance.forEach(skill => {
+      // Map sub-skills to their sections based on our curriculum data
+      const section = getSkillSection(skill.sub_skill_name);
+      
+      if (!grouped[section]) {
+        grouped[section] = {};
+      }
+      
+      grouped[section][skill.sub_skill_name] = {
+        completed: skill.questions_attempted,
+        accuracy: Math.round(skill.accuracy_percentage / 100 * 100)
+      };
+    });
+    
+    return grouped;
+  }, [subSkillPerformance]);
+
+  // Helper function to determine which section a sub-skill belongs to
+  const getSkillSection = (subSkill: string) => {
+    // Map sub-skills to sections based on curriculum data
+    const skillMappings = {
+      'Reading comprehension': 'Reading Reasoning',
+      'Inferential reasoning': 'Reading Reasoning',
+      'Text analysis': 'Reading Reasoning',
+      'Critical interpretation': 'Reading Reasoning',
+      'Deductive reasoning from text': 'Reading Reasoning',
+      'Mathematical problem solving': 'Mathematical Reasoning',
+      'Multi-step reasoning': 'Mathematical Reasoning',
+      'Mathematical modeling': 'Mathematical Reasoning',
+      'Advanced numerical reasoning': 'Mathematical Reasoning',
+      'Mathematical application': 'Mathematical Reasoning',
+      'Pattern detection with words': 'Verbal Reasoning',
+      'Vocabulary reasoning': 'Verbal Reasoning',
+      'Word relationships': 'Verbal Reasoning',
+      'Letter manipulation': 'Verbal Reasoning',
+      'Logical word consequences': 'Verbal Reasoning',
+      'Number pattern recognition': 'Quantitative Reasoning',
+      'Mathematical sequence analysis': 'Quantitative Reasoning',
+      'Numerical relationships': 'Quantitative Reasoning',
+      'Word problem solving': 'Quantitative Reasoning',
+      'Quantitative analysis': 'Quantitative Reasoning',
+      'Creative writing': 'Written Expression'
+    };
+    
+    return skillMappings[subSkill] || 'Other';
+  };
 
   // Mock data for VIC Selective Entry
   const diagnosticData = {
@@ -374,80 +539,53 @@ const PerformanceDashboard = () => {
     return <Minus className="w-4 h-4 text-slate-400" />;
   };
 
-  // Overview calculations
+  // Overview calculations using real data instead of mock data
   const getOverviewMetrics = () => {
-    const diagnosticQuestions = Object.values(diagnosticData.subSkills).reduce((total, section) => 
-      total + Object.keys(section).length * 5, 0);
-    
-    const practiceQuestions = practiceTestData.reduce((total, test) => {
-      return total + Object.values(test.sections).length * 8;
-    }, 0);
-    
-    const drillQuestions = getTotalDrillsCompleted();
-    const totalQuestions = diagnosticQuestions + practiceQuestions + drillQuestions;
-    
-    const allSectionScores = [];
-    
-    Object.values(diagnosticData.sections).forEach(score => allSectionScores.push(score));
-    
-    practiceTestData.forEach(test => {
-      Object.values(test.sections).forEach(score => allSectionScores.push(score));
-    });
-    
-    Object.entries(enhancedDrillData).forEach(([section, skills]) => {
-      const sectionAccuracies = Object.values(skills).map(skill => skill.accuracy);
-      const avgSectionAccuracy = sectionAccuracies.reduce((sum, acc) => sum + acc, 0) / sectionAccuracies.length;
-      allSectionScores.push(avgSectionAccuracy);
-    });
-    
-    const averagePerformance = Math.round(
-      allSectionScores.reduce((sum, score) => sum + score, 0) / allSectionScores.length
-    );
+    if (!dashboardStats) {
+      return { totalQuestions: 0, averagePerformance: 0 };
+    }
     
     return {
-      totalQuestions,
-      averagePerformance
+      totalQuestions: dashboardStats.total_questions_completed,
+      averagePerformance: Math.round(dashboardStats.overall_accuracy * 100)
     };
   };
 
   const getCombinedSectionPerformance = () => {
-    const sectionNames = Object.keys(diagnosticData.sections);
-    const combinedPerformance: Record<string, { averageScore: number; totalQuestions: number; trend: string }> = {};
+    if (!subSkillPerformance || subSkillPerformance.length === 0) {
+      return {};
+    }
+
+    // Group sub-skills by section
+    const grouped: Record<string, Record<string, { accuracy: number; questionsAttempted: number }>> = {};
     
-    sectionNames.forEach(section => {
-      const scores = [];
-      let totalQuestions = 0;
-      
-      scores.push(diagnosticData.sections[section]);
-      totalQuestions += Object.keys(diagnosticData.subSkills[section] || {}).length * 5;
-      
-      practiceTestData.forEach(test => {
-        if (test.sections[section]) {
-          scores.push(test.sections[section]);
-          totalQuestions += 8;
-        }
-      });
-      
-      if (enhancedDrillData[section]) {
-        const drillSkills = enhancedDrillData[section];
-        const drillScores = Object.values(drillSkills).map((skill: any) => skill.accuracy);
-        const drillQuestions = Object.values(drillSkills).reduce((sum: number, skill: any) => sum + skill.completed, 0) as number;
-        
-        scores.push(...drillScores);
-        totalQuestions += drillQuestions;
+    subSkillPerformance.forEach(skill => {
+      const section = getSkillSection(skill.sub_skill_name);
+      if (!grouped[section]) {
+        grouped[section] = {};
       }
-      
-      const averageScore = Math.round(
-        scores.reduce((sum, score) => sum + score, 0) / scores.length
-      );
+      grouped[section][skill.sub_skill_name] = {
+        accuracy: skill.accuracy_percentage / 100, // Convert percentage to decimal
+        questionsAttempted: skill.questions_attempted
+      };
+    });
+
+    // Calculate section averages
+    const combinedPerformance: Record<string, { averageScore: number; totalQuestions: number; trend: number }> = {};
+    
+    Object.entries(grouped).forEach(([section, skills]) => {
+      const skillEntries = Object.values(skills);
+      const totalQuestions = skillEntries.reduce((sum, skill) => sum + skill.questionsAttempted, 0);
+      const weightedAccuracy = skillEntries.reduce((sum, skill) => sum + (skill.accuracy * skill.questionsAttempted), 0);
+      const averageScore = totalQuestions > 0 ? weightedAccuracy / totalQuestions : 0;
       
       combinedPerformance[section] = {
         averageScore,
         totalQuestions,
-        trend: getTrendForSection(section)
+        trend: 0 // TODO: Calculate actual trend from historical data
       };
     });
-    
+
     return combinedPerformance;
   };
 
@@ -484,6 +622,38 @@ const PerformanceDashboard = () => {
   };
 
   const renderOverview = () => {
+    // Add loading state
+    if (isLoading) {
+      return (
+        <div className="space-y-8" key={`overview-${animationKey}`}>
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+          </div>
+        </div>
+      );
+    }
+
+    // Add error state
+    if (dataError) {
+      return (
+        <div className="space-y-8" key={`overview-${animationKey}`}>
+          <Card className="p-8 bg-red-50 border-red-200">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-red-900 mb-2">Error Loading Data</h3>
+              <p className="text-red-700">{dataError}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
     const metrics = getOverviewMetrics();
     const sectionPerformance = getCombinedSectionPerformance();
     
@@ -495,7 +665,7 @@ const PerformanceDashboard = () => {
             <div className="flex justify-between items-center">
               <div className="space-y-2">
                 <h3 className="text-lg font-bold text-teal-900">Total Questions Completed</h3>
-                <p className="text-sm text-teal-700 opacity-80">Across Diagnostic, Drills & Practice Tests</p>
+                <p className="text-sm text-teal-700 opacity-80">Across all test activities</p>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-black text-teal-600 mb-1">{metrics.totalQuestions}</div>
@@ -508,7 +678,7 @@ const PerformanceDashboard = () => {
             <div className="flex justify-between items-center">
               <div className="space-y-2">
                 <h3 className="text-lg font-bold text-slate-900">Overall Accuracy</h3>
-                <p className="text-sm text-slate-600 opacity-80">Across Diagnostic, Drills & Practice Tests</p>
+                <p className="text-sm text-slate-600 opacity-80">Average across all activities</p>
               </div>
               <div className="text-right">
                 <div className={`text-4xl font-black ${getScoreColor(metrics.averagePerformance)} mb-1`}>
@@ -519,135 +689,152 @@ const PerformanceDashboard = () => {
           </Card>
         </div>
 
-        {/* Section Performance Spider Chart */}
-        <Card className="p-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Performance by Test Section</h3>
-          <SpiderChart data={Object.fromEntries(
-            Object.entries(sectionPerformance).map(([section, data]) => [section, data.averageScore])
-          )} size={400} />
-        </Card>
+        {/* Show section performance only if we have data */}
+        {Object.keys(sectionPerformance).length > 0 && (
+          <Card className="p-8">
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Performance by Test Section</h3>
+            <SpiderChart data={Object.fromEntries(
+              Object.entries(sectionPerformance).map(([section, data]) => [section, data.averageScore])
+            )} size={400} />
+          </Card>
+        )}
 
         {/* Sub-skill Overview */}
-        <Card className="p-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Sub-Skill Strengths & Weaknesses</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200" hover={false}>
-              <div className="flex items-center space-x-3 mb-6">
-                <h4 className="text-lg font-bold text-teal-900 mb-6">Top 5 Sub-skills</h4>
-              </div>
-              <div className="space-y-3">
-                {getCombinedTopSubSkills().map((item, index) => (
-                  <div key={index} 
-                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-teal-200/50 hover:bg-white/80 transition-all duration-300"
-                       style={{ animationDelay: `${index * 150}ms` }}>
-                    <div>
-                      <div className="text-sm font-bold text-teal-800">{item.skill}</div>
-                      <div className="text-xs text-teal-600">{item.section}</div>
+        {subSkillPerformance.length > 0 && (
+          <Card className="p-8">
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Sub-Skill Performance Overview</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200" hover={false}>
+                <div className="flex items-center space-x-3 mb-6">
+                  <h4 className="text-lg font-bold text-teal-900">Top Performing Skills</h4>
+                </div>
+                <div className="space-y-3">
+                  {getRealTopSubSkills().map((item, index) => (
+                    <div key={index} 
+                         className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-teal-200/50 hover:bg-white/80 transition-all duration-300"
+                         style={{ animationDelay: `${index * 150}ms` }}>
+                      <div>
+                        <div className="text-sm font-bold text-teal-800">{item.skill}</div>
+                        <div className="text-xs text-teal-600">{item.section} • {item.questionsCompleted} questions</div>
+                      </div>
+                      <span className={`font-black text-lg ${getScoreColor(item.score)}`}>
+                        {item.score}%
+                      </span>
                     </div>
-                    <span className={`font-black text-lg ${getScoreColorWithDash(item.averageScore, item.skill, item.section)}`}>
-                      {formatScoreDisplay(item.averageScore, item.skill, item.section)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
+                  ))}
+                </div>
+              </Card>
 
-            <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
-              <div className="flex items-center space-x-3 mb-6">
-                <h4 className="text-lg font-bold text-red-900 mb-6">Bottom 5 Sub-skills</h4>
-              </div>
-              <div className="space-y-3">
-                {getCombinedBottomSubSkills().map((item, index) => (
-                  <div key={index} 
-                       className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
-                       style={{ animationDelay: `${index * 150}ms` }}>
-                    <div>
-                      <div className="text-sm font-bold text-red-800">{item.skill}</div>
-                      <div className="text-xs text-red-600">{item.section}</div>
+              <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
+                <div className="flex items-center space-x-3 mb-6">
+                  <h4 className="text-lg font-bold text-red-900">Areas for Improvement</h4>
+                </div>
+                <div className="space-y-3">
+                  {getRealBottomSubSkills().map((item, index) => (
+                    <div key={index} 
+                         className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
+                         style={{ animationDelay: `${index * 150}ms` }}>
+                      <div>
+                        <div className="text-sm font-bold text-red-800">{item.skill}</div>
+                        <div className="text-xs text-red-600">{item.section} • {item.questionsCompleted} questions</div>
+                      </div>
+                      <span className={`font-black text-lg ${getScoreColor(item.score)}`}>
+                        {item.score}%
+                      </span>
                     </div>
-                    <span className={`font-black text-lg ${getScoreColorWithDash(item.averageScore, item.skill, item.section)}`}>
-                      {formatScoreDisplay(item.averageScore, item.skill, item.section)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </Card>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </Card>
+        )}
 
         {/* Skills Performance with Enhanced Filters */}
-        <Card className="p-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">Overall Sub-Skill Performance</h3>
-          <div className="flex flex-wrap gap-2 mb-6">
-            <FilterButton 
-              active={skillFilter === 'all'} 
-              onClick={() => setSkillFilter('all')}
-              count={getCombinedFilteredSkills().length}
-            >
-              All Skills
-            </FilterButton>
-            {Object.keys(diagnosticData.sections).map((section) => (
-              <FilterButton
-                key={section}
-                active={skillFilter === section}
-                onClick={() => setSkillFilter(section)}
-                count={getCombinedFilteredSkills().filter(skill => skill.section === section).length}
+        {subSkillPerformance.length > 0 && (
+          <Card className="p-8">
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Detailed Sub-Skill Performance</h3>
+            <div className="flex flex-wrap gap-2 mb-6">
+              <FilterButton 
+                active={skillFilter === 'all'} 
+                onClick={() => setSkillFilter('all')}
+                count={getRealFilteredSkills('All Skills').length}
               >
-                {section.split(' ')[0]}
+                All Skills
               </FilterButton>
-            ))}
-          </div>
-          
-          {/* Show section score if filtered */}
-          {skillFilter !== 'all' && sectionPerformance[skillFilter] && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-slate-900">{skillFilter}</span>
-                <span className={`text-xl font-black ${getScoreColor(sectionPerformance[skillFilter].averageScore)}`}>
-                  {sectionPerformance[skillFilter].averageScore}%
-                </span>
-              </div>
+              {Object.keys(sectionPerformance).map((section) => (
+                <FilterButton
+                  key={section}
+                  active={skillFilter === section}
+                  onClick={() => setSkillFilter(section)}
+                  count={getRealFilteredSkills(section).length}
+                >
+                  {section.split(' ')[0]}
+                </FilterButton>
+              ))}
             </div>
-          )}
-          
-          <div className="space-y-3">
-            {getCombinedFilteredSkills().map((item, index) => (
-              <div key={index} 
-                   className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
-                   style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="w-64 text-sm text-slate-700 font-medium truncate" title={item.skill}>
-                  {item.skill}
+            
+            {/* Show section score if filtered */}
+            {skillFilter !== 'all' && sectionPerformance[skillFilter] && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-slate-900">{skillFilter}</span>
+                  <span className={`text-xl font-black ${getScoreColor(sectionPerformance[skillFilter].averageScore)}`}>
+                    {sectionPerformance[skillFilter].averageScore}%
+                  </span>
                 </div>
-                {skillFilter === 'all' && (
-                  <div className="w-36 text-xs text-slate-500 truncate font-medium">
-                    {item.section}
+              </div>
+            )}
+            
+            <div className="space-y-3">
+              {getRealFilteredSkills(skillFilter).map((item, index) => (
+                <div key={index} 
+                     className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
+                     style={{ animationDelay: `${index * 50}ms` }}>
+                  <div className="w-64 text-sm text-slate-700 font-medium truncate" title={item.skill}>
+                    {item.skill}
                   </div>
-                )}
-                <div className="w-32 text-xs text-slate-400 font-medium">
-                  {getDiagnosticQuestionsCompleted(item.skill, item.section)} questions completed
-                </div>
-                <div className="flex-1">
-                  {shouldShowProgressBar(item.skill, item.section) ? (
-                    <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
-                  ) : (
-                    <div className="bg-slate-100 rounded-full h-3">
-                      <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                  {skillFilter === 'all' && (
+                    <div className="w-36 text-xs text-slate-500 truncate font-medium">
+                      {item.section}
                     </div>
                   )}
+                  <div className="w-32 text-xs text-slate-400 font-medium">
+                    {item.questionsCompleted} questions completed
+                  </div>
+                  <div className="flex-1">
+                    {item.questionsCompleted > 0 ? (
+                      <AnimatedProgressBar value={item.score} delay={index * 100} />
+                    ) : (
+                      <div className="bg-slate-100 rounded-full h-3">
+                        <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                      </div>
+                    )}
+                  </div>
+                  <div className={`w-16 text-sm font-bold text-right ${item.questionsCompleted > 0 ? getScoreColor(item.score) : 'text-slate-400'}`}>
+                    {item.questionsCompleted > 0 ? `${item.score}%` : '—'}
+                  </div>
                 </div>
-                <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
-                  {formatScoreDisplay(item.score, item.skill, item.section)}
-                </div>
-                <button 
-                  className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                  onClick={() => {/* Handle drill start */}}
-                >
-                  Drill
-                </button>
-              </div>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* No data state */}
+        {subSkillPerformance.length === 0 && (
+          <Card className="p-8 text-center">
+            <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-900 mb-2">No Performance Data Yet</h3>
+            <p className="text-slate-600 mb-4">
+              Start taking tests or doing practice drills to see your performance insights here.
+            </p>
+            <button 
+              onClick={() => window.location.href = '/diagnostic'} 
+              className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+            >
+              Take Diagnostic Test
+            </button>
+          </Card>
+        )}
       </div>
     );
   };
@@ -798,153 +985,6 @@ const PerformanceDashboard = () => {
       </div>
     );
   };
-
-  const renderDiagnostic = () => (
-    <div className="space-y-8" key={`diagnostic-${animationKey}`}>
-      {/* Overall Score */}
-      <Card className={`p-8 ${getScoreBg(diagnosticData.overall)} shadow-xl`}>
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-slate-900">Diagnostic Test Performance</h3>
-            <p className="text-sm text-slate-600 opacity-80">VIC Selective Entry Diagnostic</p>
-          </div>
-          <div className="text-right">
-            <div className={`text-4xl font-black ${getScoreColor(diagnosticData.overall)} mb-1`}>
-              {diagnosticData.overall}%
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Spider Chart */}
-      <Card className="p-8">
-        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Performance by Test Section</h3>
-        <SpiderChart data={diagnosticData.sections} size={400} />
-      </Card>
-
-      {/* Sub-skill Overview */}
-      <Card className="p-8">
-        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Sub-Skill Strengths & Weaknesses</h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6 bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200" hover={false}>
-            <div className="flex items-center space-x-3 mb-6">
-              <h4 className="text-lg font-bold text-teal-900 mb-6">Top 5 Sub-skills</h4>
-            </div>
-            <div className="space-y-3">
-              {getTopSubSkills().map((item, index) => (
-                <div key={index} 
-                     className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-teal-200/50 hover:bg-white/80 transition-all duration-300"
-                     style={{ animationDelay: `${index * 150}ms` }}>
-                  <div>
-                    <div className="text-sm font-bold text-teal-800">{item.skill}</div>
-                    <div className="text-xs text-teal-600">{item.section}</div>
-                  </div>
-                  <span className={`font-black text-lg ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
-                    {formatScoreDisplay(item.score, item.skill, item.section)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 border-red-200" hover={false}>
-            <div className="flex items-center space-x-3 mb-6">
-              <h4 className="text-lg font-bold text-red-900 mb-6">Bottom 5 Sub-skills</h4>
-            </div>
-            <div className="space-y-3">
-              {getBottomSubSkills().map((item, index) => (
-                <div key={index} 
-                     className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-red-200/50 hover:bg-white/80 transition-all duration-300"
-                     style={{ animationDelay: `${index * 150}ms` }}>
-                  <div>
-                    <div className="text-sm font-bold text-red-800">{item.skill}</div>
-                    <div className="text-xs text-red-600">{item.section}</div>
-                  </div>
-                  <span className={`font-black text-lg ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
-                    {formatScoreDisplay(item.score, item.skill, item.section)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </Card>
-
-      {/* Skills Performance with Enhanced Filters */}
-      <Card className="p-8">
-        <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Sub-Skill Performance</h3>
-        <div className="flex flex-wrap gap-2 mb-6">
-          <FilterButton 
-            active={skillFilter === 'all'} 
-            onClick={() => setSkillFilter('all')}
-            count={getAllSubSkillsRanked().length}
-          >
-            All Skills
-          </FilterButton>
-          {Object.keys(diagnosticData.sections).map((section) => (
-            <FilterButton
-              key={section}
-              active={skillFilter === section}
-              onClick={() => setSkillFilter(section)}
-              count={Object.keys(diagnosticData.subSkills[section] || {}).length}
-            >
-              {section.split(' ')[0]}
-            </FilterButton>
-          ))}
-        </div>
-        
-        {/* Show section score if filtered */}
-        {skillFilter !== 'all' && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-slate-900">{skillFilter}</span>
-              <span className={`text-xl font-black ${getScoreColor(diagnosticData.sections[skillFilter])}`}>
-                {diagnosticData.sections[skillFilter]}%
-              </span>
-            </div>
-          </div>
-        )}
-        
-        <div className="space-y-3">
-          {getFilteredSkills().map((item, index) => (
-            <div key={index} 
-                 className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
-                 style={{ animationDelay: `${index * 50}ms` }}>
-              <div className="w-64 text-sm text-slate-700 font-medium truncate" title={item.skill}>
-                {item.skill}
-              </div>
-              {skillFilter === 'all' && (
-                <div className="w-36 text-xs text-slate-500 truncate font-medium">
-                  {item.section}
-                </div>
-              )}
-              <div className="w-32 text-xs text-slate-400 font-medium">
-                {getDiagnosticQuestionsCompleted(item.skill, item.section)} questions completed
-              </div>
-              <div className="flex-1">
-                {shouldShowProgressBar(item.skill, item.section) ? (
-                  <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
-                ) : (
-                  <div className="bg-slate-100 rounded-full h-3">
-                    <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
-                  </div>
-                )}
-              </div>
-              <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
-                {formatScoreDisplay(item.score, item.skill, item.section)}
-              </div>
-              <button 
-                className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                onClick={() => {/* Handle drill start */}}
-              >
-                Drill
-              </button>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
 
   const getSelectedTestData = () => {
     if (!selectedTest) return null;
@@ -1108,7 +1148,7 @@ const PerformanceDashboard = () => {
                         8 questions completed
                       </div>
                       <div className="flex-1">
-                        {shouldShowProgressBar(item.skill, item.section) ? (
+                        {item.questionsCompleted > 0 ? (
                           <AnimatedProgressBar value={item.averageScore} delay={index * 100} />
                         ) : (
                           <div className="bg-slate-100 rounded-full h-3">
@@ -1116,8 +1156,8 @@ const PerformanceDashboard = () => {
                           </div>
                         )}
                       </div>
-                      <div className={`w-16 text-sm font-bold text-right ${getScoreColorWithDash(item.score, item.skill, item.section)}`}>
-                        {formatScoreDisplay(item.score, item.skill, item.section)}
+                      <div className={`w-16 text-sm font-bold text-right ${getScoreColor(item.score)}`}>
+                        {item.score}%
                       </div>
                       <button 
                         className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
@@ -1232,7 +1272,7 @@ const PerformanceDashboard = () => {
                   {drill.completed} questions completed
                 </div>
                 <div className="flex-1">
-                  {shouldShowDrillProgressBar(drill) ? (
+                  {drill.completed > 0 ? (
                     <AnimatedProgressBar value={drill.accuracy} delay={index * 100} />
                   ) : (
                     <div className="bg-slate-100 rounded-full h-3">
@@ -1240,8 +1280,8 @@ const PerformanceDashboard = () => {
                     </div>
                   )}
                 </div>
-                <div className={`w-16 text-sm font-bold text-right ${getDrillScoreColorWithDash(drill)}`}>
-                  {formatDrillScoreDisplay(drill)}
+                <div className={`w-16 text-sm font-bold text-right ${drill.completed > 0 ? getScoreColor(drill.accuracy) : 'text-slate-400'}`}>
+                  {drill.completed > 0 ? `${drill.accuracy}%` : '—'}
                 </div>
                 <button 
                   className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-4 py-2 text-sm rounded-lg hover:from-slate-700 hover:to-gray-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
@@ -1356,86 +1396,149 @@ const PerformanceDashboard = () => {
     return skillsWithAverage.sort((a, b) => b.averageScore - a.averageScore);
   };
 
-  const getCombinedTopSubSkills = () => {
-    return getCombinedSubSkillsRanked().slice(0, 5);
+  const getRealTopSubSkills = () => {
+    return subSkillPerformance
+      .sort((a, b) => b.accuracy_percentage - a.accuracy_percentage)
+      .slice(0, 5)
+      .map(skill => ({
+        skill: skill.sub_skill_name,
+        section: getSkillSection(skill.sub_skill_name),
+        score: skill.accuracy_percentage,
+        questionsCompleted: skill.questions_attempted
+      }));
   };
 
-  const getCombinedBottomSubSkills = () => {
-    const allSkills = getCombinedSubSkillsRanked();
-    return allSkills.slice(-5).reverse();
+  const getRealBottomSubSkills = () => {
+    return subSkillPerformance
+      .filter(skill => skill.questions_attempted > 0) // Only include attempted skills
+      .sort((a, b) => a.accuracy_percentage - b.accuracy_percentage)
+      .slice(0, 5)
+      .map(skill => ({
+        skill: skill.sub_skill_name,
+        section: getSkillSection(skill.sub_skill_name),
+        score: skill.accuracy_percentage,
+        questionsCompleted: skill.questions_attempted
+      }));
   };
 
-  const getCombinedFilteredSkills = () => {
-    const allSkills = getCombinedSubSkillsRanked();
-    
-    if (skillFilter === 'all') {
-      return allSkills;
-    }
-    
-    return allSkills.filter(item => item.section === skillFilter);
+  const getRealFilteredSkills = (skillFilter: string) => {
+    return subSkillPerformance
+      .filter(skill => 
+        skillFilter === 'All Skills' || 
+        getSkillSection(skill.sub_skill_name) === skillFilter
+      )
+      .sort((a, b) => b.accuracy_percentage - a.accuracy_percentage)
+      .map(skill => ({
+        skill: skill.sub_skill_name,
+        section: getSkillSection(skill.sub_skill_name),
+        score: skill.accuracy_percentage,
+        questionsCompleted: skill.questions_attempted,
+        correct: skill.questions_correct
+      }));
   };
 
-  // Helper functions to get questions completed for each sub-skill
-  const getDiagnosticQuestionsCompleted = (skill, section) => {
-    // Each diagnostic sub-skill has 5 questions
-    return diagnosticData.subSkills[section] && diagnosticData.subSkills[section][skill] ? 5 : 0;
-  };
+  const renderDiagnostic = () => {
+    return (
+      <div className="space-y-8" key={`diagnostic-${animationKey}`}>
+        {/* Add loading state */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+          </div>
+        )}
 
-  const getPracticeQuestionsCompleted = (skill, section) => {
-    // Count questions from practice tests where this sub-skill appears
-    let totalQuestions = 0;
-    practiceTestData.forEach(test => {
-      if (test.subSkills && test.subSkills[section] && test.subSkills[section][skill]) {
-        totalQuestions += 8; // 8 questions per sub-skill per practice test
-      }
-    });
-    return totalQuestions;
-  };
+        {/* Add error state */}
+        {dataError && (
+          <Card className="p-8 bg-red-50 border-red-200">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-red-900 mb-2">Error Loading Data</h3>
+              <p className="text-red-700">{dataError}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          </Card>
+        )}
 
-  const getDrillQuestionsCompleted = (skill, section) => {
-    return enhancedDrillData[section] && enhancedDrillData[section][skill] 
-      ? enhancedDrillData[section][skill].completed 
-      : 0;
-  };
+        {/* Diagnostic Overview */}
+        {!isLoading && !dataError && (
+          <>
+            <Card className="p-8 bg-gradient-to-br from-teal-50 via-teal-50 to-cyan-50 border-teal-200" glow>
+              <h3 className="text-xl font-bold text-slate-900 mb-6">Diagnostic Test Performance</h3>
+              
+              {dashboardStats?.diagnostic_completed ? (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-bold text-slate-800">Overall Score</h4>
+                    <div className={`text-4xl font-black ${getScoreColor(dashboardStats.diagnostic_score || 0)}`}>
+                      {dashboardStats.diagnostic_score || 0}%
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-bold text-slate-800">Questions Completed</h4>
+                    <div className="text-2xl font-bold text-slate-600">
+                      {dashboardStats.total_questions_completed}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Target className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+                  <h4 className="text-lg font-bold text-slate-800 mb-2">No Diagnostic Test Completed</h4>
+                  <p className="text-slate-600 mb-4">Complete the diagnostic test to see your performance insights.</p>
+                  <button 
+                    onClick={() => window.location.href = '/diagnostic'} 
+                    className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                  >
+                    Start Diagnostic Test
+                  </button>
+                </div>
+              )}
+            </Card>
 
-  const getTotalQuestionsCompleted = (skill, section) => {
-    return getDiagnosticQuestionsCompleted(skill, section) + 
-           getPracticeQuestionsCompleted(skill, section) + 
-           getDrillQuestionsCompleted(skill, section);
-  };
-
-  // Helper function to format score display - shows dash if no questions completed
-  const formatScoreDisplay = (score, skill, section) => {
-    const totalQuestions = getTotalQuestionsCompleted(skill, section);
-    return totalQuestions === 0 ? '-' : `${score}%`;
-  };
-
-  // Helper function to determine if we should show progress bar
-  const shouldShowProgressBar = (skill, section) => {
-    return getTotalQuestionsCompleted(skill, section) > 0;
-  };
-
-  // Helper function to get appropriate score color, using neutral color for no data
-  const getScoreColorWithDash = (score, skill, section) => {
-    const totalQuestions = getTotalQuestionsCompleted(skill, section);
-    if (totalQuestions === 0) return 'text-slate-400';
-    return getScoreColor(score);
-  };
-
-  // Helper function to get appropriate score color for drills, using neutral color for no data
-  const getDrillScoreColorWithDash = (drill) => {
-    if (drill.completed === 0) return 'text-slate-400';
-    return getScoreColor(drill.accuracy);
-  };
-
-  // Helper function to format drill score display - shows dash if no questions completed
-  const formatDrillScoreDisplay = (drill) => {
-    return drill.completed === 0 ? '-' : `${drill.accuracy}%`;
-  };
-
-  // Helper function to determine if we should show progress bar for drills
-  const shouldShowDrillProgressBar = (drill) => {
-    return drill.completed > 0;
+            {/* Sub-skill Performance - Only show if we have data */}
+            {subSkillPerformance.length > 0 && (
+              <Card className="p-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">Sub-Skill Breakdown</h3>
+                <div className="space-y-3">
+                  {subSkillPerformance.map((skill, index) => (
+                    <div key={index} 
+                         className="flex items-center space-x-4 p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01]"
+                         style={{ animationDelay: `${index * 50}ms` }}>
+                      <div className="w-64 text-sm text-slate-700 font-medium truncate" title={skill.sub_skill_name}>
+                        {skill.sub_skill_name}
+                      </div>
+                      <div className="w-36 text-xs text-slate-500 truncate font-medium">
+                        {skill.section_name}
+                      </div>
+                      <div className="w-32 text-xs text-slate-400 font-medium">
+                        {skill.questions_attempted} questions attempted
+                      </div>
+                      <div className="flex-1">
+                        {skill.questions_attempted > 0 ? (
+                          <AnimatedProgressBar value={skill.accuracy_percentage} delay={index * 100} />
+                        ) : (
+                          <div className="bg-slate-100 rounded-full h-3">
+                            <div className="h-3 rounded-full bg-slate-200 w-full opacity-50"></div>
+                          </div>
+                        )}
+                      </div>
+                      <div className={`w-16 text-sm font-bold text-right ${skill.questions_attempted > 0 ? getScoreColor(skill.accuracy_percentage) : 'text-slate-400'}`}>
+                        {skill.questions_attempted > 0 ? `${skill.accuracy_percentage}%` : '—'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </>
+        )}
+      </div>
+    );
   };
 
   return (

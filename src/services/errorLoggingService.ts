@@ -189,4 +189,19 @@ export function withErrorHandling<T extends any[], R>(
       throw error;
     }
   };
-} 
+}
+
+// Error Logging Service
+export class ErrorLoggingService {
+  static async logError(error: any, context?: string) {
+    console.error('Error logged:', error, context);
+    return true;
+  }
+
+  static async logWarning(message: string, context?: string) {
+    console.warn('Warning logged:', message, context);
+    return true;
+  }
+}
+
+export default ErrorLoggingService; 

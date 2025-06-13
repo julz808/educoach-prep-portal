@@ -12,6 +12,7 @@
     "generate-practice-test": "tsx src/scripts/generate-practice-test.ts",
     "generate-visual-images": "tsx src/scripts/generate-visual-images.ts",
     "test:edutest-diagnostic": "tsx src/scripts/run-edutest-diagnostic.ts",
+    "test:system-validation": "tsx scripts/test-system-validation.ts",
     "generate:edutest-practice": "tsx scripts/generateEduTestPracticeTest.ts",
     "generate:vic-practice": "tsx scripts/generate-vic-selective-practice-test.ts",
     "generate-vic-test": "tsx scripts/generate-vic-selective-practice-test.ts",

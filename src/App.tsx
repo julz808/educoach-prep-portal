@@ -50,6 +50,7 @@ const App = () => {
                         {/* Test-taking routes (outside of Layout) */}
                         <Route path="/test/:testType/:subjectId" element={<TestTaking />} />
                         <Route path="/test/:testType/:subjectId/:sectionId" element={<TestTaking />} />
+                        <Route path="/test/:testType/:subjectId/:sectionId/:sessionId" element={<TestTaking />} />
                         
                         {/* Dashboard routes (inside Layout) */}
                         <Route path="/dashboard" element={<Layout />}>
