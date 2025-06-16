@@ -87,6 +87,24 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 
 > **Note:** Never commit secrets to version control.
 
+## Critical Constants
+
+### Product Types (EXACT - Case Sensitive!)
+```typescript
+export const PRODUCTS = [
+  'VIC Selective Entry (Year 9 Entry)',
+  'NSW Selective Entry (Year 7 Entry)',
+  'Year 5 NAPLAN',
+  'Year 7 NAPLAN',
+  'EduTest Scholarship (Year 7 Entry)',
+  'ACER Scholarship (Year 7 Entry)'
+] as const;
+
+Diagnostic: 'diagnostic'
+Practice: 'practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'
+Drill: 'drill'
+```
+
 ## Implementation Priority
 
 1. Connect frontend and backend for test sessions and drills
@@ -117,6 +135,22 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - Run lint and typecheck before committing
 - Review all code changes before merging
 - Document any non-obvious decisions or workarounds
+
+## Useful Claude Commands
+
+```bash
+# Analyze current state
+claude "Show me which components are using mock data instead of real database queries"
+
+# Connect specific feature
+claude "Connect the dashboard MetricsCard to the user_progress table following the query pattern in this file"
+
+# Debug issues
+claude "The test session isn't saving. Help me debug the save_state functionality"
+
+# Best practices
+claude "Review the authentication flow and suggest improvements following React/TypeScript best practices"
+```
 
 ## Other Notes
 
