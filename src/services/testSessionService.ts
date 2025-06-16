@@ -12,7 +12,10 @@ export interface TestSessionConfig {
   skillName?: string;
   questionCount: number;
   timeLimit: number; // in minutes
-  metadata?: Record<string, any>;
+  metadata?: {
+    questionOrder?: string[];
+    [key: string]: any;
+  };
 }
 
 export interface QuestionResponseData {
@@ -44,19 +47,25 @@ export interface TestSessionData {
   productType: string;
   testMode: string;
   sectionName: string;
-  currentQuestionIndex: number;
-  questionsAnswered: number;
   totalQuestions: number;
-  startedAt: string;
-  status: 'in_progress' | 'completed' | 'paused';
+  currentQuestionIndex: number;
+  status: string;
   sessionData: {
-    answers: Record<string, any>;
+    startedAt: string;
+    timeRemainingSeconds: number;
     flaggedQuestions: number[];
-    timeRemainingSeconds?: number;
-    currentQuestionIndex: number;
-    lastUpdated: string;
+    answers: Record<string, string>;
+    lastUpdated?: string;
   };
-  questionResponses: Record<string, any>;
+  questionOrder: string[];
+  startedAt: string;
+  questionResponses: Record<string, {
+    user_answer: string;
+    is_correct: boolean;
+    time_spent_seconds: number;
+    is_flagged: boolean;
+    is_skipped: boolean;
+  }>;
 }
 
 export class TestSessionService {
@@ -65,70 +74,79 @@ export class TestSessionService {
   private static sessionStartTime: number = Date.now();
 
   /**
-   * Create or resume a test session using database function
+   * Create or resume a test session with question order
    */
   static async createOrResumeSession(
     userId: string,
     productType: string,
-    testMode: string,
+    testMode: 'diagnostic' | 'practice' | 'drill',
     sectionName: string,
-    totalQuestions?: number
+    totalQuestions?: number,
+    questionOrder?: string[]
   ): Promise<string> {
     try {
+      console.log('🚀 Creating/resuming session with question order:', {
+        userId,
+        productType,
+        testMode,
+        sectionName,
+        totalQuestions,
+        questionOrderLength: questionOrder?.length || 0
+      });
+
       const { data, error } = await supabase.rpc('create_or_resume_test_session', {
         p_user_id: userId,
         p_product_type: productType,
         p_test_mode: testMode,
         p_section_name: sectionName,
-        p_total_questions: totalQuestions
+        p_total_questions: totalQuestions || null,
+        p_question_order: questionOrder || []
       });
 
       if (error) {
-        console.error('Error creating/resuming session:', error);
-        throw error;
+        console.error('Database error creating session:', error);
+        throw new Error(`Failed to create session: ${error.message}`);
       }
 
-      this.activeSession = data;
-      this.sessionStartTime = Date.now();
+      if (!data) {
+        throw new Error('No session ID returned from database');
+      }
 
-      console.log('🎯 Test session created/resumed:', {
-        sessionId: data,
-        productType,
-        testMode,
-        sectionName,
-        totalQuestions
-      });
-
+      console.log('✅ Session created/resumed:', data);
       return data;
     } catch (error) {
-      console.error('Error in createOrResumeSession:', error);
-      throw new Error('Failed to create or resume test session. Please try again.');
+      console.error('Failed to create/resume session:', error);
+      throw error;
     }
   }
 
   /**
-   * Get session data for resumption
+   * Get session data for resumption with question order
    */
   static async getSessionForResume(sessionId: string): Promise<TestSessionData | null> {
     try {
+      console.log('🔄 Getting session for resume:', sessionId);
+
       const { data, error } = await supabase.rpc('get_session_for_resume', {
         p_session_id: sessionId
       });
 
       if (error) {
-        console.error('Error getting session for resume:', error);
-        throw error;
+        console.error('Database error getting session:', error);
+        throw new Error(`Failed to get session: ${error.message}`);
       }
 
       if (!data || data.length === 0) {
+        console.log('No session found for ID:', sessionId);
         return null;
       }
 
       const sessionData = data[0];
-      console.log('📋 Session data retrieved for resume:', {
-        sessionId,
-        questionsAnswered: sessionData.questions_answered,
-        currentIndex: sessionData.current_question_index
+      console.log('✅ Session data retrieved:', {
+        sessionId: sessionData.session_id,
+        questionOrderLength: sessionData.question_order?.length || 0,
+        currentQuestion: sessionData.current_question_index,
+        status: sessionData.status
       });
 
       return {
@@ -137,58 +155,69 @@ export class TestSessionService {
         productType: sessionData.product_type,
         testMode: sessionData.test_mode,
         sectionName: sessionData.section_name,
-        currentQuestionIndex: sessionData.current_question_index,
-        questionsAnswered: sessionData.questions_answered,
         totalQuestions: sessionData.total_questions,
-        startedAt: sessionData.started_at,
+        currentQuestionIndex: sessionData.current_question_index,
         status: sessionData.status,
         sessionData: sessionData.session_data || {
-          answers: {},
+          startedAt: sessionData.started_at,
+          timeRemainingSeconds: 3600,
           flaggedQuestions: [],
-          currentQuestionIndex: 0,
-          lastUpdated: new Date().toISOString()
+          answers: {}
         },
+        questionOrder: sessionData.question_order || [],
+        startedAt: sessionData.started_at,
         questionResponses: sessionData.question_responses || {}
       };
     } catch (error) {
-      console.error('Error getting session for resume:', error);
-      return null;
+      console.error('Failed to get session for resume:', error);
+      throw error;
     }
   }
 
   /**
-   * Update session progress after each answer
+   * Update session progress with question order support
    */
   static async updateSessionProgress(
     sessionId: string,
     currentQuestionIndex: number,
-    answers: Record<string, any>,
-    flaggedQuestions: number[] = [],
-    timeRemainingSeconds?: number
+    answers: Record<number, string>,
+    flaggedQuestions: number[],
+    timeRemainingSeconds: number,
+    questionOrder?: string[]
   ): Promise<void> {
     try {
+      console.log('💾 Updating session progress with question order:', {
+        sessionId,
+        currentQuestionIndex,
+        answersCount: Object.keys(answers).length,
+        flaggedCount: flaggedQuestions.length,
+        timeRemaining: timeRemainingSeconds,
+        questionOrderLength: questionOrder?.length || 0
+      });
+
+      const answersJsonb: Record<string, string> = {};
+      Object.entries(answers).forEach(([index, answer]) => {
+        answersJsonb[index] = answer;
+      });
+
       const { error } = await supabase.rpc('update_session_progress', {
         p_session_id: sessionId,
         p_current_question_index: currentQuestionIndex,
-        p_answers: answers,
+        p_answers: answersJsonb,
         p_flagged_questions: flaggedQuestions,
-        p_time_remaining_seconds: timeRemainingSeconds
+        p_time_remaining_seconds: timeRemainingSeconds,
+        p_question_order: questionOrder || []
       });
 
       if (error) {
-        console.error('Error updating session progress:', error);
-        throw error;
+        console.error('Database error updating session:', error);
+        throw new Error(`Failed to update session: ${error.message}`);
       }
 
-      console.log('💾 Session progress updated:', {
-        sessionId,
-        currentIndex: currentQuestionIndex,
-        answersCount: Object.keys(answers).length,
-        flaggedCount: flaggedQuestions.length
-      });
+      console.log('✅ Session progress updated successfully');
     } catch (error) {
-      console.error('Error in updateSessionProgress:', error);
-      // Don't throw to avoid disrupting user experience
+      console.error('Failed to update session progress:', error);
+      throw error;
     }
   }
 
@@ -316,7 +345,8 @@ export class TestSessionService {
         config.productType,
         config.type,
         config.sectionName || 'default',
-        config.questionCount
+        config.questionCount,
+        config.metadata?.questionOrder
       );
       
       return sessionId;
@@ -415,5 +445,47 @@ export class TestSessionService {
     this.activeSession = sessionId;
     this.sessionStartTime = Date.now();
     return sessionId;
+  }
+
+  /**
+   * Get question order for a session
+   */
+  static async getSessionQuestionOrder(sessionId: string): Promise<string[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_session_question_order', {
+        p_session_id: sessionId
+      });
+
+      if (error) {
+        console.error('Database error getting question order:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Failed to get session question order:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Rebuild answers from question responses (fallback method)
+   */
+  static async rebuildSessionAnswers(sessionId: string): Promise<Record<string, string>> {
+    try {
+      const { data, error } = await supabase.rpc('rebuild_session_answers', {
+        p_session_id: sessionId
+      });
+
+      if (error) {
+        console.error('Database error rebuilding answers:', error);
+        return {};
+      }
+
+      return data || {};
+    } catch (error) {
+      console.error('Failed to rebuild session answers:', error);
+      return {};
+    }
   }
 } 

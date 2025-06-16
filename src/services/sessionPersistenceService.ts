@@ -40,13 +40,19 @@ export class SessionPersistenceService {
         status: session.status
       });
 
+      // Extract question order from session data if available
+      const questionOrder = session.sessionData?.questionIds || 
+                           session.sessionData?.questions || 
+                           [];
+
       // Use the new TestSessionService method for updating progress
       await TestSessionService.updateSessionProgress(
         session.id,
         session.currentQuestionIndex,
         session.answers,
         session.flaggedQuestions,
-        session.timeRemaining
+        session.timeRemaining,
+        questionOrder // Pass question order
       );
 
       // Keep localStorage as backup for immediate access
@@ -58,6 +64,7 @@ export class SessionPersistenceService {
         status: session.status,
         lastActivity: new Date().toISOString(),
         questionsAnswered: Object.keys(session.answers).length,
+        questionIds: questionOrder, // Store question order in localStorage too
         ...(session.sessionData || {})
       };
 
@@ -69,7 +76,8 @@ export class SessionPersistenceService {
         status: session.status,
         questionsAnswered: Object.keys(session.answers).length,
         currentQuestionIndex: session.currentQuestionIndex,
-        timeRemaining: session.timeRemaining
+        timeRemaining: session.timeRemaining,
+        questionOrderLength: questionOrder.length
       });
     } catch (error) {
       console.error('❌ Failed to save session:', error);
@@ -92,6 +100,8 @@ export class SessionPersistenceService {
 
       // Convert the database format to our interface format
       const answers: Record<number, string> = {};
+      
+      // First try to get answers from session_data
       if (sessionData.sessionData?.answers) {
         Object.entries(sessionData.sessionData.answers).forEach(([key, value]) => {
           const index = parseInt(key);
@@ -99,6 +109,23 @@ export class SessionPersistenceService {
             answers[index] = value as string;
           }
         });
+      }
+      
+      // If no answers in session_data, try to rebuild from question responses
+      if (Object.keys(answers).length === 0 && sessionData.questionOrder.length > 0) {
+        console.log('🔄 Rebuilding answers from question responses...');
+        try {
+          const rebuiltAnswers = await TestSessionService.rebuildSessionAnswers(sessionId);
+          Object.entries(rebuiltAnswers).forEach(([key, value]) => {
+            const index = parseInt(key);
+            if (!isNaN(index)) {
+              answers[index] = value;
+            }
+          });
+          console.log('✅ Rebuilt answers:', Object.keys(answers).length);
+        } catch (error) {
+          console.error('Failed to rebuild answers:', error);
+        }
       }
 
       return {
@@ -115,7 +142,11 @@ export class SessionPersistenceService {
         startedAt: sessionData.startedAt,
         lastUpdatedAt: sessionData.sessionData?.lastUpdated || sessionData.startedAt,
         status: sessionData.status as 'in-progress' | 'completed' | 'paused',
-        sessionData: sessionData.sessionData
+        sessionData: {
+          ...sessionData.sessionData,
+          questionIds: sessionData.questionOrder, // Include question order
+          questionResponses: sessionData.questionResponses
+        }
       };
     } catch (error) {
       console.error('Failed to load session:', error);
@@ -190,7 +221,8 @@ export class SessionPersistenceService {
     productType: string,
     testMode: 'diagnostic' | 'practice' | 'drill',
     sectionName: string,
-    totalQuestions?: number
+    totalQuestions?: number,
+    questionIds?: string[] // Add question IDs parameter
   ): Promise<string> {
     try {
       console.log('🚀 Creating or resuming session:', {
@@ -198,16 +230,18 @@ export class SessionPersistenceService {
         productType,
         testMode,
         sectionName,
-        totalQuestions
+        totalQuestions,
+        questionIdsLength: questionIds?.length || 0
       });
 
-      // Use the new TestSessionService method
+      // Use the new TestSessionService method with question order
       const sessionId = await TestSessionService.createOrResumeSession(
         userId,
         productType,
         testMode,
         sectionName,
-        totalQuestions
+        totalQuestions,
+        questionIds // Pass question IDs as question order
       );
 
       console.log('✅ Session created/resumed:', sessionId);

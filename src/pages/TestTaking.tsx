@@ -220,6 +220,9 @@ const TestTaking: React.FC = () => {
         }
       });
 
+      // Extract question IDs in order
+      const questionIds = currentSession.questions.map(q => q.id);
+
       const persistedSession: PersistedTestSession = {
         id: currentSession.id,
         userId: user.id,
@@ -235,7 +238,8 @@ const TestTaking: React.FC = () => {
         lastUpdatedAt: new Date().toISOString(),
         status: currentSession.status === 'review' ? 'completed' : currentSession.status,
         sessionData: {
-          questions: currentSession.questions.map(q => q.id),
+          questionIds: questionIds, // Store question IDs for proper restoration
+          questions: currentSession.questions.map(q => q.id), // Backward compatibility
           metadata: currentSession.metadata
         }
       };
@@ -245,7 +249,8 @@ const TestTaking: React.FC = () => {
         sessionId: currentSession.id,
         currentQuestion: currentSession.currentQuestion,
         answersCount: Object.keys(stringAnswers).length,
-        status: currentSession.status
+        status: currentSession.status,
+        questionIdsCount: questionIds.length
       });
       
       setProgressSaved(true);
@@ -425,31 +430,39 @@ const TestTaking: React.FC = () => {
       const questionsResponse = await loadQuestionsForSession();
       if (!questionsResponse) return null;
 
-      // For resumed sessions, we need to preserve the original question order
-      // The saved answers are indexed by the original question positions
+      // For resumed sessions, restore the original question order using stored question IDs
       let finalQuestions = questionsResponse.questions;
       
-      // If this is a resumed session and we have session data with question IDs,
-      // try to restore the original question order
-      if (persistedSession.sessionData?.questions && Array.isArray(persistedSession.sessionData.questions)) {
-        const savedQuestionIds = persistedSession.sessionData.questions;
+      // If we have stored question IDs, restore the exact order
+      if (persistedSession.sessionData?.questionIds && Array.isArray(persistedSession.sessionData.questionIds)) {
+        const savedQuestionIds = persistedSession.sessionData.questionIds;
         const reorderedQuestions: Question[] = [];
+        
+        console.log('🔄 Restoring question order from stored IDs:', {
+          savedIdsCount: savedQuestionIds.length,
+          loadedQuestionsCount: questionsResponse.questions.length
+        });
         
         // Try to match questions by ID to restore original order
         for (const savedId of savedQuestionIds) {
           const matchingQuestion = questionsResponse.questions.find(q => q.id === savedId);
           if (matchingQuestion) {
             reorderedQuestions.push(matchingQuestion);
+          } else {
+            console.warn(`⚠️ Could not find question with ID: ${savedId}`);
           }
         }
         
         // If we successfully matched all questions, use the reordered list
-        if (reorderedQuestions.length === savedQuestionIds.length) {
+        if (reorderedQuestions.length === savedQuestionIds.length && reorderedQuestions.length > 0) {
           finalQuestions = reorderedQuestions;
-          console.log('✅ Restored original question order for resumed session');
+          console.log('✅ Successfully restored original question order');
         } else {
-          console.warn('⚠️ Could not restore original question order, using current order');
+          console.warn('⚠️ Could not restore complete question order, using current order');
+          console.log('Matched:', reorderedQuestions.length, 'Expected:', savedQuestionIds.length);
         }
+      } else {
+        console.log('ℹ️ No stored question IDs found, using current question order');
       }
 
       // Convert answers back to number format
@@ -830,6 +843,9 @@ const TestTaking: React.FC = () => {
     if (!session || !user) return;
     
     try {
+      // Extract question IDs for session creation
+      const questionIds = session.questions.map(q => q.id);
+      
       const sessionConfig: TestSessionConfig = {
         type: session.type === 'diagnostic' ? 'diagnostic' : 'practice',
         productType: session.metadata?.productType || 'default',
@@ -840,7 +856,10 @@ const TestTaking: React.FC = () => {
         skillId: session.skillId,
         skillName: session.skillName,
         questionCount: session.questions?.length || 0,
-        timeLimit: session.timeLimit || 60
+        timeLimit: session.timeLimit || 60,
+        metadata: {
+          questionOrder: questionIds // Pass question order in metadata
+        }
       };
 
       const testSessionId = await TestSessionService.startSession(user.id, sessionConfig);
@@ -865,6 +884,7 @@ const TestTaking: React.FC = () => {
       
       console.log('✅ Test session initialized with coordinated ID:', testSessionId);
       console.log('🔓 Recording enabled after session save');
+      console.log('📝 Question IDs stored:', questionIds.length);
     } catch (error) {
       console.error('Failed to initialize test session:', error);
       setRecordingEnabled(false);
