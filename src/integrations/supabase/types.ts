@@ -579,6 +579,7 @@ export type Database = {
           id: string
           paused_at: string | null
           product_type: string
+          question_order: string[] | null
           questions_answered: number | null
           section_name: string | null
           section_scores: Json | null
@@ -605,6 +606,7 @@ export type Database = {
           id?: string
           paused_at?: string | null
           product_type: string
+          question_order?: string[] | null
           questions_answered?: number | null
           section_name?: string | null
           section_scores?: Json | null
@@ -631,6 +633,7 @@ export type Database = {
           id?: string
           paused_at?: string | null
           product_type?: string
+          question_order?: string[] | null
           questions_answered?: number | null
           section_name?: string | null
           section_scores?: Json | null
@@ -656,6 +659,59 @@ export type Database = {
           },
         ]
       }
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          display_name: string | null
+          student_first_name: string
+          student_last_name: string
+          parent_first_name: string
+          parent_last_name: string
+          school_name: string
+          year_level: number
+          timezone: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          display_name?: string | null
+          student_first_name: string
+          student_last_name: string
+          parent_first_name: string
+          parent_last_name: string
+          school_name: string
+          year_level: number
+          timezone?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          display_name?: string | null
+          student_first_name?: string
+          student_last_name?: string
+          parent_first_name?: string
+          parent_last_name?: string
+          school_name?: string
+          year_level?: number
+          timezone?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -664,6 +720,13 @@ export type Database = {
       complete_test_session: {
         Args:
           | { p_session_id: string }
+          | {
+              p_session_id: string
+              p_user_id: string
+              p_product_type: string
+              p_test_mode: string
+              p_section_scores?: Json
+            }
           | {
               p_session_id: string
               p_user_id: string
@@ -680,6 +743,7 @@ export type Database = {
           p_test_mode: string
           p_section_name: string
           p_total_questions?: number
+          p_question_order?: string[]
         }
         Returns: string
       }
@@ -715,14 +779,18 @@ export type Database = {
           product_type: string
           test_mode: string
           section_name: string
-          current_question_index: number
-          questions_answered: number
           total_questions: number
-          started_at: string
+          current_question_index: number
           status: string
           session_data: Json
+          question_order: string[]
+          started_at: string
           question_responses: Json
         }[]
+      }
+      get_session_question_order: {
+        Args: { p_session_id: string }
+        Returns: string[]
       }
       get_sub_skill_performance: {
         Args: { p_user_id: string; p_product_type: string }
@@ -794,6 +862,10 @@ export type Database = {
         Args: { section_name: string }
         Returns: string
       }
+      rebuild_session_answers: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
       record_question_response: {
         Args:
           | {
@@ -804,6 +876,17 @@ export type Database = {
               p_answer: string
               p_is_correct: boolean
               p_time_spent: number
+            }
+          | {
+              p_user_id: string
+              p_question_id: string
+              p_test_session_id: string
+              p_product_type: string
+              p_user_answer: string
+              p_is_correct: boolean
+              p_time_spent_seconds?: number
+              p_is_flagged?: boolean
+              p_is_skipped?: boolean
             }
           | {
               p_user_id: string
@@ -837,9 +920,18 @@ export type Database = {
           | {
               p_session_id: string
               p_current_question_index: number
-              p_answers: Json
+              p_answers?: Json
               p_flagged_questions?: number[]
               p_time_remaining_seconds?: number
+              p_question_order?: string[]
+            }
+          | {
+              p_session_id: string
+              p_current_question_index: number
+              p_answers?: Json
+              p_flagged_questions?: number[]
+              p_time_remaining_seconds?: number
+              p_question_order?: string[]
             }
           | {
               p_session_id: string

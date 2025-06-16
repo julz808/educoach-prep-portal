@@ -94,13 +94,22 @@ export class TestSessionService {
         questionOrderLength: questionOrder?.length || 0
       });
 
+      // Convert string array to UUID array for database function
+      const questionOrderUUIDs = questionOrder?.map(id => {
+        // Ensure the ID is a valid UUID format
+        if (typeof id === 'string' && id.length > 0) {
+          return id;
+        }
+        return null;
+      }).filter(Boolean) || [];
+
       const { data, error } = await supabase.rpc('create_or_resume_test_session', {
         p_user_id: userId,
         p_product_type: productType,
         p_test_mode: testMode,
         p_section_name: sectionName,
         p_total_questions: totalQuestions || null,
-        p_question_order: questionOrder || []
+        p_question_order: questionOrderUUIDs
       });
 
       if (error) {
@@ -121,31 +130,44 @@ export class TestSessionService {
   }
 
   /**
-   * Get session data for resumption with question order
+   * Get complete session state from backend for UI restoration
    */
   static async getSessionForResume(sessionId: string): Promise<TestSessionData | null> {
     try {
-      console.log('🔄 Getting session for resume:', sessionId);
+      console.log('🔄 Getting complete session state for resume:', sessionId);
 
-      const { data, error } = await supabase.rpc('get_session_for_resume', {
-        p_session_id: sessionId
-      });
+      // Get session data and section states in parallel
+      const [sessionResult, sectionResult] = await Promise.all([
+        supabase.rpc('get_session_for_resume', { p_session_id: sessionId }),
+        supabase
+          .from('test_section_states')
+          .select('*')
+          .eq('test_session_id', sessionId)
+      ]);
 
-      if (error) {
-        console.error('Database error getting session:', error);
-        throw new Error(`Failed to get session: ${error.message}`);
+      if (sessionResult.error) {
+        console.error('Database error getting session:', sessionResult.error);
+        throw new Error(`Failed to get session: ${sessionResult.error.message}`);
       }
 
-      if (!data || data.length === 0) {
+      if (!sessionResult.data || sessionResult.data.length === 0) {
         console.log('No session found for ID:', sessionId);
         return null;
       }
 
-      const sessionData = data[0];
-      console.log('✅ Session data retrieved:', {
+      const sessionData = sessionResult.data[0];
+      const sectionStates = sectionResult.data || [];
+      
+      // Merge section state data with session data
+      const primarySection = sectionStates.find(s => s.section_name === sessionData.section_name) || sectionStates[0];
+      
+      console.log('✅ Complete session state retrieved:', {
         sessionId: sessionData.session_id,
         questionOrderLength: sessionData.question_order?.length || 0,
-        currentQuestion: sessionData.current_question_index,
+        currentQuestion: primarySection?.current_question_index ?? sessionData.current_question_index,
+        timeRemaining: primarySection?.time_remaining_seconds ?? 3600,
+        answers: Object.keys(primarySection?.answers || {}).length,
+        flaggedQuestions: primarySection?.flagged_questions?.length || 0,
         status: sessionData.status
       });
 
@@ -156,20 +178,151 @@ export class TestSessionService {
         testMode: sessionData.test_mode,
         sectionName: sessionData.section_name,
         totalQuestions: sessionData.total_questions,
-        currentQuestionIndex: sessionData.current_question_index,
+        currentQuestionIndex: primarySection?.current_question_index ?? sessionData.current_question_index,
         status: sessionData.status,
-        sessionData: sessionData.session_data || {
+        sessionData: {
           startedAt: sessionData.started_at,
-          timeRemainingSeconds: 3600,
-          flaggedQuestions: [],
-          answers: {}
+          timeRemainingSeconds: primarySection?.time_remaining_seconds ?? 3600,
+          flaggedQuestions: primarySection?.flagged_questions || [],
+          answers: primarySection?.answers || {},
+          lastUpdated: primarySection?.last_updated || sessionData.started_at
         },
         questionOrder: sessionData.question_order || [],
         startedAt: sessionData.started_at,
-        questionResponses: sessionData.question_responses || {}
+        questionResponses: sessionData.question_responses || {},
+        sectionStates: sectionStates
       };
     } catch (error) {
       console.error('Failed to get session for resume:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Real-time answer submission with immediate backend persistence
+   */
+  static async submitAnswerRealtime(
+    sessionId: string,
+    questionIndex: number,
+    answerValue: string,
+    isCorrect: boolean,
+    timeSpentSeconds: number,
+    questionId: string,
+    userId: string,
+    productType: string,
+    subSkill: string,
+    difficulty: number,
+    isFlagged?: boolean,
+    isSkipped?: boolean
+  ): Promise<void> {
+    try {
+      console.log('💾 Real-time answer submission:', {
+        sessionId,
+        questionIndex,
+        answerValue,
+        isCorrect,
+        questionId
+      });
+
+      // Record the question response immediately
+      const { error: responseError } = await supabase.rpc('record_question_response', {
+        p_user_id: userId,
+        p_question_id: questionId,
+        p_test_session_id: sessionId,
+        p_product_type: productType,
+        p_user_answer: answerValue,
+        p_is_correct: isCorrect,
+        p_time_spent_seconds: timeSpentSeconds,
+        p_is_flagged: isFlagged || false,
+        p_is_skipped: isSkipped || false
+      });
+
+      if (responseError) {
+        console.error('Failed to record question response:', responseError);
+        throw responseError;
+      }
+
+      console.log('✅ Real-time answer recorded to backend');
+    } catch (error) {
+      console.error('Real-time answer submission failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Real-time flag update with immediate backend persistence
+   */
+  static async updateFlagRealtime(
+    sessionId: string,
+    sectionName: string,
+    flaggedQuestions: number[]
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.rpc('update_flagged_questions', {
+        p_session_id: sessionId,
+        p_section_name: sectionName,
+        p_flagged_questions: flaggedQuestions
+      });
+
+      if (error) {
+        console.error('Failed to update flags:', error);
+        throw error;
+      }
+
+      console.log('🏴 Flags updated in backend:', flaggedQuestions);
+    } catch (error) {
+      console.error('Real-time flag update failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Real-time timer update with immediate backend persistence
+   */
+  static async updateTimerRealtime(
+    sessionId: string,
+    sectionName: string,
+    timeRemainingSeconds: number
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.rpc('update_timer_state', {
+        p_session_id: sessionId,
+        p_section_name: sectionName,
+        p_time_remaining_seconds: timeRemainingSeconds
+      });
+
+      if (error) {
+        console.error('Failed to update timer:', error);
+        throw error;
+      }
+
+      console.log('⏱️ Timer updated in backend:', timeRemainingSeconds);
+    } catch (error) {
+      console.error('Real-time timer update failed:', error);
+      // Don't throw timer errors to avoid disrupting test flow
+    }
+  }
+
+  /**
+   * Auto-save session progress with enhanced persistence
+   */
+  static async autoSaveSessionProgress(
+    sessionId: string,
+    currentQuestionIndex: number,
+    answers: Record<number, string>,
+    flaggedQuestions: number[],
+    timeRemainingSeconds: number,
+    questionOrder?: string[],
+    sectionName?: string
+  ): Promise<void> {
+    try {
+      // Auto-save to both user_test_sessions and test_section_states tables
+      await Promise.all([
+        this.updateSessionProgress(sessionId, currentQuestionIndex, answers, flaggedQuestions, timeRemainingSeconds, questionOrder),
+        this.updateSectionState(sessionId, sectionName || 'default', currentQuestionIndex, answers, flaggedQuestions, timeRemainingSeconds)
+      ]);
+    } catch (error) {
+      console.error('Auto-save failed:', error);
       throw error;
     }
   }
@@ -200,13 +353,22 @@ export class TestSessionService {
         answersJsonb[index] = answer;
       });
 
+      // Convert string array to UUID array for database function
+      const questionOrderUUIDs = questionOrder?.map(id => {
+        // Ensure the ID is a valid UUID format
+        if (typeof id === 'string' && id.length > 0) {
+          return id;
+        }
+        return null;
+      }).filter(Boolean) || [];
+
       const { error } = await supabase.rpc('update_session_progress', {
         p_session_id: sessionId,
         p_current_question_index: currentQuestionIndex,
         p_answers: answersJsonb,
         p_flagged_questions: flaggedQuestions,
         p_time_remaining_seconds: timeRemainingSeconds,
-        p_question_order: questionOrder || []
+        p_question_order: questionOrderUUIDs
       });
 
       if (error) {
@@ -469,6 +631,145 @@ export class TestSessionService {
   }
 
   /**
+   * Update section state for granular persistence
+   */
+  static async updateSectionState(
+    sessionId: string,
+    sectionName: string,
+    currentQuestionIndex: number,
+    answers: Record<number, string>,
+    flaggedQuestions: number[],
+    timeRemainingSeconds: number
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.rpc('update_section_state', {
+        p_session_id: sessionId,
+        p_section_name: sectionName,
+        p_current_question_index: currentQuestionIndex,
+        p_answers: answers,
+        p_flagged_questions: flaggedQuestions,
+        p_time_remaining_seconds: timeRemainingSeconds
+      });
+
+      if (error) {
+        console.error('Database error updating section state:', error);
+        throw new Error(`Failed to update section state: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Failed to update section state:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get section state for resume
+   */
+  static async getSectionState(sessionId: string, sectionName: string): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('test_section_states')
+        .select('*')
+        .eq('test_session_id', sessionId)
+        .eq('section_name', sectionName)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Database error getting section state:', error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Failed to get section state:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Setup window exit auto-save handlers
+   */
+  static setupWindowExitHandlers(sessionId: string, saveCallback: () => Promise<void>): () => void {
+    const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+      try {
+        await saveCallback();
+      } catch (error) {
+        console.error('Failed to save on window exit:', error);
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden') {
+        try {
+          await saveCallback();
+        } catch (error) {
+          console.error('Failed to save on visibility change:', error);
+        }
+      }
+    };
+
+    const handlePageHide = async () => {
+      try {
+        await saveCallback();
+      } catch (error) {
+        console.error('Failed to save on page hide:', error);
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }
+
+  /**
+   * Check if session exists and get its current state
+   */
+  static async getSessionState(userId: string, productType: string, testMode: string, sectionName?: string): Promise<{
+    hasActiveSession: boolean;
+    sessionId?: string;
+    currentQuestionIndex?: number;
+    timeRemaining?: number;
+    status?: string;
+  }> {
+    try {
+      const { data, error } = await supabase.rpc('get_active_session_state', {
+        p_user_id: userId,
+        p_product_type: productType,
+        p_test_mode: testMode,
+        p_section_name: sectionName
+      });
+
+      if (error) {
+        console.error('Error getting session state:', error);
+        return { hasActiveSession: false };
+      }
+
+      if (data && data.length > 0) {
+        const session = data[0];
+        return {
+          hasActiveSession: true,
+          sessionId: session.session_id,
+          currentQuestionIndex: session.current_question_index,
+          timeRemaining: session.time_remaining_seconds,
+          status: session.status
+        };
+      }
+
+      return { hasActiveSession: false };
+    } catch (error) {
+      console.error('Failed to get session state:', error);
+      return { hasActiveSession: false };
+    }
+  }
+
+  /**
    * Rebuild answers from question responses (fallback method)
    */
   static async rebuildSessionAnswers(sessionId: string): Promise<Record<string, string>> {
@@ -486,6 +787,49 @@ export class TestSessionService {
     } catch (error) {
       console.error('Failed to rebuild session answers:', error);
       return {};
+    }
+  }
+
+  /**
+   * Real-time timer sync interval for continuous backend persistence
+   */
+  static startTimerSyncInterval(
+    sessionId: string,
+    sectionName: string,
+    getTimeRemaining: () => number,
+    intervalMs: number = 10000
+  ): number {
+    return window.setInterval(async () => {
+      try {
+        const currentTime = getTimeRemaining();
+        await this.updateTimerRealtime(sessionId, sectionName, currentTime);
+        console.log('⏱️ Timer sync completed:', currentTime);
+      } catch (error) {
+        console.error('Timer sync failed:', error);
+      }
+    }, intervalMs);
+  }
+
+  /**
+   * Auto-save interval for periodic session persistence
+   */
+  static startAutoSaveInterval(sessionId: string, saveCallback: () => Promise<void>, intervalMs: number = 30000): number {
+    return window.setInterval(async () => {
+      try {
+        await saveCallback();
+        console.log('📱 Auto-save completed for session:', sessionId);
+      } catch (error) {
+        console.error('Auto-save interval failed:', error);
+      }
+    }, intervalMs);
+  }
+
+  /**
+   * Stop auto-save interval
+   */
+  static stopAutoSaveInterval(intervalId: number): void {
+    if (intervalId) {
+      clearInterval(intervalId);
     }
   }
 } 

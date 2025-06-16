@@ -30,147 +30,7 @@ import { SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '../data/curriculumData';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-// Mock data for demonstration
-const mockUserPerformance = {
-  testResults: [
-    {
-      id: 1,
-      date: '2024-01-15',
-      testType: 'practice',
-      score: 85,
-      timeSpentMinutes: 45,
-      topicResults: {
-        'Mathematics': 85,
-        'Algebra': 90,
-        'Geometry': 80
-      },
-      subSkillResults: {
-        'Linear Equations': 90,
-        'Quadratic Functions': 85,
-        'Circle Geometry': 80,
-        'Triangle Properties': 75
-      }
-    },
-    {
-      id: 2,
-      date: '2024-01-14',
-      testType: 'mock',
-      score: 78,
-      timeSpentMinutes: 52,
-      topicResults: {
-        'Science': 78,
-        'Physics': 75,
-        'Chemistry': 80
-      },
-      subSkillResults: {
-        'Mechanics': 75,
-        'Thermodynamics': 70,
-        'Chemical Reactions': 80,
-        'Atomic Structure': 85
-      }
-    }
-  ],
-  subSkillMastery: {
-    'Linear Equations': 90,
-    'Quadratic Functions': 85,
-    'Circle Geometry': 80,
-    'Triangle Properties': 75,
-    'Mechanics': 75,
-    'Thermodynamics': 70,
-    'Chemical Reactions': 80,
-    'Atomic Structure': 85
-  },
-  topicMastery: {
-    'Mathematics': 85,
-    'Science': 78,
-    'Reading': 82,
-    'Writing': 75
-  },
-  totalStudyTimeMinutes: 300
-};
-
-// Mock user progress data - showing different states for demonstration
-const mockUserProgress = {
-  diagnostic: {
-    isComplete: false,
-    sectionsCompleted: 2,
-    totalSections: 4,
-    results: null // Will have results when complete
-  },
-  drills: {
-    questionsCompleted: 150,
-    totalQuestions: 500, // Added to track completion
-    subSkillsDrilled: 3, // Number of sub-skills with >0 questions completed
-    totalSubSkills: 8, // Total available sub-skills
-    skillAreasProgress: 5,
-    currentFocus: null
-  },
-  practiceTests: {
-    testsCompleted: 3,
-    totalTests: 5, // Changed from 3 to 5 to show incomplete state
-    averageScore: 0,
-    lastTest: null
-  }
-};
-
-// Example with different completion states for demo
-const mockUserProgressVaried = {
-  diagnostic: {
-    isComplete: true,
-    sectionsCompleted: 4,
-    totalSections: 4,
-    results: {
-      strongest: { area: 'Mathematics', score: 92 },
-      weakest: { area: 'Reading Comprehension', score: 68 }
-    }
-  },
-  drills: {
-    questionsCompleted: 0,
-    totalQuestions: 500,
-    subSkillsDrilled: 8, // All sub-skills completed
-    totalSubSkills: 8,
-    skillAreasProgress: 0,
-    currentFocus: null
-  },
-  practiceTests: {
-    testsCompleted: 1,
-    totalTests: 5,
-    averageScore: 82,
-    lastTest: { name: 'Mathematics Practice Test 1', score: 85 }
-  }
-};
-
-const mockQuestion = {
-  id: '1',
-  text: 'What is the derivative of x²?',
-  options: ['2x', 'x²', '2', 'x'],
-  correctAnswer: 0,
-  explanation: 'The derivative of x² is 2x using the power rule.',
-  topic: 'Mathematics',
-  subSkill: 'Calculus',
-  difficulty: 3
-};
-
-const mockQuestions = [
-  {
-    id: '1',
-    question: 'What is the derivative of x²?',
-    options: ['2x', 'x²', '2', 'x'],
-    correctAnswer: 0,
-    explanation: 'The derivative of x² is 2x using the power rule.',
-    subject: 'Mathematics',
-    difficulty: 'medium' as const
-  },
-  {
-    id: '2',
-    question: 'Which element has the chemical symbol "Au"?',
-    options: ['Silver', 'Gold', 'Aluminum', 'Argon'],
-    correctAnswer: 1,
-    explanation: 'Au is the chemical symbol for Gold, derived from the Latin word "aurum".',
-    subject: 'Chemistry',
-    difficulty: 'easy' as const
-  }
-];
+// Removed mock data - now using real database integration
 
 // Animated Progress Bar Component
 const AnimatedProgressBar = ({ value, className = "", delay = 0 }) => {
@@ -226,18 +86,54 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [testData, setTestData] = useState<TestType | null>(null);
   const [recentQuestions, setRecentQuestions] = useState<OrganizedQuestion[]>([]);
-  const [userProgress, setUserProgress] = useState({
-    diagnostic: { isComplete: false, sectionsCompleted: 0, totalSections: 0, results: null },
-    drills: { questionsCompleted: 0, totalQuestions: 0, subSkillsDrilled: 0, totalSubSkills: 0, skillAreasProgress: 0, currentFocus: null },
-    practiceTests: { testsCompleted: 0, totalTests: 0, averageScore: 0, lastTest: null }
-  });
+  // Removed userProgress state - now using real progress states
   const [realUserStats, setRealUserStats] = useState({
     totalQuestionsCompleted: 0,
-    overallAccuracy: 0,
     totalStudyTimeHours: 0,
-    currentStreak: 0
+    currentStreak: 0,
+    averageScore: '-'
   });
   const [animationKey, setAnimationKey] = useState(0);
+  const [heroMetrics, setHeroMetrics] = useState({
+    streak: 0,
+    questionsAvailable: 0,
+  });
+  const [diagnosticProgress, setDiagnosticProgress] = useState({
+    sectionsCompleted: 0,
+    totalSections: 0,
+    hasActiveSession: false,
+    activeSessionId: null as string | null,
+    resumeProgress: null as {
+      currentQuestion: number;
+      totalQuestions: number;
+      timeRemaining: number;
+      answersCount: number;
+    } | null
+  });
+  const [drillProgress, setDrillProgress] = useState({
+    subSkillsDrilled: 0,
+    totalSubSkills: 0,
+    hasActiveSession: false,
+    activeSessionId: null as string | null,
+    resumeProgress: null as {
+      currentQuestion: number;
+      totalQuestions: number;
+      timeRemaining: number;
+      answersCount: number;
+    } | null
+  });
+  const [practiceProgress, setPracticeProgress] = useState({
+    testsCompleted: 0,
+    totalTests: 5,
+    hasActiveSession: false,
+    activeSessionId: null as string | null,
+    resumeProgress: null as {
+      currentQuestion: number;
+      totalQuestions: number;
+      timeRemaining: number;
+      answersCount: number;
+    } | null
+  });
   
   const { selectedProduct } = useProduct();
   const { user } = useAuth();
@@ -246,51 +142,159 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       if (!selectedProduct || !user) return;
-      
       setLoading(true);
-      
       try {
-        console.log('🔧 DEBUG: Loading dashboard data for product:', selectedProduct);
-        
-        // Fetch user progress
-        const { data: userProgress } = await supabase
+        // 1. Fetch user_progress for selected product
+        const { data: userProgress, error: userProgressError } = await supabase
           .from('user_progress')
           .select('*')
           .eq('user_id', user.id)
           .eq('product_type', selectedProduct)
           .single();
+        if (userProgressError) throw userProgressError;
 
-        // Fetch test attempts
-        const { data: testAttempts } = await supabase
-          .from('test_attempts')
-          .select('*')
+        // 2. Fetch average score from user_test_sessions
+        const { data: avgScoreData, error: avgScoreError } = await supabase
+          .from('user_test_sessions')
+          .select('final_score')
           .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .in('status', ['completed'])
+          .in('test_mode', ['diagnostic', 'practice']);
+        if (avgScoreError) throw avgScoreError;
+        let averageScore: string = '-';
+        if (avgScoreData && avgScoreData.length > 0) {
+          const scores = avgScoreData
+            .map((row: { final_score: number | null }) => row.final_score)
+            .filter((s: number | null): s is number => typeof s === 'number');
+          if (scores.length > 0) {
+            averageScore = Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length).toString();
+          }
+        }
+
+        // 3. Calculate study hours
+        let studyHours = 0;
+        if (userProgress?.total_study_time_seconds != null) {
+          studyHours = Math.round((userProgress.total_study_time_seconds / 3600) * 2) / 2;
+        }
+
+        // 4. Set metrics state
+        setRealUserStats({
+          totalQuestionsCompleted: userProgress?.total_questions_completed ?? 0,
+          totalStudyTimeHours: studyHours,
+          currentStreak: userProgress?.streak_days ?? 0,
+          averageScore: averageScore
+        });
+
+        // 5. Hero banner metrics
+        // a. Streak
+        const streak = userProgress?.streak_days ?? 0;
+        // b. Questions available
+        const { count: questionsAvailable } = await supabase
+          .from('questions')
+          .eq('test_type', selectedProduct)
+          .select('id', { count: 'exact', head: true });
+        setHeroMetrics({
+          streak,
+          questionsAvailable: questionsAvailable || 0,
+        });
+
+        // 6. Diagnostic progress
+        // a. Sections completed
+        const { data: diagnosticSections } = await supabase
+          .from('test_sections')
+          .select('section_name')
           .eq('product_type', selectedProduct);
+        const totalSections = diagnosticSections ? diagnosticSections.length : 0;
+        // b. Completed sections (from user_test_sessions with test_mode 'diagnostic' and status 'completed')
+        const { data: completedDiagnosticSections } = await supabase
+          .from('user_test_sessions')
+          .select('section_name')
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .eq('test_mode', 'diagnostic')
+          .eq('status', 'completed');
+        const sectionsCompleted = completedDiagnosticSections ? completedDiagnosticSections.length : 0;
+        setDiagnosticProgress({
+          sectionsCompleted,
+          totalSections,
+          hasActiveSession: diagnosticResumeState.canResume,
+          activeSessionId: diagnosticResumeState.sessionId || null,
+          resumeProgress: diagnosticResumeState.progress || null
+        });
 
-        // Fetch question responses
-        const { data: questionResponses } = await supabase
-          .from('user_question_responses')
-          .select('*')
-          .eq('user_id', user.id);
+        // 7. Skill Drills progress
+        // a. Total sub-skills
+        const { data: subSkills } = await supabase
+          .from('sub_skills')
+          .select('id')
+          .eq('product_type', selectedProduct);
+        const totalSubSkills = subSkills ? subSkills.length : 0;
+        // b. Sub-skills drilled (from user_sub_skill_performance with questions_attempted > 0)
+        const { data: drilledSubSkills } = await supabase
+          .from('user_sub_skill_performance')
+          .select('sub_skill_id, questions_attempted')
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .gt('questions_attempted', 0);
+        const subSkillsDrilled = drilledSubSkills ? drilledSubSkills.length : 0;
+        setDrillProgress({
+          subSkillsDrilled,
+          totalSubSkills,
+          hasActiveSession: drillResumeState.canResume,
+          activeSessionId: drillResumeState.sessionId || null,
+          resumeProgress: drillResumeState.progress || null
+        });
+        
+        setPracticeProgress({
+          testsCompleted: practiceTestsCompleted,
+          totalTests: 5,
+          hasActiveSession: practiceResumeState.canResume,
+          activeSessionId: practiceResumeState.sessionId || null,
+          resumeProgress: practiceResumeState.progress || null
+        });
 
-        // Fetch questions for recent questions display
+        // 8. Practice Tests progress
+        // a. Tests completed (user_test_sessions with test_mode 'practice' and status 'completed')
+        const { data: completedPracticeTests } = await supabase
+          .from('user_test_sessions')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .eq('test_mode', 'practice')
+          .eq('status', 'completed');
+        const practiceTestsCompleted = completedPracticeTests ? completedPracticeTests.length : 0;
+        
+        // Check for active sessions for each test mode
+        const { SessionPersistenceService } = await import('@/services/sessionPersistenceService');
+        
+        // Check diagnostic session state
+        const diagnosticResumeState = await SessionPersistenceService.getSessionResumeState(
+          user.id,
+          selectedProduct,
+          'diagnostic'
+        );
+        
+        // Check practice session state  
+        const practiceResumeState = await SessionPersistenceService.getSessionResumeState(
+          user.id,
+          selectedProduct,
+          'practice'
+        );
+        
+        // Check drill session state
+        const drillResumeState = await SessionPersistenceService.getSessionResumeState(
+          user.id,
+          selectedProduct,
+          'drill'
+        );
+
+        // Fetch questions for recent questions display (unchanged)
         const { data: questions } = await supabase
           .from('questions')
           .select('id, question_text, answer_options, correct_answer, solution, sub_skill, section_name, difficulty, passage_id')
           .eq('test_type', selectedProduct)
           .limit(10);
-
-        // Calculate real user stats
-        const realStats = {
-          totalQuestionsCompleted: userProgress?.questions_attempted || 0,
-          overallAccuracy: userProgress?.accuracy_rate || 0,
-          totalStudyTimeHours: userProgress?.total_time_minutes ? Math.round(userProgress.total_time_minutes / 60 * 10) / 10 : 0,
-          currentStreak: userProgress?.current_streak || 0
-        };
-
-        setRealUserStats(realStats);
-
-        // Transform questions to OrganizedQuestion format
         const transformedQuestions: OrganizedQuestion[] = (questions || []).map(q => ({
           id: q.id,
           text: q.question_text,
@@ -305,53 +309,21 @@ const Dashboard: React.FC = () => {
           topic: q.section_name,
           hasVisual: false
         }));
-
         setRecentQuestions(transformedQuestions);
 
         // Create test structure from questions
         const testStructure = createBasicTestStructure(questions || [], selectedProduct);
         setTestData(testStructure);
-
-        // Calculate progress for different test modes
-        const diagnosticProgress = testAttempts?.filter(attempt => attempt.test_mode === 'diagnostic').length || 0;
-        const drillsProgress = testAttempts?.filter(attempt => attempt.test_mode === 'drill').length || 0;
-        const practiceProgress = testAttempts?.filter(attempt => attempt.test_mode === 'practice').length || 0;
-
-        setUserProgress({
-          diagnostic: {
-            isComplete: diagnosticProgress > 0,
-            sectionsCompleted: diagnosticProgress,
-            totalSections: 10, // Default estimate
-            results: null
-          },
-          drills: {
-            questionsCompleted: questionResponses?.length || 0,
-            totalQuestions: 100, // Default estimate
-            subSkillsDrilled: drillsProgress,
-            totalSubSkills: 20, // Default estimate
-            skillAreasProgress: drillsProgress,
-            currentFocus: null
-          },
-          practiceTests: {
-            testsCompleted: practiceProgress,
-            totalTests: 5, // Default estimate
-            averageScore: 0,
-            lastTest: null
-          }
-        });
         
         setAnimationKey(prev => prev + 1);
         
       } catch (err) {
         console.error('Error loading dashboard data:', err);
-        const placeholder = getPlaceholderTestStructure(selectedProduct);
-        setTestData(placeholder);
-        setRecentQuestions([]);
-        
-        setUserProgress({
-          diagnostic: { isComplete: false, sectionsCompleted: 0, totalSections: 0, results: null },
-          drills: { questionsCompleted: 0, totalQuestions: 0, subSkillsDrilled: 0, totalSubSkills: 0, skillAreasProgress: 0, currentFocus: null },
-          practiceTests: { testsCompleted: 0, totalTests: 0, averageScore: 0, lastTest: null }
+        setRealUserStats({
+          totalQuestionsCompleted: 0,
+          totalStudyTimeHours: 0,
+          currentStreak: 0,
+          averageScore: '-'
         });
       } finally {
         setLoading(false);
@@ -483,7 +455,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Overall Average Score',
-      value: `${realUserStats.overallAccuracy}%`,
+      value: `${realUserStats.averageScore}`,
       icon: <Target className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -542,30 +514,49 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
             <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${userProgress.diagnostic.sectionsCompleted === userProgress.diagnostic.totalSections ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${userProgress.diagnostic.sectionsCompleted === userProgress.diagnostic.totalSections ? 'text-green-600' : 'text-purple-600'}`}>Sections Completed</div>
-                <div className={`text-xl font-bold ${userProgress.diagnostic.sectionsCompleted === userProgress.diagnostic.totalSections ? 'text-green-700' : 'text-purple-900'}`}>
-                  {userProgress.diagnostic.sectionsCompleted}/{userProgress.diagnostic.totalSections}
+              <div className={`p-4 rounded-xl ${diagnosticProgress.sectionsCompleted === diagnosticProgress.totalSections ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-sm mb-1 ${diagnosticProgress.sectionsCompleted === diagnosticProgress.totalSections ? 'text-green-600' : 'text-purple-600'}`}>Sections Completed</div>
+                <div className={`text-xl font-bold ${diagnosticProgress.sectionsCompleted === diagnosticProgress.totalSections ? 'text-green-700' : 'text-purple-900'}`}>
+                  {diagnosticProgress.sectionsCompleted}/{diagnosticProgress.totalSections}
                 </div>
               </div>
             </div>
-            <Button 
-              onClick={() => {
-                if (userProgress.diagnostic.sectionsCompleted === userProgress.diagnostic.totalSections) {
-                  navigate('/dashboard/insights');
-                } else {
-                  navigate('/dashboard/diagnostic');
-                }
-              }}
-              className="w-full h-12 text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg shadow-purple-200 transform hover:scale-105 transition-all duration-200"
-            >
-              <Sparkles size={18} className="mr-2" />
-              {userProgress.diagnostic.sectionsCompleted === 0 
-                ? 'Start Diagnostic' 
-                : userProgress.diagnostic.sectionsCompleted === userProgress.diagnostic.totalSections 
-                  ? 'View Results' 
-                  : 'Continue Diagnostic'}
-            </Button>
+            <div className="space-y-3">
+              {diagnosticProgress.hasActiveSession && diagnosticProgress.resumeProgress && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+                  <div className="flex items-center justify-between text-blue-800">
+                    <span className="font-medium">Session in Progress</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      Q{diagnosticProgress.resumeProgress.currentQuestion}/{diagnosticProgress.resumeProgress.totalQuestions}
+                    </Badge>
+                  </div>
+                  <div className="text-blue-600 mt-1">
+                    {diagnosticProgress.resumeProgress.answersCount} answers • {Math.floor(diagnosticProgress.resumeProgress.timeRemaining / 60)}min remaining
+                  </div>
+                </div>
+              )}
+              <Button 
+                onClick={() => {
+                  if (diagnosticProgress.hasActiveSession && diagnosticProgress.activeSessionId) {
+                    navigate(`/test-taking/diagnostic/section/${diagnosticProgress.activeSessionId}`);
+                  } else if (diagnosticProgress.sectionsCompleted === diagnosticProgress.totalSections) {
+                    navigate('/dashboard/insights');
+                  } else {
+                    navigate('/dashboard/diagnostic');
+                  }
+                }}
+                className="w-full h-12 text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg shadow-purple-200 transform hover:scale-105 transition-all duration-200"
+              >
+                <Sparkles size={18} className="mr-2" />
+                {diagnosticProgress.hasActiveSession
+                  ? 'Resume Diagnostic'
+                  : diagnosticProgress.sectionsCompleted === 0 
+                    ? 'Start Diagnostic' 
+                    : diagnosticProgress.sectionsCompleted === diagnosticProgress.totalSections 
+                      ? 'View Results' 
+                      : 'Continue Diagnostic'}
+              </Button>
+            </div>
           </CardContent>
         </EnhancedCard>
 
@@ -588,30 +579,49 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
             <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${userProgress.drills.subSkillsDrilled === userProgress.drills.totalSubSkills ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${userProgress.drills.subSkillsDrilled === userProgress.drills.totalSubSkills ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Drilled</div>
-                <div className={`text-xl font-bold ${userProgress.drills.subSkillsDrilled === userProgress.drills.totalSubSkills ? 'text-green-700' : 'text-orange-900'}`}>
-                  {userProgress.drills.subSkillsDrilled}/{userProgress.drills.totalSubSkills}
+              <div className={`p-4 rounded-xl ${drillProgress.subSkillsDrilled === drillProgress.totalSubSkills ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-sm mb-1 ${drillProgress.subSkillsDrilled === drillProgress.totalSubSkills ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Drilled</div>
+                <div className={`text-xl font-bold ${drillProgress.subSkillsDrilled === drillProgress.totalSubSkills ? 'text-green-700' : 'text-orange-900'}`}>
+                  {drillProgress.subSkillsDrilled}/{drillProgress.totalSubSkills}
                 </div>
               </div>
             </div>
-            <Button 
-              onClick={() => {
-                if (userProgress.drills.subSkillsDrilled === userProgress.drills.totalSubSkills) {
-                  navigate('/dashboard/insights');
-                } else {
-                  navigate('/dashboard/drill');
-                }
-              }}
-              className="w-full h-12 text-base bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-lg shadow-orange-200 transform hover:scale-105 transition-all duration-200"
-            >
-              <Zap size={18} className="mr-2" />
-              {userProgress.drills.subSkillsDrilled === 0 
-                ? 'Start Drilling' 
-                : userProgress.drills.subSkillsDrilled === userProgress.drills.totalSubSkills 
-                  ? 'View Results' 
-                  : 'Continue Drilling'}
-            </Button>
+            <div className="space-y-3">
+              {drillProgress.hasActiveSession && drillProgress.resumeProgress && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm">
+                  <div className="flex items-center justify-between text-orange-800">
+                    <span className="font-medium">Drill in Progress</span>
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Q{drillProgress.resumeProgress.currentQuestion}/{drillProgress.resumeProgress.totalQuestions}
+                    </Badge>
+                  </div>
+                  <div className="text-orange-600 mt-1">
+                    {drillProgress.resumeProgress.answersCount} answers completed
+                  </div>
+                </div>
+              )}
+              <Button 
+                onClick={() => {
+                  if (drillProgress.hasActiveSession && drillProgress.activeSessionId) {
+                    navigate(`/test-taking/drill/section/${drillProgress.activeSessionId}`);
+                  } else if (drillProgress.subSkillsDrilled === drillProgress.totalSubSkills) {
+                    navigate('/dashboard/insights');
+                  } else {
+                    navigate('/dashboard/drill');
+                  }
+                }}
+                className="w-full h-12 text-base bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-lg shadow-orange-200 transform hover:scale-105 transition-all duration-200"
+              >
+                <Zap size={18} className="mr-2" />
+                {drillProgress.hasActiveSession
+                  ? 'Resume Drill'
+                  : drillProgress.subSkillsDrilled === 0 
+                    ? 'Start Drilling' 
+                    : drillProgress.subSkillsDrilled === drillProgress.totalSubSkills 
+                      ? 'View Results' 
+                      : 'Continue Drilling'}
+              </Button>
+            </div>
           </CardContent>
         </EnhancedCard>
 
@@ -634,30 +644,49 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
             <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${userProgress.practiceTests.testsCompleted === userProgress.practiceTests.totalTests ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${userProgress.practiceTests.testsCompleted === userProgress.practiceTests.totalTests ? 'text-green-600' : 'text-rose-600'}`}>Tests Completed</div>
-                <div className={`text-xl font-bold ${userProgress.practiceTests.testsCompleted === userProgress.practiceTests.totalTests ? 'text-green-700' : 'text-rose-900'}`}>
-                  {userProgress.practiceTests.testsCompleted}/{userProgress.practiceTests.totalTests}
+              <div className={`p-4 rounded-xl ${practiceProgress.testsCompleted === practiceProgress.totalTests ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-sm mb-1 ${practiceProgress.testsCompleted === practiceProgress.totalTests ? 'text-green-600' : 'text-rose-600'}`}>Tests Completed</div>
+                <div className={`text-xl font-bold ${practiceProgress.testsCompleted === practiceProgress.totalTests ? 'text-green-700' : 'text-rose-900'}`}>
+                  {practiceProgress.testsCompleted}/{practiceProgress.totalTests}
                 </div>
               </div>
             </div>
-            <Button 
-              onClick={() => {
-                if (userProgress.practiceTests.testsCompleted === userProgress.practiceTests.totalTests) {
-                  navigate('/dashboard/insights');
-                } else {
-                  navigate('/dashboard/practice-tests');
-                }
-              }}
-              className="w-full h-12 text-base bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-lg shadow-rose-200 transform hover:scale-105 transition-all duration-200"
-            >
-              <Play size={18} className="mr-2" />
-              {userProgress.practiceTests.testsCompleted === 0 
-                ? 'Start Practice Test' 
-                : userProgress.practiceTests.testsCompleted === userProgress.practiceTests.totalTests 
-                  ? 'View Results' 
-                  : 'Continue Practice Test'}
-            </Button>
+            <div className="space-y-3">
+              {practiceProgress.hasActiveSession && practiceProgress.resumeProgress && (
+                <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 text-sm">
+                  <div className="flex items-center justify-between text-rose-800">
+                    <span className="font-medium">Practice Test in Progress</span>
+                    <Badge variant="secondary" className="bg-rose-100 text-rose-800">
+                      Q{practiceProgress.resumeProgress.currentQuestion}/{practiceProgress.resumeProgress.totalQuestions}
+                    </Badge>
+                  </div>
+                  <div className="text-rose-600 mt-1">
+                    {practiceProgress.resumeProgress.answersCount} answers • {Math.floor(practiceProgress.resumeProgress.timeRemaining / 60)}min remaining
+                  </div>
+                </div>
+              )}
+              <Button 
+                onClick={() => {
+                  if (practiceProgress.hasActiveSession && practiceProgress.activeSessionId) {
+                    navigate(`/test-taking/practice/section/${practiceProgress.activeSessionId}`);
+                  } else if (practiceProgress.testsCompleted === practiceProgress.totalTests) {
+                    navigate('/dashboard/insights');
+                  } else {
+                    navigate('/dashboard/practice-tests');
+                  }
+                }}
+                className="w-full h-12 text-base bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-lg shadow-rose-200 transform hover:scale-105 transition-all duration-200"
+              >
+                <Play size={18} className="mr-2" />
+                {practiceProgress.hasActiveSession
+                  ? 'Resume Practice Test'
+                  : practiceProgress.testsCompleted === 0 
+                    ? 'Start Practice Test' 
+                    : practiceProgress.testsCompleted === practiceProgress.totalTests 
+                      ? 'View Results' 
+                      : 'Continue Practice Test'}
+              </Button>
+            </div>
           </CardContent>
         </EnhancedCard>
       </div>
@@ -701,10 +730,12 @@ const Dashboard: React.FC = () => {
                   <X size={20} />
                 </Button>
               </div>
-              <InteractiveInsightsDashboard 
-                userPerformance={mockUserPerformance} 
-                testType="practice"
-              />
+              <div className="p-6 text-center text-gray-500">
+                <p>Performance insights will be available once you complete some tests.</p>
+                <Button onClick={() => setShowInsights(false)} className="mt-4">
+                  Start Taking Tests
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -722,7 +753,7 @@ const Dashboard: React.FC = () => {
 };
 
 // Helper function to create basic test structure
-const createBasicTestStructure = (questions: any[], productType: string): TestType => {
+const createBasicTestStructure = (questions: { section_name: string; test_mode: string }[], productType: string): TestType => {
   const sections = [...new Set(questions.map(q => q.section_name))];
   const testModes = [...new Set(questions.map(q => q.test_mode))];
   

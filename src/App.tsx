@@ -23,6 +23,9 @@ import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProductProvider } from "./context/ProductContext";
+import AuthCallback from '@/pages/AuthCallback';
+import ResetPassword from '@/pages/ResetPassword';
+import Profile from '@/pages/Profile';
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -46,6 +49,8 @@ const App = () => {
                       <Route path="/question-generation-demo" element={<QuestionGenerationDemo />} />
                       <Route path="/edutest-generator" element={<EduTestGenerator />} />
                       <Route path="/svg-demo" element={<SVGQuestionDemo />} />
+                      <Route path="/auth/callback" element={<AuthCallback />} />
+                      <Route path="/auth/reset-password" element={<ResetPassword />} />
                       <Route element={<ProtectedRoute />}>
                         {/* Test-taking routes (outside of Layout) */}
                         <Route path="/test/:testType/:subjectId" element={<TestTaking />} />
@@ -60,6 +65,7 @@ const App = () => {
                           <Route path="practice-tests" element={<PracticeTests />} />
                           <Route path="insights" element={<Insights />} />
                         </Route>
+                        <Route path="/profile" element={<Profile />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>

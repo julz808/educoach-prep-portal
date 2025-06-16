@@ -15,7 +15,7 @@ export interface PersistedTestSession {
   startedAt: string;
   lastUpdatedAt: string;
   status: 'in-progress' | 'completed' | 'paused';
-  sessionData?: Record<string, any>;
+  sessionData?: Record<string, unknown>;
 }
 
 export interface SectionProgress {
@@ -29,11 +29,57 @@ export interface SectionProgress {
 
 export class SessionPersistenceService {
   /**
-   * Save test session progress using the new update_session_progress function
+   * Real-time session state persistence - always saves to backend immediately
+   */
+  static async saveSessionRealtime(session: PersistedTestSession): Promise<void> {
+    try {
+      console.log('💾 Real-time session save process:', {
+        sessionId: session.id,
+        userId: session.userId,
+        sectionName: session.sectionName,
+        status: session.status,
+        currentQuestion: session.currentQuestionIndex,
+        timeRemaining: session.timeRemaining
+      });
+
+      // Extract question order from session data if available
+      const questionOrder = session.sessionData?.questionIds || 
+                           session.sessionData?.questions || 
+                           [];
+
+      // Save to both tables immediately with real-time updates
+      await Promise.all([
+        // Update main session progress
+        TestSessionService.autoSaveSessionProgress(
+          session.id,
+          session.currentQuestionIndex,
+          session.answers,
+          session.flaggedQuestions,
+          session.timeRemaining,
+          questionOrder,
+          session.sectionName
+        ),
+        // Update timer state in real-time
+        TestSessionService.updateTimerRealtime(
+          session.id,
+          session.sectionName,
+          session.timeRemaining
+        )
+      ]);
+
+      console.log('✅ Real-time session state persisted to backend');
+    } catch (error) {
+      console.error('❌ Real-time session save failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Enhanced auto-save session progress using the new auto-save functionality
    */
   static async saveSession(session: PersistedTestSession): Promise<void> {
     try {
-      console.log('💾 Starting session save process...', {
+      console.log('💾 Starting enhanced session save process...', {
         sessionId: session.id,
         userId: session.userId,
         sectionName: session.sectionName,
@@ -45,30 +91,19 @@ export class SessionPersistenceService {
                            session.sessionData?.questions || 
                            [];
 
-      // Use the new TestSessionService method for updating progress
-      await TestSessionService.updateSessionProgress(
+      // Use the new enhanced auto-save method that saves to both tables
+      await TestSessionService.autoSaveSessionProgress(
         session.id,
         session.currentQuestionIndex,
         session.answers,
         session.flaggedQuestions,
         session.timeRemaining,
-        questionOrder // Pass question order
+        questionOrder,
+        session.sectionName
       );
 
-      // Keep localStorage as backup for immediate access
-      const sessionData = {
-        currentQuestionIndex: session.currentQuestionIndex,
-        answers: session.answers,
-        flaggedQuestions: session.flaggedQuestions,
-        timeRemaining: session.timeRemaining,
-        status: session.status,
-        lastActivity: new Date().toISOString(),
-        questionsAnswered: Object.keys(session.answers).length,
-        questionIds: questionOrder, // Store question order in localStorage too
-        ...(session.sessionData || {})
-      };
-
-      localStorage.setItem(`session_${session.id}`, JSON.stringify(sessionData));
+      // Remove localStorage dependency - all state now comes from backend
+      // No local storage needed as backend is the single source of truth
 
       console.log('✅ Session saved:', session.id);
       console.log('📊 Session details:', {
@@ -86,22 +121,24 @@ export class SessionPersistenceService {
   }
 
   /**
-   * Load test session by ID using the new get_session_for_resume function
+   * Load complete session state from backend - no local fallbacks
    */
   static async loadSession(sessionId: string): Promise<PersistedTestSession | null> {
     try {
-      // Use the new TestSessionService method for loading session data
+      console.log('🔄 Loading session state from backend:', sessionId);
+      
+      // Load complete session state from backend only
       const sessionData = await TestSessionService.getSessionForResume(sessionId);
       
       if (!sessionData) {
-        // Try loading from localStorage backup
-        return this.loadSessionFromStorage(sessionId);
+        console.log('⚠️ No session found in backend:', sessionId);
+        return null;
       }
 
-      // Convert the database format to our interface format
+      // Convert backend data to interface format - prioritize section states
       const answers: Record<number, string> = {};
       
-      // First try to get answers from session_data
+      // Get answers from section states (most up-to-date)
       if (sessionData.sessionData?.answers) {
         Object.entries(sessionData.sessionData.answers).forEach(([key, value]) => {
           const index = parseInt(key);
@@ -109,9 +146,10 @@ export class SessionPersistenceService {
             answers[index] = value as string;
           }
         });
+        console.log('✅ Loaded answers from section states:', Object.keys(answers).length);
       }
       
-      // If no answers in session_data, try to rebuild from question responses
+      // Fallback: rebuild from question responses if no section state answers
       if (Object.keys(answers).length === 0 && sessionData.questionOrder.length > 0) {
         console.log('🔄 Rebuilding answers from question responses...');
         try {
@@ -145,37 +183,94 @@ export class SessionPersistenceService {
         sessionData: {
           ...sessionData.sessionData,
           questionIds: sessionData.questionOrder, // Include question order
-          questionResponses: sessionData.questionResponses
+          questionResponses: sessionData.questionResponses,
+          sectionStates: sessionData.sectionStates // Include section states
         }
       };
     } catch (error) {
-      console.error('Failed to load session:', error);
-      return this.loadSessionFromStorage(sessionId);
+      console.error('Failed to load session from backend:', error);
+      return null; // No local fallbacks - backend is single source of truth
     }
   }
 
   /**
-   * Get user's active session for a specific section
+   * Get user's active session for a specific section with enhanced state checking
    */
   static async getActiveSessionForSection(
     userId: string,
     productType: string,
-    sectionName: string
+    sectionName: string,
+    testMode: 'diagnostic' | 'practice' | 'drill' = 'diagnostic'
   ): Promise<PersistedTestSession | null> {
     try {
-      // Create or resume session - this will return existing session if one exists
-      const sessionId = await TestSessionService.createOrResumeSession(
+      // First check if there's an active session
+      const sessionState = await TestSessionService.getSessionState(
         userId,
         productType,
-        'diagnostic',
+        testMode,
         sectionName
       );
 
-      // Load the session data
-      return await this.loadSession(sessionId);
+      if (sessionState.hasActiveSession && sessionState.sessionId) {
+        console.log('🔄 Found active session, loading...', sessionState.sessionId);
+        return await this.loadSession(sessionState.sessionId);
+      }
+
+      // No active session found
+      console.log('ℹ️ No active session found for section:', sectionName);
+      return null;
     } catch (error) {
       console.error('Failed to get active session:', error);
       return null;
+    }
+  }
+
+  /**
+   * Check session resume state for dashboard display
+   */
+  static async getSessionResumeState(
+    userId: string,
+    productType: string,
+    testMode: 'diagnostic' | 'practice' | 'drill',
+    sectionName?: string
+  ): Promise<{
+    canResume: boolean;
+    sessionId?: string;
+    progress?: {
+      currentQuestion: number;
+      totalQuestions: number;
+      timeRemaining: number;
+      answersCount: number;
+    };
+  }> {
+    try {
+      const sessionState = await TestSessionService.getSessionState(
+        userId,
+        productType,
+        testMode,
+        sectionName
+      );
+
+      if (sessionState.hasActiveSession && sessionState.sessionId) {
+        const session = await this.loadSession(sessionState.sessionId);
+        if (session) {
+          return {
+            canResume: true,
+            sessionId: session.id,
+            progress: {
+              currentQuestion: session.currentQuestionIndex + 1,
+              totalQuestions: session.totalQuestions,
+              timeRemaining: session.timeRemaining,
+              answersCount: Object.keys(session.answers).length
+            }
+          };
+        }
+      }
+
+      return { canResume: false };
+    } catch (error) {
+      console.error('Failed to get session resume state:', error);
+      return { canResume: false };
     }
   }
 
@@ -194,7 +289,7 @@ export class SessionPersistenceService {
       
       const progressMap: Record<string, SectionProgress> = {};
       
-      progressData.forEach((section: any) => {
+      progressData.forEach((section: { section_name: string; status: string; questions_completed: number; total_questions: number; last_updated: string; session_id: string }) => {
         progressMap[section.section_name] = {
           sectionName: section.section_name,
           status: section.status,
@@ -260,7 +355,7 @@ export class SessionPersistenceService {
     userId: string,
     productType: string,
     testMode: string,
-    sectionScores?: Record<string, any>
+    sectionScores?: Record<string, unknown>
   ): Promise<void> {
     try {
       console.log('🏁 Completing session:', sessionId);
@@ -398,6 +493,40 @@ export class SessionPersistenceService {
       console.error('Failed to load session from storage:', error);
       return null;
     }
+  }
+
+  /**
+   * Setup auto-save with window exit handlers
+   */
+  static setupAutoSave(
+    session: PersistedTestSession,
+    saveCallback: () => Promise<void>
+  ): {
+    intervalId: number;
+    cleanupHandlers: () => void;
+  } {
+    // Setup periodic auto-save (every 30 seconds)
+    const intervalId = TestSessionService.startAutoSaveInterval(
+      session.id,
+      saveCallback,
+      30000
+    );
+
+    // Setup window exit handlers
+    const cleanupHandlers = TestSessionService.setupWindowExitHandlers(
+      session.id,
+      saveCallback
+    );
+
+    return { intervalId, cleanupHandlers };
+  }
+
+  /**
+   * Stop auto-save and cleanup handlers
+   */
+  static stopAutoSave(intervalId: number, cleanupHandlers: () => void): void {
+    TestSessionService.stopAutoSaveInterval(intervalId);
+    cleanupHandlers();
   }
 
   /**

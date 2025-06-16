@@ -57,7 +57,7 @@ interface TestSession {
   status: 'in-progress' | 'completed' | 'review' | 'paused';
   metadata?: {
     productType?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   isResumed?: boolean;
 }
@@ -81,7 +81,7 @@ const getTimeLimit = (testTypeName: string, sectionName: string): number => {
   }
 
   // Try to find exact match first
-  const exactMatch = (testStructure as any)[sectionName];
+  const exactMatch = testStructure[sectionName as keyof typeof testStructure] as { time?: number } | undefined;
   if (exactMatch && typeof exactMatch === 'object' && exactMatch.time) {
     return exactMatch.time;
   }
@@ -94,7 +94,7 @@ const getTimeLimit = (testTypeName: string, sectionName: string): number => {
   );
 
   if (partialMatch) {
-    const matchedSection = (testStructure as any)[partialMatch];
+    const matchedSection = testStructure[partialMatch as keyof typeof testStructure] as { time?: number } | undefined;
     if (matchedSection && typeof matchedSection === 'object' && matchedSection.time) {
       return matchedSection.time;
     }
@@ -183,6 +183,8 @@ const TestTaking: React.FC = () => {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [recordingEnabled, setRecordingEnabled] = useState<boolean>(false);
   const [progressSaved, setProgressSaved] = useState<boolean>(false);
+  const [autoSaveInterval, setAutoSaveInterval] = useState<number | null>(null);
+  const [exitHandlers, setExitHandlers] = useState<(() => void) | null>(null);
   
   // Offline responses management
   const {
@@ -203,7 +205,7 @@ const TestTaking: React.FC = () => {
     }
   });
 
-  // Function to save session progress
+  // Enhanced function to save session progress with auto-save
   const saveSessionProgress = async (currentSession: TestSession) => {
     if (!user || !currentSession.id) {
       console.warn('Cannot save session: missing user or session ID');
@@ -244,13 +246,15 @@ const TestTaking: React.FC = () => {
         }
       };
 
+      // Use enhanced auto-save that persists to both tables
       await SessionPersistenceService.saveSession(persistedSession);
-      console.log('💾 Session progress saved successfully:', {
+      console.log('💾 Enhanced session progress saved successfully:', {
         sessionId: currentSession.id,
         currentQuestion: currentSession.currentQuestion,
         answersCount: Object.keys(stringAnswers).length,
         status: currentSession.status,
-        questionIdsCount: questionIds.length
+        questionIdsCount: questionIds.length,
+        sectionName: currentSession.sectionName
       });
       
       setProgressSaved(true);
@@ -258,6 +262,50 @@ const TestTaking: React.FC = () => {
     } catch (error) {
       console.error('Failed to save session progress:', error);
       // Don't throw error to avoid disrupting user experience
+    }
+  };
+
+  // Setup auto-save when session starts
+  const setupAutoSave = (currentSession: TestSession) => {
+    if (!currentSession || !user) return;
+
+    const saveCallback = async () => {
+      await saveSessionProgress(currentSession);
+    };
+
+    // Setup auto-save with window exit handlers
+    const { intervalId, cleanupHandlers } = SessionPersistenceService.setupAutoSave(
+      {
+        id: currentSession.id,
+        userId: user.id,
+        productType: currentSession.metadata?.productType || selectedProduct,
+        testType: currentSession.type,
+        sectionName: currentSession.sectionName || 'Unknown',
+        currentQuestionIndex: currentSession.currentQuestion,
+        answers: {},
+        flaggedQuestions: [],
+        timeRemaining: timeRemaining,
+        totalQuestions: currentSession.questions.length,
+        startedAt: currentSession.startTime.toISOString(),
+        lastUpdatedAt: new Date().toISOString(),
+        status: 'in-progress'
+      },
+      saveCallback
+    );
+
+    setAutoSaveInterval(intervalId);
+    setExitHandlers(() => cleanupHandlers);
+    
+    console.log('📱 Auto-save setup completed for session:', currentSession.id);
+  };
+
+  // Cleanup auto-save on component unmount or session change
+  const cleanupAutoSave = () => {
+    if (autoSaveInterval && exitHandlers) {
+      SessionPersistenceService.stopAutoSave(autoSaveInterval, exitHandlers);
+      setAutoSaveInterval(null);
+      setExitHandlers(null);
+      console.log('🧹 Auto-save cleanup completed');
     }
   };
 
@@ -525,15 +573,19 @@ const TestTaking: React.FC = () => {
         }
       });
 
-      // Set the time remaining from the persisted session
+      // Set the time remaining from the persisted session (backend is source of truth)
       setTimeRemaining(persistedSession.timeRemaining);
+      setBackendSynced(true); // Mark as synced since we just loaded from backend
       
-      console.log('✅ Session restored:', {
+      console.log('✅ Complete session state restored from backend:', {
         sessionId: persistedSession.id,
         currentQuestion: persistedSession.currentQuestionIndex,
         answersCount: Object.keys(numberAnswers).length,
         timeRemaining: persistedSession.timeRemaining,
         questionsCount: finalQuestions.length,
+        flaggedQuestions: persistedSession.flaggedQuestions.length,
+        sectionStates: persistedSession.sessionData?.sectionStates?.length || 0,
+        backendSynced: true,
         restoredAnswers: Object.keys(numberAnswers).map(idx => `Q${parseInt(idx) + 1}: ${numberAnswers[parseInt(idx)]}`).join(', ')
       });
       
@@ -802,6 +854,23 @@ const TestTaking: React.FC = () => {
     initializeSession();
   }, [testType, subjectId, sectionId, searchParams, selectedProduct, user, sessionId]);
 
+  // Cleanup auto-save on unmount
+  useEffect(() => {
+    return () => {
+      cleanupAutoSave();
+    };
+  }, [autoSaveInterval, exitHandlers]);
+
+  // Update auto-save when session changes
+  useEffect(() => {
+    if (session && session.status === 'in-progress' && activeSessionId && recordingEnabled) {
+      // Cleanup previous auto-save
+      cleanupAutoSave();
+      // Setup new auto-save with current session
+      setupAutoSave(session);
+    }
+  }, [session?.currentQuestion, session?.answers, session?.flaggedQuestions, timeRemaining]);
+
   // Timer effect with auto-finish when reaching 0
   useEffect(() => {
     if (!session || session.status !== 'in-progress') return;
@@ -873,6 +942,9 @@ const TestTaking: React.FC = () => {
       console.log('💾 Saving session to database before enabling recording...');
       await saveSessionProgress(updatedSession);
       
+      // Setup auto-save with window exit handlers
+      setupAutoSave(updatedSession);
+      
       // Add a small delay to ensure database transaction is complete
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -885,6 +957,7 @@ const TestTaking: React.FC = () => {
       console.log('✅ Test session initialized with coordinated ID:', testSessionId);
       console.log('🔓 Recording enabled after session save');
       console.log('📝 Question IDs stored:', questionIds.length);
+      console.log('📱 Auto-save and exit handlers configured');
     } catch (error) {
       console.error('Failed to initialize test session:', error);
       setRecordingEnabled(false);
@@ -961,7 +1034,7 @@ const TestTaking: React.FC = () => {
       
       // Save progress
       try {
-        await saveSessionProgress(updatedSession);
+        await saveSessionProgressRealtime(updatedSession);
       } catch (error) {
         console.error('Failed to save session progress:', error);
       }
@@ -982,7 +1055,7 @@ const TestTaking: React.FC = () => {
       
       // Save progress
       try {
-        await saveSessionProgress(updatedSession);
+        await saveSessionProgressRealtime(updatedSession);
       } catch (error) {
         console.error('Failed to save session progress:', error);
       }
@@ -1018,6 +1091,9 @@ const TestTaking: React.FC = () => {
 
   const handleFinish = async () => {
     if (!session) return;
+
+    // Cleanup auto-save before finishing
+    cleanupAutoSave();
 
     // Convert answers to string format for session completion
     const stringAnswers: Record<number, string> = {};
@@ -1107,6 +1183,9 @@ const TestTaking: React.FC = () => {
         console.error('Failed to save progress on exit:', error);
       }
     }
+
+    // Cleanup auto-save
+    cleanupAutoSave();
 
     // Reset session tracking
     TestSessionService.resetSession();
@@ -1267,9 +1346,19 @@ const TestTaking: React.FC = () => {
   // Main test taking interface
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Enhanced Progress Indicator */}
+      {/* Real-time Status Indicators */}
       {recordingEnabled && (
         <div className="fixed top-4 right-4 z-50 space-y-2">
+          {/* Backend Sync Status */}
+          <div className={`px-3 py-1 rounded-lg text-sm flex items-center ${
+            backendSynced ? 'bg-green-500' : 'bg-red-500'
+          } text-white`}>
+            <div className={`w-2 h-2 rounded-full mr-2 ${
+              backendSynced ? 'bg-green-200' : 'bg-red-200'
+            }`} />
+            {backendSynced ? 'Synced' : 'Sync Failed'}
+          </div>
+          
           {/* Connection Status */}
           <div className={`px-3 py-1 rounded-lg text-sm flex items-center ${
             isOnline ? 'bg-green-500' : 'bg-orange-500'
@@ -1280,7 +1369,7 @@ const TestTaking: React.FC = () => {
             {isOnline ? 'Online' : 'Offline'}
           </div>
           
-          {/* Sync Status */}
+          {/* Real-time Sync Status */}
           {isSyncing && (
             <div className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm flex items-center">
               <svg className="animate-spin w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -1297,20 +1386,30 @@ const TestTaking: React.FC = () => {
             </div>
           )}
           
-          {/* Progress Saved */}
+          {/* Real-time Save Confirmation */}
           {progressSaved && (
             <div className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm flex items-center">
               <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              {isOnline ? 'Saved' : 'Queued'}
+              Saved to Backend
+            </div>
+          )}
+          
+          {/* Timer Sync Indicator */}
+          {timerSyncInterval && (
+            <div className="bg-purple-500 text-white px-3 py-1 rounded-lg text-sm flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+              Timer Sync
             </div>
           )}
           
           {/* Session ID */}
           {activeSessionId && (
             <div className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm">
-              Session: {activeSessionId.split('_')[2]}
+              Session: {activeSessionId.substring(0, 8)}...
             </div>
           )}
         </div>

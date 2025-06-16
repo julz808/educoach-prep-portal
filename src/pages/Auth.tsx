@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,15 +7,25 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, School, GraduationCap, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/context/AuthContext";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { resendVerificationEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [studentFirstName, setStudentFirstName] = useState("");
+  const [studentLastName, setStudentLastName] = useState("");
+  const [parentFirstName, setParentFirstName] = useState("");
+  const [parentLastName, setParentLastName] = useState("");
+  const [schoolName, setSchoolName] = useState("");
+  const [yearLevel, setYearLevel] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   // Clean up auth state to avoid issues
   const cleanupAuthState = () => {
@@ -50,6 +59,11 @@ const Auth = () => {
       
       if (error) throw error;
       
+      // Check if email is verified
+      if (data.user && !data.user.email_confirmed_at) {
+        toast.warning('Please verify your email address to access all features.');
+      }
+      
       toast.success("Successfully signed in!");
       navigate("/dashboard");
     } catch (error: any) {
@@ -68,23 +82,79 @@ const Auth = () => {
       cleanupAuthState();
       
       // Sign up
-      const { data, error } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            username,
-            full_name: fullName,
-          }
-        }
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       
-      if (error) throw error;
+      if (authError) throw authError;
+      
+      if (authData.user) {
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: authData.user.id,
+            student_first_name: studentFirstName,
+            student_last_name: studentLastName,
+            parent_first_name: parentFirstName,
+            parent_last_name: parentLastName,
+            school_name: schoolName,
+            year_level: parseInt(yearLevel),
+            display_name: `${studentFirstName} ${studentLastName}`,
+          });
+
+        if (profileError) throw profileError;
+
+        // Initialize progress for all products
+        const products = [
+          'VIC Selective Entry (Year 9 Entry)',
+          'NSW Selective Entry (Year 7 Entry)',
+          'Year 5 NAPLAN',
+          'Year 7 NAPLAN',
+          'EduTest Scholarship (Year 7 Entry)',
+          'ACER Scholarship (Year 7 Entry)'
+        ];
+
+        const { error: progressError } = await supabase
+          .from('user_progress')
+          .insert(
+            products.map(product => ({
+              user_id: authData.user.id,
+              product_type: product
+            }))
+          );
+
+        if (progressError) throw progressError;
+      }
       
       toast.success("Account created! Please check your email for verification.");
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Error creating account");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Password reset instructions sent to your email!");
+      setShowResetPassword(false);
+    } catch (error: any) {
+      toast.error(error.message || "Error sending reset instructions");
     } finally {
       setIsLoading(false);
     }
@@ -106,46 +176,95 @@ const Auth = () => {
           </TabsList>
           
           <TabsContent value="login">
-            <form onSubmit={handleSignIn}>
-              <CardContent className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="example@email.com"
-                      className="pl-8"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+            {showResetPassword ? (
+              <form onSubmit={handleResetPassword}>
+                <CardContent className="space-y-4 pt-4">
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Enter your email address and we'll send you instructions to reset your password.
+                    </AlertDescription>
+                  </Alert>
+                  <div className="space-y-2">
+                    <Label htmlFor="reset-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="example@email.com"
+                        className="pl-8"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      className="pl-8"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-2">
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send Reset Instructions"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setShowResetPassword(false)}
+                  >
+                    Back to Login
+                  </Button>
+                </CardFooter>
+              </form>
+            ) : (
+              <form onSubmit={handleSignIn}>
+                <CardContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="example@email.com"
+                        className="pl-8"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing In..." : "Sign In"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </CardFooter>
-            </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="pl-8"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-2">
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Signing In..." : "Sign In"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setShowResetPassword(true)}
+                  >
+                    Forgot Password?
+                  </Button>
+                </CardFooter>
+              </form>
+            )}
           </TabsContent>
           
           <TabsContent value="register">
@@ -167,33 +286,101 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="studentFirstName">Student First Name</Label>
                   <div className="relative">
                     <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="username"
+                      id="studentFirstName"
                       type="text"
-                      placeholder="johndoe"
+                      placeholder="John"
                       className="pl-8"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      value={studentFirstName}
+                      onChange={(e) => setStudentFirstName(e.target.value)}
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="studentLastName">Student Last Name</Label>
                   <div className="relative">
                     <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="fullName"
+                      id="studentLastName"
                       type="text"
-                      placeholder="John Doe"
+                      placeholder="Doe"
                       className="pl-8"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      value={studentLastName}
+                      onChange={(e) => setStudentLastName(e.target.value)}
                       required
                     />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="parentFirstName">Parent First Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="parentFirstName"
+                      type="text"
+                      placeholder="Jane"
+                      className="pl-8"
+                      value={parentFirstName}
+                      onChange={(e) => setParentFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="parentLastName">Parent Last Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="parentLastName"
+                      type="text"
+                      placeholder="Doe"
+                      className="pl-8"
+                      value={parentLastName}
+                      onChange={(e) => setParentLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="schoolName">School Name</Label>
+                  <div className="relative">
+                    <School className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="schoolName"
+                      type="text"
+                      placeholder="Your School"
+                      className="pl-8"
+                      value={schoolName}
+                      onChange={(e) => setSchoolName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="yearLevel">Year Level</Label>
+                  <div className="relative">
+                    <GraduationCap className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Select
+                      value={yearLevel}
+                      onValueChange={setYearLevel}
+                      required
+                    >
+                      <SelectTrigger className="pl-8">
+                        <SelectValue placeholder="Select year level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">Year 5</SelectItem>
+                        <SelectItem value="6">Year 6</SelectItem>
+                        <SelectItem value="7">Year 7</SelectItem>
+                        <SelectItem value="8">Year 8</SelectItem>
+                        <SelectItem value="9">Year 9</SelectItem>
+                        <SelectItem value="10">Year 10</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-2">

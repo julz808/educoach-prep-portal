@@ -7,8 +7,11 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - ✅ Database schema, migrations, and RLS policies complete
 - ✅ Authentication system implemented (Supabase Auth)
 - ✅ User profile and product management in place
-- ❌ Frontend/backend integration in progress
-- ❌ Test taking, progress tracking, and analytics pending
+- ✅ Real-time session management system implemented
+- ✅ Test taking system complete (all modes: diagnostic, practice, drill)
+- ✅ Progress tracking and persistence complete
+- ✅ Dashboard backend integration complete
+- ⏳ Performance analytics and insights in progress
 
 ## Tech Stack
 - **Frontend:** React (Vite, TypeScript, shadcn/ui, TailwindCSS, React Router, TanStack Query)
@@ -31,14 +34,24 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - **drill_sessions:** Drill attempts, sub-skill, difficulty, answers
 - **question_attempt_history:** All question attempts, correctness, time spent
 
-## Key Tasks Needed
-- [ ] Connect frontend to backend for test sessions, drills, and progress
-- [ ] Implement test session creation, save/resume, and completion
-- [ ] Integrate question loading and answer submission
-- [ ] Build dashboard metrics and analytics
-- [ ] Add error handling and edge case management
+## Completed Tasks
+- [x] Connect frontend to backend for test sessions, drills, and progress
+- [x] Implement test session creation, save/resume, and completion
+- [x] Integrate question loading and answer submission
+- [x] Real-time answer submission and persistence
+- [x] Auto-save functionality with window exit handlers
+- [x] Session state restoration (answers, flags, timer)
+- [x] Dashboard metrics with real backend data
+- [x] Cross-device session synchronization
+- [x] Offline support with sync queue
+
+## Remaining Tasks
+- [ ] Advanced performance analytics and insights
+- [ ] Detailed progress reports and recommendations
+- [ ] Add comprehensive error handling and edge cases
 - [ ] Refactor for best practices and code clarity
 - [ ] Add and improve unit/integration tests
+- [ ] Production deployment preparation
 
 ## Common Commands
 
@@ -105,21 +118,47 @@ Practice: 'practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'
 Drill: 'drill'
 ```
 
-## Implementation Priority
+## Current Implementation Priority
 
-1. Connect frontend and backend for test sessions and drills
-2. Implement answer submission and progress tracking
-3. Build dashboard and analytics
-4. Add error handling and edge case management
-5. Refactor for best practices and maintainability
-6. Expand and improve test coverage
+1. ✅ ~~Connect frontend and backend for test sessions and drills~~
+2. ✅ ~~Implement answer submission and progress tracking~~
+3. ✅ ~~Build dashboard and analytics~~
+4. ⏳ Advanced performance insights and analytics
+5. ⏳ Add comprehensive error handling and edge cases
+6. ⏳ Refactor for best practices and maintainability
+7. ⏳ Expand and improve test coverage
+8. ⏳ Production deployment preparation
 
-## Known Issues
+## Development Guidelines
 
-- Frontend/backend integration incomplete
-- Test session save/resume logic needs implementation
-- Dashboard metrics not yet connected to backend
-- Error handling and edge case coverage incomplete
+### UI/Frontend Changes
+- **Preserve existing look and feel** - only modify backend integration logic
+- **No major UI redesigns** unless specifically requested
+- **Focus on functionality**, not visual changes
+- **Maintain current user experience** while enhancing backend connectivity
+
+### Backend/Database Changes
+- **Supabase schema should remain stable** - avoid table structure changes
+- **Add database functions as needed** for new functionality
+- **Update database-schema.sql only when necessary**
+- **Focus on enhancing existing tables** rather than creating new ones
+
+## Recently Completed (Latest)
+
+### Real-time Session Management System
+- ✅ Immediate backend persistence for all user actions
+- ✅ Perfect session resume functionality
+- ✅ Real-time flag and timer synchronization
+- ✅ Complete elimination of localStorage dependency
+- ✅ Multi-table coordinated updates
+- ✅ Enhanced UI status indicators
+- ✅ Cross-platform state synchronization
+
+## Remaining Issues
+
+- Advanced analytics queries need optimization
+- Comprehensive error handling coverage incomplete
+- Unit test coverage needs expansion
 
 ## Testing Approach
 
@@ -143,17 +182,37 @@ Drill: 'drill'
 claude "Show me which components are using mock data instead of real database queries"
 
 # Connect specific feature
-claude "Connect the dashboard MetricsCard to the user_progress table following the query pattern in this file"
+claude "Connect the insights analytics to the user_sub_skill_performance table following the existing query patterns"
 
 # Debug issues
-claude "The test session isn't saving. Help me debug the save_state functionality"
+claude "The performance analytics are loading slowly. Help optimize the database queries"
 
 # Best practices
-claude "Review the authentication flow and suggest improvements following React/TypeScript best practices"
+claude "Review the session management flow and suggest improvements following React/TypeScript best practices"
+
+# Data analysis
+claude "Create performance insights queries that analyze user progress across all test modes"
 ```
 
-## Other Notes
+## Implementation Files
 
-- See `README.md` for detailed schema and implementation flows
-- See `implementation-plan.md` for phased task breakdown
-- Use Claude Code for code review, refactoring, and connecting frontend/backend logic 
+- `README.md` - Detailed schema and implementation flows
+- `implementation-plan.md` - Phased task breakdown and current status
+- `REALTIME_SESSION_IMPLEMENTATION.md` - Complete technical documentation for session system
+- `supabase-realtime-functions.sql` - Database functions for real-time operations
+- `test-realtime-session.md` - Testing guide for session functionality
+
+## Architecture Notes
+
+- **Real-time persistence**: All user actions save to backend immediately
+- **Backend-driven state**: No localStorage dependency, database is single source of truth
+- **Multi-table coordination**: Updates across user_test_sessions, test_section_states, question_attempt_history
+- **Cross-platform sync**: Session state synchronized across all devices and tabs
+- **Offline resilience**: Answer queuing with automatic sync on reconnection
+
+## Use Claude Code for:
+- Performance optimization of database queries
+- Advanced analytics implementation
+- Error handling and edge case coverage
+- Code review and refactoring
+- Testing strategy development 
