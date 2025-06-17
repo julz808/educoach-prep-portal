@@ -11,7 +11,7 @@ import {
   CheckCircle, CheckCircle2, AlertCircle, Brain, Star, Zap, Flag,
   RotateCcw, ArrowLeft, Award, TrendingUp, Users, Timer,
   Home, MessageSquare, Calculator, PieChart, 
-  PenTool, Palette
+  PenTool, Palette, Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
@@ -22,6 +22,8 @@ import {
   type TestSection,
   type OrganizedQuestion
 } from '@/services/supabaseQuestionService';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SubSkillProgress {
   easy: { completed: number; total: number; bestScore?: number };
@@ -62,6 +64,7 @@ const Drill: React.FC = () => {
   
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadDrillData = async () => {
@@ -345,6 +348,157 @@ const Drill: React.FC = () => {
     return recommended.slice(0, 3);
   };
 
+  // Development Tools Functions
+  const handleClearProgress = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Clear all drill progress? This will delete all sessions and progress data.')) {
+      try {
+        // Clear all user_test_sessions for this user/product/mode
+        const { error: sessionsError } = await supabase
+          .from('user_test_sessions')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .eq('test_mode', 'drill');
+
+        if (sessionsError) throw sessionsError;
+        
+        console.log('✅ DEV: Cleared all drill sessions');
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to clear progress:', error);
+        alert('Failed to clear progress. Check console for details.');
+      }
+    }
+  };
+
+  const handleHalfComplete = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Set drills to half-complete state with mixed progress?')) {
+      try {
+        // Get all sub-skills from all skill areas
+        const allSubSkills = skillAreas.flatMap(area => area.subSkills);
+        
+        for (let i = 0; i < allSubSkills.length; i++) {
+          const subSkill = allSubSkills[i];
+          const difficulties = ['easy', 'medium', 'hard'];
+          
+          for (let j = 0; j < difficulties.length; j++) {
+            const difficulty = difficulties[j];
+            let sessionData = null;
+            
+            // Create a mix of statuses
+            const sessionIndex = i * 3 + j; // Unique index for each difficulty level
+            
+            if (sessionIndex < Math.floor(allSubSkills.length * 0.3)) {
+              // 30% completed
+              const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+              sessionData = {
+                user_id: user.id,
+                product_type: selectedProduct,
+                test_mode: 'drill',
+                section_name: `${subSkill.name} - ${difficulty}`,
+                status: 'completed',
+                current_question_index: 5, // Assume 5 questions per drill
+                total_questions: 5,
+                final_score: mockScore,
+                session_data: {
+                  answers: {},
+                  timeRemaining: 0,
+                  flaggedQuestions: []
+                }
+              };
+            } else if (sessionIndex < Math.floor(allSubSkills.length * 0.6)) {
+              // 30% in-progress
+              sessionData = {
+                user_id: user.id,
+                product_type: selectedProduct,
+                test_mode: 'drill',
+                section_name: `${subSkill.name} - ${difficulty}`,
+                status: 'active',
+                current_question_index: 2, // Partially complete
+                total_questions: 5,
+                final_score: null,
+                session_data: {
+                  answers: {},
+                  timeRemaining: 600, // 10 minutes remaining
+                  flaggedQuestions: []
+                }
+              };
+            }
+            // 40% remain not-started (no session created)
+            
+            if (sessionData) {
+              const { error: sessionError } = await supabase
+                .from('user_test_sessions')
+                .insert(sessionData);
+
+              if (sessionError) throw sessionError;
+              
+              console.log(`✅ DEV: Created mock ${sessionData.status} session for ${subSkill.name} - ${difficulty}`);
+            }
+          }
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to set half-complete state:', error);
+        alert('Failed to set half-complete state. Check console for details.');
+      }
+    }
+  };
+
+  const handleFinishAll = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Complete all drill exercises with mock data?')) {
+      try {
+        const allSubSkills = skillAreas.flatMap(area => area.subSkills);
+        const difficulties = ['easy', 'medium', 'hard'];
+        
+        for (const subSkill of allSubSkills) {
+          for (const difficulty of difficulties) {
+            const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+            
+            // Create mock completed session
+            const { error: sessionError } = await supabase
+              .from('user_test_sessions')
+              .insert({
+                user_id: user.id,
+                product_type: selectedProduct,
+                test_mode: 'drill',
+                section_name: `${subSkill.name} - ${difficulty}`,
+                status: 'completed',
+                current_question_index: 5, // Assume 5 questions per drill
+                total_questions: 5,
+                final_score: mockScore,
+                session_data: {
+                  answers: {},
+                  timeRemaining: 0,
+                  flaggedQuestions: []
+                }
+              });
+
+            if (sessionError) throw sessionError;
+            
+            console.log(`✅ DEV: Created mock session for ${subSkill.name} - ${difficulty}`);
+          }
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to complete all drills:', error);
+        alert('Failed to complete all drills. Check console for details.');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -543,6 +697,49 @@ const Drill: React.FC = () => {
     <div className="space-y-8">
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
+
+      {/* Development Tools - Only show in development */}
+      {import.meta.env.DEV && (
+        <Card className="border-2 border-red-200 bg-red-50/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-red-800 flex items-center space-x-2">
+              <Zap size={16} />
+              <span>Development Tools - Skill Drills</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleClearProgress}
+                className="border-red-300 text-red-700 hover:bg-red-100"
+              >
+                <Trash2 size={14} className="mr-1" />
+                Clear All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleHalfComplete}
+                className="border-amber-300 text-amber-700 hover:bg-amber-100"
+              >
+                <Target size={14} className="mr-1" />
+                Half Complete
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleFinishAll}
+                className="border-green-300 text-green-700 hover:bg-green-100"
+              >
+                <CheckCircle size={14} className="mr-1" />
+                Finish All
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Skill Areas - Single Column */}
       <div>

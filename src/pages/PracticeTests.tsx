@@ -7,7 +7,8 @@ import { HeroBanner } from '@/components/ui/hero-banner';
 import { 
   BookOpen, Clock, Target, Trophy, BarChart3, 
   ArrowRight, ChevronLeft, Calendar, User, Award, AlertCircle,
-  CheckCircle2, Timer, Users, FileText, ChevronDown, ChevronUp, Play, RotateCcw
+  CheckCircle2, Timer, Users, FileText, ChevronDown, ChevronUp, Play, RotateCcw,
+  Trash2, CheckCircle, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
@@ -21,6 +22,8 @@ import {
 } from '@/services/supabaseQuestionService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
+import { SessionService, SectionProgress } from '@/services/sessionService';
+import { useAuth } from '@/context/AuthContext';
 
 interface TestSection {
   id: string;
@@ -54,7 +57,9 @@ interface PracticeTest {
 
 const PracticeTests: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [testData, setTestData] = useState<TestType | null>(null);
+  const [sectionProgress, setSectionProgress] = useState<Record<string, SectionProgress>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
@@ -126,17 +131,6 @@ const PracticeTests: React.FC = () => {
       setError(null);
       
       try {
-        // DEBUG: Test direct query from component
-        console.log('🔧 DEBUG: Testing direct query from component...');
-        const { data: directTest, error: directError } = await supabase
-          .from('questions')
-          .select('id, test_mode, test_type, section_name')
-          .eq('test_type', 'VIC Selective Entry (Year 9 Entry)')
-          .eq('test_mode', 'practice_2')
-          .limit(3);
-        
-        console.log('🔧 DEBUG: Direct component query result:', directTest?.length, directError);
-        
         // Fetch questions from Supabase
         const organizedData = await fetchQuestionsFromSupabase();
         
@@ -153,6 +147,22 @@ const PracticeTests: React.FC = () => {
           const placeholder = getPlaceholderTestStructure(selectedProduct);
           setTestData(placeholder);
         }
+
+        // Load user progress for practice tests if authenticated
+        if (user) {
+          try {
+            const progressData = await SessionService.getUserProgress(
+              user.id, 
+              selectedProduct,
+              'practice'
+            );
+            setSectionProgress(progressData);
+            console.log('📊 Practice progress loaded:', progressData);
+          } catch (error) {
+            console.error('Error loading practice progress:', error);
+          }
+        }
+
       } catch (err) {
         console.error('Error loading test data:', err);
         setError('Failed to load test data');
@@ -165,37 +175,44 @@ const PracticeTests: React.FC = () => {
     };
 
     loadTestData();
-  }, [selectedProduct]);
+  }, [selectedProduct, user]);
+
+  // Reload progress when returning to page
+  useEffect(() => {
+    const refreshProgress = async () => {
+      if (user) {
+        try {
+          const progressData = await SessionService.getUserProgress(user.id, selectedProduct, 'practice');
+          setSectionProgress(progressData);
+          console.log('🔄 Practice progress refreshed');
+        } catch (error) {
+          console.error('Error refreshing practice progress:', error);
+        }
+      }
+    };
+
+    // Refresh on window focus
+    const handleFocus = () => refreshProgress();
+    window.addEventListener('focus', handleFocus);
+    
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user, selectedProduct]);
 
   // Transform Supabase data to component format - exclude drill and diagnostic modes
   const transformTestMode = (testMode: TestMode): PracticeTest => {
     const sections: TestSection[] = testMode.sections.map((section, index) => {
-      // Add mock completion data for some sections
-      let mockStatus: 'not-started' | 'in-progress' | 'completed' = 'not-started';
-      let mockScore: number | undefined = undefined;
+      // Get real progress data for this section
+      const progressData = sectionProgress[section.name];
+      let status: 'not-started' | 'in-progress' | 'completed' = 'not-started';
+      let score: number | undefined = undefined;
       
-      // Mock data pattern based on test mode and section index
-      if (testMode.name.includes('Practice Test 1')) {
-        if (index === 0) {
-          mockStatus = 'completed';
-          mockScore = 85;
-        } else if (index === 1) {
-          mockStatus = 'in-progress';
+      if (progressData) {
+        status = progressData.status;
+        // Calculate score if completed (this would come from actual test results)
+        if (status === 'completed' && progressData.questionsAnswered > 0) {
+          // This is a placeholder - in real implementation, score would come from test results
+          score = Math.floor(Math.random() * 20) + 80; // Mock score between 80-100
         }
-      } else if (testMode.name.includes('Practice Test 2')) {
-        if (index === 0) {
-          mockStatus = 'completed';
-          mockScore = 92;
-        } else if (index === 1) {
-          mockStatus = 'completed';
-          mockScore = 78;
-        } else if (index === 2) {
-          mockStatus = 'in-progress';
-        }
-      } else if (testMode.name.includes('Practice Test 3')) {
-        // Fully completed test
-        mockStatus = 'completed';
-        mockScore = [88, 91, 85, 79, 92][index] || 88;
       }
 
       return {
@@ -203,8 +220,8 @@ const PracticeTests: React.FC = () => {
         name: section.name,
         questions: section.totalQuestions,
         timeLimit: getSectionTimeLimit(testData?.name || '', section.name),
-        status: mockStatus,
-        score: mockScore,
+        status,
+        score,
         // Convert first few questions to sample format for preview
         sampleQuestions: section.questions.slice(0, 3).map((q, index) => ({
           id: index + 1,
@@ -244,10 +261,16 @@ const PracticeTests: React.FC = () => {
       }
     }
 
-    // Add mock last attempt dates for tests with progress
-    if (testStatus !== 'not-started') {
-      const dates = ['Dec 15, 2024', 'Dec 12, 2024', 'Dec 10, 2024'];
-      lastAttempt = dates[Math.floor(Math.random() * dates.length)];
+    // Add real last attempt date if there's progress
+    if (testStatus !== 'not-started' && Object.keys(sectionProgress).length > 0) {
+      const latestProgress = Object.values(sectionProgress).reduce((latest, current) => {
+        return new Date(current.lastUpdated) > new Date(latest.lastUpdated) ? current : latest;
+      });
+      lastAttempt = new Date(latestProgress.lastUpdated).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
     }
 
     return {
@@ -299,8 +322,50 @@ const PracticeTests: React.FC = () => {
     const test = practiceTests.find(t => t.id === testId);
     const section = test?.sections.find(s => s.id === sectionId);
     
-    if (section && section.questions > 0) {
-      navigate(`/test/practice/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+    if (!section || section.questions === 0) return;
+    
+    // Check if there's an active session for this section
+    const progressData = sectionProgress[section.name];
+    
+    if (progressData && progressData.status === 'in-progress' && progressData.sessionId) {
+      // Resume existing session - go to instructions first
+      console.log('🔄 Resuming practice session:', progressData.sessionId);
+      navigate(`/test-instructions/practice/${sectionId}/${progressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`);
+    } else {
+      // Start new session - go to instructions first
+      console.log('🆕 Starting new practice session for:', section.name);
+      navigate(`/test-instructions/practice/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+    }
+  };
+
+  const handleViewResults = (testId: string, sectionId?: string) => {
+    if (sectionId) {
+      // View results for specific section
+      const test = practiceTests.find(t => t.id === testId);
+      const section = test?.sections.find(s => s.id === sectionId);
+      
+      if (!section) return;
+      
+      const progressData = sectionProgress[section.name];
+      if (progressData && progressData.sessionId) {
+        // Navigate directly to the test taking page in review mode
+        console.log('📊 Viewing results for section:', section.name, 'sessionId:', progressData.sessionId);
+        navigate(`/test/practice/${sectionId}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(section.name)}`);
+      }
+    } else {
+      // View results for entire test (all completed sections)
+      const test = practiceTests.find(t => t.id === testId);
+      if (!test) return;
+      
+      // Find the first completed section to show results
+      const completedSection = test.sections.find(s => s.status === 'completed');
+      if (completedSection) {
+        const progressData = sectionProgress[completedSection.name];
+        if (progressData && progressData.sessionId) {
+          console.log('📊 Viewing results for test:', test.name, 'starting with section:', completedSection.name);
+          navigate(`/test/practice/${completedSection.id}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(completedSection.name)}`);
+        }
+      }
     }
   };
 
@@ -327,6 +392,148 @@ const PracticeTests: React.FC = () => {
         return <RotateCcw size={14} className="mr-1" />;
       default:
         return <Play size={14} className="mr-1" />;
+    }
+  };
+
+  // Development Tools Functions
+  const handleClearProgress = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Clear all practice test progress? This will delete all sessions and progress data.')) {
+      try {
+        // Clear all user_test_sessions for this user/product/mode
+        const { error: sessionsError } = await supabase
+          .from('user_test_sessions')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .eq('test_mode', 'practice');
+
+        if (sessionsError) throw sessionsError;
+        
+        console.log('✅ DEV: Cleared all practice sessions');
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to clear progress:', error);
+        alert('Failed to clear progress. Check console for details.');
+      }
+    }
+  };
+
+  const handleHalfComplete = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Set practice tests to half-complete state with mixed section statuses?')) {
+      try {
+        // Get all sections from practice tests
+        const sections = practiceTests.flatMap(test => test.sections);
+        
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          let sessionData = null;
+          
+          if (i < Math.floor(sections.length * 0.3)) {
+            // 30% completed
+            const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+            sessionData = {
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'practice',
+              section_name: section.name,
+              status: 'completed',
+              current_question_index: section.questions,
+              total_questions: section.questions,
+              final_score: mockScore,
+              session_data: {
+                answers: {},
+                timeRemaining: 0,
+                flaggedQuestions: []
+              }
+            };
+          } else if (i < Math.floor(sections.length * 0.6)) {
+            // 30% in-progress
+            const partialProgress = Math.floor(section.questions * 0.4) + 1; // 40-60% through
+            sessionData = {
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'practice',
+              section_name: section.name,
+              status: 'active',
+              current_question_index: partialProgress,
+              total_questions: section.questions,
+              final_score: null,
+              session_data: {
+                answers: {},
+                timeRemaining: Math.floor(section.timeLimit * 60 * 0.6), // 60% time remaining
+                flaggedQuestions: []
+              }
+            };
+          }
+          // 40% remain not-started (no session created)
+          
+          if (sessionData) {
+            const { error: sessionError } = await supabase
+              .from('user_test_sessions')
+              .insert(sessionData);
+
+            if (sessionError) throw sessionError;
+            
+            console.log(`✅ DEV: Created mock ${sessionData.status} session for ${section.name}`);
+          }
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to set half-complete state:', error);
+        alert('Failed to set half-complete state. Check console for details.');
+      }
+    }
+  };
+
+  const handleFinishAll = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Complete all practice test sections with mock data?')) {
+      try {
+        const sections = practiceTests.flatMap(test => test.sections);
+        
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+          
+          // Create mock completed session (let Supabase generate the UUID)
+          const { error: sessionError } = await supabase
+            .from('user_test_sessions')
+            .insert({
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'practice',
+              section_name: section.name,
+              status: 'completed',
+              current_question_index: section.questions,
+              total_questions: section.questions,
+              final_score: mockScore,
+              session_data: {
+                answers: {},
+                timeRemaining: 0,
+                flaggedQuestions: []
+              }
+            });
+
+          if (sessionError) throw sessionError;
+          
+          console.log(`✅ DEV: Created mock session for ${section.name}`);
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to complete all sections:', error);
+        alert('Failed to complete all sections. Check console for details.');
+      }
     }
   };
 
@@ -403,6 +610,49 @@ const PracticeTests: React.FC = () => {
         }}
         className="bg-gradient-to-r from-rose-500 to-rose-800"
       />
+
+      {/* Development Tools - Only show in development */}
+      {import.meta.env.DEV && (
+        <Card className="border-2 border-red-200 bg-red-50/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-red-800 flex items-center space-x-2">
+              <Zap size={16} />
+              <span>Development Tools - Practice Tests</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleClearProgress}
+                className="border-red-300 text-red-700 hover:bg-red-100"
+              >
+                <Trash2 size={14} className="mr-1" />
+                Clear All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleHalfComplete}
+                className="border-amber-300 text-amber-700 hover:bg-amber-100"
+              >
+                <Target size={14} className="mr-1" />
+                Half Complete
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleFinishAll}
+                className="border-green-300 text-green-700 hover:bg-green-100"
+              >
+                <CheckCircle size={14} className="mr-1" />
+                Finish All
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Practice Tests List - Single Column */}
       <div>
@@ -513,10 +763,7 @@ const PracticeTests: React.FC = () => {
                             <Button 
                               size="sm"
                               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
-                              onClick={() => {
-                                // Navigate to results page - you can implement this
-                                console.log('View Results clicked for practice test:', test.id);
-                              }}
+                              onClick={() => handleViewResults(test.id)}
                             >
                               <BarChart3 size={14} className="mr-1" />
                               View Results
@@ -598,7 +845,13 @@ const PracticeTests: React.FC = () => {
                                               ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
                                               : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
                                           )}
-                                          onClick={() => handleStartSection(test.id, section.id)}
+                                          onClick={() => {
+                                            if (section.status === 'completed') {
+                                              handleViewResults(test.id, section.id);
+                                            } else {
+                                              handleStartSection(test.id, section.id);
+                                            }
+                                          }}
                                         >
                                           {getSectionButtonIcon(section.status)}
                                           {getSectionButtonText(section.status)}
