@@ -856,11 +856,11 @@ const TestTaking: React.FC = () => {
     
     // Navigate to the correct page based on test type
     if (testType === 'diagnostic') {
-      navigate('/diagnostic');
+      navigate('/dashboard/diagnostic');
     } else if (testType === 'practice') {
-      navigate('/practice');
+      navigate('/dashboard/practice-tests');
     } else if (testType === 'drill') {
-      navigate('/drill');
+      navigate('/dashboard/drill');
     } else {
       // Fallback to general dashboard
       navigate('/dashboard');
@@ -873,11 +873,11 @@ const TestTaking: React.FC = () => {
     
     // Navigate to the correct page based on test type
     if (testType === 'diagnostic') {
-      navigate('/diagnostic');
+      navigate('/dashboard/diagnostic');
     } else if (testType === 'practice') {
-      navigate('/practice');
+      navigate('/dashboard/practice-tests');
     } else if (testType === 'drill') {
-      navigate('/drill');
+      navigate('/dashboard/drill');
     } else {
       // Fallback to general dashboard
       navigate('/dashboard');
@@ -908,7 +908,7 @@ const TestTaking: React.FC = () => {
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Error Loading Test</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => navigate('/diagnostic')}>
+            <Button onClick={() => navigate('/dashboard/diagnostic')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
