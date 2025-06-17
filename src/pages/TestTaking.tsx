@@ -846,9 +846,13 @@ const TestTaking: React.FC = () => {
     console.log('🚪 EXIT: Current session status:', session?.status);
     console.log('🚪 EXIT: Session ID:', session?.id);
     
-    // Always save on exit to catch any written responses or other unsaved data
-    await saveProgress();
-    console.log('🚪 EXIT: Final save complete, navigating to correct page');
+    // Only save progress if not in review mode (review mode should be read-only)
+    if (session?.status !== 'review') {
+      await saveProgress();
+      console.log('🚪 EXIT: Final save complete, navigating to correct page');
+    } else {
+      console.log('🚪 EXIT: Skipping save in review mode, navigating to correct page');
+    }
     
     // Navigate to the correct page based on test type
     if (testType === 'diagnostic') {
