@@ -7,7 +7,8 @@ import { HeroBanner } from '@/components/ui/hero-banner';
 import { 
   BookOpen, Clock, Target, Trophy, BarChart3, 
   ArrowRight, ChevronLeft, Calendar, User, Award, AlertCircle,
-  CheckCircle2, Timer, Users, FileText, ChevronDown, ChevronUp, Play, RotateCcw, Activity
+  CheckCircle2, Timer, Users, FileText, ChevronDown, ChevronUp, Play, RotateCcw, Activity,
+  Trash2, CheckCircle, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
@@ -18,8 +19,9 @@ import {
   type TestSection 
 } from '@/services/supabaseQuestionService';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
-import { SessionPersistenceService, SectionProgress } from '@/services/sessionPersistenceService';
+import { SessionService, SectionProgress } from '@/services/sessionService';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DiagnosticSection {
   id: string;
@@ -137,13 +139,18 @@ const DiagnosticTests: React.FC = () => {
         
         // Load user progress if authenticated
         if (user) {
-          console.log('👤 User is authenticated, loading progress for:', user.id);
-          const progressData = await SessionPersistenceService.getDiagnosticProgress(
-            user.id, 
-            selectedProduct
-          );
-          setSectionProgress(progressData);
-          console.log('📊 Progress data loaded:', progressData);
+          console.log('👤 User is authenticated, loading progress for:', user.id, 'product:', selectedProduct);
+          try {
+            const progressData = await SessionService.getUserProgress(
+              user.id, 
+              selectedProduct,
+              'diagnostic'
+            );
+            setSectionProgress(progressData);
+            console.log('📊 Progress data loaded successfully:', progressData);
+          } catch (error) {
+            console.error('❌ Error loading diagnostic progress:', error);
+          }
         } else {
           console.log('❌ No user found, skipping progress load');
         }
@@ -162,6 +169,36 @@ const DiagnosticTests: React.FC = () => {
 
     loadDiagnosticData();
   }, [selectedProduct, user]);
+  
+  // Reload progress when returning to page
+  useEffect(() => {
+    const refreshProgress = async () => {
+      if (user) {
+        try {
+          console.log('🔄 REFRESH: Refreshing progress data...');
+          const progressData = await SessionService.getUserProgress(user.id, selectedProduct, 'diagnostic');
+          setSectionProgress(progressData);
+          console.log('🔄 REFRESH: Progress refreshed with data:', progressData);
+          
+          // Log status of each section for debugging
+          Object.entries(progressData).forEach(([sectionName, progress]) => {
+            console.log(`🔄 REFRESH: Section "${sectionName}" - Status: ${progress.status}, SessionID: ${progress.sessionId}`);
+          });
+        } catch (error) {
+          console.error('Error refreshing progress:', error);
+        }
+      }
+    };
+
+    // Refresh on window focus
+    const handleFocus = () => {
+      console.log('🔄 REFRESH: Window focused, refreshing progress...');
+      refreshProgress();
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user, selectedProduct]);
 
   // Transform diagnostic modes to match our new structure with real progress data
   const transformDiagnosticMode = (mode: TestMode, progressData: Record<string, SectionProgress> = {}): DiagnosticTest => {
@@ -323,80 +360,96 @@ const DiagnosticTests: React.FC = () => {
   const handleStartSection = (sectionId: string, sectionName: string) => {
     const section = diagnosticTest?.sections.find(s => s.id === sectionId);
     
-    console.log('🎯 handleStartSection called:', {
-      sectionId,
-      sectionName,
-      section: section ? { id: section.id, name: section.name, status: section.status } : null,
-      availableProgress: Object.keys(sectionProgress),
-      sectionProgressDetails: sectionProgress
-    });
+    if (!section || section.questions === 0) return;
     
-    if (section && section.questions > 0) {
-      // Check if this section has an in-progress session with improved matching
-      let sectionProgressData = sectionProgress[section.name] || sectionProgress[section.id];
+    // Check if there's an active session for this section
+    const progressData = sectionProgress[sectionName];
+    
+    if (progressData && progressData.status === 'in-progress' && progressData.sessionId) {
+      // Resume existing session - go to instructions first
+      console.log('🔄 Resuming session:', progressData.sessionId);
+      navigate(`/test-instructions/diagnostic/${sectionId}/${progressData.sessionId}?sectionName=${encodeURIComponent(sectionName)}`);
+    } else {
+      // Start new session - go to instructions first
+      console.log('🆕 Starting new session for:', sectionName);
+      navigate(`/test-instructions/diagnostic/${sectionId}?sectionName=${encodeURIComponent(sectionName)}`);
+    }
+  };
+
+  const handleViewResults = (sectionId?: string) => {
+    console.log('🔍 handleViewResults called with sectionId:', sectionId);
+    console.log('🔍 Available sectionProgress:', sectionProgress);
+    
+    if (sectionId) {
+      // View results for specific section
+      const section = diagnosticTest?.sections.find(s => s.id === sectionId);
+      console.log('🔍 Found section:', section);
       
-      // If no exact match, try partial matching for section names
-      if (!sectionProgressData) {
-        const progressKeys = Object.keys(sectionProgress);
-        
-        // Look for partial matches (case-insensitive)
-        const partialMatch = progressKeys.find(key => {
-          const keyLower = key.toLowerCase();
-          const sectionLower = section.name.toLowerCase();
-          
-          // Check if either contains the other (for cases like "General Ability - Quantitative" vs "General Ability")
-          return keyLower.includes(sectionLower) || 
-                 sectionLower.includes(keyLower) ||
-                 // Check for common words (but exclude very short words)
-                 keyLower.split(/[\s-]+/).some(word => 
-                   word.length > 3 && sectionLower.includes(word)
-                 ) ||
-                 sectionLower.split(/[\s-]+/).some(word => 
-                   word.length > 3 && keyLower.includes(word)
-                 );
-        });
-        
-        if (partialMatch) {
-          sectionProgressData = sectionProgress[partialMatch];
-          console.log(`🔄 Found partial match for "${section.name}": using progress from "${partialMatch}"`);
+      if (!section) {
+        console.log('❌ No section found for id:', sectionId);
+        return;
+      }
+      
+      const progressData = sectionProgress[section.name];
+      console.log('🔍 Progress data for section', section.name, ':', progressData);
+      
+      if (progressData && progressData.sessionId) {
+        // Navigate directly to the test taking page in review mode
+        console.log('📊 Viewing results for section:', section.name, 'sessionId:', progressData.sessionId);
+        navigate(`/test/diagnostic/${sectionId}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(section.name)}`);
+      } else {
+        console.log('❌ No session ID found in progress data');
+        // Try to find a completed session directly from the database
+        findCompletedSession(section.name, sectionId);
+      }
+    } else {
+      // View results for entire test (all completed sections)
+      if (!diagnosticTest) {
+        console.log('❌ No diagnostic test available');
+        return;
+      }
+      
+      // Find the first completed section to show results
+      const completedSection = diagnosticTest.sections.find(s => s.status === 'completed');
+      if (completedSection) {
+        const progressData = sectionProgress[completedSection.name];
+        if (progressData && progressData.sessionId) {
+          console.log('📊 Viewing results for test:', diagnosticTest.name, 'starting with section:', completedSection.name);
+          navigate(`/test/diagnostic/${completedSection.id}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(completedSection.name)}`);
+        } else {
+          console.log('❌ No session ID found for completed section');
+          findCompletedSession(completedSection.name, completedSection.id);
         }
       }
-      
-      console.log('🔍 Section progress lookup:', {
-        sectionName: section.name,
-        sectionId: section.id,
-        progressByName: sectionProgress[section.name],
-        progressById: sectionProgress[section.id],
-        finalProgressData: sectionProgressData,
-        availableProgressKeys: Object.keys(sectionProgress),
-        sessionIdFromProgress: sectionProgressData?.sessionId,
-        statusFromProgress: sectionProgressData?.status,
-        hasSessionId: !!sectionProgressData?.sessionId,
-        sessionIdType: typeof sectionProgressData?.sessionId,
-        fullSectionProgress: sectionProgress,
-        sectionProgressDataStructure: sectionProgressData ? Object.keys(sectionProgressData) : 'No data'
-      });
-      
-      if (sectionProgressData && sectionProgressData.status === 'in-progress' && sectionProgressData.sessionId) {
-        // Resume existing session
-        console.log('🔄 Resuming session:', {
-          sessionId: sectionProgressData.sessionId,
-          sectionName: section.name,
-          navigateUrl: `/test/diagnostic/${sectionId}/${sectionProgressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`
-        });
-        navigate(`/test/diagnostic/${sectionId}/${sectionProgressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`);
+    }
+  };
+
+  // Helper function to find completed session from database
+  const findCompletedSession = async (sectionName: string, sectionId: string) => {
+    console.log('🔍 Searching for completed session for:', sectionName);
+    try {
+      const { data: sessions, error } = await supabase
+        .from('user_test_sessions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('product_type', selectedProduct)
+        .eq('test_mode', 'diagnostic')
+        .eq('section_name', sectionName)
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (sessions && sessions.length > 0) {
+        const sessionId = sessions[0].id;
+        console.log('✅ Found completed session:', sessionId);
+        navigate(`/test/diagnostic/${sectionId}/${sessionId}?review=true&sectionName=${encodeURIComponent(sectionName)}`);
       } else {
-        // Start new session
-        console.log('🆕 Starting new session for section:', {
-          sectionName: section.name,
-          reason: !sectionProgressData ? 'No progress data' : 
-                  sectionProgressData.status !== 'in-progress' ? `Status is ${sectionProgressData.status}` :
-                  !sectionProgressData.sessionId ? 'No session ID' : 'Unknown',
-          progressData: sectionProgressData,
-          navigateUrl: `/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`
-        });
-        navigate(`/test/diagnostic/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+        console.log('❌ No completed session found in database');
       }
+    } catch (error) {
+      console.error('Error finding completed session:', error);
     }
   };
 
@@ -488,6 +541,157 @@ const DiagnosticTests: React.FC = () => {
     );
   }
 
+  // Development utility functions
+  const handleClearProgress = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Clear all diagnostic progress? This cannot be undone.')) {
+      try {
+        // Clear all user_test_sessions for this user/product/mode
+        const { error: sessionsError } = await supabase
+          .from('user_test_sessions')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct)
+          .eq('test_mode', 'diagnostic');
+
+        if (sessionsError) throw sessionsError;
+
+        // Clear all test_section_states for this user/product
+        const { error: statesError } = await supabase
+          .from('test_section_states')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_type', selectedProduct);
+
+        if (statesError) throw statesError;
+
+        console.log('✅ DEV: Cleared all diagnostic progress');
+        
+        // Refresh the page data
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to clear progress:', error);
+        alert('Failed to clear progress. Check console for details.');
+      }
+    }
+  };
+
+  const handleHalfComplete = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Set half-complete state with mock data?')) {
+      try {
+        const sections = diagnosticTest?.sections || [];
+        
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          
+          // Create different states: completed, in-progress, or not-started
+          let sessionData;
+          if (i < Math.floor(sections.length * 0.3)) {
+            // 30% completed
+            const mockScore = Math.floor(Math.random() * 30) + 70;
+            sessionData = {
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'diagnostic',
+              section_name: section.name,
+              status: 'completed',
+              current_question_index: section.questions,
+              total_questions: section.questions,
+              final_score: mockScore,
+              session_data: {
+                answers: {},
+                timeRemaining: 0,
+                flaggedQuestions: []
+              }
+            };
+          } else if (i < Math.floor(sections.length * 0.6)) {
+            // 30% in-progress
+            const partialProgress = Math.floor(section.questions * 0.4) + 1; // 40-60% through
+            sessionData = {
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'diagnostic',
+              section_name: section.name,
+              status: 'active',
+              current_question_index: partialProgress,
+              total_questions: section.questions,
+              final_score: null,
+              session_data: {
+                answers: {},
+                timeRemaining: Math.floor(section.timeLimit * 60 * 0.6), // 60% time remaining
+                flaggedQuestions: []
+              }
+            };
+          }
+          // 40% remain not-started (no session created)
+          
+          if (sessionData) {
+            const { error: sessionError } = await supabase
+              .from('user_test_sessions')
+              .insert(sessionData);
+
+            if (sessionError) throw sessionError;
+            
+            console.log(`✅ DEV: Created mock ${sessionData.status} session for ${section.name}`);
+          }
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to set half-complete state:', error);
+        alert('Failed to set half-complete state. Check console for details.');
+      }
+    }
+  };
+
+  const handleFinishAll = async () => {
+    if (!user || import.meta.env.PROD) return;
+    
+    if (confirm('🚨 DEV: Complete all sections with mock data?')) {
+      try {
+        const sections = diagnosticTest?.sections || [];
+        
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+          
+          // Create mock completed session (let Supabase generate the UUID)
+          const { error: sessionError } = await supabase
+            .from('user_test_sessions')
+            .insert({
+              user_id: user.id,
+              product_type: selectedProduct,
+              test_mode: 'diagnostic',
+              section_name: section.name,
+              status: 'completed',
+              current_question_index: section.questions,
+              total_questions: section.questions,
+              final_score: mockScore,
+              session_data: {
+                answers: {},
+                timeRemaining: 0,
+                flaggedQuestions: []
+              }
+            });
+
+          if (sessionError) throw sessionError;
+          
+          console.log(`✅ DEV: Created mock session for ${section.name}`);
+        }
+        
+        // Refresh the page data
+        setTimeout(() => window.location.reload(), 500);
+      } catch (error) {
+        console.error('Failed to complete all sections:', error);
+        alert('Failed to complete all sections. Check console for details.');
+      }
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Hero Banner */}
@@ -519,6 +723,49 @@ const DiagnosticTests: React.FC = () => {
         })}
         className="bg-gradient-to-r from-purple-400 to-purple-900"
       />
+
+      {/* Development Tools - Only show in development */}
+      {import.meta.env.DEV && (
+        <Card className="border-2 border-red-200 bg-red-50/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-red-800 flex items-center space-x-2">
+              <Zap size={16} />
+              <span>Development Tools - Diagnostic</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleClearProgress}
+                className="border-red-300 text-red-700 hover:bg-red-100"
+              >
+                <Trash2 size={14} className="mr-1" />
+                Clear All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleHalfComplete}
+                className="border-amber-300 text-amber-700 hover:bg-amber-100"
+              >
+                <Target size={14} className="mr-1" />
+                Half Complete
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleFinishAll}
+                className="border-green-300 text-green-700 hover:bg-green-100"
+              >
+                <CheckCircle size={14} className="mr-1" />
+                Finish All
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Diagnostic Test - Single Column */}
       <div>
@@ -602,30 +849,38 @@ const DiagnosticTests: React.FC = () => {
                 <>
                   {/* Collapsed View - Summary */}
                   {expandedTest !== diagnosticTest.id && (
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                      <div className="text-sm text-slate-600">
-                        {diagnosticTest.lastAttempt ? (
-                          <div className="flex items-center space-x-2">
-                            <Calendar size={12} />
-                            <span>Last attempt: {diagnosticTest.lastAttempt}</span>
-                          </div>
-                        ) : (
-                          <span>Ready to start</span>
-                        )}
+                    <div className="pt-4 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-slate-600">
+                          {diagnosticTest.lastAttempt ? (
+                            <div className="flex items-center space-x-2">
+                              <Calendar size={12} />
+                              <span>Last attempt: {diagnosticTest.lastAttempt}</span>
+                            </div>
+                          ) : (
+                            <span>Ready to start</span>
+                          )}
+                        </div>
+                        <div>
+                          {/* Show View Results if ANY section is completed, not just when all are completed */}
+                          {diagnosticTest.sections.some(s => s.status === 'completed') && (
+                            <Button 
+                              size="sm"
+                              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('🔥 View Results button clicked!');
+                                console.log('🔥 diagnosticTest.status:', diagnosticTest.status);
+                                handleViewResults();
+                              }}
+                            >
+                              <BarChart3 size={14} className="mr-1" />
+                              View Results
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      {diagnosticTest.status === 'completed' && (
-                        <Button 
-                          size="sm"
-                          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
-                          onClick={() => {
-                            // Navigate to results page - you can implement this
-                            console.log('View Results clicked for diagnostic test');
-                          }}
-                        >
-                          <BarChart3 size={14} className="mr-1" />
-                          View Results
-                        </Button>
-                      )}
                     </div>
                   )}
 
@@ -695,14 +950,25 @@ const DiagnosticTests: React.FC = () => {
                                     <Button
                                       size="sm"
                                       className={cn(
-                                        "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
+                                        "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md relative z-10",
                                         section.status === 'completed' 
-                                          ? "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300" 
+                                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white cursor-pointer" 
                                           : section.status === 'in-progress'
                                           ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
                                           : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                                       )}
-                                      onClick={() => handleStartSection(section.id, section.name)}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        console.log('🔥 Section button clicked!', section.name, 'status:', section.status);
+                                        if (section.status === 'completed') {
+                                          console.log('🔥 Calling handleViewResults for section:', section.id);
+                                          handleViewResults(section.id);
+                                        } else {
+                                          console.log('🔥 Calling handleStartSection for section:', section.id);
+                                          handleStartSection(section.id, section.name);
+                                        }
+                                      }}
                                     >
                                       {getSectionButtonIcon(section.status)}
                                       <span className="ml-1">{getSectionButtonText(section.status)}</span>
