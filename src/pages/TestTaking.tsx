@@ -447,30 +447,49 @@ const TestTaking: React.FC = () => {
             console.log('🔄 RESUME: Converting saved answers. Total questions loaded:', questions.length);
             console.log('🔄 RESUME: Saved answers to convert:', savedSession.answers);
             
-            Object.entries(savedSession.answers).forEach(([qIndex, optionText]) => {
+            Object.entries(savedSession.answers).forEach(([qIndex, savedAnswer]) => {
               const questionIndex = parseInt(qIndex);
               const question = questions[questionIndex];
-              console.log(`🔄 RESUME: Processing answer for question ${questionIndex}:`, {
-                savedOptionText: optionText,
-                questionExists: !!question,
-                questionHasOptions: !!(question && question.options),
-                questionOptions: question?.options
-              });
+              
+              // Check if this is the new format (JSON) or old format (plain text)
+              let answerIndex = -1;
+              let optionText = '';
+              
+              try {
+                // Try to parse as JSON (new format)
+                const parsed = JSON.parse(savedAnswer);
+                if (parsed.index !== undefined) {
+                  answerIndex = parsed.index;
+                  optionText = parsed.text;
+                  console.log(`🔄 RESUME: Using new format for question ${questionIndex}: index=${answerIndex}, text="${optionText}"`);
+                }
+              } catch (e) {
+                // Fall back to old format (plain text)
+                optionText = savedAnswer;
+                console.log(`🔄 RESUME: Using old format for question ${questionIndex}: text="${optionText}"`);
+              }
               
               if (question && question.options) {
-                // Try exact match first
-                let answerIndex = question.options.findIndex(opt => opt === optionText);
-                
-                // If no exact match, try trimmed comparison
-                if (answerIndex === -1) {
-                  answerIndex = question.options.findIndex(opt => opt.trim() === optionText.trim());
-                }
-                
-                if (answerIndex !== -1) {
+                // If we have the index from new format, use it directly
+                if (answerIndex !== -1 && answerIndex < question.options.length) {
                   answers[questionIndex] = answerIndex;
-                  console.log('🔄 RESUME: ✅ Restored answer for question', questionIndex, '→', answerIndex, '(', optionText, ')');
+                  console.log('🔄 RESUME: ✅ Restored answer from index for question', questionIndex, '→', answerIndex);
                 } else {
-                  console.warn('🔄 RESUME: ❌ Could not find answer index for:', optionText, 'in options:', question.options);
+                  // Otherwise, try to match by text (old format or fallback)
+                  answerIndex = question.options.findIndex(opt => opt === optionText);
+                  
+                  // If no exact match, try trimmed comparison
+                  if (answerIndex === -1) {
+                    answerIndex = question.options.findIndex(opt => opt.trim() === optionText.trim());
+                  }
+                  
+                  if (answerIndex !== -1) {
+                    answers[questionIndex] = answerIndex;
+                    console.log('🔄 RESUME: ✅ Restored answer from text match for question', questionIndex, '→', answerIndex, '(', optionText, ')');
+                  } else {
+                    console.warn('🔄 RESUME: ❌ Could not find answer for question', questionIndex, ':', optionText);
+                    console.warn('🔄 RESUME: Available options:', question.options);
+                  }
                 }
               } else {
                 console.warn('🔄 RESUME: ❌ Question', questionIndex, 'not found or has no options');
@@ -672,12 +691,16 @@ const TestTaking: React.FC = () => {
     });
 
     try {
-      // Convert answers to string format
+      // Convert answers to string format with index information
       const stringAnswers: Record<string, string> = {};
       Object.entries(session.answers).forEach(([qIndex, answerIndex]) => {
         const question = session.questions[parseInt(qIndex)];
         if (question && question.options && question.options[answerIndex]) {
-          stringAnswers[qIndex] = question.options[answerIndex];
+          // Store both the index and the text for better recovery
+          stringAnswers[qIndex] = JSON.stringify({
+            index: answerIndex,
+            text: question.options[answerIndex]
+          });
           console.log('💾 SAVE: Converting answer for question', qIndex, ':', answerIndex, '->', question.options[answerIndex]);
         }
       });
