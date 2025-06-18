@@ -702,14 +702,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                 {isReviewMode ? (
                   <>
                     <div className="mb-4 p-3 bg-edu-light-blue/20 rounded-lg">
-                      <h4 className="font-semibold text-edu-navy mb-2 text-center">Your Score</h4>
+                      <h4 className="font-semibold text-edu-navy mb-2 text-center">Test Results</h4>
                       <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Correct:</span>
-                          <span className="font-semibold text-green-600">
-                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}
-                          </span>
-                        </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Score:</span>
                           <span className="font-semibold text-edu-navy">
@@ -717,13 +711,19 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Percentage:</span>
+                          <span className="text-gray-600">Percentage Score:</span>
                           <span className="font-bold text-edu-teal text-lg">
                             {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Accuracy:</span>
+                          <span className="font-semibold text-edu-navy">
+                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{Object.keys(answers).length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Accuracy %:</span>
                           <span className="font-semibold text-edu-navy">
                             {Object.keys(answers).length > 0 ? Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / Object.keys(answers).length) * 100) : 0}%
                           </span>
