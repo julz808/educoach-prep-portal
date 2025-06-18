@@ -444,19 +444,36 @@ const TestTaking: React.FC = () => {
 
             // Convert saved session to our format
             const answers: Record<number, number> = {};
+            console.log('🔄 RESUME: Converting saved answers. Total questions loaded:', questions.length);
+            console.log('🔄 RESUME: Saved answers to convert:', savedSession.answers);
+            
             Object.entries(savedSession.answers).forEach(([qIndex, optionText]) => {
               const questionIndex = parseInt(qIndex);
               const question = questions[questionIndex];
+              console.log(`🔄 RESUME: Processing answer for question ${questionIndex}:`, {
+                savedOptionText: optionText,
+                questionExists: !!question,
+                questionHasOptions: !!(question && question.options),
+                questionOptions: question?.options
+              });
+              
               if (question && question.options) {
-                const answerIndex = question.options.findIndex(opt => opt === optionText);
+                // Try exact match first
+                let answerIndex = question.options.findIndex(opt => opt === optionText);
+                
+                // If no exact match, try trimmed comparison
+                if (answerIndex === -1) {
+                  answerIndex = question.options.findIndex(opt => opt.trim() === optionText.trim());
+                }
+                
                 if (answerIndex !== -1) {
                   answers[questionIndex] = answerIndex;
-                  console.log('🔄 RESUME: Restored answer for question', questionIndex, '→', answerIndex, '(', optionText, ')');
+                  console.log('🔄 RESUME: ✅ Restored answer for question', questionIndex, '→', answerIndex, '(', optionText, ')');
                 } else {
-                  console.warn('🔄 RESUME: Could not find answer index for:', optionText, 'in options:', question.options);
+                  console.warn('🔄 RESUME: ❌ Could not find answer index for:', optionText, 'in options:', question.options);
                 }
               } else {
-                console.warn('🔄 RESUME: Question', questionIndex, 'not found or has no options');
+                console.warn('🔄 RESUME: ❌ Question', questionIndex, 'not found or has no options');
               }
             });
 
@@ -486,15 +503,22 @@ const TestTaking: React.FC = () => {
             };
 
             // Apply answers and text answers to questions
+            console.log('🔄 RESUME: Applying answers to questions. Total answers restored:', Object.keys(resumedSession.answers).length);
             resumedSession.questions.forEach((question, index) => {
               if (resumedSession.answers[index] !== undefined) {
                 question.userAnswer = resumedSession.answers[index];
+                console.log(`🔄 RESUME: Applied answer to question ${index}: userAnswer = ${question.userAnswer}`);
               }
               if (resumedSession.textAnswers[index] !== undefined) {
                 question.userTextAnswer = resumedSession.textAnswers[index];
-                console.log('🔄 RESUME: Restored text answer for question', index, '→', resumedSession.textAnswers[index].substring(0, 50) + '...');
+                console.log('🔄 RESUME: Applied text answer to question', index, '→', resumedSession.textAnswers[index].substring(0, 50) + '...');
               }
               question.flagged = resumedSession.flaggedQuestions.has(index);
+            });
+            console.log('🔄 RESUME: Final session state:', {
+              totalQuestions: resumedSession.questions.length,
+              answersRestored: Object.keys(resumedSession.answers).length,
+              questionsWithUserAnswer: resumedSession.questions.filter(q => q.userAnswer !== undefined).length
             });
 
             setSession(resumedSession);

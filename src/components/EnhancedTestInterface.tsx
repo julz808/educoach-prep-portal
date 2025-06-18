@@ -712,7 +712,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Percentage Score:</span>
-                          <span className="font-bold text-edu-teal text-lg">
+                          <span className="font-semibold text-edu-navy">
                             {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
                           </span>
                         </div>
