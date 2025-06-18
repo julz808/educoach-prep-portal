@@ -17,6 +17,8 @@ interface Question {
   subSkill: string;
   difficulty: number;
   passageContent?: string;
+  format?: 'Multiple Choice' | 'Written Response';
+  userTextAnswer?: string; // For written responses
 }
 
 interface EnhancedTestInterfaceProps {
@@ -24,11 +26,13 @@ interface EnhancedTestInterfaceProps {
   currentQuestionIndex: number;
   timeRemaining?: number;
   onAnswer: (answerIndex: number) => void;
+  onTextAnswer?: (text: string) => void; // For written responses
   onNext: () => void;
   onPrevious: () => void;
   onJumpToQuestion: (questionIndex: number) => void;
   onFlag: (questionIndex: number) => void;
   answers: Record<number, number>;
+  textAnswers?: Record<number, string>; // For written responses
   flaggedQuestions: Set<number>;
   showFeedback?: boolean;
   isReviewMode?: boolean;
@@ -42,11 +46,13 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   currentQuestionIndex,
   timeRemaining,
   onAnswer,
+  onTextAnswer,
   onNext,
   onPrevious,
   onJumpToQuestion,
   onFlag,
   answers,
+  textAnswers = {},
   flaggedQuestions,
   showFeedback = false,
   isReviewMode = false,
@@ -56,18 +62,42 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [textAnswer, setTextAnswer] = useState<string>('');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [questionTransition, setQuestionTransition] = useState(false);
   const [showTimeWarning, setShowTimeWarning] = useState<string | null>(null);
   const [warningsShown, setWarningsShown] = useState<Set<number>>(new Set());
 
   const currentQuestion = questions[currentQuestionIndex];
+  
+  // Guard clause: if no current question, return loading state
+  if (!currentQuestion) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading question...</p>
+        </div>
+      </div>
+    );
+  }
+  
   const hasPassage = currentQuestion?.passageContent && currentQuestion.passageContent.trim().length > 0;
+  
+  // Check if this is a written response question
+  const isWrittenResponse = currentQuestion?.format === 'Written Response' || 
+                          currentQuestion?.topic?.toLowerCase().includes('writing') ||
+                          currentQuestion?.topic?.toLowerCase().includes('written') ||
+                          currentQuestion?.subSkill?.toLowerCase().includes('writing') ||
+                          currentQuestion?.subSkill?.toLowerCase().includes('written') ||
+                          !currentQuestion?.options || 
+                          currentQuestion?.options.length === 0;
 
-  // Update selected answer when question changes
+  // Update selected answer/text when question changes
   useEffect(() => {
     setSelectedAnswer(answers[currentQuestionIndex] ?? null);
-  }, [currentQuestionIndex, answers]);
+    setTextAnswer(textAnswers[currentQuestionIndex] ?? '');
+  }, [currentQuestionIndex, answers, textAnswers]);
 
   // Question transition animation
   useEffect(() => {
@@ -108,13 +138,28 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showFeedback && !isReviewMode) return;
+    if (showFeedback || isReviewMode) return; // Don't allow selection in review mode
     setSelectedAnswer(answerIndex);
     onAnswer(answerIndex);
   };
 
+  const handleTextAnswerChange = (text: string) => {
+    setTextAnswer(text);
+    if (onTextAnswer) {
+      onTextAnswer(text);
+    }
+  };
+
   const getQuestionStatus = (questionIndex: number) => {
-    const isAnswered = answers[questionIndex] !== undefined;
+    const question = questions[questionIndex];
+    const isWrittenResponseQuestion = question?.format === 'Written Response' || 
+                                    !question?.options || 
+                                    question?.options.length === 0;
+    
+    const isAnswered = isWrittenResponseQuestion 
+      ? (textAnswers[questionIndex] && textAnswers[questionIndex].trim().length > 0)
+      : answers[questionIndex] !== undefined;
+    
     const isFlagged = flaggedQuestions.has(questionIndex);
     
     // In review mode, show correct/incorrect status if answered
@@ -185,10 +230,10 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     const baseClass = "w-full p-4 text-left rounded-xl border-2 transition-all duration-200 group hover:border-edu-teal/60";
     
     if (showFeedback) {
-      if (index === currentQuestion.correctAnswer) {
+      if (index === currentQuestion?.correctAnswer) {
         return cn(baseClass, "border-green-500 bg-green-50 hover:border-green-500");
       }
-      if (selectedAnswer === index && index !== currentQuestion.correctAnswer) {
+      if (selectedAnswer === index && index !== currentQuestion?.correctAnswer) {
         return cn(baseClass, "border-red-500 bg-red-50 hover:border-red-500");
       }
       return cn(baseClass, "border-gray-200 bg-gray-50");
@@ -253,7 +298,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     "prose prose-gray max-w-none text-base leading-relaxed transition-all duration-300 ease-out",
                     questionTransition ? "opacity-0 transform translate-x-4" : "opacity-100 transform translate-x-0"
                   )}>
-                    {currentQuestion.passageContent?.split('\n').map((paragraph, index) => (
+                    {currentQuestion?.passageContent?.split('\n').map((paragraph, index) => (
                       <p key={index} className="mb-4 text-gray-800">
                         {formatPassageText(paragraph)}
                       </p>
@@ -273,19 +318,21 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="flex items-center justify-end pb-4 border-b border-gray-100">
                       <div className="flex items-center space-x-3">
                         {/* Flag Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onFlag(currentQuestionIndex)}
-                          className={cn(
-                            "w-8 h-8 p-0 hover:bg-transparent",
-                            flaggedQuestions.has(currentQuestionIndex) 
-                              ? "text-red-500 hover:text-red-600" 
-                              : "text-gray-500 hover:text-red-500"
-                          )}
-                        >
-                          <Flag size={20} />
-                        </Button>
+                        {!isReviewMode && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onFlag(currentQuestionIndex)}
+                            className={cn(
+                              "w-8 h-8 p-0 hover:bg-transparent",
+                              flaggedQuestions.has(currentQuestionIndex) 
+                                ? "text-red-500 hover:text-red-600" 
+                                : "text-gray-500 hover:text-red-500"
+                            )}
+                          >
+                            <Flag size={20} />
+                          </Button>
+                        )}
                         
                         {/* Navigation Controls */}
                         <div className="flex items-center space-x-4">
@@ -300,13 +347,23 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           </Button>
                           
                           {isLastQuestion ? (
-                            <Button
-                              onClick={onFinish}
-                              className="bg-green-600 hover:bg-green-700 text-white rounded-full px-4 h-10 font-medium text-sm"
-                            >
-                              <CheckCircle size={14} className="mr-1.5" />
-                              Finish
-                            </Button>
+                            isReviewMode ? (
+                              <Button
+                                onClick={onFinish}
+                                className="bg-edu-teal hover:bg-edu-teal/90 text-white rounded-full px-4 h-10 font-medium text-sm"
+                              >
+                                <CheckCircle size={14} className="mr-1.5" />
+                                Exit Review
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={onFinish}
+                                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-4 h-10 font-medium text-sm"
+                              >
+                                <CheckCircle size={14} className="mr-1.5" />
+                                Finish
+                              </Button>
+                            )
                           ) : (
                             <Button
                               size="sm"
@@ -323,18 +380,47 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     {/* Question Text */}
                     <div>
                       <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
-                        {formatQuestionText(currentQuestion.text)}
+                        {formatQuestionText(currentQuestion?.text || '')}
                       </h2>
                     </div>
 
-                    {/* Answer Options */}
-                    {currentQuestion.options && (
+                    {/* Answer Options - Multiple Choice or Written Response */}
+                    {isWrittenResponse ? (
                       <div className="space-y-4">
-                        {currentQuestion.options.map((option, index) => (
+                        <div className="bg-gradient-to-r from-edu-light-blue/30 to-white rounded-lg p-4 border border-edu-teal/20">
+                          <p className="text-sm text-edu-navy font-medium mb-2">
+                            📝 Written Response Required
+                          </p>
+                          <p className="text-xs text-edu-navy/70">
+                            Please type your answer in the text area below. Take your time to craft a thoughtful response.
+                          </p>
+                        </div>
+                        <textarea
+                          value={textAnswer}
+                          onChange={(e) => handleTextAnswerChange(e.target.value)}
+                          placeholder="Type your answer here..."
+                          disabled={showFeedback && !isReviewMode}
+                          className={cn(
+                            "w-full min-h-[250px] p-4 border-2 rounded-xl text-base leading-relaxed",
+                            "focus:outline-none focus:ring-2 focus:ring-edu-teal focus:border-edu-teal",
+                            "resize-vertical transition-colors duration-200",
+                            textAnswer.trim().length > 0 
+                              ? "border-edu-teal bg-edu-teal/5" 
+                              : "border-gray-200 hover:border-edu-teal/40"
+                          )}
+                        />
+                        <div className="flex justify-between items-center text-sm text-gray-600">
+                          <span>Character count: {textAnswer.length}</span>
+                          <span>Word count: {textAnswer.trim().split(/\s+/).filter(word => word.length > 0).length}</span>
+                        </div>
+                      </div>
+                    ) : currentQuestion?.options && (
+                      <div className="space-y-4">
+                        {currentQuestion?.options.map((option, index) => (
                           <button
                             key={index}
                             onClick={() => handleAnswerSelect(index)}
-                            disabled={showFeedback && !isReviewMode}
+                            disabled={showFeedback || isReviewMode}
                             className={cn(getOptionClassName(index), "min-h-[60px]")}
                           >
                             <div className="flex items-center space-x-3 h-full">
@@ -368,27 +454,29 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   <div className="flex items-center justify-between pb-6 border-b border-gray-100">
                     <div className="flex items-center space-x-4 text-sm">
                       <span className="bg-edu-teal/10 text-edu-teal px-3 py-1 rounded-full font-medium">
-                        {currentQuestion.topic}
+                        {currentQuestion?.topic || 'General'}
                       </span>
                       <span className="bg-edu-coral/10 text-edu-coral px-3 py-1 rounded-full font-medium">
-                        {currentQuestion.subSkill}
+                        {currentQuestion?.subSkill || 'General'}
                       </span>
                     </div>
                     <div className="flex items-center space-x-3">
                       {/* Flag Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onFlag(currentQuestionIndex)}
-                        className={cn(
-                          "w-8 h-8 p-0 hover:bg-transparent",
-                          flaggedQuestions.has(currentQuestionIndex) 
-                            ? "text-red-500 hover:text-red-600" 
-                            : "text-gray-500 hover:text-red-500"
-                        )}
-                      >
-                        <Flag size={20} />
-                      </Button>
+                      {!isReviewMode && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onFlag(currentQuestionIndex)}
+                          className={cn(
+                            "w-8 h-8 p-0 hover:bg-transparent",
+                            flaggedQuestions.has(currentQuestionIndex) 
+                              ? "text-red-500 hover:text-red-600" 
+                              : "text-gray-500 hover:text-red-500"
+                          )}
+                        >
+                          <Flag size={20} />
+                        </Button>
+                      )}
                       
                       {/* Navigation Controls */}
                       <div className="flex items-center space-x-4">
@@ -403,13 +491,23 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         </Button>
                         
                         {isLastQuestion ? (
-                          <Button
-                            onClick={onFinish}
-                            className="bg-green-600 hover:bg-green-700 text-white rounded-full px-4 h-10 font-medium text-sm"
-                          >
-                            <CheckCircle size={14} className="mr-1.5" />
-                            Finish
-                          </Button>
+                          isReviewMode ? (
+                            <Button
+                              onClick={onFinish}
+                              className="bg-edu-teal hover:bg-edu-teal/90 text-white rounded-full px-4 h-10 font-medium text-sm"
+                            >
+                              <CheckCircle size={14} className="mr-1.5" />
+                              Exit Review
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={onFinish}
+                              className="bg-green-600 hover:bg-green-700 text-white rounded-full px-4 h-10 font-medium text-sm"
+                            >
+                              <CheckCircle size={14} className="mr-1.5" />
+                              Finish
+                            </Button>
+                          )
                         ) : (
                           <Button
                             size="sm"
@@ -426,14 +524,35 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   {/* Question Text */}
                   <div>
                     <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
-                      {formatQuestionText(currentQuestion.text)}
+                      {formatQuestionText(currentQuestion?.text || '')}
                     </h2>
                   </div>
 
-                  {/* Answer Options */}
-                  {currentQuestion.options && (
+                  {/* Answer Options - Multiple Choice or Written Response */}
+                  {isWrittenResponse ? (
+                    <div className="space-y-4">
+                      <textarea
+                        value={textAnswer}
+                        onChange={(e) => handleTextAnswerChange(e.target.value)}
+                        placeholder="Type your answer here..."
+                        disabled={showFeedback && !isReviewMode}
+                        className={cn(
+                          "w-full min-h-[300px] p-4 border-2 rounded-xl text-base leading-relaxed",
+                          "focus:outline-none focus:ring-2 focus:ring-edu-teal focus:border-edu-teal",
+                          "resize-vertical transition-colors duration-200",
+                          textAnswer.trim().length > 0 
+                            ? "border-edu-teal bg-edu-teal/5" 
+                            : "border-gray-200 hover:border-edu-teal/40"
+                        )}
+                      />
+                      <div className="flex justify-between items-center text-sm text-gray-600">
+                        <span>Character count: {textAnswer.length}</span>
+                        <span>Word count: {textAnswer.trim().split(/\s+/).filter(word => word.length > 0).length}</span>
+                      </div>
+                    </div>
+                  ) : currentQuestion?.options && (
                     <div className="space-y-5">
-                      {currentQuestion.options.map((option, index) => (
+                      {currentQuestion?.options.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleAnswerSelect(index)}
@@ -457,11 +576,11 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   )}
 
                   {/* Feedback Section */}
-                  {showFeedback && currentQuestion.explanation && (
+                  {showFeedback && currentQuestion?.explanation && (
                     <div className="mt-8 p-6 bg-gradient-to-r from-edu-light-blue to-white rounded-xl border-l-4 border-edu-teal">
                       <div className="flex items-start space-x-3">
                         <div className="shrink-0 mt-0.5">
-                          {selectedAnswer === currentQuestion.correctAnswer ? (
+                          {selectedAnswer === currentQuestion?.correctAnswer ? (
                             <CheckCircle size={20} className="text-green-600" />
                           ) : (
                             <AlertCircle size={20} className="text-red-600" />
@@ -469,9 +588,9 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         </div>
                         <div>
                           <h3 className="font-semibold text-edu-navy mb-2">
-                            {selectedAnswer === currentQuestion.correctAnswer ? "Correct!" : "Not quite right"}
+                            {selectedAnswer === currentQuestion?.correctAnswer ? "Correct!" : "Not quite right"}
                           </h3>
-                          <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(currentQuestion.explanation)}</p>
+                          <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(currentQuestion?.explanation)}</p>
                         </div>
                       </div>
                     </div>
@@ -482,7 +601,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
           )}
 
           {/* Exit Button - Top Left */}
-          {!isReviewMode && onExit && (
+          {onExit && (
             <div className="absolute top-6 left-6 z-20">
               <Button
                 variant="ghost"
@@ -580,18 +699,66 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 
               {/* Statistics */}
               <div className="pt-6 border-t space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Answered:</span>
-                  <span className="font-semibold text-edu-navy">
-                    {Object.keys(answers).length}/{questions.length}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Flagged:</span>
-                  <span className="font-semibold text-edu-coral">
-                    {flaggedQuestions.size}
-                  </span>
-                </div>
+                {isReviewMode ? (
+                  <>
+                    <div className="mb-4 p-3 bg-edu-light-blue/20 rounded-lg">
+                      <h4 className="font-semibold text-edu-navy mb-2 text-center">Your Score</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Correct:</span>
+                          <span className="font-semibold text-green-600">
+                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Total Score:</span>
+                          <span className="font-semibold text-edu-navy">
+                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{questions.length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Percentage:</span>
+                          <span className="font-bold text-edu-teal text-lg">
+                            {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Accuracy:</span>
+                          <span className="font-semibold text-edu-navy">
+                            {Object.keys(answers).length > 0 ? Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / Object.keys(answers).length) * 100) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Answered:</span>
+                      <span className="font-semibold text-edu-navy">
+                        {Object.keys(answers).length}/{questions.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Flagged:</span>
+                      <span className="font-semibold text-edu-coral">
+                        {flaggedQuestions.size}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Answered:</span>
+                      <span className="font-semibold text-edu-navy">
+                        {Object.keys(answers).length}/{questions.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Flagged:</span>
+                      <span className="font-semibold text-edu-coral">
+                        {flaggedQuestions.size}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -659,24 +826,33 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                 <LogOut size={20} className="text-edu-coral" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-edu-navy">Exit Test?</h3>
-                <p className="text-sm text-gray-600">Are you sure you want to exit this test?</p>
+                <h3 className="text-lg font-semibold text-edu-navy">
+                  {isReviewMode ? "Exit Review?" : "Exit Test?"}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {isReviewMode 
+                    ? "Are you sure you want to exit the review?" 
+                    : "Are you sure you want to exit this test?"
+                  }
+                </p>
               </div>
             </div>
             
-            <div className="mb-6">
-              <div className="bg-edu-light-blue/30 border border-edu-teal/20 rounded-lg p-4">
-                <div className="flex items-start space-x-2">
-                  <AlertCircle size={16} className="text-edu-teal mt-0.5 shrink-0" />
-                  <div className="text-sm text-edu-navy">
-                    <p className="font-medium mb-1">Your progress will be saved</p>
-                    <p>• All your answers will be saved</p>
-                    <p>• The timer will be paused</p>
-                    <p>• You can resume exactly where you left off</p>
+            {!isReviewMode && (
+              <div className="mb-6">
+                <div className="bg-edu-light-blue/30 border border-edu-teal/20 rounded-lg p-4">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle size={16} className="text-edu-teal mt-0.5 shrink-0" />
+                    <div className="text-sm text-edu-navy">
+                      <p className="font-medium mb-1">Your progress will be saved</p>
+                      <p>• All your answers will be saved</p>
+                      <p>• The timer will be paused</p>
+                      <p>• You can resume exactly where you left off</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex space-x-3">
               <Button
@@ -684,7 +860,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                 onClick={() => setShowExitConfirm(false)}
                 className="flex-1 bg-edu-teal hover:bg-edu-teal/90 text-white border-edu-teal"
               >
-                Continue Test
+                {isReviewMode ? "Continue Review" : "Continue Test"}
               </Button>
               <Button
                 onClick={() => {
@@ -693,7 +869,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                 }}
                 className="flex-1 bg-edu-coral hover:bg-edu-coral/90 text-white"
               >
-                Exit & Save
+                {isReviewMode ? "Exit Review" : "Exit & Save"}
               </Button>
             </div>
           </div>

@@ -75,6 +75,7 @@ const TestTaking: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [initializing, setInitializing] = useState(false);
   const initializingRef = useRef(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -823,7 +824,14 @@ const TestTaking: React.FC = () => {
     });
   };
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
+    if (!session) return;
+    
+    // Show confirmation dialog
+    setShowSubmitConfirm(true);
+  };
+
+  const handleConfirmSubmit = async () => {
     if (!session) return;
 
     try {
@@ -835,9 +843,11 @@ const TestTaking: React.FC = () => {
       await SessionService.completeSession(session.id);
       
       setSession(prev => prev ? { ...prev, status: 'completed' } : prev);
+      setShowSubmitConfirm(false);
       console.log('🏁 FINISH: Session completed successfully');
     } catch (error) {
       console.error('Failed to finish session:', error);
+      setShowSubmitConfirm(false);
     }
   };
 
@@ -996,25 +1006,75 @@ const TestTaking: React.FC = () => {
 
   // Main test interface
   return (
-    <EnhancedTestInterface
-      questions={session.questions}
-      currentQuestionIndex={session.currentQuestion}
-      timeRemaining={timeRemaining}
-      onAnswer={handleAnswer}
-      onTextAnswer={handleTextAnswer}
-      onNext={handleNext}
-      onPrevious={handlePrevious}
-      onJumpToQuestion={handleJumpToQuestion}
-      onFlag={handleFlag}
-      answers={session.answers}
-      textAnswers={session.textAnswers}
-      flaggedQuestions={session.flaggedQuestions}
-      showFeedback={false}
-      isReviewMode={false}
-      testTitle={session.sectionName}
-      onFinish={handleFinish}
-      onExit={handleExit}
-    />
+    <>
+      <EnhancedTestInterface
+        questions={session.questions}
+        currentQuestionIndex={session.currentQuestion}
+        timeRemaining={timeRemaining}
+        onAnswer={handleAnswer}
+        onTextAnswer={handleTextAnswer}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onJumpToQuestion={handleJumpToQuestion}
+        onFlag={handleFlag}
+        answers={session.answers}
+        textAnswers={session.textAnswers}
+        flaggedQuestions={session.flaggedQuestions}
+        showFeedback={false}
+        isReviewMode={false}
+        testTitle={session.sectionName}
+        onFinish={handleFinish}
+        onExit={handleExit}
+      />
+
+      {/* Submit Confirmation Dialog */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="text-green-600" size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-edu-navy">Submit Test?</h3>
+                <p className="text-sm text-gray-600">Are you ready to submit your test?</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <div className="bg-edu-light-blue/30 border border-edu-teal/20 rounded-lg p-4">
+                <div className="flex items-start space-x-2">
+                  <AlertCircle size={16} className="text-edu-teal mt-0.5 shrink-0" />
+                  <div className="text-sm text-edu-navy">
+                    <p className="font-medium mb-1">Once submitted, you cannot make changes</p>
+                    <p>• Your answers will be saved and scored</p>
+                    <p>• You can review your results afterward</p>
+                    <p>• Make sure you've answered all questions you want to complete</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowSubmitConfirm(false)}
+                className="flex-1 border-gray-300 hover:border-edu-teal hover:text-edu-teal"
+              >
+                Continue Test
+              </Button>
+              <Button
+                onClick={handleConfirmSubmit}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <CheckCircle size={16} className="mr-2" />
+                Submit Test
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
