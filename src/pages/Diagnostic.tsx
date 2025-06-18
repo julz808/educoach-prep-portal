@@ -22,6 +22,7 @@ import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { SessionService, SectionProgress } from '@/services/sessionService';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { DeveloperTools } from '@/components/DeveloperTools';
 
 interface DiagnosticSection {
   id: string;
@@ -140,10 +141,27 @@ const DiagnosticTests: React.FC = () => {
         // Load user progress if authenticated
         if (user) {
           console.log('👤 User is authenticated, loading progress for:', user.id, 'product:', selectedProduct);
+          
+          // Add debugging for product type mapping
+          const getDbProductType = (productId: string): string => {
+            const productMap: Record<string, string> = {
+              'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+              'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+              'year-5-naplan': 'Year 5 NAPLAN',
+              'year-7-naplan': 'Year 7 NAPLAN',
+              'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+              'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+            };
+            return productMap[productId] || productId;
+          };
+          
+          const dbProductType = getDbProductType(selectedProduct);
+          console.log('🔍 DIAGNOSTIC: Query will use productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+          
           try {
             const progressData = await SessionService.getUserProgress(
               user.id, 
-              selectedProduct,
+              dbProductType,
               'diagnostic'
             );
             setSectionProgress(progressData);
@@ -176,7 +194,24 @@ const DiagnosticTests: React.FC = () => {
       if (user) {
         try {
           console.log('🔄 REFRESH: Refreshing progress data...');
-          const progressData = await SessionService.getUserProgress(user.id, selectedProduct, 'diagnostic');
+          
+          // Use the same product mapping as the main load
+          const getDbProductType = (productId: string): string => {
+            const productMap: Record<string, string> = {
+              'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+              'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+              'year-5-naplan': 'Year 5 NAPLAN',
+              'year-7-naplan': 'Year 7 NAPLAN',
+              'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+              'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+            };
+            return productMap[productId] || productId;
+          };
+          
+          const dbProductType = getDbProductType(selectedProduct);
+          console.log('🔄 REFRESH: Using productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+          
+          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
           setSectionProgress(progressData);
           console.log('🔄 REFRESH: Progress refreshed with data:', progressData);
           
@@ -724,48 +759,12 @@ const DiagnosticTests: React.FC = () => {
         className="bg-gradient-to-r from-purple-400 to-purple-900"
       />
 
-      {/* Development Tools - Only show in development */}
-      {import.meta.env.DEV && (
-        <Card className="border-2 border-red-200 bg-red-50/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-red-800 flex items-center space-x-2">
-              <Zap size={16} />
-              <span>Development Tools - Diagnostic</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex space-x-3">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClearProgress}
-                className="border-red-300 text-red-700 hover:bg-red-100"
-              >
-                <Trash2 size={14} className="mr-1" />
-                Clear All
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleHalfComplete}
-                className="border-amber-300 text-amber-700 hover:bg-amber-100"
-              >
-                <Target size={14} className="mr-1" />
-                Half Complete
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleFinishAll}
-                className="border-green-300 text-green-700 hover:bg-green-100"
-              >
-                <CheckCircle size={14} className="mr-1" />
-                Finish All
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Development Tools */}
+      <DeveloperTools 
+        testType="diagnostic" 
+        selectedProduct={selectedProduct} 
+        onDataChanged={() => window.location.reload()}
+      />
 
       {/* Diagnostic Test - Single Column */}
       <div>

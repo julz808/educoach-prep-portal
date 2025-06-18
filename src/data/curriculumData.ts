@@ -3,14 +3,14 @@
 
 export const TEST_STRUCTURES = {
   "Year 5 NAPLAN": {
-    "NAPLAN Y5 Writing": {
+    "Writing": {
       "questions": 1, 
       "time": 42, 
       "format": "Written Response",
       "passages": 0,
       "words_per_passage": 0
     },
-    "NAPLAN Y5 Reading": {
+    "Reading": {
       "questions": 40, 
       "time": 50, 
       "format": "Multiple Choice",
@@ -40,35 +40,35 @@ export const TEST_STRUCTURES = {
     }
   },
   "Year 7 NAPLAN": {
-    "NAPLAN Y7 Writing": {
+    "Writing": {
       "questions": 1, 
       "time": 42, 
       "format": "Written Response",
       "passages": 0,
       "words_per_passage": 0
     },
-    "NAPLAN Y7 Reading": {
+    "Reading": {
       "questions": 50, 
       "time": 65, 
       "format": "Multiple Choice",
       "passages": 8,
       "words_per_passage": 200
     },
-    "NAPLAN Y7 Language Conventions": {
+    "Language Conventions": {
       "questions": 45, 
       "time": 45, 
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
     },
-    "NAPLAN Y7 Numeracy No Calculator": {
+    "Numeracy No Calculator": {
       "questions": 30, 
       "time": 30, 
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
     },
-    "NAPLAN Y7 Numeracy Calculator": {
+    "Numeracy Calculator": {
       "questions": 35, 
       "time": 35, 
       "format": "Multiple Choice",
@@ -77,14 +77,14 @@ export const TEST_STRUCTURES = {
     }
   },
   "ACER Scholarship (Year 7 Entry)": {
-    "ACER Written Expression": {
+    "Written Expression": {
       "questions": 1, 
       "time": 25, 
       "format": "Written Response",
       "passages": 0,
       "words_per_passage": 0
     },
-    "ACER Mathematics": {
+    "Mathematics": {
       "questions": 35, 
       "time": 47, 
       "format": "Multiple Choice",
@@ -121,14 +121,14 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     },
-    "EduTest Mathematics": {
+    "Mathematics": {
       "questions": 60, 
       "time": 30, 
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
     },
-    "EduTest Written Expression": {
+    "Written Expression": {
       "questions": 2, 
       "time": 30, 
       "format": "Written Response",
@@ -137,7 +137,7 @@ export const TEST_STRUCTURES = {
     }
   },
   "NSW Selective Entry (Year 7 Entry)": {
-    "NSW Reading": {
+    "Reading": {
       "questions": 30, 
       "time": 40, 
       "format": "Multiple Choice",
@@ -158,7 +158,7 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     },
-    "NSW Writing": {
+    "Writing": {
       "questions": 1, 
       "time": 30, 
       "format": "Written Response",
@@ -195,7 +195,7 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     },
-    "VIC Writing": {
+    "Writing": {
       "questions": 2, 
       "time": 40, 
       "format": "Written Response",
@@ -736,6 +736,52 @@ export const UNIFIED_SUB_SKILLS = {
   },
   "Information Synthesis and Integration": {
     "description": "Synthesising information from multiple sources effectively",
+    "visual_required": false
+  },
+  
+  // Additional sub-skills for comprehensive coverage
+  "Grammar & Syntax": {
+    "description": "Understanding and applying correct grammar rules and sentence structure",
+    "visual_required": false
+  },
+  "Spelling & Vocabulary": {
+    "description": "Correct spelling and effective vocabulary usage in context",
+    "visual_required": false
+  },
+  "Punctuation & Mechanics": {
+    "description": "Proper use of punctuation marks and writing mechanics",
+    "visual_required": false
+  },
+  "Sentence Structure": {
+    "description": "Constructing clear, varied, and grammatically correct sentences",
+    "visual_required": false
+  },
+  "Language Usage": {
+    "description": "Appropriate use of language conventions and style",
+    "visual_required": false
+  },
+  "Mental Mathematics": {
+    "description": "Performing calculations quickly and accurately without calculators",
+    "visual_required": false
+  },
+  "Complex Calculations": {
+    "description": "Advanced calculations using tools and technology",
+    "visual_required": false
+  },
+  "Data Analysis": {
+    "description": "Interpreting and analyzing complex data sets and relationships",
+    "visual_required": true
+  },
+  "Statistical Reasoning": {
+    "description": "Understanding statistical concepts and drawing valid conclusions",
+    "visual_required": true
+  },
+  "Advanced Problem Solving": {
+    "description": "Complex multi-step problem solving using various strategies",
+    "visual_required": false
+  },
+  "Mathematical Modelling": {
+    "description": "Creating mathematical models to represent real-world situations",
     "visual_required": false
   }
 } as const;

@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { type Database } from '@/integrations/supabase/types';
+import { UNIFIED_SUB_SKILLS } from '@/data/curriculumData';
 
 type Question = Database['public']['Tables']['questions']['Row'];
 type Passage = Database['public']['Tables']['passages']['Row'];
@@ -13,6 +14,7 @@ export interface OrganizedQuestion {
   type: string;
   topic: string;
   subSkill: string;
+  subSkillId?: string; // Add the UUID field
   difficulty: number;
   hasVisual: boolean;
   visualData?: any;
@@ -117,6 +119,7 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
     type: question.response_type || 'mcq',
     topic: question.section_name,
     subSkill: question.sub_skill,
+    subSkillId: question.sub_skill_id, // Add the UUID field
     difficulty: question.difficulty,
     hasVisual: question.has_visual || false,
     visualData: question.visual_data,
@@ -404,9 +407,32 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     
     const passageMap = new Map(passages.map(p => [p.id, p]));
     
-    // Group questions by section_name (skill areas) and then by sub_skill
+    // Group questions by section_name (skill areas) and then by actual sub_skill from database
     const skillAreaMap = new Map<string, Map<string, Question[]>>();
     
+    console.log('🔧 DEBUG: Using actual sub_skill values from Supabase questions table');
+    
+    // First, let's see what sub_skill values actually exist in the database
+    const actualSubSkills = new Map<string, Set<string>>();
+    drillQuestions.forEach(question => {
+      const sectionName = question.section_name;
+      const subSkill = question.sub_skill;
+      
+      if (!actualSubSkills.has(sectionName)) {
+        actualSubSkills.set(sectionName, new Set());
+      }
+      
+      if (subSkill) {
+        actualSubSkills.get(sectionName)!.add(subSkill);
+      }
+    });
+    
+    console.log('🔧 DEBUG: Actual sub_skill values in database:');
+    actualSubSkills.forEach((subSkills, sectionName) => {
+      console.log(`🔧 DEBUG: ${sectionName}:`, Array.from(subSkills));
+    });
+    
+    // Group questions by their actual sub_skill values from the database
     drillQuestions.forEach(question => {
       const sectionName = question.section_name;
       const subSkill = question.sub_skill || 'General';
@@ -423,25 +449,38 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
       subSkillMap.get(subSkill)!.push(question);
     });
     
+    console.log('🔧 DEBUG: Questions grouped by actual database sub_skill values:');
+    skillAreaMap.forEach((subSkillMap, sectionName) => {
+      console.log(`🔧 DEBUG: ${sectionName}:`);
+      subSkillMap.forEach((questions, subSkill) => {
+        const easyCount = questions.filter(q => q.difficulty === 1).length;
+        const mediumCount = questions.filter(q => q.difficulty === 2).length;
+        const hardCount = questions.filter(q => q.difficulty === 3).length;
+        console.log(`🔧 DEBUG:   • ${subSkill}: ${questions.length} total (Easy: ${easyCount}, Medium: ${mediumCount}, Hard: ${hardCount})`);
+      });
+    });
+    
     console.log('🔧 DEBUG: Grouped into skill areas:', Array.from(skillAreaMap.keys()));
     
     // Transform into TestMode structure
     const drillModes: TestMode[] = Array.from(skillAreaMap.entries()).map(([sectionName, subSkillMap]) => {
-      const sections: TestSection[] = Array.from(subSkillMap.entries()).map(([subSkillName, questions]) => {
-        const transformedQuestions = questions.map(q => {
-          const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
-          return transformQuestion(q, passage);
+      const sections: TestSection[] = Array.from(subSkillMap.entries())
+        .filter(([subSkillName, questions]) => questions.length > 0) // Only include sub-skills with questions
+        .map(([subSkillName, questions]) => {
+          const transformedQuestions = questions.map(q => {
+            const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
+            return transformQuestion(q, passage);
+          });
+          
+          return {
+            id: `${sectionName}-${subSkillName}`.toLowerCase().replace(/\s+/g, '-'),
+            name: subSkillName,
+            questions: transformedQuestions,
+            totalQuestions: transformedQuestions.length,
+            timeLimit: Math.ceil(transformedQuestions.length * 1.5),
+            status: 'not-started' as const,
+          };
         });
-        
-        return {
-          id: `${sectionName}-${subSkillName}`.toLowerCase().replace(/\s+/g, '-'),
-          name: subSkillName,
-          questions: transformedQuestions,
-          totalQuestions: transformedQuestions.length,
-          timeLimit: Math.ceil(transformedQuestions.length * 1.5),
-          status: 'not-started' as const,
-        };
-      });
       
       const totalQuestions = sections.reduce((sum, section) => sum + section.totalQuestions, 0);
       
@@ -461,6 +500,9 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     console.log('🔧 DEBUG: Created', drillModes.length, 'drill modes');
     drillModes.forEach(mode => {
       console.log(`🔧 DEBUG: - ${mode.name}: ${mode.sections.length} sub-skills, ${mode.totalQuestions} questions`);
+      mode.sections.forEach(section => {
+        console.log(`🔧 DEBUG:   • ${section.name}: ${section.totalQuestions} questions`);
+      });
     });
     
     return drillModes;

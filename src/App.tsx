@@ -11,6 +11,7 @@ import Drill from "./pages/Drill";
 import PracticeTests from "./pages/PracticeTests";
 import Insights from "./pages/Insights";
 import TestTaking from "./pages/TestTaking";
+import TestInstructionsPage from "./pages/TestInstructionsPage";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
@@ -52,6 +53,10 @@ const App = () => {
                       <Route path="/auth/callback" element={<AuthCallback />} />
                       <Route path="/auth/reset-password" element={<ResetPassword />} />
                       <Route element={<ProtectedRoute />}>
+                        {/* Test instruction routes (outside of Layout) */}
+                        <Route path="/test-instructions/:testType/:subjectId" element={<TestInstructionsPage />} />
+                        <Route path="/test-instructions/:testType/:subjectId/:sessionId" element={<TestInstructionsPage />} />
+                        
                         {/* Test-taking routes (outside of Layout) */}
                         <Route path="/test/:testType/:subjectId" element={<TestTaking />} />
                         <Route path="/test/:testType/:subjectId/:sectionId" element={<TestTaking />} />

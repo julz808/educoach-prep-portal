@@ -24,6 +24,21 @@ import {
 } from '@/services/supabaseQuestionService';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { DeveloperTools } from '@/components/DeveloperTools';
+
+// Map frontend product IDs to database product_type values
+const getDbProductType = (productId: string): string => {
+  const productMap: Record<string, string> = {
+    'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+    'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+    'year-5-naplan': 'Year 5 NAPLAN',
+    'year-7-naplan': 'Year 7 NAPLAN',
+    'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+    'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+  };
+  console.log('🗺️ DRILL: Mapping productId:', productId, 'to dbProductType:', productMap[productId] || productId);
+  return productMap[productId] || productId;
+};
 
 interface SubSkillProgress {
   easy: { completed: number; total: number; bestScore?: number };
@@ -61,10 +76,82 @@ const Drill: React.FC = () => {
   const [selectedSubSkill, setSelectedSubSkill] = useState<SubSkill | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [drillProgress, setDrillProgress] = useState<Record<string, any>>({});
   
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Load drill progress from database
+  const loadDrillProgress = async () => {
+    if (!user) return {};
+    
+    try {
+      const dbProductType = getDbProductType(selectedProduct);
+      console.log('🔧 DRILL: Loading progress for product:', dbProductType);
+      
+      const { data: sessions, error } = await supabase
+        .from('drill_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('product_type', dbProductType);
+
+      if (error) {
+        console.error('Error loading drill progress:', error);
+        return {};
+      }
+
+      console.log('🔧 DRILL: Loaded drill sessions:', sessions);
+
+      // Organize sessions by sub_skill_id and difficulty
+      const progressMap: Record<string, any> = {};
+      
+      sessions?.forEach(session => {
+        console.log(`🔧 DRILL: Processing session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
+        
+        const key = `${session.sub_skill_id}-${session.difficulty}`;
+        if (!progressMap[session.sub_skill_id]) {
+          progressMap[session.sub_skill_id] = {
+            easy: { completed: 0, total: 0, bestScore: undefined },
+            medium: { completed: 0, total: 0, bestScore: undefined },
+            hard: { completed: 0, total: 0, bestScore: undefined }
+          };
+        }
+
+        const difficultyKey = session.difficulty === 1 ? 'easy' : session.difficulty === 2 ? 'medium' : 'hard';
+        const accuracy = session.questions_answered > 0 ? Math.round((session.questions_correct / session.questions_answered) * 100) : 0;
+        
+        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, accuracy=${accuracy}%`);
+        
+        progressMap[session.sub_skill_id][difficultyKey] = {
+          completed: session.questions_answered || 0,
+          total: session.questions_total || 0,
+          bestScore: session.status === 'completed' ? accuracy : undefined,
+          sessionId: session.id // Store session ID for navigation
+        };
+      });
+
+      console.log('🔧 DRILL: Processed progress map:', progressMap);
+      return progressMap;
+    } catch (error) {
+      console.error('Error loading drill progress:', error);
+      return {};
+    }
+  };
+
+  // Separate function to reload progress data
+  const reloadProgressData = async () => {
+    try {
+      console.log('🔄 DRILL: Reloading progress data...');
+      const progressData = await loadDrillProgress();
+      setDrillProgress(progressData);
+      console.log('🔄 DRILL: Progress data reloaded:', progressData);
+      return progressData;
+    } catch (error) {
+      console.error('🔄 DRILL: Error reloading progress:', error);
+      return {};
+    }
+  };
 
   useEffect(() => {
     const loadDrillData = async () => {
@@ -73,6 +160,10 @@ const Drill: React.FC = () => {
       
       try {
         console.log('🔧 DEBUG: Fetching drill modes for product:', selectedProduct);
+        
+        // Load drill progress from database
+        const progressData = await reloadProgressData();
+        
         const modes = await fetchDrillModes(selectedProduct);
         console.log('🔧 DEBUG: Received drill modes:', modes);
         console.log('🔧 DEBUG: Number of modes:', modes?.length);
@@ -152,57 +243,57 @@ const Drill: React.FC = () => {
               total: totalQuestions
             });
             
-            // Mock progress data (in real app, fetch from user progress API)
-            const easyCompleted = Math.floor(Math.random() * (easyTotal + 1));
-            const mediumCompleted = Math.floor(Math.random() * (mediumTotal + 1));
-            const hardCompleted = Math.floor(Math.random() * (hardTotal + 1));
+            // Get real progress data from database
+            // Note: section.id is constructed but we need to match against the actual sub_skill_id from questions
+            // Extract the actual sub_skill_id (UUID) from the questions in this section
+            const actualSubSkillId = section.questions.length > 0 && section.questions[0].subSkillId ? 
+              section.questions[0].subSkillId : section.name;
             
-            // Create varied completion states for demonstration
-            let finalEasyCompleted, finalMediumCompleted, finalHardCompleted;
-            const randomState = Math.random();
+            console.log(`🔧 DRILL: Looking for progress with actualSubSkillId: "${actualSubSkillId}" (section.id: "${section.id}", section.name: "${section.name}")`);
+            console.log(`🔧 DRILL: Available progress keys:`, Object.keys(progressData));
+            console.log(`🔧 DRILL: Progress data for this subSkill:`, progressData[actualSubSkillId]);
             
-            if (randomState < 0.3) {
-              // Not started (30% chance)
-              finalEasyCompleted = 0;
-              finalMediumCompleted = 0;
-              finalHardCompleted = 0;
-            } else if (randomState < 0.7) {
-              // In progress (40% chance)
-              finalEasyCompleted = Math.floor(easyTotal * 0.3);
-              finalMediumCompleted = Math.floor(mediumTotal * 0.2);
-              finalHardCompleted = Math.floor(hardTotal * 0.1);
-            } else {
-              // Completed (30% chance)
-              finalEasyCompleted = easyTotal;
-              finalMediumCompleted = mediumTotal;
-              finalHardCompleted = hardTotal;
+            // Also try alternative keys in case there's still a mismatch
+            let realProgress = progressData[actualSubSkillId];
+            if (!realProgress) {
+              // Try with section.id as fallback
+              realProgress = progressData[section.id];
+              console.log(`🔧 DRILL: Fallback - trying section.id "${section.id}":`, realProgress);
             }
+            if (!realProgress) {
+              // Try with section.name as fallback
+              realProgress = progressData[section.name];
+              console.log(`🔧 DRILL: Fallback - trying section.name "${section.name}":`, realProgress);
+            }
+            
+            // Default if still no match
+            if (!realProgress) {
+              realProgress = {
+                easy: { completed: 0, total: easyTotal, bestScore: undefined },
+                medium: { completed: 0, total: mediumTotal, bestScore: undefined },
+                hard: { completed: 0, total: hardTotal, bestScore: undefined }
+              };
+              console.log(`🔧 DRILL: No progress found, using default:`, realProgress);
+            } else {
+              console.log(`🔧 DRILL: Found existing progress:`, realProgress);
+            }
+            
+            // Update totals to match actual question counts
+            realProgress.easy.total = easyTotal;
+            realProgress.medium.total = mediumTotal;
+            realProgress.hard.total = hardTotal;
+            
+            console.log(`🔧 DRILL: Progress for ${subSkillName}:`, realProgress);
             
             const subSkill: SubSkill = {
               id: section.id,
               name: subSkillName,
               description: `Master ${subSkillName.toLowerCase()} through targeted practice`,
               questions: section.questions,
-              progress: {
-                easy: { 
-                  completed: finalEasyCompleted, 
-                  total: easyTotal,
-                  bestScore: finalEasyCompleted > 0 ? Math.floor(Math.random() * 40) + 60 : undefined
-                },
-                medium: { 
-                  completed: finalMediumCompleted, 
-                  total: mediumTotal,
-                  bestScore: finalMediumCompleted > 0 ? Math.floor(Math.random() * 30) + 70 : undefined
-                },
-                hard: { 
-                  completed: finalHardCompleted, 
-                  total: hardTotal,
-                  bestScore: finalHardCompleted > 0 ? Math.floor(Math.random() * 20) + 80 : undefined
-                }
-              },
-              isRecommended: Math.random() > 0.7, // Mock recommendation (30% chance)
+              progress: realProgress,
+              isRecommended: false, // Could be calculated based on performance
               totalQuestions: totalQuestions,
-              completedQuestions: finalEasyCompleted + finalMediumCompleted + finalHardCompleted
+              completedQuestions: realProgress.easy.completed + realProgress.medium.completed + realProgress.hard.completed
             };
 
             skillArea.subSkills.push(subSkill);
@@ -229,7 +320,43 @@ const Drill: React.FC = () => {
     };
 
     loadDrillData();
-  }, [selectedProduct]);
+  }, [selectedProduct, user]);
+
+  // Add periodic refresh to catch developer tools changes
+  useEffect(() => {
+    if (!user) return;
+
+    const refreshProgress = async () => {
+      console.log('🔄 DRILL: Periodic progress refresh...');
+      await reloadProgressData();
+    };
+
+    // Refresh on window focus
+    const handleFocus = () => refreshProgress();
+    window.addEventListener('focus', handleFocus);
+    
+    // Refresh periodically when window is visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 DRILL: Page became visible, refreshing progress...');
+        refreshProgress();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Also refresh every 5 seconds in development to catch dev tool changes
+    const interval = setInterval(() => {
+      if (!document.hidden && import.meta.env.DEV) {
+        refreshProgress();
+      }
+    }, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, [user]);
 
   const getSkillAreaIcon = (skillAreaName: string): React.ReactNode => {
     const name = skillAreaName.toLowerCase();
@@ -285,10 +412,32 @@ const Drill: React.FC = () => {
     console.log(`🔧 DEBUG: Filtering ${difficulty} questions (difficulty=${targetDifficulty}):`, availableQuestions.length, 'found out of', questions.length, 'total');
     
     if (availableQuestions.length > 0) {
-      // Navigate to the test-taking route for full-screen mode
-      const skillId = selectedSubSkill.id;
-      const skillName = selectedSubSkill.name;
-      navigate(`/test/drill/${skillId}?skill=${skillName}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`);
+      // Check if there's an existing session for this sub-skill and difficulty
+      const actualSubSkillId = selectedSubSkill.questions.length > 0 && selectedSubSkill.questions[0].subSkillId ? 
+        selectedSubSkill.questions[0].subSkillId : selectedSubSkill.name;
+      
+      const progressData = drillProgress[actualSubSkillId];
+      const difficultyProgress = progressData?.[difficulty];
+      
+      console.log(`🔧 DRILL: Looking for existing session - subSkillId: ${actualSubSkillId}, difficulty: ${difficulty}`);
+      console.log(`🔧 DRILL: Progress data:`, difficultyProgress);
+      
+      let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
+      
+      if (difficultyProgress?.sessionId) {
+        // Add session ID for resume/review
+        navigationUrl += `&sessionId=${difficultyProgress.sessionId}`;
+        console.log(`🔧 DRILL: Adding session ID to navigation: ${difficultyProgress.sessionId}`);
+        
+        // Add review mode for completed sessions
+        if (difficultyProgress.completed === difficultyProgress.total && difficultyProgress.total > 0) {
+          navigationUrl += '&review=true';
+          console.log(`🔧 DRILL: Session is completed, adding review mode`);
+        }
+      }
+      
+      console.log(`🔧 DRILL: Navigating to: ${navigationUrl}`);
+      navigate(navigationUrl);
     } else {
       console.warn(`No ${difficulty} questions available for ${selectedSubSkill.name}`);
       // Could show a message to the user here
@@ -296,32 +445,15 @@ const Drill: React.FC = () => {
   };
 
   const getDifficultyConfig = (difficulty: 'easy' | 'medium' | 'hard') => {
-    switch (difficulty) {
-      case 'easy':
-        return {
-          color: 'green',
-          bgClass: 'bg-green-50 border-green-200 hover:bg-green-100',
-          textClass: 'text-green-700',
-          buttonClass: 'bg-green-500 hover:bg-green-600 text-white',
-          badgeClass: 'bg-green-100 text-green-700'
-        };
-      case 'medium':
-        return {
-          color: 'amber',
-          bgClass: 'bg-amber-50 border-amber-200 hover:bg-amber-100',
-          textClass: 'text-amber-700',
-          buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white',
-          badgeClass: 'bg-amber-100 text-amber-700'
-        };
-      case 'hard':
-        return {
-          color: 'red',
-          bgClass: 'bg-red-50 border-red-200 hover:bg-red-100',
-          textClass: 'text-red-700',
-          buttonClass: 'bg-red-500 hover:bg-red-600 text-white',
-          badgeClass: 'bg-red-100 text-red-700'
-        };
-    }
+    // All difficulty levels now have the same light grey background with teal theme
+    return {
+      color: 'edu-teal',
+      bgClass: 'bg-slate-50 border-edu-teal border-2 hover:bg-slate-100',
+      textClass: 'text-slate-700',
+      buttonClass: 'bg-edu-teal hover:bg-edu-teal/90 text-white',
+      badgeClass: 'bg-edu-teal/10 text-edu-teal border-edu-teal/20',
+      progressColor: 'text-edu-teal'
+    };
   };
 
   const getProgressPercentage = (completed: number, total: number) => {
@@ -348,156 +480,6 @@ const Drill: React.FC = () => {
     return recommended.slice(0, 3);
   };
 
-  // Development Tools Functions
-  const handleClearProgress = async () => {
-    if (!user || import.meta.env.PROD) return;
-    
-    if (confirm('🚨 DEV: Clear all drill progress? This will delete all sessions and progress data.')) {
-      try {
-        // Clear all user_test_sessions for this user/product/mode
-        const { error: sessionsError } = await supabase
-          .from('user_test_sessions')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('product_type', selectedProduct)
-          .eq('test_mode', 'drill');
-
-        if (sessionsError) throw sessionsError;
-        
-        console.log('✅ DEV: Cleared all drill sessions');
-        
-        // Refresh the page data
-        setTimeout(() => window.location.reload(), 500);
-      } catch (error) {
-        console.error('Failed to clear progress:', error);
-        alert('Failed to clear progress. Check console for details.');
-      }
-    }
-  };
-
-  const handleHalfComplete = async () => {
-    if (!user || import.meta.env.PROD) return;
-    
-    if (confirm('🚨 DEV: Set drills to half-complete state with mixed progress?')) {
-      try {
-        // Get all sub-skills from all skill areas
-        const allSubSkills = skillAreas.flatMap(area => area.subSkills);
-        
-        for (let i = 0; i < allSubSkills.length; i++) {
-          const subSkill = allSubSkills[i];
-          const difficulties = ['easy', 'medium', 'hard'];
-          
-          for (let j = 0; j < difficulties.length; j++) {
-            const difficulty = difficulties[j];
-            let sessionData = null;
-            
-            // Create a mix of statuses
-            const sessionIndex = i * 3 + j; // Unique index for each difficulty level
-            
-            if (sessionIndex < Math.floor(allSubSkills.length * 0.3)) {
-              // 30% completed
-              const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
-              sessionData = {
-                user_id: user.id,
-                product_type: selectedProduct,
-                test_mode: 'drill',
-                section_name: `${subSkill.name} - ${difficulty}`,
-                status: 'completed',
-                current_question_index: 5, // Assume 5 questions per drill
-                total_questions: 5,
-                final_score: mockScore,
-                session_data: {
-                  answers: {},
-                  timeRemaining: 0,
-                  flaggedQuestions: []
-                }
-              };
-            } else if (sessionIndex < Math.floor(allSubSkills.length * 0.6)) {
-              // 30% in-progress
-              sessionData = {
-                user_id: user.id,
-                product_type: selectedProduct,
-                test_mode: 'drill',
-                section_name: `${subSkill.name} - ${difficulty}`,
-                status: 'active',
-                current_question_index: 2, // Partially complete
-                total_questions: 5,
-                final_score: null,
-                session_data: {
-                  answers: {},
-                  timeRemaining: 600, // 10 minutes remaining
-                  flaggedQuestions: []
-                }
-              };
-            }
-            // 40% remain not-started (no session created)
-            
-            if (sessionData) {
-              const { error: sessionError } = await supabase
-                .from('user_test_sessions')
-                .insert(sessionData);
-
-              if (sessionError) throw sessionError;
-              
-              console.log(`✅ DEV: Created mock ${sessionData.status} session for ${subSkill.name} - ${difficulty}`);
-            }
-          }
-        }
-        
-        // Refresh the page data
-        setTimeout(() => window.location.reload(), 500);
-      } catch (error) {
-        console.error('Failed to set half-complete state:', error);
-        alert('Failed to set half-complete state. Check console for details.');
-      }
-    }
-  };
-
-  const handleFinishAll = async () => {
-    if (!user || import.meta.env.PROD) return;
-    
-    if (confirm('🚨 DEV: Complete all drill exercises with mock data?')) {
-      try {
-        const allSubSkills = skillAreas.flatMap(area => area.subSkills);
-        const difficulties = ['easy', 'medium', 'hard'];
-        
-        for (const subSkill of allSubSkills) {
-          for (const difficulty of difficulties) {
-            const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
-            
-            // Create mock completed session
-            const { error: sessionError } = await supabase
-              .from('user_test_sessions')
-              .insert({
-                user_id: user.id,
-                product_type: selectedProduct,
-                test_mode: 'drill',
-                section_name: `${subSkill.name} - ${difficulty}`,
-                status: 'completed',
-                current_question_index: 5, // Assume 5 questions per drill
-                total_questions: 5,
-                final_score: mockScore,
-                session_data: {
-                  answers: {},
-                  timeRemaining: 0,
-                  flaggedQuestions: []
-                }
-              });
-
-            if (sessionError) throw sessionError;
-            
-            console.log(`✅ DEV: Created mock session for ${subSkill.name} - ${difficulty}`);
-          }
-        }
-        
-        // Refresh the page data
-        setTimeout(() => window.location.reload(), 500);
-      } catch (error) {
-        console.error('Failed to complete all drills:', error);
-        alert('Failed to complete all drills. Check console for details.');
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -588,8 +570,8 @@ const Drill: React.FC = () => {
               return (
                 <Card key={level} className={cn("transition-all duration-200 hover:shadow-lg cursor-pointer", config.bgClass)}
                       onClick={() => startDrill(level)}>
-                  <CardContent className="p-8 text-center">
-                    <div className="mb-6">
+                  <CardContent className="p-8 text-center h-full flex flex-col">
+                    <div className="flex-1">
                       <h3 className="text-2xl font-bold capitalize mb-2">{level}</h3>
                       <p className="text-sm text-gray-600 mb-4">
                         {data.completed}/{data.total} questions completed
@@ -605,7 +587,7 @@ const Drill: React.FC = () => {
                             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                           />
                           <path
-                            className={`stroke-current text-${config.color}-500`}
+                            className="stroke-current text-edu-teal"
                             strokeWidth="3"
                             strokeDasharray={`${getProgressPercentage(data.completed, data.total)}, 100`}
                             strokeLinecap="round"
@@ -620,13 +602,17 @@ const Drill: React.FC = () => {
                         </div>
                       </div>
 
-                      {data.bestScore && (
-                        <Badge variant="outline" className="mb-4">
-                          Best Score: {data.bestScore}%
-                        </Badge>
-                      )}
+                      {/* Fixed height container for badge to prevent layout shift */}
+                      <div className="h-8 flex items-center justify-center mb-4">
+                        {data.bestScore && (
+                          <Badge variant="outline" className={cn(config.badgeClass)}>
+                            Best Score: {data.bestScore}%
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     
+                    {/* Button always at bottom */}
                     <Button
                       className={cn("w-full", config.buttonClass)}
                       disabled={data.total === 0}
@@ -698,48 +684,17 @@ const Drill: React.FC = () => {
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
 
-      {/* Development Tools - Only show in development */}
-      {import.meta.env.DEV && (
-        <Card className="border-2 border-red-200 bg-red-50/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-red-800 flex items-center space-x-2">
-              <Zap size={16} />
-              <span>Development Tools - Skill Drills</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex space-x-3">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClearProgress}
-                className="border-red-300 text-red-700 hover:bg-red-100"
-              >
-                <Trash2 size={14} className="mr-1" />
-                Clear All
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleHalfComplete}
-                className="border-amber-300 text-amber-700 hover:bg-amber-100"
-              >
-                <Target size={14} className="mr-1" />
-                Half Complete
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleFinishAll}
-                className="border-green-300 text-green-700 hover:bg-green-100"
-              >
-                <CheckCircle size={14} className="mr-1" />
-                Finish All
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Development Tools */}
+      <DeveloperTools 
+        testType="drill" 
+        selectedProduct={selectedProduct} 
+        onDataChanged={async () => {
+          console.log('🔄 DRILL: Developer tools data changed, force reloading...');
+          await reloadProgressData();
+          // Also reload the drill modes to get fresh data
+          window.location.reload();
+        }}
+      />
 
       {/* Skill Areas - Single Column */}
       <div>

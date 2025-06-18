@@ -127,43 +127,32 @@ export class SessionPersistenceService {
     try {
       console.log('🔄 Loading session state from backend:', sessionId);
       
-      // Load complete session state from backend only
-      const sessionData = await TestSessionService.getSessionForResume(sessionId);
+      // Use simple direct loading for diagnostic sessions
+      const { SimpleDiagnosticService } = await import('./simpleDiagnosticService');
+      const sessionData = await SimpleDiagnosticService.getSessionForResume(sessionId);
       
       if (!sessionData) {
         console.log('⚠️ No session found in backend:', sessionId);
         return null;
       }
 
-      // Convert backend data to interface format - prioritize section states
+      // Convert answers from object to Record<number, string> format
       const answers: Record<number, string> = {};
       
-      // Get answers from section states (most up-to-date)
+      console.log('🔍 Converting answers from sessionData:', sessionData.sessionData?.answers);
+      
       if (sessionData.sessionData?.answers) {
         Object.entries(sessionData.sessionData.answers).forEach(([key, value]) => {
           const index = parseInt(key);
           if (!isNaN(index)) {
             answers[index] = value as string;
+            console.log(`🔍 Converted answer ${key} -> ${index}: ${value}`);
           }
         });
-        console.log('✅ Loaded answers from section states:', Object.keys(answers).length);
-      }
-      
-      // Fallback: rebuild from question responses if no section state answers
-      if (Object.keys(answers).length === 0 && sessionData.questionOrder.length > 0) {
-        console.log('🔄 Rebuilding answers from question responses...');
-        try {
-          const rebuiltAnswers = await TestSessionService.rebuildSessionAnswers(sessionId);
-          Object.entries(rebuiltAnswers).forEach(([key, value]) => {
-            const index = parseInt(key);
-            if (!isNaN(index)) {
-              answers[index] = value;
-            }
-          });
-          console.log('✅ Rebuilt answers:', Object.keys(answers).length);
-        } catch (error) {
-          console.error('Failed to rebuild answers:', error);
-        }
+        console.log('✅ Loaded answers from session data:', Object.keys(answers).length);
+        console.log('✅ Final answers object:', answers);
+      } else {
+        console.log('⚠️ No answers found in sessionData');
       }
 
       return {
@@ -182,14 +171,14 @@ export class SessionPersistenceService {
         status: sessionData.status as 'in-progress' | 'completed' | 'paused',
         sessionData: {
           ...sessionData.sessionData,
-          questionIds: sessionData.questionOrder, // Include question order
+          questionIds: sessionData.questionOrder,
           questionResponses: sessionData.questionResponses,
-          sectionStates: sessionData.sectionStates // Include section states
+          sectionStates: sessionData.sectionStates
         }
       };
     } catch (error) {
       console.error('Failed to load session from backend:', error);
-      return null; // No local fallbacks - backend is single source of truth
+      return null;
     }
   }
 
@@ -275,7 +264,7 @@ export class SessionPersistenceService {
   }
 
   /**
-   * Get all section progress for a user's diagnostic test using the new function
+   * Get all section progress for a user's diagnostic test using simple direct queries
    */
   static async getDiagnosticProgress(
     userId: string,
@@ -284,32 +273,35 @@ export class SessionPersistenceService {
     try {
       console.log('🔍 getDiagnosticProgress called with:', { userId, productType });
       
-      // Use the new database function
-      const progressData = await TestSessionService.getDiagnosticProgress(userId, productType);
+      // Use simple direct database queries instead of complex functions
+      const { SimpleDiagnosticService } = await import('./simpleDiagnosticService');
+      const progressData = await SimpleDiagnosticService.getDiagnosticProgress(userId, productType);
       
       const progressMap: Record<string, SectionProgress> = {};
       
-      progressData.forEach((section: { section_name: string; status: string; questions_completed: number; total_questions: number; last_updated: string; session_id: string }) => {
-        progressMap[section.section_name] = {
-          sectionName: section.section_name,
+      // Convert simple progress to our interface
+      Object.values(progressData).forEach(section => {
+        progressMap[section.sectionName] = {
+          sectionName: section.sectionName,
           status: section.status,
-          questionsCompleted: section.questions_completed,
-          totalQuestions: section.total_questions,
-          lastUpdated: section.last_updated,
-          sessionId: section.session_id
+          questionsCompleted: section.questionsCompleted,
+          totalQuestions: section.totalQuestions,
+          lastUpdated: section.lastUpdated,
+          sessionId: section.sessionId
         };
       });
 
-      console.log('📊 Diagnostic progress loaded:', progressMap);
+      console.log('📊 Diagnostic progress processed:', progressMap);
       return progressMap;
     } catch (error) {
       console.error('❌ Failed to get diagnostic progress:', error);
+      console.error('❌ Error details:', error.message, error.stack);
       return {};
     }
   }
 
   /**
-   * Create or resume a test session using the new database function
+   * Create or resume a test session using simple direct operations
    */
   static async createOrResumeSession(
     userId: string,
@@ -329,14 +321,27 @@ export class SessionPersistenceService {
         questionIdsLength: questionIds?.length || 0
       });
 
-      // Use the new TestSessionService method with question order
+      // Use simple direct database operations for diagnostics
+      if (testMode === 'diagnostic') {
+        const { SimpleDiagnosticService } = await import('./simpleDiagnosticService');
+        const sessionId = await SimpleDiagnosticService.createOrResumeSession(
+          userId,
+          productType,
+          sectionName,
+          totalQuestions || 0
+        );
+        console.log('✅ Session created/resumed:', sessionId);
+        return sessionId;
+      }
+
+      // Fallback for other test modes (keeping original logic for now)
       const sessionId = await TestSessionService.createOrResumeSession(
         userId,
         productType,
         testMode,
         sectionName,
         totalQuestions,
-        questionIds // Pass question IDs as question order
+        questionIds
       );
 
       console.log('✅ Session created/resumed:', sessionId);
