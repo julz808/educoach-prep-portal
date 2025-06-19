@@ -10,6 +10,7 @@ import {
   type DrillResults 
 } from '@/services/analyticsService';
 import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PerformanceData {
   overall: OverallPerformance | null;
@@ -118,12 +119,12 @@ const SpiderChart = ({ data, size = 320, animate = true }: {
               animation: animate ? `fadeInSlideUp 1s ease-out ${i * 0.1 + 0.8}s both` : 'none'
             }}
           >
-            <div className="text-xs font-medium text-slate-700 leading-tight">
+            <div className="text-sm font-medium text-slate-700 leading-tight">
               {item.label.split('\n').map((line, idx) => (
                 <div key={idx}>{line}</div>
               ))}
             </div>
-            <div className={`text-sm font-bold mt-1 ${
+            <div className={`text-base font-bold mt-1 ${
               item.value >= 80 ? 'text-green-600' : 
               item.value >= 60 ? 'text-orange-600' : 
               'text-red-600'
@@ -133,32 +134,6 @@ const SpiderChart = ({ data, size = 320, animate = true }: {
           </div>
         );
       })}
-      
-      <style jsx>{`
-        @keyframes growFromCenter {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          60% {
-            transform: scale(1.05);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        @keyframes fadeInSlideUp {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) translateY(15px) scale(0.8);
-          }
-          100% {
-            opacity: 1;
-            transform: translate(-50%, -50%) translateY(0) scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 };
@@ -180,6 +155,18 @@ const PerformanceDashboard = () => {
     practice: null,
     drills: null,
   });
+  
+  // Animation states
+  const [animatedOverallScore, setAnimatedOverallScore] = useState(0);
+  const [animatedOverallAccuracy, setAnimatedOverallAccuracy] = useState(0);
+  const [animateSpiderChart, setAnimateSpiderChart] = useState(true);
+  const [animatedSectionScores, setAnimatedSectionScores] = useState<Record<string, number>>({});
+  const [animatedSubSkillScores, setAnimatedSubSkillScores] = useState<Record<string, number>>({});
+  const [animatedPracticeScore, setAnimatedPracticeScore] = useState(0);
+  const [animatedPracticeAccuracy, setAnimatedPracticeAccuracy] = useState(0);
+  
+  // User profile state
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   // Load real performance data
   useEffect(() => {
@@ -194,6 +181,17 @@ const PerformanceDashboard = () => {
       
       try {
         console.log('📊 Loading performance data for:', user.id, selectedProduct);
+        
+        // Load user profile
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile) {
+          setUserProfile(profile);
+        }
         
         // Load data with individual error handling for each section
         const results = await Promise.allSettled([
@@ -227,6 +225,7 @@ const PerformanceDashboard = () => {
         });
 
         console.log('✅ Performance data loaded successfully');
+        console.log('🔍 Practice data received:', practice);
       } catch (error) {
         console.error('❌ Error loading performance data:', error);
         setDataError('Failed to load performance data. Please try again.');
@@ -237,6 +236,146 @@ const PerformanceDashboard = () => {
 
     loadPerformanceData();
   }, [user, selectedProduct]);
+  
+  // Counting animation for overall score and accuracy
+  useEffect(() => {
+    const targetScore = performanceData.diagnostic?.overallScore || 0;
+    const targetAccuracy = performanceData.diagnostic?.overallAccuracy || 0;
+    
+    // Reset and animate
+    setAnimatedOverallScore(0);
+    setAnimatedOverallAccuracy(0);
+    
+    const duration = 1500; // 1.5 seconds
+    const steps = 30;
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      
+      setAnimatedOverallScore(Math.round(targetScore * progress));
+      setAnimatedOverallAccuracy(Math.round(targetAccuracy * progress));
+      
+      if (currentStep >= steps) {
+        clearInterval(timer);
+      }
+    }, stepDuration);
+    
+    return () => clearInterval(timer);
+  }, [performanceData.diagnostic]);
+  
+  // Trigger spider chart animation on view toggle
+  useEffect(() => {
+    setAnimateSpiderChart(false);
+    const timer = setTimeout(() => setAnimateSpiderChart(true), 50);
+    return () => clearTimeout(timer);
+  }, [sectionView]);
+  
+  // Animate section scores when view changes or data loads
+  useEffect(() => {
+    if (!performanceData.diagnostic?.sectionBreakdown) return;
+    
+    const newScores: Record<string, number> = {};
+    const duration = 1200; // Match the growToRight animation duration
+    const steps = 24;
+    const stepDuration = duration / steps;
+    
+    performanceData.diagnostic.sectionBreakdown.forEach((section, index) => {
+      const targetValue = sectionView === 'score' ? section.score : section.accuracy;
+      const delay = index * 150; // Match the animation delay
+      
+      // Start at 0
+      newScores[section.sectionName] = 0;
+      
+      setTimeout(() => {
+        let currentStep = 0;
+        const timer = setInterval(() => {
+          currentStep++;
+          const progress = currentStep / steps;
+          newScores[section.sectionName] = Math.round(targetValue * progress);
+          setAnimatedSectionScores({...newScores});
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+          }
+        }, stepDuration);
+      }, delay);
+    });
+    
+    setAnimatedSectionScores(newScores);
+  }, [performanceData.diagnostic, sectionView]);
+  
+  // Animate sub-skill scores when view changes or data loads
+  useEffect(() => {
+    if (!performanceData.diagnostic?.allSubSkills) return;
+    
+    const newScores: Record<string, number> = {};
+    const duration = 1200; // Match the growToRight animation duration
+    const steps = 24;
+    const stepDuration = duration / steps;
+    
+    performanceData.diagnostic.allSubSkills.forEach((skill, index) => {
+      const targetValue = subSkillView === 'score' 
+        ? (skill.questionsTotal > 0 ? Math.round((skill.questionsCorrect / skill.questionsTotal) * 100) : 0)
+        : (skill.questionsAttempted > 0 ? Math.round((skill.questionsCorrect / skill.questionsAttempted) * 100) : 0);
+      const delay = index * 120; // Match the animation delay
+      
+      // Start at 0
+      newScores[skill.subSkill] = 0;
+      
+      setTimeout(() => {
+        let currentStep = 0;
+        const timer = setInterval(() => {
+          currentStep++;
+          const progress = currentStep / steps;
+          newScores[skill.subSkill] = Math.round(targetValue * progress);
+          setAnimatedSubSkillScores({...newScores});
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+          }
+        }, stepDuration);
+      }, delay);
+    });
+    
+    setAnimatedSubSkillScores(newScores);
+  }, [performanceData.diagnostic, subSkillView]);
+  
+  // Animate practice test scores
+  useEffect(() => {
+    if (!performanceData.practice?.tests) return;
+    
+    const selectedTest = performanceData.practice.tests.find(t => t.testNumber === selectedPracticeTest);
+    if (!selectedTest || selectedTest.status !== 'completed') return;
+    
+    const targetScore = selectedTest.score || 0;
+    const targetAccuracy = selectedTest.score || 0; // Will calculate proper accuracy later
+    
+    // Reset and animate
+    setAnimatedPracticeScore(0);
+    setAnimatedPracticeAccuracy(0);
+    
+    const duration = 1500; // 1.5 seconds
+    const steps = 30;
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      
+      setAnimatedPracticeScore(Math.round(targetScore * progress));
+      setAnimatedPracticeAccuracy(Math.round(targetAccuracy * progress));
+      
+      if (currentStep >= steps) {
+        clearInterval(timer);
+      }
+    }, stepDuration);
+    
+    return () => clearInterval(timer);
+  }, [performanceData.practice, selectedPracticeTest]);
 
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
@@ -320,7 +459,9 @@ const PerformanceDashboard = () => {
           <h1 className="text-4xl font-black text-slate-900 mb-3 bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
             Performance Insights
           </h1>
-          <p className="text-slate-600 text-lg font-medium">{selectedProduct}</p>
+          <p className="text-slate-600 text-lg font-medium">
+            {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Loading...'}
+          </p>
         </div>
 
         {/* Tabs */}
@@ -355,7 +496,46 @@ const PerformanceDashboard = () => {
           {/* Overall Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Overall Performance</h2>
+              {(() => {
+                const hasOverallData = performanceData.overall?.questionsCompleted > 0;
+                const hasDiagnosticData = performanceData.diagnostic;
+                const hasPracticeData = performanceData.practice?.tests?.some(test => test.status === 'completed');
+                const hasDrillData = performanceData.drills?.subSkillBreakdown?.some(section => 
+                  section.subSkills.some(skill => skill.questionsCompleted > 0)
+                );
+                
+                const hasAnyData = hasOverallData || hasDiagnosticData || hasPracticeData || hasDrillData;
+                
+                return !hasAnyData ? (
+                <div className="text-center py-16">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
+                    <BarChart3 className="h-12 w-12 text-teal-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Start Your Learning Journey</h3>
+                  <p className="text-slate-600 mb-8 max-w-md mx-auto">Complete some activities to see your overall performance insights. Your progress across all test modes will be summarized here.</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-blue-800">
+                        <div className="font-semibold mb-1">To see overall insights:</div>
+                        <div>• Complete diagnostic sections, OR</div>
+                        <div>• Complete a practice test, OR</div>
+                        <div>• Answer drill questions</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 justify-center">
+                    <button className="px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold">
+                      Start Diagnostic
+                    </button>
+                    <button className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-semibold">
+                      Practice Skills
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6">Overall Performance</h2>
               
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -372,7 +552,7 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">847</div>
+                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.questionsCompleted || 0}</div>
                   </div>
                 </div>
                 
@@ -389,7 +569,7 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">75%</div>
+                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.overallAccuracy || 0}%</div>
                   </div>
                 </div>
                 
@@ -406,7 +586,7 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">78%</div>
+                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.averageTestScore || '-'}%</div>
                   </div>
                 </div>
                 
@@ -423,7 +603,7 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">18.5h</div>
+                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.studyTimeHours || 0}h</div>
                   </div>
                 </div>
               </div>
@@ -440,20 +620,14 @@ const PerformanceDashboard = () => {
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
-                      {[
-                        { skill: 'Literal Comprehension', accuracy: 95, section: 'Reading Reasoning' },
-                        { skill: 'Numerical Operations', accuracy: 92, section: 'Mathematics Reasoning' },
-                        { skill: 'Vocabulary in Context', accuracy: 88, section: 'Reading Reasoning' },
-                        { skill: 'Persuasive Writing', accuracy: 85, section: 'Writing' },
-                        { skill: 'Text Structure Analysis', accuracy: 83, section: 'Reading Reasoning' }
-                      ].map((item, index) => (
+                      {(performanceData.diagnostic?.strengths || []).slice(0, 5).map((item, index) => (
                         <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                           <div className="flex-1">
-                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.skill}</h5>
-                            <p className="text-sm text-slate-600">{item.section}</p>
+                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
+                            <p className="text-sm text-slate-600">{item.questionsAttempted} questions</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="text-lg font-semibold text-green-600">{item.accuracy}%</div>
+                            <div className="text-lg font-semibold text-green-600">{Math.round(item.accuracy)}%</div>
                             <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                               <div 
                                 className="h-full rounded-full bg-green-500"
@@ -477,22 +651,16 @@ const PerformanceDashboard = () => {
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
-                      {[
-                        { skill: 'Verbal Reasoning & Analogies', accuracy: 45, section: 'General Ability - Verbal' },
-                        { skill: 'Logical Reasoning & Deduction', accuracy: 52, section: 'General Ability - Verbal' },
-                        { skill: 'Algebraic Reasoning', accuracy: 58, section: 'Mathematics Reasoning' },
-                        { skill: 'Pattern Recognition & Sequences', accuracy: 62, section: 'General Ability - Quantitative' },
-                        { skill: 'Conceptual Understanding', accuracy: 65, section: 'General Ability - Quantitative' }
-                      ].map((item, index) => (
+                      {(performanceData.diagnostic?.weaknesses || []).slice(0, 5).map((item, index) => (
                         <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                           <div className="flex-1">
-                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.skill}</h5>
-                            <p className="text-sm text-slate-600">{item.section}</p>
+                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
+                            <p className="text-sm text-slate-600">{item.questionsAttempted} questions</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className={`text-lg font-semibold ${
                               item.accuracy >= 60 ? 'text-orange-600' : 'text-red-600'
-                            }`}>{item.accuracy}%</div>
+                            }`}>{Math.round(item.accuracy)}%</div>
                             <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                               <div 
                                 className={`h-full rounded-full ${
@@ -504,10 +672,19 @@ const PerformanceDashboard = () => {
                           </div>
                         </div>
                       ))}
+                      {(!performanceData.diagnostic?.weaknesses || performanceData.diagnostic.weaknesses.length === 0) && (
+                        <div className="text-center py-8 text-slate-500">
+                          <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          Complete more questions to see areas for improvement
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
+                </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -519,8 +696,18 @@ const PerformanceDashboard = () => {
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
                     <Target className="h-12 w-12 text-teal-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">No Diagnostic Results</h3>
-                  <p className="text-slate-600 mb-8 max-w-md mx-auto">Complete your diagnostic test to see detailed performance insights and identify your strengths and areas for improvement.</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Complete Your Diagnostic First</h3>
+                  <p className="text-slate-600 mb-8 max-w-md mx-auto">You need to complete <strong>all sections</strong> of the diagnostic test to see your detailed performance insights, strengths, and areas for improvement.</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-blue-800">
+                        <div className="font-semibold mb-1">Requirements:</div>
+                        <div>• Complete at least 3 diagnostic sections</div>
+                        <div>• Finish each section to see results</div>
+                      </div>
+                    </div>
+                  </div>
                   <button className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     Start Diagnostic Test
                   </button>
@@ -532,7 +719,7 @@ const PerformanceDashboard = () => {
                     {/* Overall Score */}
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                       <div className="text-center">
-                        <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
                           Overall Score
                           <div className="relative inline-block">
                             <Info size={14} className="text-slate-400 cursor-help" />
@@ -543,19 +730,25 @@ const PerformanceDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="text-4xl font-bold text-slate-900 mb-2">78<span className="text-2xl text-slate-600">/100</span></div>
-                        <div className={`text-lg font-semibold ${
-                          78 >= 80 ? 'text-green-600' : 
-                          78 >= 60 ? 'text-orange-600' : 
-                          'text-red-600'
-                        }`}>78%</div>
+                        <div className="flex items-center justify-center gap-4">
+                          <div className="text-3xl font-bold text-slate-900">
+                            {performanceData.diagnostic.totalQuestionsCorrect}
+                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestions}</span>
+                          </div>
+                          <div className="h-10 w-px bg-slate-200"></div>
+                          <div className={`text-3xl font-bold ${
+                            performanceData.diagnostic.overallScore >= 80 ? 'text-green-600' : 
+                            performanceData.diagnostic.overallScore >= 60 ? 'text-orange-600' : 
+                            'text-red-600'
+                          }`}>{animatedOverallScore}%</div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Overall Accuracy */}
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                       <div className="text-center">
-                        <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
                           Overall Accuracy
                           <div className="relative inline-block">
                             <Info size={14} className="text-slate-400 cursor-help" />
@@ -566,12 +759,18 @@ const PerformanceDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="text-4xl font-bold text-slate-900 mb-2">74<span className="text-2xl text-slate-600">/95</span></div>
-                        <div className={`text-lg font-semibold ${
-                          78 >= 80 ? 'text-green-600' : 
-                          78 >= 60 ? 'text-orange-600' : 
-                          'text-red-600'
-                        }`}>78%</div>
+                        <div className="flex items-center justify-center gap-4">
+                          <div className="text-3xl font-bold text-slate-900">
+                            {performanceData.diagnostic.totalQuestionsCorrect}
+                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestionsAttempted}</span>
+                          </div>
+                          <div className="h-10 w-px bg-slate-200"></div>
+                          <div className={`text-3xl font-bold ${
+                            performanceData.diagnostic.overallAccuracy >= 80 ? 'text-green-600' : 
+                            performanceData.diagnostic.overallAccuracy >= 60 ? 'text-orange-600' : 
+                            'text-red-600'
+                          }`}>{animatedOverallAccuracy}%</div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -626,69 +825,66 @@ const PerformanceDashboard = () => {
                       {/* Spider Chart - Left Side */}
                       <div className="w-1/2 p-6 flex items-center justify-center border-r border-slate-200">
                         <SpiderChart 
-                          data={[
-                            { section: 'Reading Reasoning', score: 17, total: 20, answered: 19, accuracy: 89 },
-                            { section: 'Mathematics Reasoning', score: 16, total: 20, answered: 18, accuracy: 89 },
-                            { section: 'General Ability - Verbal', score: 16, total: 20, answered: 18, accuracy: 89 },
-                            { section: 'General Ability - Quantitative', score: 15, total: 20, answered: 17, accuracy: 88 },
-                            { section: 'Writing', score: 14, total: 20, answered: 16, accuracy: 88 }
-                          ].map(section => ({
-                            label: section.section.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
-                            value: sectionView === 'score' ? Math.round((section.score / section.total) * 100) : section.accuracy,
+                          data={performanceData.diagnostic.sectionBreakdown.map(section => ({
+                            label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+                            value: sectionView === 'score' ? section.score : section.accuracy,
                             maxValue: 100
                           }))}
                           size={320}
-                          animate={true}
+                          animate={animateSpiderChart}
                         />
                       </div>
                       
                       {/* Section List - Right Side */}
                       <div className="w-1/2 divide-y divide-slate-100">
-                        {[
-                          { section: 'Reading Reasoning', score: 17, total: 20, answered: 19, accuracy: 89 },
-                          { section: 'Mathematics Reasoning', score: 16, total: 20, answered: 18, accuracy: 89 },
-                          { section: 'General Ability - Verbal', score: 16, total: 20, answered: 18, accuracy: 89 },
-                          { section: 'General Ability - Quantitative', score: 15, total: 20, answered: 17, accuracy: 88 },
-                          { section: 'Writing', score: 14, total: 20, answered: 16, accuracy: 88 }
-                        ]
+                        {performanceData.diagnostic.sectionBreakdown
                           .sort((a, b) => {
-                            const aValue = sectionView === 'score' ? (a.score / a.total * 100) : a.accuracy;
-                            const bValue = sectionView === 'score' ? (b.score / b.total * 100) : b.accuracy;
+                            const aValue = sectionView === 'score' ? a.score : a.accuracy;
+                            const bValue = sectionView === 'score' ? b.score : b.accuracy;
                             return bValue - aValue;
                           })
                           .map((section, index) => {
-                          const performance = Math.round((section.score / section.total) * 100);
+                          // For Writing sections, use default 50% score as requested
+                          const isWritingSection = section.sectionName.toLowerCase().includes('writing');
+                          const displayScore = isWritingSection ? 50 : section.score;
+                          const displayAccuracy = isWritingSection ? 50 : section.accuracy;
+                          
                           return (
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-slate-900 text-sm">{section.section}</h4>
+                                  <h4 className="font-medium text-slate-900 text-sm">{section.sectionName}</h4>
                                 </div>
-                                <div className="flex flex-col items-end gap-1">
+                                <div className="flex flex-col items-end gap-2">
                                   <div className={`text-base font-semibold ${
                                     sectionView === 'score'
-                                      ? (performance >= 80 ? 'text-green-600' : performance >= 60 ? 'text-orange-600' : 'text-red-600')
-                                      : (section.accuracy >= 80 ? 'text-green-600' : section.accuracy >= 60 ? 'text-orange-600' : 'text-red-600')
+                                      ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
+                                      : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
                                   }`}>
-                                    {sectionView === 'score' ? performance : section.accuracy}%
+                                    {animatedSectionScores[section.sectionName] || 0}%
                                   </div>
                                   <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                     <div 
+                                      key={`${section.sectionName}-${sectionView}`} // Force re-render on toggle
                                       className={`h-full rounded-full growToRight ${
                                         sectionView === 'score'
-                                          ? (performance >= 80 ? 'bg-green-500' : performance >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                          : (section.accuracy >= 80 ? 'bg-green-500' : section.accuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                          ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                          : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
                                       }`}
                                       style={{ 
-                                        width: `${sectionView === 'score' ? performance : section.accuracy}%`,
+                                        width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
                                         animationDelay: `${index * 150}ms`
                                       }}
                                     />
                                   </div>
-                                  <div className="text-xs text-slate-600">
+                                  <div 
+                                    key={`${section.sectionName}-fraction-${sectionView}`}
+                                    className="text-xs text-slate-600 fadeIn"
+                                    style={{ animationDelay: `${index * 150 + 600}ms` }}
+                                  >
                                     {sectionView === 'score' 
-                                      ? <span>{section.score}/{section.total}</span>
-                                      : <span>{section.score}/{section.answered}</span>
+                                      ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                      : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
                                     }
                                   </div>
                                 </div>
@@ -755,74 +951,122 @@ const PerformanceDashboard = () => {
                     </div>
                     
                     <div className="divide-y divide-slate-100">
-                      {[
-                        { skill: 'Inferential Reasoning', section: 'Reading Reasoning', score: 8, total: 8, answered: 8, performancePercent: 100, accuracyPercent: 100, category: 'reading' },
-                        { skill: 'Critical Analysis & Evaluation', section: 'Reading Reasoning', score: 7, total: 8, answered: 7, performancePercent: 88, accuracyPercent: 100, category: 'reading' },
-                        { skill: 'Verbal Reasoning & Analogies', section: 'General Ability - Verbal', score: 7, total: 8, answered: 8, performancePercent: 88, accuracyPercent: 88, category: 'verbal' },
-                        { skill: 'Text Structure Analysis', section: 'Reading Reasoning', score: 6, total: 8, answered: 7, performancePercent: 75, accuracyPercent: 86, category: 'reading' },
-                        { skill: 'Creative Writing', section: 'Writing', score: 6, total: 8, answered: 8, performancePercent: 75, accuracyPercent: 75, category: 'writing' },
-                        { skill: 'Algebraic Reasoning', section: 'Mathematics Reasoning', score: 5, total: 8, answered: 6, performancePercent: 63, accuracyPercent: 83, category: 'mathematical' },
-                        { skill: 'Logical Reasoning & Deduction', section: 'General Ability - Verbal', score: 5, total: 8, answered: 7, performancePercent: 63, accuracyPercent: 71, category: 'verbal' },
-                        { skill: 'Pattern Recognition & Sequences', section: 'General Ability - Quantitative', score: 5, total: 8, answered: 8, performancePercent: 63, accuracyPercent: 63, category: 'quantitative' },
-                        { skill: 'Data Interpretation and Statistics', section: 'Mathematics Reasoning', score: 4, total: 8, answered: 6, performancePercent: 50, accuracyPercent: 67, category: 'mathematical' },
-                        { skill: 'Numerical Reasoning', section: 'General Ability - Quantitative', score: 3, total: 8, answered: 7, performancePercent: 38, accuracyPercent: 43, category: 'quantitative' }
-                      ]
-                        .filter(item => practiceFilter === 'all' || item.category === practiceFilter)
-                        .sort((a, b) => {
-                          const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
-                          const bValue = subSkillView === 'score' ? b.performancePercent : b.accuracyPercent;
-                          return bValue - aValue;
-                        })
-                        .map((skill, index) => (
-                        <div key={index} className="px-6 py-4 hover:bg-slate-50 transition-colors">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="relative group">
-                                <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
-                                  {skill.skill}
-                                  <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                </h5>
-                                {UNIFIED_SUB_SKILLS[skill.skill] && (
-                                  <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
-                                    <div className="font-semibold text-teal-400 mb-2">{skill.skill}</div>
-                                    <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[skill.skill]?.description || 'No description available'}</div>
-                                    <div className="absolute top-0 left-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                      {/* Use all sub-skills from analytics service */}
+                      {(function() {
+                        const allSkills = performanceData.diagnostic?.allSubSkills || [];
+                        
+                        // Map to consistent format using actual section names
+                        const mappedSkills = allSkills.map(skill => {
+                          const sectionName = skill.sectionName || 'Unknown Section';
+                          
+                          // Map section names to filter categories
+                          let category = 'all';
+                          if (sectionName === 'Reading Reasoning') {
+                            category = 'reading';
+                          } else if (sectionName === 'Mathematics Reasoning') {
+                            category = 'mathematical';
+                          } else if (sectionName === 'General Ability - Verbal') {
+                            category = 'verbal';
+                          } else if (sectionName === 'General Ability - Quantitative') {
+                            category = 'quantitative';
+                          } else if (sectionName === 'Writing') {
+                            category = 'writing';
+                          }
+                          
+                          return {
+                            skill: skill.subSkill,
+                            section: sectionName,
+                            score: skill.questionsCorrect,
+                            total: skill.questionsTotal,
+                            answered: skill.questionsAttempted,
+                            performancePercent: skill.questionsTotal > 0 ? Math.round((skill.questionsCorrect / skill.questionsTotal) * 100) : 0,
+                            accuracyPercent: skill.questionsAttempted > 0 ? Math.round((skill.questionsCorrect / skill.questionsAttempted) * 100) : 0,
+                            category
+                          };
+                        });
+                        
+                        return mappedSkills
+                          .filter(item => practiceFilter === 'all' || item.category === practiceFilter)
+                          .sort((a, b) => {
+                            const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
+                            const bValue = subSkillView === 'score' ? b.performancePercent : b.accuracyPercent;
+                            return bValue - aValue;
+                          })
+                          .map((skill, index) => (
+                            <div key={index} className="px-6 py-4 hover:bg-slate-50 transition-colors">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="relative group">
+                                    <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
+                                      {skill.skill}
+                                      <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </h5>
+                                    {UNIFIED_SUB_SKILLS[skill.skill] && (
+                                      <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
+                                        <div className="font-semibold text-teal-400 mb-2">{skill.skill}</div>
+                                        <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[skill.skill]?.description || 'No description available'}</div>
+                                        <div className="absolute top-0 left-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              <p className="text-sm text-slate-500">{skill.section}</p>
-                            </div>
-                            <div className="flex flex-col items-end gap-2">
-                              <div className={`text-lg font-semibold ${
-                                subSkillView === 'score'
-                                  ? (skill.performancePercent >= 80 ? 'text-green-600' : skill.performancePercent >= 60 ? 'text-orange-600' : 'text-red-600')
-                                  : (skill.accuracyPercent >= 80 ? 'text-green-600' : skill.accuracyPercent >= 60 ? 'text-orange-600' : 'text-red-600')
-                              }`}>
-                                {subSkillView === 'score' ? skill.performancePercent : skill.accuracyPercent}%
-                              </div>
-                              <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
-                                <div 
-                                  className={`h-full rounded-full growToRight ${
+                                  <p className="text-sm text-slate-500">{skill.section}</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                  <div className={`text-lg font-semibold ${
                                     subSkillView === 'score'
-                                      ? (skill.performancePercent >= 80 ? 'bg-green-500' : skill.performancePercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                      : (skill.accuracyPercent >= 80 ? 'bg-green-500' : skill.accuracyPercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                  }`}
-                                  style={{ 
-                                    width: `${subSkillView === 'score' ? skill.performancePercent : skill.accuracyPercent}%`,
-                                    animationDelay: `${index * 120}ms`
-                                  }}
-                                />
-                              </div>
-                              <div className="text-sm text-slate-600">
-                                {subSkillView === 'score' 
-                                  ? <span>{skill.score}/{skill.total}</span>
-                                  : <span>{skill.score}/{skill.answered}</span>
-                                }
+                                      ? (skill.performancePercent >= 80 ? 'text-green-600' : skill.performancePercent >= 60 ? 'text-orange-600' : 'text-red-600')
+                                      : (skill.accuracyPercent >= 80 ? 'text-green-600' : skill.accuracyPercent >= 60 ? 'text-orange-600' : 'text-red-600')
+                                  }`}>
+                                    {animatedSubSkillScores[skill.skill] || 0}%
+                                  </div>
+                                  <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div 
+                                      key={`${skill.skill}-${subSkillView}`} // Force re-render on toggle
+                                      className={`h-full rounded-full growToRight ${
+                                        subSkillView === 'score'
+                                          ? (skill.performancePercent >= 80 ? 'bg-green-500' : skill.performancePercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                          : (skill.accuracyPercent >= 80 ? 'bg-green-500' : skill.accuracyPercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                      }`}
+                                      style={{ 
+                                        width: `${subSkillView === 'score' ? skill.performancePercent : skill.accuracyPercent}%`,
+                                        animationDelay: `${index * 120}ms`
+                                      }}
+                                    />
+                                  </div>
+                                  <div 
+                                    key={`${skill.skill}-fraction-${subSkillView}`}
+                                    className="text-sm text-slate-600 fadeIn"
+                                    style={{ animationDelay: `${index * 120 + 600}ms` }}
+                                  >
+                                    {subSkillView === 'score' 
+                                      ? <span>{skill.score}/{skill.total}</span>
+                                      : <span>{skill.score}/{skill.answered}</span>
+                                    }
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      ))}
+                          ));
+                      })()}
+                      {(() => {
+                        console.log('🔍 INSIGHTS: Diagnostic data debug:', {
+                          strengthsLength: performanceData.diagnostic?.strengths?.length || 0,
+                          weaknessesLength: performanceData.diagnostic?.weaknesses?.length || 0,
+                          strengths: performanceData.diagnostic?.strengths,
+                          weaknesses: performanceData.diagnostic?.weaknesses,
+                          allDiagnosticData: performanceData.diagnostic
+                        });
+                        
+                        if (!performanceData.diagnostic?.allSubSkills?.length) {
+                          return (
+                            <div className="text-center py-8 text-slate-500">
+                              <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              Complete the diagnostic test to see detailed sub-skill performance
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -832,380 +1076,333 @@ const PerformanceDashboard = () => {
 
           {/* Practice Tests Tab */}
           {activeTab === 'practice' && (
-            <div className="space-y-10">
-              {/* Header */}
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Practice Test Results</h2>
-                <p className="text-sm text-slate-600">Select a test to view detailed performance analysis</p>
-              </div>
-              
+            <div className="space-y-8">
               {/* Test Selection Cards */}
-              <div className="grid grid-cols-5 gap-3">
-                {[
-                  { testNumber: 1, score: 78, status: 'completed', completedAt: '2024-01-15' },
-                  { testNumber: 2, score: 72, status: 'completed', completedAt: '2024-01-22' },
-                  { testNumber: 3, score: 85, status: 'completed', completedAt: '2024-01-29' },
-                  { testNumber: 4, score: null, status: 'in-progress', completedAt: null },
-                  { testNumber: 5, score: null, status: 'not-started', completedAt: null }
-                ].map((test, index) => (
+              <div className="grid grid-cols-5 gap-4">
+                {(performanceData.practice?.tests || []).map((test, index) => (
                   <div 
                     key={index} 
                     onClick={() => test.status === 'completed' && setSelectedPracticeTest(test.testNumber)}
-                    className={`
-                      relative p-4 rounded-xl border transition-all duration-300 cursor-pointer hover:shadow-lg bg-white border-slate-200 shadow-sm
-                      ${
-                        selectedPracticeTest === test.testNumber ? 'ring-4 ring-teal-200 shadow-lg' : ''
-                      }
-                    `}
+                    className={`relative p-4 rounded-xl border ${
+                      selectedPracticeTest === test.testNumber
+                        ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white border-transparent shadow-lg scale-105 transform'
+                        : test.status === 'completed'
+                        ? 'bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-105 transform'
+                        : 'bg-white border-slate-200 shadow-sm opacity-60'
+                    }`}
                   >
                     <div className="text-center">
-                      <h3 className="text-lg font-bold text-slate-900 mb-2">Test {test.testNumber}</h3>
-                      {test.score !== null ? (
-                        <div className={`text-2xl font-bold mb-2 ${
-                          test.score >= 80 ? 'text-green-600' : 
-                          test.score >= 60 ? 'text-orange-600' : 
-                          'text-red-600'
-                        }`}>
-                          {test.score}%
-                        </div>
+                      <h3 className={`text-lg font-bold mb-2 ${
+                        selectedPracticeTest === test.testNumber ? 'text-white' : 'text-slate-900'
+                      }`}>
+                        Test {test.testNumber}
+                      </h3>
+                      {test.status === 'completed' && test.score !== null ? (
+                        <>
+                          <div className={`text-2xl font-bold mb-1 ${
+                            selectedPracticeTest === test.testNumber 
+                              ? 'text-white' 
+                              : test.score >= 80 ? 'text-green-600' : test.score >= 60 ? 'text-orange-600' : 'text-red-600'
+                          }`}>
+                            {test.score}%
+                          </div>
+                          <p className={`text-sm font-medium ${
+                            selectedPracticeTest === test.testNumber ? 'text-white/90' : 'text-slate-600'
+                          }`}>
+                            {new Date(test.completedAt).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </p>
+                        </>
                       ) : (
-                        <div className="text-lg font-semibold mb-2 text-slate-600">
+                        <div className="text-lg font-semibold text-slate-600">
                           {test.status === 'in-progress' ? 'In Progress' : 'Not Started'}
                         </div>
-                      )}
-                      {test.completedAt && (
-                        <p className="text-sm text-slate-600 font-medium">
-                          {new Date(test.completedAt).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </p>
                       )}
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {/* Overall Performance and Accuracy Cards - Match diagnostic styling */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Overall Score */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Overall Score
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Score</div>
-                          <div>Measures your performance against the total number of questions in the test, including unanswered questions.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                {/* Fill remaining slots if less than 5 tests */}
+                {Array.from({ length: Math.max(0, 5 - (performanceData.practice?.tests?.length || 0)) }, (_, i) => {
+                  const testNumber = (performanceData.practice?.tests?.length || 0) + i + 1;
+                  return (
+                    <div 
+                      key={`empty-${i}`} 
+                      className="relative p-4 rounded-xl border bg-white border-slate-200 shadow-sm opacity-50"
+                    >
+                      <div className="text-center">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Test {testNumber}</h3>
+                        <div className="text-lg font-semibold mb-2 text-slate-600">
+                          Not Started
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">
-                      {selectedPracticeTest === 1 ? '78' : selectedPracticeTest === 2 ? '72' : '85'}
-                      <span className="text-2xl text-slate-600">/100</span>
-                    </div>
-                    <div className={`text-lg font-semibold ${
-                      (selectedPracticeTest === 1 ? 78 : selectedPracticeTest === 2 ? 72 : 85) >= 80 ? 'text-green-600' : 
-                      (selectedPracticeTest === 1 ? 78 : selectedPracticeTest === 2 ? 72 : 85) >= 60 ? 'text-orange-600' : 
-                      'text-red-600'
-                    }`}>
-                      {selectedPracticeTest === 1 ? '78' : selectedPracticeTest === 2 ? '72' : '85'}%
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
+              </div>
 
-                {/* Overall Accuracy */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Overall Accuracy
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Accuracy</div>
-                          <div>Shows percentage of questions answered correctly out of questions you attempted (excludes unanswered questions).</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+              {(() => {
+                const selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest && t.status === 'completed');
+                if (!selectedTest) {
+                  return (
+                    <div className="text-center py-16">
+                      <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
+                        <FileText className="h-12 w-12 text-teal-500" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">Select a Completed Test</h3>
+                      <p className="text-slate-600 mb-8 max-w-md mx-auto">Choose a completed practice test above to view detailed performance analysis.</p>
+                    </div>
+                  );
+                }
+                
+                // Use REAL data from the database
+                const totalQuestions = selectedTest.totalQuestions || 0;
+                const questionsAttempted = selectedTest.questionsAttempted || 0;
+                const questionsCorrect = selectedTest.questionsCorrect || 0;
+                const overallScore = totalQuestions > 0 ? Math.round((questionsCorrect / totalQuestions) * 100) : (selectedTest.score || 0);
+                const overallAccuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : overallScore;
+                
+                return (
+                  <div className="space-y-8">
+                    {/* Overall Performance Cards */}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Overall Score */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                        <div className="text-center">
+                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            Overall Score
+                            <div className="relative inline-block">
+                              <Info size={14} className="text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                <div className="font-semibold mb-1">Score</div>
+                                <div>Measures your performance against the total number of questions in the test, including unanswered questions.</div>
+                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center gap-4">
+                            <div className="text-3xl font-bold text-slate-900">
+                              {questionsCorrect}
+                              <span className="text-slate-600">/{totalQuestions}</span>
+                            </div>
+                            <div className="h-10 w-px bg-slate-200"></div>
+                            <div className={`text-3xl font-bold ${
+                              overallScore >= 80 ? 'text-green-600' : 
+                              overallScore >= 60 ? 'text-orange-600' : 
+                              'text-red-600'
+                            }`}>{overallScore}%</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Overall Accuracy */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                        <div className="text-center">
+                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            Overall Accuracy
+                            <div className="relative inline-block">
+                              <Info size={14} className="text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                <div className="font-semibold mb-1">Accuracy</div>
+                                <div>Shows how well you performed on questions you actually attempted, excluding skipped or timed-out questions.</div>
+                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center gap-4">
+                            <div className="text-3xl font-bold text-slate-900">
+                              {questionsCorrect}
+                              <span className="text-slate-600">/{questionsAttempted}</span>
+                            </div>
+                            <div className="h-10 w-px bg-slate-200"></div>
+                            <div className={`text-3xl font-bold ${
+                              overallAccuracy >= 80 ? 'text-green-600' : 
+                              overallAccuracy >= 60 ? 'text-orange-600' : 
+                              'text-red-600'
+                            }`}>{overallAccuracy}%</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">
-                      {selectedPracticeTest === 1 ? '82' : selectedPracticeTest === 2 ? '75' : '89'}
-                      <span className="text-2xl text-slate-600">/{selectedPracticeTest === 1 ? '95' : selectedPracticeTest === 2 ? '96' : '95'}</span>
-                    </div>
-                    <div className={`text-lg font-semibold ${
-                      (selectedPracticeTest === 1 ? 82 : selectedPracticeTest === 2 ? 75 : 89) >= 80 ? 'text-green-600' : 
-                      (selectedPracticeTest === 1 ? 82 : selectedPracticeTest === 2 ? 75 : 89) >= 60 ? 'text-orange-600' : 
-                      'text-red-600'
-                    }`}>
-                      {selectedPracticeTest === 1 ? '82' : selectedPracticeTest === 2 ? '75' : '89'}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Analysis sections - only show if a test is selected */}
-              {selectedPracticeTest && (
-                <div className="space-y-8">
 
                   {/* Section Results */}
-                  <div className="bg-white rounded-2xl border border-slate-200 shadow-md">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-900">Section Results</h3>
-                    <div className="flex items-center gap-4">
-                      <div className="flex bg-slate-100 rounded-lg p-1">
-                        <button
-                          onClick={() => setSectionView('score')}
-                          className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
-                            sectionView === 'score' 
-                              ? 'bg-white text-slate-900 shadow-sm' 
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Score
-                        </button>
-                        <button
-                          onClick={() => setSectionView('accuracy')}
-                          className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
-                            sectionView === 'accuracy' 
-                              ? 'bg-white text-slate-900 shadow-sm' 
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Accuracy
-                        </button>
-                      </div>
-                      <div className="relative group">
-                        <Info size={16} className="text-slate-400 cursor-help" />
-                        <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="space-y-3">
-                            <div>
-                              <div className="font-semibold text-teal-400 mb-1">Score View</div>
-                              <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-slate-900">Section Results</h3>
+                      <div className="flex items-center gap-4">
+                        <div className="flex bg-slate-100 rounded-lg p-1">
+                          <button
+                            onClick={() => setSectionView('score')}
+                            className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              sectionView === 'score' 
+                                ? 'bg-white text-slate-900 shadow-sm' 
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Score
+                          </button>
+                          <button
+                            onClick={() => setSectionView('accuracy')}
+                            className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              sectionView === 'accuracy' 
+                                ? 'bg-white text-slate-900 shadow-sm' 
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Accuracy
+                          </button>
+                        </div>
+                        <div className="relative group">
+                          <Info size={16} className="text-slate-400 cursor-help" />
+                          <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                            <div className="space-y-3">
+                              <div>
+                                <div className="font-semibold text-teal-400 mb-1">Score View</div>
+                                <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                              </div>
+                              <div>
+                                <div className="font-semibold text-orange-400 mb-1">Accuracy View</div>
+                                <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
+                              </div>
                             </div>
-                            <div>
-                              <div className="font-semibold text-orange-400 mb-1">Accuracy View</div>
-                              <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
-                            </div>
+                            <div className="absolute top-0 right-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                           </div>
-                          <div className="absolute top-0 right-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="flex">
-                  {/* Spider Chart - Left Side */}
-                  <div className="w-1/2 p-6 flex items-center justify-center border-r border-slate-200">
-                    <SpiderChart 
-                      key={`${selectedPracticeTest}-${sectionView}`}
-                      data={[
-                        { section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 16 : selectedPracticeTest === 2 ? 14 : 18, total: 20, answered: selectedPracticeTest === 1 ? 19 : selectedPracticeTest === 2 ? 18 : 19, accuracy: selectedPracticeTest === 1 ? 84 : selectedPracticeTest === 2 ? 78 : 95 },
-                        { section: 'Mathematics Reasoning', score: selectedPracticeTest === 1 ? 15 : selectedPracticeTest === 2 ? 16 : 17, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 19 : 18, accuracy: selectedPracticeTest === 1 ? 83 : selectedPracticeTest === 2 ? 84 : 94 },
-                        { section: 'General Ability - Verbal', score: selectedPracticeTest === 1 ? 17 : selectedPracticeTest === 2 ? 13 : 16, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 17 : 18, accuracy: selectedPracticeTest === 1 ? 94 : selectedPracticeTest === 2 ? 76 : 89 },
-                        { section: 'General Ability - Quantitative', score: selectedPracticeTest === 1 ? 14 : selectedPracticeTest === 2 ? 15 : 18, total: 20, answered: selectedPracticeTest === 1 ? 17 : selectedPracticeTest === 2 ? 19 : 19, accuracy: selectedPracticeTest === 1 ? 82 : selectedPracticeTest === 2 ? 79 : 95 },
-                        { section: 'Writing', score: selectedPracticeTest === 1 ? 16 : selectedPracticeTest === 2 ? 14 : 16, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 17 : 17, accuracy: selectedPracticeTest === 1 ? 89 : selectedPracticeTest === 2 ? 82 : 94 }
-                      ].map(section => ({
-                        label: section.section.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
-                        value: sectionView === 'score' ? Math.round((section.score / section.total) * 100) : section.accuracy,
-                        maxValue: 100
-                      }))}
-                      size={320}
-                      animate={true}
-                    />
-                  </div>
-                  
-                  {/* Section List - Right Side */}
-                  <div className="w-1/2 divide-y divide-slate-100">
-                    {[
-                      { section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 16 : selectedPracticeTest === 2 ? 14 : 18, total: 20, answered: selectedPracticeTest === 1 ? 19 : selectedPracticeTest === 2 ? 18 : 19, accuracy: selectedPracticeTest === 1 ? 84 : selectedPracticeTest === 2 ? 78 : 95 },
-                      { section: 'Mathematics Reasoning', score: selectedPracticeTest === 1 ? 15 : selectedPracticeTest === 2 ? 16 : 17, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 19 : 18, accuracy: selectedPracticeTest === 1 ? 83 : selectedPracticeTest === 2 ? 84 : 94 },
-                      { section: 'General Ability - Verbal', score: selectedPracticeTest === 1 ? 17 : selectedPracticeTest === 2 ? 13 : 16, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 17 : 18, accuracy: selectedPracticeTest === 1 ? 94 : selectedPracticeTest === 2 ? 76 : 89 },
-                      { section: 'General Ability - Quantitative', score: selectedPracticeTest === 1 ? 14 : selectedPracticeTest === 2 ? 15 : 18, total: 20, answered: selectedPracticeTest === 1 ? 17 : selectedPracticeTest === 2 ? 19 : 19, accuracy: selectedPracticeTest === 1 ? 82 : selectedPracticeTest === 2 ? 79 : 95 },
-                      { section: 'Writing', score: selectedPracticeTest === 1 ? 16 : selectedPracticeTest === 2 ? 14 : 16, total: 20, answered: selectedPracticeTest === 1 ? 18 : selectedPracticeTest === 2 ? 17 : 17, accuracy: selectedPracticeTest === 1 ? 89 : selectedPracticeTest === 2 ? 82 : 94 }
-                    ]
-                      .sort((a, b) => {
-                        const aValue = sectionView === 'score' ? (a.score / a.total * 100) : a.accuracy;
-                        const bValue = sectionView === 'score' ? (b.score / b.total * 100) : b.accuracy;
-                        return bValue - aValue;
-                      })
-                      .map((section, index) => {
-                      const performance = Math.round((section.score / section.total) * 100);
-                      return (
-                        <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-slate-900 text-sm">{section.section}</h4>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <div className={`text-base font-semibold ${
-                                sectionView === 'score'
-                                  ? (performance >= 80 ? 'text-green-600' : performance >= 60 ? 'text-orange-600' : 'text-red-600')
-                                  : (section.accuracy >= 80 ? 'text-green-600' : section.accuracy >= 60 ? 'text-orange-600' : 'text-red-600')
-                              }`}>
-                                {sectionView === 'score' ? performance : section.accuracy}%
-                              </div>
-                              <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                <div 
-                                  className={`h-full rounded-full growToRight ${
-                                    sectionView === 'score'
-                                      ? (performance >= 80 ? 'bg-green-500' : performance >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                      : (section.accuracy >= 80 ? 'bg-green-500' : section.accuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                  }`}
-                                  style={{ 
-                                    width: `${sectionView === 'score' ? performance : section.accuracy}%`,
-                                    animationDelay: `${index * 150}ms`
-                                  }}
-                                />
-                              </div>
-                              <div className="text-xs text-slate-600">
-                                {sectionView === 'score' 
-                                  ? <span>{section.score}/{section.total}</span>
-                                  : <span>{section.score}/{section.answered}</span>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Sub-Skills Performance */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-md">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-900">Sub-Skills Performance</h3>
-                    <div className="flex items-center gap-4">
-                      <div className="flex bg-slate-100 rounded-lg p-1">
-                        <button
-                          onClick={() => setSubSkillView('score')}
-                          className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
-                            subSkillView === 'score' 
-                              ? 'bg-white text-slate-900 shadow-sm' 
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Score
-                        </button>
-                        <button
-                          onClick={() => setSubSkillView('accuracy')}
-                          className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
-                            subSkillView === 'accuracy' 
-                              ? 'bg-white text-slate-900 shadow-sm' 
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Accuracy
-                        </button>
+              
+                    <div className="flex">
+                      {/* Spider Chart - Left Side */}
+                      <div className="w-1/2 p-6 flex items-center justify-center border-r border-slate-200">
+                        <SpiderChart 
+                          data={(selectedTest.sectionBreakdown || []).map((section) => ({
+                            label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+                            value: sectionView === 'score' ? section.score : section.accuracy,
+                            maxValue: 100
+                          }))}
+                          size={320}
+                          animate={animateSpiderChart}
+                        />
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="px-6 py-4 border-b border-slate-200">
-                  {/* Filter tabs */}
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { id: 'all', label: 'All' },
-                      { id: 'reading', label: 'Reading' },
-                      { id: 'mathematical', label: 'Mathematical' },
-                      { id: 'verbal', label: 'Verbal' },
-                      { id: 'quantitative', label: 'Quantitative' },
-                      { id: 'writing', label: 'Writing' }
-                    ].map((filter) => (
-                      <button
-                        key={filter.id}
-                        onClick={() => setPracticeFilter(filter.id)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                          practiceFilter === filter.id
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Skills List */}
-                <div className="divide-y divide-slate-100">
-                    {[
-                      { skill: 'Inferential Reasoning', section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 7 : selectedPracticeTest === 2 ? 6 : 8, total: 8, answered: selectedPracticeTest === 1 ? 8 : selectedPracticeTest === 2 ? 7 : 8, performancePercent: selectedPracticeTest === 1 ? 88 : selectedPracticeTest === 2 ? 75 : 100, accuracyPercent: selectedPracticeTest === 1 ? 88 : selectedPracticeTest === 2 ? 86 : 100, category: 'reading' },
-                      { skill: 'Critical Analysis & Evaluation', section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 7 : 7, total: 8, answered: selectedPracticeTest === 1 ? 7 : selectedPracticeTest === 2 ? 8 : 7, performancePercent: selectedPracticeTest === 1 ? 75 : selectedPracticeTest === 2 ? 88 : 88, accuracyPercent: selectedPracticeTest === 1 ? 86 : selectedPracticeTest === 2 ? 88 : 100, category: 'reading' },
-                      { skill: 'Text Structure Analysis', section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 5 : selectedPracticeTest === 2 ? 5 : 6, total: 8, answered: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 7 : 7, performancePercent: selectedPracticeTest === 1 ? 63 : selectedPracticeTest === 2 ? 63 : 75, accuracyPercent: selectedPracticeTest === 1 ? 83 : selectedPracticeTest === 2 ? 71 : 86, category: 'reading' },
-                      { skill: 'Vocabulary in Context', section: 'Reading Reasoning', score: selectedPracticeTest === 1 ? 4 : selectedPracticeTest === 2 ? 4 : 5, total: 8, answered: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 6 : 6, performancePercent: selectedPracticeTest === 1 ? 50 : selectedPracticeTest === 2 ? 50 : 63, accuracyPercent: selectedPracticeTest === 1 ? 67 : selectedPracticeTest === 2 ? 67 : 83, category: 'reading' },
-                      { skill: 'Algebraic Reasoning', section: 'Mathematics Reasoning', score: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 5 : 7, total: 8, answered: selectedPracticeTest === 1 ? 7 : selectedPracticeTest === 2 ? 7 : 8, performancePercent: selectedPracticeTest === 1 ? 75 : selectedPracticeTest === 2 ? 63 : 88, accuracyPercent: selectedPracticeTest === 1 ? 86 : selectedPracticeTest === 2 ? 71 : 88, category: 'mathematical' },
-                      { skill: 'Geometric & Spatial Reasoning', section: 'Mathematics Reasoning', score: selectedPracticeTest === 1 ? 5 : selectedPracticeTest === 2 ? 4 : 6, total: 8, answered: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 6 : 7, performancePercent: selectedPracticeTest === 1 ? 63 : selectedPracticeTest === 2 ? 50 : 75, accuracyPercent: selectedPracticeTest === 1 ? 83 : selectedPracticeTest === 2 ? 67 : 86, category: 'mathematical' },
-                      { skill: 'Verbal Reasoning & Analogies', section: 'General Ability - Verbal', score: selectedPracticeTest === 1 ? 4 : selectedPracticeTest === 2 ? 3 : 5, total: 8, answered: selectedPracticeTest === 1 ? 6 : selectedPracticeTest === 2 ? 5 : 6, performancePercent: selectedPracticeTest === 1 ? 50 : selectedPracticeTest === 2 ? 38 : 63, accuracyPercent: selectedPracticeTest === 1 ? 67 : selectedPracticeTest === 2 ? 60 : 83, category: 'verbal' },
-                      { skill: 'Pattern Recognition & Sequences', section: 'General Ability - Quantitative', score: selectedPracticeTest === 1 ? 3 : selectedPracticeTest === 2 ? 2 : 4, total: 8, answered: selectedPracticeTest === 1 ? 5 : selectedPracticeTest === 2 ? 4 : 5, performancePercent: selectedPracticeTest === 1 ? 38 : selectedPracticeTest === 2 ? 25 : 50, accuracyPercent: selectedPracticeTest === 1 ? 60 : selectedPracticeTest === 2 ? 50 : 80, category: 'quantitative' }
-                    ]
-                      .filter(item => practiceFilter === 'all' || item.category === practiceFilter)
-                      .sort((a, b) => {
-                        const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
-                        const bValue = subSkillView === 'score' ? b.performancePercent : b.accuracyPercent;
-                        return bValue - aValue;
-                      })
-                      .map((skill, index) => (
-                      <div key={index} className="px-6 py-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="relative group">
-                              <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
-                                {skill.skill}
-                                <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                              </h5>
-                              {UNIFIED_SUB_SKILLS[skill.skill] && (
-                                <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
-                                  <div className="font-semibold text-teal-400 mb-2">{skill.skill}</div>
-                                  <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[skill.skill]?.description || 'No description available'}</div>
-                                  <div className="absolute top-0 left-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                      
+                      {/* Section List - Right Side */}
+                      <div className="w-1/2 divide-y divide-slate-100">
+                        {(selectedTest.sectionBreakdown || [])
+                          .map((section, index) => {
+                            const displayScore = section.score;
+                            const displayAccuracy = section.accuracy;
+                            
+                            return (
+                              <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <h4 className="font-medium text-slate-900 text-sm">{section.sectionName}</h4>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-2">
+                                    <div className={`text-base font-semibold ${
+                                      sectionView === 'score'
+                                        ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
+                                        : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
+                                    }`}>
+                                      {sectionView === 'score' ? displayScore : displayAccuracy}%
+                                    </div>
+                                    <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                      <div 
+                                        key={`${section.sectionName}-${sectionView}`}
+                                        className={`h-full rounded-full growToRight ${
+                                          sectionView === 'score'
+                                            ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                            : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                        }`}
+                                        style={{ 
+                                          width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
+                                          animationDelay: `${index * 150}ms`
+                                        }}
+                                      />
+                                    </div>
+                                    <div 
+                                      key={`${section.sectionName}-fraction-${sectionView}`}
+                                      className="text-xs text-slate-600 fadeIn"
+                                      style={{ animationDelay: `${index * 150 + 600}ms` }}
+                                    >
+                                      {sectionView === 'score' 
+                                        ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                        : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
+                                      }
+                                    </div>
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <p className="text-sm text-slate-500">{skill.section}</p>
-                          </div>
-                          <div className="flex flex-col items-end gap-2">
-                            <div className={`text-lg font-semibold ${
-                              subSkillView === 'score'
-                                ? (skill.performancePercent >= 80 ? 'text-green-600' : skill.performancePercent >= 60 ? 'text-orange-600' : 'text-red-600')
-                                : (skill.accuracyPercent >= 80 ? 'text-green-600' : skill.accuracyPercent >= 60 ? 'text-orange-600' : 'text-red-600')
-                            }`}>
-                              {subSkillView === 'score' ? skill.performancePercent : skill.accuracyPercent}%
-                            </div>
-                            <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full growToRight ${
-                                  subSkillView === 'score'
-                                    ? (skill.performancePercent >= 80 ? 'bg-green-500' : skill.performancePercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                    : (skill.accuracyPercent >= 80 ? 'bg-green-500' : skill.accuracyPercent >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                }`}
-                                style={{ 
-                                  width: `${subSkillView === 'score' ? skill.performancePercent : skill.accuracyPercent}%`,
-                                  animationDelay: `${index * 120}ms`
-                                }}
-                              />
-                            </div>
-                            <div className="text-sm text-slate-600">
-                              {subSkillView === 'score' 
-                                ? <span>{skill.score}/{skill.total}</span>
-                                : <span>{skill.score}/{skill.answered}</span>
-                              }
-                            </div>
-                          </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-Skills Performance */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
+                        <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                          <button
+                            onClick={() => setSubSkillView('score')}
+                            className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              subSkillView === 'score' 
+                                ? 'bg-white text-slate-900 shadow-sm' 
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Score
+                          </button>
+                          <button
+                            onClick={() => setSubSkillView('accuracy')}
+                            className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              subSkillView === 'accuracy' 
+                                ? 'bg-white text-slate-900 shadow-sm' 
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Accuracy
+                          </button>
                         </div>
                       </div>
-                    ))}
+                      
+                      {/* Filter Tabs */}
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { id: 'all', label: 'All Skills' },
+                          { id: 'reading', label: 'Reading Reasoning' },
+                          { id: 'mathematical', label: 'Mathematics Reasoning' },
+                          { id: 'verbal', label: 'General Ability - Verbal' },
+                          { id: 'quantitative', label: 'General Ability - Quantitative' },
+                          { id: 'writing', label: 'Writing' }
+                        ].map((filter) => (
+                          <button
+                            key={filter.id}
+                            onClick={() => setPracticeFilter(filter.id)}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                              practiceFilter === filter.id
+                                ? 'bg-slate-900 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
+                          >
+                            {filter.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* For practice tests, show message about sub-skills */}
+                    <div className="text-center py-8 text-slate-500">
+                      <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      Sub-skill breakdown is available in the Diagnostic tab. Practice tests show overall section performance.
+                    </div>
                   </div>
                 </div>
-              </div>
-              )}
+              );
+              })()}
             </div>
           )}
 
@@ -1213,147 +1410,24 @@ const PerformanceDashboard = () => {
           {/* Drills Tab */}
           {activeTab === 'drills' && (
             <div className="space-y-8">
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Total Questions */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Total Questions
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Total Questions</div>
-                          <div>Number of drill questions completed across all skill areas.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">151<span className="text-2xl text-slate-600">/169</span></div>
-                    <div className="text-lg font-semibold text-slate-600">questions completed</div>
+              {!performanceData.drills?.subSkillBreakdown?.some(section =>
+                section.subSkills.some(skill => skill.questionsCompleted > 0)
+              ) ? (
+                <div className="text-center py-16">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
+                    <Target className="h-12 w-12 text-teal-500" />
                   </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Practice Some Skills First</h3>
+                  <p className="text-slate-600 mb-8 max-w-md mx-auto">You need to complete <strong>at least one drill question</strong> in any sub-skill to see your drill performance insights and progress tracking.</p>
+                  <button className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    Start Skill Practice
+                  </button>
                 </div>
-
-                {/* Overall Accuracy */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Overall Accuracy
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Accuracy</div>
-                          <div>Average accuracy rate across all completed drill questions.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">68<span className="text-2xl text-slate-600">/100</span></div>
-                    <div className={`text-lg font-semibold ${
-                      68 >= 80 ? 'text-green-600' : 
-                      68 >= 60 ? 'text-orange-600' : 
-                      'text-red-600'
-                    }`}>68%</div>
-                  </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">
+                  <p>Drill analysis will be available here when drill data is present.</p>
                 </div>
-              </div>
-
-              {/* Sub-Skill Performance */}
-              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
-                  </div>
-                  
-                  {/* Filter Tabs */}
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'all', label: 'All Skills' },
-                      { id: 'reading', label: 'Reading Reasoning' },
-                      { id: 'mathematics', label: 'Mathematics Reasoning' },
-                      { id: 'verbal', label: 'General Ability - Verbal' },
-                      { id: 'quantitative', label: 'General Ability - Quantitative' },
-                      { id: 'writing', label: 'Writing' }
-                    ].map((filter) => (
-                      <button
-                        key={filter.id}
-                        onClick={() => setDrillFilter(filter.id)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                          drillFilter === filter.id
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="divide-y divide-slate-100">
-                  {[
-                    { skill: 'Pattern Recognition & Sequences', section: 'General Ability - Quantitative', questions: 18, accuracy: 62, category: 'quantitative' },
-                    { skill: 'Inferential Reasoning', section: 'Reading Reasoning', questions: 15, accuracy: 82, category: 'reading' },
-                    { skill: 'Numerical Operations', section: 'Mathematics Reasoning', questions: 15, accuracy: 65, category: 'mathematics' },
-                    { skill: 'Conceptual Understanding', section: 'General Ability - Quantitative', questions: 15, accuracy: 65, category: 'quantitative' },
-                    { skill: 'Critical Analysis & Evaluation', section: 'Reading Reasoning', questions: 12, accuracy: 78, category: 'reading' },
-                    { skill: 'Verbal Reasoning & Analogies', section: 'General Ability - Verbal', questions: 20, accuracy: 45, category: 'verbal' },
-                    { skill: 'Text Structure Analysis', section: 'Reading Reasoning', questions: 14, accuracy: 71, category: 'reading' },
-                    { skill: 'Algebraic Reasoning', section: 'Mathematics Reasoning', questions: 18, accuracy: 58, category: 'mathematics' },
-                    { skill: 'Persuasive Writing', section: 'Writing', questions: 8, accuracy: 83, category: 'writing' },
-                    { skill: 'Logical Reasoning & Deduction', section: 'General Ability - Verbal', questions: 16, accuracy: 52, category: 'verbal' },
-                  ]
-                    .filter(item => drillFilter === 'all' || item.category === drillFilter)
-                    .sort((a, b) => b.accuracy - a.accuracy)
-                    .map((item, index) => (
-                    <div key={index} className="px-6 py-4 hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="relative group">
-                            <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
-                              {item.skill}
-                              <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </h5>
-                            {UNIFIED_SUB_SKILLS[item.skill] && (
-                              <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
-                                <div className="font-semibold text-teal-400 mb-2">{item.skill}</div>
-                                <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[item.skill]?.description || 'No description available'}</div>
-                                <div className="absolute top-0 left-4 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-sm text-slate-500">{item.section}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <div className={`text-lg font-semibold ${
-                            item.accuracy >= 80 ? 'text-green-600' : 
-                            item.accuracy >= 60 ? 'text-orange-600' : 
-                            'text-red-600'
-                          }`}>
-                            {item.accuracy}%
-                          </div>
-                          <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full growToRight ${
-                                item.accuracy >= 80 ? 'bg-green-500' : 
-                                item.accuracy >= 60 ? 'bg-orange-500' : 
-                                'bg-red-500'
-                              }`}
-                              style={{ 
-                                width: `${item.accuracy}%`,
-                                animationDelay: `${index * 120}ms`
-                              }}
-                            />
-                          </div>
-                          <div className="text-sm text-slate-600">
-                            {item.questions} questions
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           )}
         </div>
@@ -1380,6 +1454,42 @@ const globalStyles = `
       transform: scaleX(1);
     }
   }
+  
+  .fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes growFromCenter {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeInSlideUp {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(15px) scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0) scale(1);
+    }
+  }
 `;
 
 // Inject styles into document head
@@ -1392,4 +1502,4 @@ if (typeof document !== 'undefined') {
   }
 }
 
-export default PerformanceDashboard; 
+export default PerformanceDashboard;
