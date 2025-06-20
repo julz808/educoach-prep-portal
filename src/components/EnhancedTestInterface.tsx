@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { formatQuestionText, cleanOptionText, formatPassageText, formatExplanationText } from '@/utils/textFormatting';
+import { WritingAssessmentFeedback } from './WritingAssessmentFeedback';
+import { WritingAssessmentService } from '@/services/writingAssessmentService';
 
 interface Question {
   id: string;
@@ -39,6 +41,7 @@ interface EnhancedTestInterfaceProps {
   onFinish?: () => void;
   onExit?: () => void;
   testTitle?: string;
+  sessionId?: string; // For loading writing assessments
 }
 
 export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
@@ -58,7 +61,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   isReviewMode = false,
   onFinish,
   onExit,
-  testTitle = "Test"
+  testTitle = "Test",
+  sessionId
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -67,6 +71,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   const [questionTransition, setQuestionTransition] = useState(false);
   const [showTimeWarning, setShowTimeWarning] = useState<string | null>(null);
   const [warningsShown, setWarningsShown] = useState<Set<number>>(new Set());
+  const [writingAssessment, setWritingAssessment] = useState<any>(null);
+  const [loadingAssessment, setLoadingAssessment] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
   
@@ -98,6 +104,36 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     setSelectedAnswer(answers[currentQuestionIndex] ?? null);
     setTextAnswer(textAnswers[currentQuestionIndex] ?? '');
   }, [currentQuestionIndex, answers, textAnswers]);
+
+  // Load writing assessment for current question in review mode
+  useEffect(() => {
+    const loadWritingAssessment = async () => {
+      if (!isReviewMode || !sessionId || !currentQuestion) return;
+      
+      // Check if this is a writing question
+      const isWritingQuestion = isWrittenResponse;
+      if (!isWritingQuestion) {
+        setWritingAssessment(null);
+        return;
+      }
+
+      setLoadingAssessment(true);
+      try {
+        const assessment = await WritingAssessmentService.getWritingAssessment(
+          currentQuestion.id,
+          sessionId
+        );
+        setWritingAssessment(assessment);
+      } catch (error) {
+        console.error('Failed to load writing assessment:', error);
+        setWritingAssessment(null);
+      } finally {
+        setLoadingAssessment(false);
+      }
+    };
+
+    loadWritingAssessment();
+  }, [currentQuestionIndex, isReviewMode, sessionId, currentQuestion?.id, isWrittenResponse]);
 
   // Question transition animation
   useEffect(() => {
@@ -576,24 +612,38 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   )}
 
                   {/* Feedback Section */}
-                  {showFeedback && currentQuestion?.explanation && (
-                    <div className="mt-8 p-6 bg-gradient-to-r from-edu-light-blue to-white rounded-xl border-l-4 border-edu-teal">
-                      <div className="flex items-start space-x-3">
-                        <div className="shrink-0 mt-0.5">
-                          {selectedAnswer === currentQuestion?.correctAnswer ? (
-                            <CheckCircle size={20} className="text-green-600" />
-                          ) : (
-                            <AlertCircle size={20} className="text-red-600" />
-                          )}
+                  {showFeedback && (
+                    <>
+                      {/* Multiple Choice Feedback */}
+                      {!isWrittenResponse && currentQuestion?.explanation && (
+                        <div className="mt-8 p-6 bg-gradient-to-r from-edu-light-blue to-white rounded-xl border-l-4 border-edu-teal">
+                          <div className="flex items-start space-x-3">
+                            <div className="shrink-0 mt-0.5">
+                              {selectedAnswer === currentQuestion?.correctAnswer ? (
+                                <CheckCircle size={20} className="text-green-600" />
+                              ) : (
+                                <AlertCircle size={20} className="text-red-600" />
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-edu-navy mb-2">
+                                {selectedAnswer === currentQuestion?.correctAnswer ? "Correct!" : "Not quite right"}
+                              </h3>
+                              <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(currentQuestion?.explanation)}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-edu-navy mb-2">
-                            {selectedAnswer === currentQuestion?.correctAnswer ? "Correct!" : "Not quite right"}
-                          </h3>
-                          <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(currentQuestion?.explanation)}</p>
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                      
+                      {/* Writing Assessment Feedback */}
+                      {isWrittenResponse && isReviewMode && (
+                        <WritingAssessmentFeedback
+                          assessment={writingAssessment}
+                          userResponse={textAnswer}
+                          isLoading={loadingAssessment}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </CardContent>

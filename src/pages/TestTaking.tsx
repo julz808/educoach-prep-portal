@@ -13,6 +13,7 @@ import {
   type OrganizedQuestion 
 } from '@/services/supabaseQuestionService';
 import { SessionService, type TestSession } from '@/services/sessionService';
+import { WritingAssessmentService } from '@/services/writingAssessmentService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 
@@ -1124,6 +1125,9 @@ const TestTaking: React.FC = () => {
       // Save final progress with all latest responses
       await saveProgress(session); // Use current session state
       
+      // Process any writing questions for AI assessment
+      await processWritingAssessments();
+      
       // Mark as completed
       await SessionService.completeSession(session.id);
       
@@ -1134,6 +1138,72 @@ const TestTaking: React.FC = () => {
       console.error('Failed to finish session:', error);
       setShowSubmitConfirm(false);
     }
+  };
+
+  // Process writing assessments for all writing questions in the session
+  const processWritingAssessments = async () => {
+    if (!session || !user) return;
+
+    console.log('✍️ WRITING: Starting writing assessment processing for session', session.id);
+    
+    const writingQuestions = session.questions.filter((question, index) => {
+      const isWritingQuestion = question.format === 'Written Response' || 
+                               question.subSkill?.toLowerCase().includes('writing') ||
+                               question.subSkill?.toLowerCase().includes('written') ||
+                               question.topic?.toLowerCase().includes('writing') ||
+                               question.topic?.toLowerCase().includes('written');
+      
+      const hasResponse = session.textAnswers[index] && session.textAnswers[index].trim().length > 0;
+      
+      console.log(`✍️ WRITING: Question ${index} (${question.id}) - isWriting:${isWritingQuestion}, hasResponse:${hasResponse}, subSkill:${question.subSkill}`);
+      
+      return isWritingQuestion && hasResponse;
+    });
+
+    if (writingQuestions.length === 0) {
+      console.log('✍️ WRITING: No writing questions with responses found');
+      return;
+    }
+
+    console.log(`✍️ WRITING: Found ${writingQuestions.length} writing questions to assess`);
+    
+    // Get the correct product type
+    const productType = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
+    
+    // Process each writing question
+    for (const question of writingQuestions) {
+      const questionIndex = session.questions.findIndex(q => q.id === question.id);
+      const userResponse = session.textAnswers[questionIndex];
+      
+      if (!userResponse || userResponse.trim().length === 0) {
+        console.log(`✍️ WRITING: Skipping question ${questionIndex} - no response`);
+        continue;
+      }
+
+      try {
+        console.log(`✍️ WRITING: Assessing question ${questionIndex} (${question.id}) for product ${productType}`);
+        
+        const assessment = await WritingAssessmentService.assessWriting(
+          userResponse,
+          question.id,
+          productType,
+          session.id,
+          user.id
+        );
+        
+        console.log(`✍️ WRITING: Assessment completed for question ${questionIndex}:`, {
+          totalScore: assessment.totalScore,
+          maxScore: assessment.maxPossibleScore,
+          percentage: assessment.percentageScore
+        });
+        
+      } catch (error) {
+        console.error(`✍️ WRITING: Failed to assess question ${questionIndex}:`, error);
+        // Continue with other questions even if one fails
+      }
+    }
+    
+    console.log('✍️ WRITING: Writing assessment processing completed');
   };
 
   const handleExit = async () => {
@@ -1285,6 +1355,7 @@ const TestTaking: React.FC = () => {
         testTitle={`${session.sectionName} - Review`}
         onFinish={handleBackToDashboard}
         onExit={handleBackToDashboard}
+        sessionId={session.id}
       />
     );
   }
@@ -1310,6 +1381,7 @@ const TestTaking: React.FC = () => {
         testTitle={session.sectionName}
         onFinish={handleFinish}
         onExit={handleExit}
+        sessionId={session.id}
       />
 
       {/* Submit Confirmation Dialog */}
