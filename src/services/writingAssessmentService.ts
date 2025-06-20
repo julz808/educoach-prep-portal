@@ -122,83 +122,74 @@ export class WritingAssessmentService {
   }
   
   /**
-   * Call Claude API for writing assessment
+   * Call Claude API for writing assessment via backend proxy
    */
   private static async callClaudeAPI(
     userResponse: string,
     writingPrompt: string,
     rubric: any
   ): Promise<AssessmentResult> {
-    const apiKey = import.meta.env.VITE_CLAUDE_API_KEY || process.env.CLAUDE_API_KEY;
-    if (!apiKey) {
-      throw new Error('Claude API key not found');
-    }
-    
     const yearLevel = WritingRubricService.getYearLevel(rubric.testName);
-    const prompt = WritingRubricService.generateAssessmentPrompt(
-      userResponse,
-      writingPrompt,
-      rubric,
-      yearLevel
-    );
     
-    console.log('🤖 Calling Claude API...');
+    console.log('🤖 Calling Claude API via backend proxy...');
     
-    const response = await fetch(this.CLAUDE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        temperature: 0.1, // Low temperature for consistent scoring
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Claude API error (${response.status}): ${errorData}`);
-    }
-    
-    const data = await response.json();
-    const content = data.content?.[0]?.text;
-    
-    if (!content) {
-      throw new Error('No content in Claude API response');
-    }
-    
-    // Parse JSON response
-    let parsedResponse;
+    // Try Supabase Edge Function first, then fallback to local proxy
     try {
-      // Extract JSON from response (Claude sometimes adds extra text)
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        parsedResponse = JSON.parse(jsonMatch[0]);
-      } else {
-        parsedResponse = JSON.parse(content);
+      // Option 1: Supabase Edge Function
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('🔄 Attempting Supabase Edge Function...');
+        const response = await supabase.functions.invoke('assess-writing', {
+          body: {
+            userResponse,
+            writingPrompt,
+            rubric,
+            yearLevel
+          }
+        });
+        
+        if (!response.error && response.data) {
+          console.log('✅ Supabase Edge Function successful');
+          return response.data as AssessmentResult;
+        }
+        
+        console.warn('⚠️ Supabase Edge Function failed:', response.error);
       }
-    } catch (parseError) {
-      console.error('Error parsing Claude response:', content);
-      throw new Error('Invalid JSON response from Claude API');
+    } catch (edgeError) {
+      console.warn('⚠️ Supabase Edge Function error:', edgeError);
     }
     
-    // Validate and clean response
-    const assessment = WritingRubricService.validateAssessmentResponse(parsedResponse, rubric);
-    
-    // Add token usage if available
-    if (data.usage) {
-      assessment.processingMetadata.promptTokens = data.usage.input_tokens;
-      assessment.processingMetadata.responseTokens = data.usage.output_tokens;
+    // Option 2: Local proxy server fallback
+    try {
+      console.log('🔄 Attempting local proxy server...');
+      const proxyUrl = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
+      
+      const response = await fetch(`${proxyUrl}/api/assess-writing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userResponse,
+          writingPrompt,
+          rubric,
+          yearLevel
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Proxy API error (${response.status}): ${errorData}`);
+      }
+      
+      const assessment = await response.json();
+      console.log('✅ Local proxy server successful');
+      return assessment as AssessmentResult;
+      
+    } catch (proxyError) {
+      console.warn('⚠️ Local proxy server error:', proxyError);
+      throw new Error(`All assessment methods failed. Last error: ${proxyError.message}`);
     }
-    
-    return assessment;
   }
   
   /**
