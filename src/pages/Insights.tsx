@@ -1143,7 +1143,21 @@ const PerformanceDashboard = () => {
               </div>
 
               {(() => {
-                const selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest && t.status === 'completed');
+                // Debug: log all practice tests to see their structure
+                console.log('🔍 All practice tests:', performanceData.practice?.tests);
+                console.log('🔍 Looking for test number:', selectedPracticeTest);
+                
+                // First try to find completed test, then fall back to any test with that number
+                let selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest && t.status === 'completed');
+                
+                if (!selectedTest) {
+                  // If no completed test found, try to find any test with that number
+                  selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest);
+                  console.log('🔍 Fallback: found test with any status:', selectedTest);
+                }
+                
+                console.log('🔍 Final selected test:', selectedTest);
+                
                 if (!selectedTest) {
                   return (
                     <div className="text-center py-16">
@@ -1156,12 +1170,26 @@ const PerformanceDashboard = () => {
                   );
                 }
                 
-                // Use REAL data from the database
+                // Use ONLY real data from the database
                 const totalQuestions = selectedTest.totalQuestions || 0;
                 const questionsAttempted = selectedTest.questionsAttempted || 0;
                 const questionsCorrect = selectedTest.questionsCorrect || 0;
-                const overallScore = totalQuestions > 0 ? Math.round((questionsCorrect / totalQuestions) * 100) : (selectedTest.score || 0);
-                const overallAccuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : overallScore;
+                const overallScore = selectedTest.score || 0;
+                const overallAccuracy = questionsAttempted > 0 
+                  ? Math.round((questionsCorrect / questionsAttempted) * 100) 
+                  : 0;
+                
+                console.log('🔍 Selected test details:', {
+                  testNumber: selectedTest.testNumber,
+                  score: selectedTest.score,
+                  totalQuestions,
+                  questionsAttempted,
+                  questionsCorrect,
+                  overallScore,
+                  overallAccuracy,
+                  hasRealData: selectedTest.totalQuestions ? 'Yes' : 'No',
+                  rawTest: selectedTest
+                });
                 
                 return (
                   <div className="space-y-8">
@@ -1288,8 +1316,8 @@ const PerformanceDashboard = () => {
                       
                       {/* Section List - Right Side */}
                       <div className="w-1/2 divide-y divide-slate-100">
-                        {(selectedTest.sectionBreakdown || [])
-                          .map((section, index) => {
+                        {selectedTest.sectionBreakdown && selectedTest.sectionBreakdown.length > 0 ? (
+                          selectedTest.sectionBreakdown.map((section, index) => {
                             const displayScore = section.score;
                             const displayAccuracy = section.accuracy;
                             
@@ -1335,7 +1363,13 @@ const PerformanceDashboard = () => {
                                 </div>
                               </div>
                             );
-                          })}
+                          })
+                        ) : (
+                          <div className="p-8 text-center text-slate-500">
+                            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p>Loading section data...</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1394,11 +1428,67 @@ const PerformanceDashboard = () => {
                       </div>
                     </div>
                     
-                    {/* For practice tests, show message about sub-skills */}
-                    <div className="text-center py-8 text-slate-500">
-                      <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      Sub-skill breakdown is available in the Diagnostic tab. Practice tests show overall section performance.
+                    {/* Sub-Skills List for Practice Tests */}
+                    <div className="divide-y divide-slate-100">
+                      {(selectedTest.subSkillBreakdown || [])
+                        .filter(subSkill => {
+                          if (practiceFilter === 'all') return true;
+                          if (practiceFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
+                          if (practiceFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
+                          if (practiceFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
+                          if (practiceFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
+                          if (practiceFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                          return true;
+                        })
+                        .map((subSkill, index) => {
+                          const displayScore = subSkill.score;
+                          const displayAccuracy = subSkill.accuracy;
+                          
+                          return (
+                            <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-medium text-slate-900 text-sm">{subSkill.subSkillName}</h4>
+                                  <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                  <div className={`text-base font-semibold ${
+                                    subSkillView === 'score'
+                                      ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
+                                      : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
+                                  }`}>
+                                    {subSkillView === 'score' ? displayScore : displayAccuracy}%
+                                  </div>
+                                  <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div 
+                                      key={`${subSkill.subSkillName}-${subSkillView}`}
+                                      className={`h-full rounded-full growToRight ${
+                                        subSkillView === 'score'
+                                          ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                          : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                      }`}
+                                      style={{ 
+                                        width: `${subSkillView === 'score' ? displayScore : displayAccuracy}%`,
+                                        animationDelay: `${index * 100}ms`
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {subSkill.questionsCorrect}/{subSkill.questionsTotal}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
+                    
+                    {selectedTest.subSkillBreakdown && selectedTest.subSkillBreakdown.length === 0 && (
+                      <div className="text-center py-8 text-slate-500">
+                        <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        No sub-skill data available for this practice test.
+                      </div>
+                    )}
                   </div>
                 </div>
               );

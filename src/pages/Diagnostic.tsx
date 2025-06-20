@@ -462,12 +462,29 @@ const DiagnosticTests: React.FC = () => {
   // Helper function to find completed session from database
   const findCompletedSession = async (sectionName: string, sectionId: string) => {
     console.log('🔍 Searching for completed session for:', sectionName);
+    
+    // Use the same product mapping function
+    const getDbProductType = (productId: string): string => {
+      const productMap: Record<string, string> = {
+        'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+        'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+        'year-5-naplan': 'Year 5 NAPLAN',
+        'year-7-naplan': 'Year 7 NAPLAN',
+        'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+        'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+      };
+      return productMap[productId] || productId;
+    };
+    
+    const dbProductType = getDbProductType(selectedProduct);
+    console.log('🔍 Using dbProductType for session search:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+    
     try {
       const { data: sessions, error } = await supabase
         .from('user_test_sessions')
         .select('id')
         .eq('user_id', user.id)
-        .eq('product_type', selectedProduct)
+        .eq('product_type', dbProductType)
         .eq('test_mode', 'diagnostic')
         .eq('section_name', sectionName)
         .eq('status', 'completed')
@@ -582,12 +599,28 @@ const DiagnosticTests: React.FC = () => {
     
     if (confirm('🚨 DEV: Clear all diagnostic progress? This cannot be undone.')) {
       try {
+        // Use the same product mapping function
+        const getDbProductType = (productId: string): string => {
+          const productMap: Record<string, string> = {
+            'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+            'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+            'year-5-naplan': 'Year 5 NAPLAN',
+            'year-7-naplan': 'Year 7 NAPLAN',
+            'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+            'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+          };
+          return productMap[productId] || productId;
+        };
+        
+        const dbProductType = getDbProductType(selectedProduct);
+        console.log('🚨 DEV: Clearing progress for dbProductType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+        
         // Clear all user_test_sessions for this user/product/mode
         const { error: sessionsError } = await supabase
           .from('user_test_sessions')
           .delete()
           .eq('user_id', user.id)
-          .eq('product_type', selectedProduct)
+          .eq('product_type', dbProductType)
           .eq('test_mode', 'diagnostic');
 
         if (sessionsError) throw sessionsError;
@@ -597,7 +630,7 @@ const DiagnosticTests: React.FC = () => {
           .from('test_section_states')
           .delete()
           .eq('user_id', user.id)
-          .eq('product_type', selectedProduct);
+          .eq('product_type', dbProductType);
 
         if (statesError) throw statesError;
 

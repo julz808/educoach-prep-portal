@@ -6,6 +6,23 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { fetchQuestionsFromSupabase } from '@/services/supabaseQuestionService';
 
+// Helper function to parse answer options (same logic as supabaseQuestionService.ts)
+const parseAnswerOptions = (answerOptions: any): string[] => {
+  if (!answerOptions) return [];
+  
+  if (Array.isArray(answerOptions)) {
+    return answerOptions;
+  }
+  
+  if (typeof answerOptions === 'object') {
+    // Handle object format like { "A": "option1", "B": "option2", ... }
+    const keys = Object.keys(answerOptions).sort();
+    return keys.map(key => answerOptions[key]);
+  }
+  
+  return [];
+};
+
 interface DeveloperToolsProps {
   testType: 'diagnostic' | 'drill' | 'practice';
   selectedProduct: string;
@@ -261,12 +278,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       if (testType === 'diagnostic' || testType === 'practice') {
         // Get unique sections and complete them all
         const sections = [...new Set(availableQuestions.map(q => q.section_name))].filter(Boolean);
-        console.log(`🏁 DEV: Completing all ${sections.length} sections:`, sections);
+        console.log(`🏁 DEV: Completing all ${sections.length} sections with realistic test data:`, sections);
 
         for (let i = 0; i < sections.length; i++) {
           const sectionName = sections[i];
           console.log(`🏁 DEV: Creating COMPLETED session for "${sectionName}" (${i+1}/${sections.length})`);
-          await createBasicSession(dbProductType, sectionName, 'completed', testType);
+          await createRealisticSession(dbProductType, sectionName, 'completed', testType);
         }
       } else if (testType === 'drill') {
         // Get unique sub-skills and complete them all
@@ -295,6 +312,331 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       console.log(`✅ DEV: Successfully created finish-all data for ${testType}`);
     } catch (error) {
       console.error(`❌ DEV: Error creating finish-all data:`, error);
+      throw error;
+    }
+  };
+
+  const createRealisticSession = async (dbProductType: string, sectionName: string, status: string, mode: string) => {
+    console.log(`📝 DEV: Creating REALISTIC ${status} session for ${sectionName}...`);
+    
+    let questions: any[] = [];
+    
+    try {
+      if (mode === 'practice') {
+        // Use fetchQuestionsFromSupabase for practice tests (works correctly)
+        const organizedData = await fetchQuestionsFromSupabase();
+        const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
+        
+        if (!currentTestType) {
+          console.warn(`No test type found for ${selectedProduct}, creating basic session anyway`);
+          return;
+        }
+
+        // Find the section by name in practice modes
+        let foundSection = null;
+        for (const testMode of currentTestType.testModes) {
+          if (testMode.id && testMode.id.startsWith('practice_')) {
+            foundSection = testMode.sections.find(section => section.name === sectionName);
+            if (foundSection && foundSection.questions.length > 0) {
+              console.log(`📝 DEV: Found section in mode: ${testMode.name}`);
+              break;
+            }
+          }
+        }
+
+        if (!foundSection || foundSection.questions.length === 0) {
+          console.warn(`No practice questions found for ${sectionName}, creating basic session anyway`);
+          return;
+        }
+
+        questions = foundSection.questions;
+        console.log(`📝 DEV: Found ${questions.length} practice questions for ${sectionName}`);
+        
+        // Apply same Reading section reorganization as for diagnostic tests
+        const isReadingSection = sectionName.toLowerCase().includes('reading') || 
+                                 sectionName.toLowerCase().includes('comprehension');
+        
+        if (isReadingSection) {
+          console.log(`📝 DEV: Applying Reading section reorganization for practice ${sectionName}`);
+          
+          // Group questions by passage content, keeping non-passage questions at the end
+          const questionsWithPassage = questions.filter(q => q.passageContent);
+          const questionsWithoutPassage = questions.filter(q => !q.passageContent);
+          
+          // Sort questions with passages by some identifier to group them
+          const passageGroups = new Map();
+          questionsWithPassage.forEach(q => {
+            // Use passage content as grouping key (same logic as diagnostic)
+            const passageKey = q.passageContent?.substring(0, 50) || 'unknown';
+            if (!passageGroups.has(passageKey)) {
+              passageGroups.set(passageKey, []);
+            }
+            passageGroups.get(passageKey).push(q);
+          });
+          
+          // Reorganize: all questions from passage 1, then passage 2, etc., then non-passage questions
+          questions = [
+            ...Array.from(passageGroups.values()).flat(),
+            ...questionsWithoutPassage
+          ];
+          
+          console.log(`📝 DEV: Reorganized Practice Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions`);
+        }
+        
+      } else if (mode === 'diagnostic') {
+        // Use direct Supabase query for diagnostic (more reliable)  
+        const { data: rawQuestions, error: questionsError } = await supabase
+          .from('questions')
+          .select('id, question_text, answer_options, correct_answer, solution, question_order, passage_id')
+          .eq('product_type', dbProductType)
+          .eq('section_name', sectionName)
+          .eq('test_mode', 'diagnostic')
+          .order('question_order')
+          .limit(50); // Get more questions to ensure we have enough
+
+        if (questionsError || !rawQuestions || rawQuestions.length === 0) {
+          console.warn(`No diagnostic questions found for ${sectionName}, creating basic session anyway`);
+          return;
+        }
+
+        // Fetch passage data for questions that have passage_id
+        const passageIds = rawQuestions
+          .filter(q => q.passage_id)
+          .map(q => q.passage_id);
+          
+        let passages: any[] = [];
+        if (passageIds.length > 0) {
+          const { data: passageData } = await supabase
+            .from('passages')
+            .select('*')
+            .in('id', passageIds);
+          passages = passageData || [];
+        }
+        
+        const passageMap = new Map(passages.map(p => [p.id, p]));
+
+        // Convert to the same format as fetchQuestionsFromSupabase (using same parseAnswerOptions logic)
+        questions = rawQuestions.map((q: any) => {
+          const options = parseAnswerOptions(q.answer_options);
+          const correctAnswer = q.correct_answer && q.correct_answer.length === 1 ? 
+            q.correct_answer.charCodeAt(0) - 65 : 0; // Convert A,B,C,D to 0,1,2,3
+          const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
+          
+          return {
+            id: q.id,
+            text: q.question_text,
+            options,
+            correctAnswer,
+            explanation: q.solution || 'No explanation provided',
+            passageContent: passage?.content
+          };
+        });
+        
+        console.log(`📝 DEV: Found ${questions.length} diagnostic questions for ${sectionName}`);
+        
+        // Apply same Reading section reorganization as TestTaking.tsx
+        const isReadingSection = sectionName.toLowerCase().includes('reading') || 
+                                 sectionName.toLowerCase().includes('comprehension');
+        
+        if (isReadingSection) {
+          console.log(`📝 DEV: Applying Reading section reorganization for ${sectionName}`);
+          
+          // Group questions by passage_id, keeping non-passage questions at the end
+          const questionsWithPassage = questions.filter(q => q.passageContent);
+          const questionsWithoutPassage = questions.filter(q => !q.passageContent);
+          
+          // Sort questions with passages by some identifier to group them
+          const passageGroups = new Map();
+          questionsWithPassage.forEach(q => {
+            // Use passage content as grouping key (same logic as TestTaking.tsx)
+            const passageKey = q.passageContent?.substring(0, 50) || 'unknown';
+            if (!passageGroups.has(passageKey)) {
+              passageGroups.set(passageKey, []);
+            }
+            passageGroups.get(passageKey).push(q);
+          });
+          
+          // Reorganize: all questions from passage 1, then passage 2, etc., then non-passage questions
+          questions = [
+            ...Array.from(passageGroups.values()).flat(),
+            ...questionsWithoutPassage
+          ];
+          
+          console.log(`📝 DEV: Reorganized Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions`);
+        }
+      }
+
+      if (questions.length === 0) {
+        console.warn(`No questions found for ${sectionName} in ${mode} mode, creating basic session anyway`);
+        return;
+      }
+    
+      const totalQuestions = questions.length;
+      
+      // NEW RULES FOR REALISTIC TEST DATA
+      console.log(`🎯 DEV: Creating realistic test data for ${sectionName} with ${totalQuestions} questions`);
+      
+      // 1. Random number of blank questions (0 to 5 max, strictly enforced)
+      const blankQuestions = Math.floor(Math.random() * 6); // 0 to 5, exactly as specified
+      const questionsAttempted = totalQuestions - blankQuestions;
+      
+      // 2. Calculate correct answers to ensure overall score is 50-100%
+      // Overall score = correctAnswers / totalQuestions * 100
+      // So correctAnswers = (desiredScore / 100) * totalQuestions
+      const desiredOverallScore = Math.floor(Math.random() * 51) + 50; // 50-100%
+      const correctAnswers = Math.floor((desiredOverallScore / 100) * totalQuestions);
+      
+      // Ensure we don't have more correct answers than attempted questions
+      const finalCorrectAnswers = Math.min(correctAnswers, questionsAttempted);
+      
+      console.log(`🎯 DEV: ${sectionName} realistic data:`, {
+        totalQuestions,
+        questionsAttempted,
+        blankQuestions,
+        desiredOverallScore: desiredOverallScore + '%',
+        correctAnswers: finalCorrectAnswers,
+        calculation: `${finalCorrectAnswers}/${questionsAttempted} attempted, ${finalCorrectAnswers}/${totalQuestions} total = ${Math.round((finalCorrectAnswers/totalQuestions)*100)}% overall score`
+      });
+      
+      // Create realistic answer data with some blank answers
+      const answersData: Record<string, string> = {};
+      const flaggedQuestions: string[] = []; // Store as strings for TestTaking compatibility
+      
+      // Create array of question indices and shuffle to randomize which questions are left blank
+      const questionIndices = Array.from({ length: totalQuestions }, (_, i) => i);
+      const shuffledIndices = questionIndices.sort(() => Math.random() - 0.5);
+      
+      // First group: questions to leave blank
+      const blankQuestionIndices = new Set(shuffledIndices.slice(0, blankQuestions));
+      
+      // Second group: questions to answer
+      const answeredQuestionIndices = shuffledIndices.slice(blankQuestions);
+      
+      // Create answers for attempted questions
+      for (let i = 0; i < answeredQuestionIndices.length; i++) {
+        const qIndex = answeredQuestionIndices[i];
+        const question = questions[qIndex];
+        const isCorrect = i < finalCorrectAnswers; // First N answers are correct
+        
+        let selectedAnswerIndex: number;
+        if (isCorrect) {
+          selectedAnswerIndex = question.correctAnswer; // Use the correct answer index
+        } else {
+          // Pick a random incorrect answer
+          const availableOptions = question.options.length;
+          const incorrectOptions = [];
+          for (let j = 0; j < availableOptions; j++) {
+            if (j !== question.correctAnswer) {
+              incorrectOptions.push(j);
+            }
+          }
+          selectedAnswerIndex = incorrectOptions[Math.floor(Math.random() * incorrectOptions.length)];
+        }
+        
+        // Store the full option text (same format as what TestTaking expects)
+        if (question.options && question.options[selectedAnswerIndex]) {
+          answersData[qIndex.toString()] = question.options[selectedAnswerIndex];
+        }
+        
+        // Random flagging (5% chance)
+        if (Math.random() < 0.05) {
+          flaggedQuestions.push(qIndex.toString()); // Store as string for compatibility
+        }
+      }
+      
+      console.log(`📝 DEV: Created realistic answers:`, {
+        totalAnswers: Object.keys(answersData).length,
+        expectedAttempted: questionsAttempted,
+        blankQuestionIndices: Array.from(blankQuestionIndices).sort(),
+        sampleAnswers: Object.entries(answersData).slice(0, 3),
+        flaggedQuestions: flaggedQuestions,
+        sampleQuestions: questions.slice(0, 2).map((q, i) => ({
+          index: i,
+          id: q.id,
+          text: q.text?.substring(0, 50) + '...',
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        }))
+      });
+      
+      const sessionData = {
+        user_id: user.id,
+        product_type: dbProductType,
+        test_mode: mode,
+        section_name: sectionName,
+        status: status,
+        current_question_index: questionsAttempted, // Index of last attempted question
+        total_questions: totalQuestions,
+        questions_answered: questionsAttempted, // Total questions with answers
+        correct_answers: finalCorrectAnswers, // Actual correct answers count
+        final_score: Math.round((finalCorrectAnswers / totalQuestions) * 100), // Overall score including blanks
+        completed_at: status === 'completed' ? new Date().toISOString() : null,
+        answers_data: answersData,
+        flagged_questions: flaggedQuestions,
+        time_remaining_seconds: status === 'active' ? Math.floor(1800 * 0.4) : 0,
+        question_order: questions.map(q => q.id) // Store the question order for accurate calculations
+      };
+
+      const { data: sessionResult, error } = await supabase
+        .from('user_test_sessions')
+        .insert(sessionData)
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error(`❌ DEV: Error creating session for ${sectionName}:`, error);
+        throw error;
+      }
+
+      console.log(`✅ DEV: Created realistic ${status} session for ${sectionName}:`, {
+        sessionId: sessionResult.id,
+        totalQuestions,
+        questionsAttempted,
+        correctAnswers: finalCorrectAnswers,
+        overallScore: Math.round((finalCorrectAnswers / totalQuestions) * 100) + '%',
+        accuracyOfAttempted: Math.round((finalCorrectAnswers / questionsAttempted) * 100) + '%'
+      });
+      
+      // Create individual question attempt records for attempted questions only
+      for (const [qIndexStr, userAnswerText] of Object.entries(answersData)) {
+        const qIndex = parseInt(qIndexStr);
+        const question = questions[qIndex];
+        
+        // Convert answer text back to letter format for attempt history
+        let userAnswerLetter = '';
+        let optionIndex = -1;
+        if (userAnswerText && question.options) {
+          optionIndex = question.options.findIndex(opt => opt === userAnswerText);
+          if (optionIndex !== -1) {
+            userAnswerLetter = String.fromCharCode(65 + optionIndex); // 0=A, 1=B, 2=C, 3=D
+          }
+        }
+        
+        const isCorrect = optionIndex === question.correctAnswer;
+        
+        const attemptData = {
+          user_id: user.id,
+          question_id: question.id,
+          session_id: sessionResult.id,
+          session_type: mode, // 'diagnostic', 'practice', or 'drill'
+          user_answer: userAnswerLetter,
+          is_correct: isCorrect,
+          is_flagged: flaggedQuestions.includes(qIndex.toString()),
+          is_skipped: false,
+          time_spent_seconds: Math.floor(Math.random() * 180) + 60 // 60-240 seconds
+        };
+
+        const { error: attemptError } = await supabase
+          .from('question_attempt_history')
+          .insert(attemptData);
+
+        if (attemptError) {
+          console.warn(`Warning creating attempt for question ${question.id}:`, attemptError);
+        }
+      }
+      
+    } catch (error) {
+      console.error(`❌ DEV: Error in createRealisticSession:`, error);
       throw error;
     }
   };
@@ -334,6 +676,37 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
 
         questions = foundSection.questions;
         console.log(`📝 DEV: Found ${questions.length} practice questions for ${sectionName}`);
+        
+        // Apply same Reading section reorganization as for diagnostic tests
+        const isReadingSection = sectionName.toLowerCase().includes('reading') || 
+                                 sectionName.toLowerCase().includes('comprehension');
+        
+        if (isReadingSection) {
+          console.log(`📝 DEV: Applying Reading section reorganization for practice ${sectionName} (basic session)`);
+          
+          // Group questions by passage content, keeping non-passage questions at the end
+          const questionsWithPassage = questions.filter(q => q.passageContent);
+          const questionsWithoutPassage = questions.filter(q => !q.passageContent);
+          
+          // Sort questions with passages by some identifier to group them
+          const passageGroups = new Map();
+          questionsWithPassage.forEach(q => {
+            // Use passage content as grouping key (same logic as diagnostic)
+            const passageKey = q.passageContent?.substring(0, 50) || 'unknown';
+            if (!passageGroups.has(passageKey)) {
+              passageGroups.set(passageKey, []);
+            }
+            passageGroups.get(passageKey).push(q);
+          });
+          
+          // Reorganize: all questions from passage 1, then passage 2, etc., then non-passage questions
+          questions = [
+            ...Array.from(passageGroups.values()).flat(),
+            ...questionsWithoutPassage
+          ];
+          
+          console.log(`📝 DEV: Reorganized Practice Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions (basic session)`);
+        }
         
       } else if (mode === 'diagnostic') {
         // Use direct Supabase query for diagnostic (more reliable)
@@ -389,8 +762,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       questionsAnswered = Math.min(calculatedAnswered, maxAnswered);
       console.log(`📝 DEV: ACTIVE session - calculation: totalQuestions=${totalQuestions}, targetPercentage=${targetPercentage}, calculatedAnswered=${calculatedAnswered}, maxAnswered=${maxAnswered}, final questionsAnswered=${questionsAnswered}`);
     }
-    const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
+    // Use a higher score range for better test data (80-95%)
+    const mockScore = Math.floor(Math.random() * 15) + 80; // 80-95%
     const correctAnswers = Math.floor(questionsAnswered * (mockScore / 100));
+    
+    console.log(`📝 DEV: ${sectionName} - mockScore: ${mockScore}%, questionsAnswered: ${questionsAnswered}, correctAnswers: ${correctAnswers}`);
     
     // Create realistic answer data with actual question responses
     const answersData: Record<string, string> = {};
@@ -438,6 +814,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       current_question_index: questionsAnswered,
       total_questions: totalQuestions,
       questions_answered: questionsAnswered,
+      correct_answers: status === 'completed' ? correctAnswers : null, // Add the actual correct answers count
       final_score: status === 'completed' ? mockScore : null,
       completed_at: status === 'completed' ? new Date().toISOString() : null,
       answers_data: answersData,

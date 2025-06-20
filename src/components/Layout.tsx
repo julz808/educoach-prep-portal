@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavigationItem {
   id: string;
@@ -65,8 +66,9 @@ const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userProgress, setUserProgress] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { selectedProduct, setSelectedProduct, currentProduct, allProducts } = useProduct();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -99,6 +101,29 @@ const Layout: React.FC = () => {
     setUserProgress(mockProgress);
   }, []);
 
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!error && data) {
+          setUserProfile(data);
+        }
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
+
   const currentItem = navigationItems.find(item => item.path === location.pathname);
 
   const handleNavigation = (path: string) => {
@@ -130,16 +155,17 @@ const Layout: React.FC = () => {
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
               {!sidebarCollapsed && (
-                <div>
-                  <h1 className="text-2xl font-bold text-edu-navy">EduCourse</h1>
-                  <p className="text-sm text-edu-navy/60">Learning Platform</p>
-                </div>
+                <img 
+                  src="/images/educourse-logo.png" 
+                  alt="EduCourse" 
+                  className="h-20 w-auto object-contain"
+                />
               )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="text-edu-navy/60 hover:text-edu-navy"
+                className="text-edu-navy/60 hover:text-edu-navy ml-2"
               >
                 <Menu size={20} />
               </Button>
@@ -259,15 +285,23 @@ const Layout: React.FC = () => {
           {/* User Profile - Desktop */}
           {!sidebarCollapsed && (
             <div className="p-6 border-t border-gray-100">
-              <div className="flex items-center space-x-3 mb-4">
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+              >
                 <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
                   <User size={20} className="text-white" />
                 </div>
-                <div className="flex-1">
-                  <div className="font-medium text-edu-navy">Student Name</div>
-                  <div className="text-xs text-edu-navy/60">Grade 10</div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-edu-navy">
+                    {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
+                  </div>
+                  <div className="text-xs text-edu-navy/60">
+                    {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
+                  </div>
                 </div>
-              </div>
+                <ChevronRight size={16} className="text-edu-navy/40" />
+              </button>
               <Button
                 onClick={signOut}
                 variant="outline"
@@ -284,9 +318,13 @@ const Layout: React.FC = () => {
           {sidebarCollapsed && (
             <div className="p-4 border-t border-gray-100">
               <div className="space-y-2">
-                <div className="w-12 h-12 bg-edu-teal rounded-full flex items-center justify-center mx-auto">
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="w-12 h-12 bg-edu-teal rounded-full flex items-center justify-center mx-auto hover:bg-edu-teal/90 transition-colors"
+                  title="Profile"
+                >
                   <User size={20} className="text-white" />
-                </div>
+                </button>
                 <Button
                   onClick={signOut}
                   variant="outline"
@@ -313,10 +351,11 @@ const Layout: React.FC = () => {
             >
               <Menu size={20} />
             </Button>
-            <div>
-              <h1 className="text-lg font-bold text-edu-navy">EduCourse</h1>
-              <p className="text-xs text-edu-navy/60">{currentProduct?.shortName}</p>
-            </div>
+            <img 
+              src="/images/educourse-logo.png" 
+              alt="EduCourse" 
+              className="h-10 w-auto object-contain"
+            />
           </div>
           
           <div className="flex items-center space-x-2">
@@ -345,7 +384,11 @@ const Layout: React.FC = () => {
           <aside className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-6 border-b">
-                <h1 className="text-xl font-bold text-edu-navy">EduCourse</h1>
+                <img 
+                  src="/images/educourse-logo.png" 
+                  alt="EduCourse" 
+                  className="h-16 w-auto object-contain"
+                />
                 <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
                   <X size={20} />
                 </Button>
@@ -431,15 +474,23 @@ const Layout: React.FC = () => {
               
               {/* Mobile User Profile */}
               <div className="p-6 border-t border-gray-100">
-                <div className="flex items-center space-x-3 mb-4">
+                <button
+                  onClick={() => handleNavigation('/profile')}
+                  className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+                >
                   <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
                     <User size={20} className="text-white" />
                   </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-edu-navy">Student Name</div>
-                    <div className="text-xs text-edu-navy/60">Grade 10</div>
+                  <div className="flex-1 text-left">
+                    <div className="font-medium text-edu-navy">
+                      {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
+                    </div>
+                    <div className="text-xs text-edu-navy/60">
+                      {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
+                    </div>
                   </div>
-                </div>
+                  <ChevronRight size={16} className="text-edu-navy/40" />
+                </button>
                 <Button
                   onClick={signOut}
                   variant="outline"

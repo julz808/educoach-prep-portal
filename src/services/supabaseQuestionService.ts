@@ -533,7 +533,8 @@ export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode
       .from('questions')
       .select('*')
       .eq('test_type', dbTestType)
-      .eq('test_mode', 'diagnostic');
+      .eq('test_mode', 'diagnostic')
+      .order('question_order');
       
     if (error) {
       console.error('🔧 DEBUG: Error fetching diagnostic questions:', error);
