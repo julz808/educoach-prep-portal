@@ -45,6 +45,7 @@ interface EnhancedTestInterfaceProps {
   sessionId?: string; // For loading writing assessments
   testScore?: any; // For displaying weighted scores in review mode
   calculatingScore?: boolean; // For showing loading state during score calculation
+  productType?: string; // For passing to writing assessment feedback
 }
 
 export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
@@ -67,7 +68,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   testTitle = "Test",
   sessionId,
   testScore,
-  calculatingScore = false
+  calculatingScore = false,
+  productType
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -80,6 +82,15 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   const [loadingAssessment, setLoadingAssessment] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
+  
+  // Check if all questions in this test are writing questions
+  const isWritingSection = questions.length > 0 && questions.every(q => 
+    q.format === 'Written Response' || 
+    q.topic?.toLowerCase().includes('writing') ||
+    q.topic?.toLowerCase().includes('written') ||
+    q.subSkill?.toLowerCase().includes('writing') ||
+    q.subSkill?.toLowerCase().includes('written')
+  );
   
   // Guard clause: if no current question, return loading state
   if (!currentQuestion) {
@@ -204,12 +215,27 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     const isFlagged = flaggedQuestions.has(questionIndex);
     
     // In review mode, show correct/incorrect status if answered
-    if (isReviewMode && isAnswered) {
-      const isCorrect = answers[questionIndex] === questions[questionIndex].correctAnswer;
-      return {
-        primary: isCorrect ? 'correct' : 'incorrect',
-        flagged: isFlagged
-      };
+    if (isReviewMode) {
+      // For writing sections, show answered/not answered instead of correct/incorrect
+      if (isWritingSection) {
+        return {
+          primary: isAnswered ? 'correct' : 'incorrect', // Using 'correct' for green, 'incorrect' for red
+          flagged: isFlagged
+        };
+      } else if (isAnswered) {
+        // For non-writing sections, show correct/incorrect
+        const isCorrect = answers[questionIndex] === questions[questionIndex].correctAnswer;
+        return {
+          primary: isCorrect ? 'correct' : 'incorrect',
+          flagged: isFlagged
+        };
+      } else {
+        // Not answered in review mode
+        return {
+          primary: 'unanswered',
+          flagged: isFlagged
+        };
+      }
     }
     
     // In regular mode
@@ -646,6 +672,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           assessment={writingAssessment}
                           userResponse={textAnswer}
                           isLoading={loadingAssessment}
+                          productType={productType}
                         />
                       )}
                     </>
@@ -720,20 +747,39 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
               {/* Legend */}
               <div className="space-y-3 text-sm mb-6">
                 {isReviewMode ? (
-                  <>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                      <span className="text-gray-600">Correct</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                      <span className="text-gray-600">Incorrect</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 rounded-full border-2 border-edu-coral bg-white"></div>
-                      <span className="text-gray-600">Flagged</span>
-                    </div>
-                  </>
+                  isWritingSection ? (
+                    // Writing section in review mode - show answered/not answered
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                        <span className="text-gray-600">Answered</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                        <span className="text-gray-600">Not Answered</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full border-2 border-edu-coral bg-white"></div>
+                        <span className="text-gray-600">Flagged</span>
+                      </div>
+                    </>
+                  ) : (
+                    // Non-writing section in review mode - show correct/incorrect
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                        <span className="text-gray-600">Correct</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                        <span className="text-gray-600">Incorrect</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full border-2 border-edu-coral bg-white"></div>
+                        <span className="text-gray-600">Flagged</span>
+                      </div>
+                    </>
+                  )
                 ) : (
                   <>
                     <div className="flex items-center space-x-3">

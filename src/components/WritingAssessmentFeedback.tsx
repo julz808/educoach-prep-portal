@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, FileText, Target, TrendingUp, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WritingRubricService, WRITING_RUBRICS } from '@/services/writingRubricService';
 
 interface WritingAssessment {
   total_score: number;
@@ -24,12 +25,14 @@ interface WritingAssessmentFeedbackProps {
   assessment: WritingAssessment | null;
   userResponse: string;
   isLoading?: boolean;
+  productType?: string;
 }
 
 export const WritingAssessmentFeedback: React.FC<WritingAssessmentFeedbackProps> = ({
   assessment,
   userResponse,
-  isLoading = false
+  isLoading = false,
+  productType
 }) => {
   if (isLoading) {
     return (
@@ -129,25 +132,40 @@ export const WritingAssessmentFeedback: React.FC<WritingAssessmentFeedbackProps>
       {/* Criterion Scores */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-edu-navy">Detailed Assessment</CardTitle>
+          <CardTitle className="text-edu-navy">Student Feedback</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {Object.entries(assessment.criterion_scores).map(([criterion, data]) => (
-            <div key={criterion} className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-edu-navy">{criterion}</h4>
-                <div className="flex items-center space-x-2">
-                  <span className={cn("font-bold", getScoreColor((data.score / data.maxMarks) * 100))}>
-                    {data.score}/{data.maxMarks}
-                  </span>
-                  <Badge variant="outline" className="text-xs">
-                    {Math.round((data.score / data.maxMarks) * 100)}%
-                  </Badge>
+          {Object.entries(assessment.criterion_scores).map(([criterion, data]) => {
+            // Get the rubric description for this criterion
+            let rubricDescription = '';
+            if (productType && assessment.writing_genre) {
+              const rubric = WRITING_RUBRICS[productType]?.[assessment.writing_genre];
+              if (rubric) {
+                const criterionInfo = rubric.criteria.find(c => c.name === criterion);
+                rubricDescription = criterionInfo?.description || '';
+              }
+            }
+
+            return (
+              <div key={criterion} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-edu-navy text-lg">{criterion}</h4>
+                  <div className="flex items-center space-x-2">
+                    <span className={cn("font-bold text-lg", getScoreColor((data.score / data.maxMarks) * 100))}>
+                      {data.score}/{data.maxMarks}
+                    </span>
+                    <Badge variant="outline" className="text-sm">
+                      {Math.round((data.score / data.maxMarks) * 100)}%
+                    </Badge>
+                  </div>
                 </div>
+                {rubricDescription && (
+                  <p className="text-sm text-gray-600 mb-2 italic">{rubricDescription}</p>
+                )}
+                <p className="text-base text-gray-700 leading-relaxed">{data.feedback}</p>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{data.feedback}</p>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -166,8 +184,8 @@ export const WritingAssessmentFeedback: React.FC<WritingAssessmentFeedbackProps>
               <ul className="space-y-2">
                 {assessment.strengths.map((strength, index) => (
                   <li key={index} className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 shrink-0"></div>
-                    <span className="text-sm text-gray-700 leading-relaxed">{strength}</span>
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2.5 shrink-0"></div>
+                    <span className="text-base text-gray-700 leading-relaxed">{strength}</span>
                   </li>
                 ))}
               </ul>
@@ -188,8 +206,8 @@ export const WritingAssessmentFeedback: React.FC<WritingAssessmentFeedbackProps>
               <ul className="space-y-2">
                 {assessment.improvements.map((improvement, index) => (
                   <li key={index} className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 shrink-0"></div>
-                    <span className="text-sm text-gray-700 leading-relaxed">{improvement}</span>
+                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2.5 shrink-0"></div>
+                    <span className="text-base text-gray-700 leading-relaxed">{improvement}</span>
                   </li>
                 ))}
               </ul>

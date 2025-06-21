@@ -1392,15 +1392,15 @@ const TestTaking: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-edu-teal">{score}</div>
-                  <div className="text-sm text-gray-600">{testScore ? 'Points Earned' : 'Questions Correct'}</div>
+                  <div className="text-sm text-gray-600">Total Score</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-edu-coral">{percentage}%</div>
-                  <div className="text-sm text-gray-600">Score</div>
+                  <div className="text-sm text-gray-600">Percentage</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-edu-navy">{answeredQuestions}</div>
-                  <div className="text-sm text-gray-600">Answered</div>
+                  <div className="text-sm text-gray-600">Questions Answered</div>
                 </div>
               </div>
 
@@ -1442,6 +1442,7 @@ const TestTaking: React.FC = () => {
         sessionId={session.id}
         testScore={testScore}
         calculatingScore={calculatingScore}
+        productType={PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct}
       />
     );
   }
@@ -1528,7 +1529,7 @@ const TestTaking: React.FC = () => {
               </div>
               
               <h3 className="text-xl font-semibold text-edu-navy mb-3">
-                Finalizing Your Results
+                Finalising Your Results
               </h3>
               
               <p className="text-sm text-gray-600 mb-4">
