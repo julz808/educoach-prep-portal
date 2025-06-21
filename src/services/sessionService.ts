@@ -24,6 +24,7 @@ export interface SectionProgress {
   questionsAnswered: number;
   totalQuestions: number;
   lastUpdated: string;
+  questionsCompleted?: number; // For backward compatibility with Diagnostic page
 }
 
 export class SessionService {
@@ -47,6 +48,15 @@ export class SessionService {
     }
 
     // No active session, create a new one
+    console.log('🆕 SESSION: Creating new session with:', {
+      userId,
+      productType,
+      testMode,
+      sectionName,
+      totalQuestions,
+      timeLimitSeconds
+    });
+    
     const { data, error } = await supabase
       .from('user_test_sessions')
       .insert({
@@ -274,7 +284,8 @@ export class SessionService {
           status: mappedStatus,
           questionsAnswered: session.questions_answered || 0,
           totalQuestions: session.total_questions || 0,
-          lastUpdated: session.updated_at
+          lastUpdated: session.updated_at,
+          questionsCompleted: session.questions_answered || 0 // Add this for backward compatibility
         };
       }
     });
@@ -292,9 +303,16 @@ export class SessionService {
     sectionName: string,
     testMode: 'diagnostic' | 'practice' | 'drill' = 'diagnostic'
   ): Promise<string | null> {
+    console.log('🔍 SESSION: Looking for active session:', {
+      userId,
+      productType,
+      testMode,
+      sectionName
+    });
+    
     const { data, error } = await supabase
       .from('user_test_sessions')
-      .select('id')
+      .select('id, status')
       .eq('user_id', userId)
       .eq('product_type', productType)
       .eq('test_mode', testMode)
@@ -303,7 +321,17 @@ export class SessionService {
       .order('updated_at', { ascending: false })
       .limit(1);
 
-    if (error || !data || data.length === 0) return null;
+    if (error) {
+      console.error('🔍 SESSION: Error finding active session:', error);
+      return null;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('🔍 SESSION: No active session found');
+      return null;
+    }
+    
+    console.log('🔍 SESSION: Found active session:', data[0].id, 'status:', data[0].status);
     return data[0].id;
   }
 }
