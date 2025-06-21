@@ -162,7 +162,7 @@ export class WritingAssessmentService {
     // Option 2: Local proxy server fallback
     try {
       console.log('🔄 Attempting local proxy server...');
-      const proxyUrl = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
+      const proxyUrl = import.meta.env.VITE_PROXY_URL || 'http://localhost:3002';
       
       const response = await fetch(`${proxyUrl}/api/assess-writing`, {
         method: 'POST',
