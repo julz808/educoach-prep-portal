@@ -14,6 +14,7 @@ import {
 } from '@/services/supabaseQuestionService';
 import { SessionService, type TestSession } from '@/services/sessionService';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
+import { ScoringService } from '@/services/scoringService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 
@@ -92,6 +93,9 @@ const TestTaking: React.FC = () => {
   const [initializing, setInitializing] = useState(false);
   const initializingRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [isProcessingWriting, setIsProcessingWriting] = useState(false);
+  const [writingProcessingStatus, setWritingProcessingStatus] = useState<string>('');
+  const [testScore, setTestScore] = useState<any>(null);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -1126,20 +1130,36 @@ const TestTaking: React.FC = () => {
 
     try {
       console.log('🏁 FINISH: Saving final progress and completing session');
+      setShowSubmitConfirm(false);
+      
       // Save final progress with all latest responses
       await saveProgress(session); // Use current session state
       
       // Process any writing questions for AI assessment
+      setIsProcessingWriting(true);
+      setWritingProcessingStatus('Processing your writing responses...');
       await processWritingAssessments();
       
       // Mark as completed
+      setWritingProcessingStatus('Finalizing your test results...');
       await SessionService.completeSession(session.id);
       
+      // Calculate final score using ScoringService
+      setWritingProcessingStatus('Calculating final scores...');
+      const finalScore = await ScoringService.calculateTestScore(
+        session.questions,
+        session.answers,
+        session.textAnswers,
+        session.id
+      );
+      setTestScore(finalScore);
+      
+      setIsProcessingWriting(false);
       setSession(prev => prev ? { ...prev, status: 'completed' } : prev);
-      setShowSubmitConfirm(false);
-      console.log('🏁 FINISH: Session completed successfully');
+      console.log('🏁 FINISH: Session completed successfully with score:', finalScore);
     } catch (error) {
       console.error('Failed to finish session:', error);
+      setIsProcessingWriting(false);
       setShowSubmitConfirm(false);
     }
   };
@@ -1175,7 +1195,8 @@ const TestTaking: React.FC = () => {
     const productType = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
     
     // Process each writing question
-    for (const question of writingQuestions) {
+    for (let i = 0; i < writingQuestions.length; i++) {
+      const question = writingQuestions[i];
       const questionIndex = session.questions.findIndex(q => q.id === question.id);
       const userResponse = session.textAnswers[questionIndex];
       
@@ -1185,6 +1206,7 @@ const TestTaking: React.FC = () => {
       }
 
       try {
+        setWritingProcessingStatus(`Assessing writing response ${i + 1} of ${writingQuestions.length}...`);
         console.log(`✍️ WRITING: Assessing question ${questionIndex} (${question.id}) for product ${productType}`);
         
         const assessment = await WritingAssessmentService.assessWriting(
@@ -1293,12 +1315,27 @@ const TestTaking: React.FC = () => {
 
   // Completed state
   if (session.status === 'completed') {
-    const totalQuestions = session.questions.length;
-    const answeredQuestions = Object.keys(session.answers).length;
-    const score = Object.entries(session.answers).reduce((correct, [qIndex, answer]) => {
-      return session.questions[parseInt(qIndex)].correctAnswer === answer ? correct + 1 : correct;
-    }, 0);
-    const percentage = Math.round((score / totalQuestions) * 100);
+    // Use calculated test score if available, otherwise fallback to simple calculation
+    let totalQuestions, answeredQuestions, score, percentage, totalPoints, earnedPoints;
+    
+    if (testScore) {
+      // Use weighted scoring from ScoringService
+      totalQuestions = testScore.totalQuestions;
+      answeredQuestions = testScore.answeredQuestions;
+      earnedPoints = testScore.totalEarnedPoints;
+      totalPoints = testScore.totalMaxPoints;
+      percentage = testScore.percentageScore;
+      score = `${earnedPoints}/${totalPoints}`;
+    } else {
+      // Fallback to simple question count (backward compatibility)
+      totalQuestions = session.questions.length;
+      answeredQuestions = Object.keys(session.answers).length;
+      const correctCount = Object.entries(session.answers).reduce((correct, [qIndex, answer]) => {
+        return session.questions[parseInt(qIndex)].correctAnswer === answer ? correct + 1 : correct;
+      }, 0);
+      score = `${correctCount}/${totalQuestions}`;
+      percentage = Math.round((correctCount / totalQuestions) * 100);
+    }
 
     return (
       <div className="min-h-screen bg-gray-50 p-8">
@@ -1311,8 +1348,8 @@ const TestTaking: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-edu-teal">{score}/{totalQuestions}</div>
-                  <div className="text-sm text-gray-600">Questions Correct</div>
+                  <div className="text-3xl font-bold text-edu-teal">{score}</div>
+                  <div className="text-sm text-gray-600">{testScore ? 'Points Earned' : 'Questions Correct'}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-edu-coral">{percentage}%</div>
@@ -1360,6 +1397,7 @@ const TestTaking: React.FC = () => {
         onFinish={handleBackToDashboard}
         onExit={handleBackToDashboard}
         sessionId={session.id}
+        testScore={testScore}
       />
     );
   }
@@ -1431,6 +1469,43 @@ const TestTaking: React.FC = () => {
                 <CheckCircle size={16} className="mr-2" />
                 Submit Test
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Writing Assessment Processing Modal */}
+      {isProcessingWriting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-edu-light-blue/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edu-teal"></div>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-edu-navy mb-3">
+                Processing Your Test
+              </h3>
+              
+              <p className="text-sm text-gray-600 mb-4">
+                {writingProcessingStatus || 'Processing your responses...'}
+              </p>
+              
+              <div className="bg-edu-light-blue/10 border border-edu-teal/20 rounded-lg p-4">
+                <div className="flex items-start space-x-2">
+                  <AlertCircle size={16} className="text-edu-teal mt-0.5 shrink-0" />
+                  <div className="text-sm text-edu-navy text-left">
+                    <p className="font-medium mb-1">Please wait while we:</p>
+                    <p>• Assess your writing responses with AI</p>
+                    <p>• Calculate your final scores</p>
+                    <p>• Generate detailed feedback</p>
+                  </div>
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-4">
+                This may take a few moments. Please don't close this window.
+              </p>
             </div>
           </div>
         </div>

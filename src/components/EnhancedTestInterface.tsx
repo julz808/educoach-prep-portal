@@ -43,6 +43,7 @@ interface EnhancedTestInterfaceProps {
   onExit?: () => void;
   testTitle?: string;
   sessionId?: string; // For loading writing assessments
+  testScore?: any; // For displaying weighted scores in review mode
 }
 
 export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
@@ -63,7 +64,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   onFinish,
   onExit,
   testTitle = "Test",
-  sessionId
+  sessionId,
+  testScore
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -755,30 +757,57 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="mb-4 p-3 bg-edu-light-blue/20 rounded-lg">
                       <h4 className="font-semibold text-edu-navy mb-2 text-center">Test Results</h4>
                       <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Total Score:</span>
-                          <span className="font-semibold text-edu-navy">
-                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{questions.length}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Percentage Score:</span>
-                          <span className="font-semibold text-edu-navy">
-                            {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Accuracy:</span>
-                          <span className="font-semibold text-edu-navy">
-                            {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{Object.keys(answers).length}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Accuracy %:</span>
-                          <span className="font-semibold text-edu-navy">
-                            {Object.keys(answers).length > 0 ? Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / Object.keys(answers).length) * 100) : 0}%
-                          </span>
-                        </div>
+                        {testScore ? (
+                          // Use weighted scoring when available
+                          <>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Total Score:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {testScore.totalEarnedPoints}/{testScore.totalMaxPoints}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Percentage Score:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {testScore.percentageScore}%
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Questions Answered:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {testScore.answeredQuestions}/{testScore.totalQuestions}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          // Fallback to simple question count
+                          <>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Total Score:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{questions.length}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Percentage Score:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Accuracy:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{Object.keys(answers).length}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Accuracy %:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {Object.keys(answers).length > 0 ? Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / Object.keys(answers).length) * 100) : 0}%
+                              </span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div className="flex justify-between">
