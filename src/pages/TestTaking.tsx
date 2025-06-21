@@ -99,6 +99,33 @@ const TestTaking: React.FC = () => {
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
+
+  // Calculate test score when entering review mode
+  useEffect(() => {
+    const calculateReviewScore = async () => {
+      if (session && session.status === 'review' && !testScore) {
+        try {
+          console.log('📊 REVIEW: Calculating test score for review mode');
+          console.log('📊 REVIEW: Questions:', session.questions.map(q => ({ id: q.id, maxPoints: q.maxPoints, subSkill: q.subSkill })));
+          console.log('📊 REVIEW: Answers:', session.answers);
+          console.log('📊 REVIEW: Text answers:', session.textAnswers);
+          
+          const reviewScore = await ScoringService.calculateTestScore(
+            session.questions,
+            session.answers,
+            session.textAnswers,
+            session.id
+          );
+          setTestScore(reviewScore);
+          console.log('📊 REVIEW: Score calculated:', reviewScore);
+        } catch (error) {
+          console.error('📊 REVIEW: Failed to calculate score:', error);
+        }
+      }
+    };
+
+    calculateReviewScore();
+  }, [session?.status, session?.id, testScore]);
   
   console.log('🔍 REVIEW MODE: isReviewMode =', isReviewMode, 'from searchParams.review =', searchParams.get('review'));
 
@@ -1135,13 +1162,13 @@ const TestTaking: React.FC = () => {
       // Save final progress with all latest responses
       await saveProgress(session); // Use current session state
       
-      // Process any writing questions for AI assessment
+      // Process any writing questions for assessment
       setIsProcessingWriting(true);
-      setWritingProcessingStatus('Processing your writing responses...');
+      setWritingProcessingStatus('Reviewing your writing responses...');
       await processWritingAssessments();
       
       // Mark as completed
-      setWritingProcessingStatus('Finalizing your test results...');
+      setWritingProcessingStatus('Finalizing your results...');
       await SessionService.completeSession(session.id);
       
       // Calculate final score using ScoringService
@@ -1206,7 +1233,7 @@ const TestTaking: React.FC = () => {
       }
 
       try {
-        setWritingProcessingStatus(`Assessing writing response ${i + 1} of ${writingQuestions.length}...`);
+        setWritingProcessingStatus(`Reviewing writing response ${i + 1} of ${writingQuestions.length}...`);
         console.log(`✍️ WRITING: Assessing question ${questionIndex} (${question.id}) for product ${productType}`);
         
         const assessment = await WritingAssessmentService.assessWriting(
@@ -1484,11 +1511,11 @@ const TestTaking: React.FC = () => {
               </div>
               
               <h3 className="text-xl font-semibold text-edu-navy mb-3">
-                Processing Your Test
+                Finalizing Your Results
               </h3>
               
               <p className="text-sm text-gray-600 mb-4">
-                {writingProcessingStatus || 'Processing your responses...'}
+                {writingProcessingStatus || 'Reviewing your responses...'}
               </p>
               
               <div className="bg-edu-light-blue/10 border border-edu-teal/20 rounded-lg p-4">
@@ -1496,9 +1523,9 @@ const TestTaking: React.FC = () => {
                   <AlertCircle size={16} className="text-edu-teal mt-0.5 shrink-0" />
                   <div className="text-sm text-edu-navy text-left">
                     <p className="font-medium mb-1">Please wait while we:</p>
-                    <p>• Assess your writing responses with AI</p>
+                    <p>• Review your writing responses</p>
                     <p>• Calculate your final scores</p>
-                    <p>• Generate detailed feedback</p>
+                    <p>• Prepare detailed feedback</p>
                   </div>
                 </div>
               </div>

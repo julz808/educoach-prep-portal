@@ -21,6 +21,7 @@ export interface OrganizedQuestion {
   visualSvg?: string;
   visualUrl?: string;
   passageContent?: string;
+  maxPoints: number; // Maximum points for this question
 }
 
 export interface TestSection {
@@ -126,6 +127,7 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
     visualSvg: question.visual_svg || undefined,
     visualUrl: question.visual_url || undefined,
     passageContent: passage?.content,
+    maxPoints: question.max_points || 1, // Use max_points from database, default to 1 for backward compatibility
   };
 }
 
