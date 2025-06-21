@@ -720,6 +720,12 @@ const TestTaking: React.FC = () => {
               textAnswersRestored: Object.keys(resumedSession.textAnswers).length,
               timeRemaining: savedSession.timeRemainingSeconds
             });
+            console.log('🔍 DEBUG: Questions maxPoints:', resumedSession.questions.map(q => ({ 
+              id: q.id, 
+              maxPoints: q.maxPoints, 
+              subSkill: q.subSkill, 
+              topic: q.topic 
+            })));
             return;
           }
         }
@@ -835,6 +841,12 @@ const TestTaking: React.FC = () => {
         setSession(newSession);
         setTimeRemaining(timeLimitSeconds);
         console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
+        console.log('🔍 DEBUG: New session questions maxPoints:', newSession.questions.map(q => ({ 
+          id: q.id, 
+          maxPoints: q.maxPoints, 
+          subSkill: q.subSkill, 
+          topic: q.topic 
+        })));
 
       } catch (err) {
         console.error('Error initializing session:', err);
