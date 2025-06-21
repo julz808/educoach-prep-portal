@@ -33,8 +33,6 @@ SET max_points =
     ELSE max_points -- Keep existing value (default 1)
   END
 WHERE sub_skill LIKE '%Writing%' 
-   OR topic LIKE '%Writing%' 
-   OR topic LIKE '%Written%'
    OR section_name LIKE '%Writing%'
    OR section_name LIKE '%Written%';
 

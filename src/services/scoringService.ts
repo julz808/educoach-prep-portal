@@ -51,6 +51,13 @@ export class ScoringService {
   ): Promise<TestScore> {
     console.log('📊 SCORING: Starting score calculation for session:', sessionId);
     console.log('📊 SCORING: Total questions:', questions.length);
+    console.log('📊 SCORING: Questions details:', questions.map(q => ({ 
+      id: q.id, 
+      maxPoints: q.maxPoints, 
+      subSkill: q.subSkill, 
+      format: q.format,
+      topic: q.topic 
+    })));
     console.log('📊 SCORING: Answers provided:', Object.keys(answers).length);
     console.log('📊 SCORING: Text answers provided:', Object.keys(textAnswers).length);
 
@@ -73,7 +80,7 @@ export class ScoringService {
 
       if (isWriting) {
         // Get writing assessment score
-        console.log(`📊 SCORING: Processing writing question ${i} (${question.id})`);
+        console.log(`📊 SCORING: Processing writing question ${i} (${question.id}), maxPoints: ${maxPoints}`);
         
         // Check if user provided a response
         if (textAnswers[i] && textAnswers[i].trim().length > 0) {
@@ -88,13 +95,21 @@ export class ScoringService {
             if (assessment) {
               earnedPoints = assessment.total_score || 0;
               isCorrect = earnedPoints > 0;
-              console.log(`📊 SCORING: Writing question ${i} scored ${earnedPoints}/${maxPoints}`);
+              console.log(`📊 SCORING: Writing question ${i} scored ${earnedPoints}/${maxPoints} from assessment`);
             } else {
-              console.log(`📊 SCORING: No assessment found for writing question ${i}`);
+              console.log(`📊 SCORING: No assessment found for writing question ${i}, assuming 0 points`);
+              // For writing questions without assessment, give 0 points but still count maxPoints
+              earnedPoints = 0;
+              isCorrect = false;
             }
           } catch (error) {
             console.error(`📊 SCORING: Error getting writing assessment for question ${i}:`, error);
+            // On error, still count the question but give 0 points
+            earnedPoints = 0;
+            isCorrect = false;
           }
+        } else {
+          console.log(`📊 SCORING: Writing question ${i} not answered`);
         }
       } else {
         // Multiple choice scoring
