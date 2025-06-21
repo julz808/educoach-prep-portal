@@ -44,6 +44,7 @@ interface EnhancedTestInterfaceProps {
   testTitle?: string;
   sessionId?: string; // For loading writing assessments
   testScore?: any; // For displaying weighted scores in review mode
+  calculatingScore?: boolean; // For showing loading state during score calculation
 }
 
 export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
@@ -65,7 +66,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   onExit,
   testTitle = "Test",
   sessionId,
-  testScore
+  testScore,
+  calculatingScore = false
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -757,7 +759,12 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="mb-4 p-3 bg-edu-light-blue/20 rounded-lg">
                       <h4 className="font-semibold text-edu-navy mb-2 text-center">Test Results</h4>
                       <div className="space-y-2">
-                        {testScore ? (
+                        {calculatingScore ? (
+                          <div className="text-center py-4">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-edu-teal mx-auto mb-2"></div>
+                            <span className="text-sm text-gray-600">Calculating scores...</span>
+                          </div>
+                        ) : testScore ? (
                           // Use weighted scoring when available
                           <>
                             <div className="flex justify-between">

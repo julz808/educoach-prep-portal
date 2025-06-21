@@ -96,6 +96,7 @@ const TestTaking: React.FC = () => {
   const [isProcessingWriting, setIsProcessingWriting] = useState(false);
   const [writingProcessingStatus, setWritingProcessingStatus] = useState<string>('');
   const [testScore, setTestScore] = useState<any>(null);
+  const [calculatingScore, setCalculatingScore] = useState(false);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -103,8 +104,9 @@ const TestTaking: React.FC = () => {
   // Calculate test score when entering review mode
   useEffect(() => {
     const calculateReviewScore = async () => {
-      if (session && session.status === 'review' && !testScore) {
+      if (session && session.status === 'review' && !testScore && !calculatingScore) {
         try {
+          setCalculatingScore(true);
           console.log('📊 REVIEW: Calculating test score for review mode');
           console.log('📊 REVIEW: Questions:', session.questions.map(q => ({ id: q.id, maxPoints: q.maxPoints, subSkill: q.subSkill })));
           console.log('📊 REVIEW: Answers:', session.answers);
@@ -120,6 +122,8 @@ const TestTaking: React.FC = () => {
           console.log('📊 REVIEW: Score calculated:', reviewScore);
         } catch (error) {
           console.error('📊 REVIEW: Failed to calculate score:', error);
+        } finally {
+          setCalculatingScore(false);
         }
       }
     };
@@ -1425,6 +1429,7 @@ const TestTaking: React.FC = () => {
         onExit={handleBackToDashboard}
         sessionId={session.id}
         testScore={testScore}
+        calculatingScore={calculatingScore}
       />
     );
   }
