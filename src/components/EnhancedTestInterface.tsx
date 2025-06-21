@@ -21,6 +21,7 @@ interface Question {
   passageContent?: string;
   format?: 'Multiple Choice' | 'Written Response';
   userTextAnswer?: string; // For written responses
+  maxPoints: number; // Maximum points for this question (1 for MC, varies for writing)
 }
 
 interface EnhancedTestInterfaceProps {

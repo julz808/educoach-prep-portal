@@ -1,5 +1,26 @@
 # CLAUDE.md
 
+## IMPORTANT CODING STANDARDS AND PRINCIPLES
+
+### Professional Development Practices
+- **NO SHORTCUTS**: Always implement solutions properly and completely. No quick hacks or temporary fixes.
+- **BEST PRACTICES**: Follow industry-standard coding practices, patterns, and conventions.
+- **COMPLETE SOLUTIONS**: Implement features end-to-end with proper error handling, edge cases, and testing considerations.
+- **CODE QUALITY**: Write clean, maintainable, well-documented code that other developers can understand.
+
+### Honest Technical Partnership
+- **CHALLENGE INCORRECT ASSUMPTIONS**: If something seems wrong or suboptimal, speak up immediately and explain why.
+- **PROVIDE ALTERNATIVES**: Don't just point out problems - suggest better solutions with clear reasoning.
+- **TECHNICAL HONESTY**: Be direct about technical limitations, potential issues, and better approaches.
+- **QUESTION UNCLEAR REQUIREMENTS**: Ask for clarification rather than making assumptions.
+- **PUSH BACK WHEN NECESSARY**: If a request could harm the codebase or create technical debt, explain why and propose alternatives.
+
+### Implementation Philosophy
+- **THINK BEFORE CODING**: Always plan the implementation thoroughly before writing code.
+- **CONSIDER IMPLICATIONS**: Think about how changes affect other parts of the system.
+- **MAINTAIN CONSISTENCY**: Follow existing patterns and conventions in the codebase.
+- **DOCUMENT DECISIONS**: Explain why certain approaches were chosen, especially for non-obvious solutions.
+
 ## Project Overview
 EduCourse is an Australian test preparation platform for Year 5–10 students, offering diagnostic tests, skill drills, and practice tests for selective entry, NAPLAN, and scholarship exams.
 

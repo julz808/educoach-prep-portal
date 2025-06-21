@@ -41,6 +41,7 @@ interface Question {
   passageContent?: string;
   format?: 'Multiple Choice' | 'Written Response';
   userTextAnswer?: string; // For written responses
+  maxPoints: number; // Maximum points for this question (1 for MC, varies for writing)
 }
 
 interface TestSessionState {
@@ -252,7 +253,8 @@ const TestTaking: React.FC = () => {
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
         passageContent: q.passageContent || '',
-        format: questionFormat
+        format: questionFormat,
+        maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
       }));
     } else if (testType === 'practice') {
       console.log('🔍 Practice: Loading practice questions for product:', selectedProduct, 'subjectId:', subjectId);
@@ -360,7 +362,8 @@ const TestTaking: React.FC = () => {
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
         passageContent: q.passageContent || '',
-        format: questionFormat
+        format: questionFormat,
+        maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
       }));
     } else if (testType === 'drill') {
       console.log('🔧 DRILL: Loading drill questions for product:', selectedProduct, 'subjectId:', subjectId);
@@ -420,7 +423,8 @@ const TestTaking: React.FC = () => {
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
         passageContent: q.passageContent || '',
-        format: 'Multiple Choice' as const
+        format: 'Multiple Choice' as const,
+        maxPoints: 1 // Drills are always 1 point per question
       }));
       
       console.log('🔧 DRILL: Converted questions:', convertedQuestions.length, 'questions with proper fallbacks');
