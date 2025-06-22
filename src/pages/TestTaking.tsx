@@ -78,10 +78,15 @@ const TestTaking: React.FC = () => {
   // Also check for sessionId in query parameters (for drill sessions)
   const [searchParams] = useSearchParams();
   const sessionIdFromQuery = searchParams.get('sessionId');
+  const testModeFromQuery = searchParams.get('testMode'); // Get specific practice test mode
   const actualSessionId = sessionIdFromQuery || sessionId || sectionId;
   const navigate = useNavigate();
   const { selectedProduct } = useProduct();
   const { user } = useAuth();
+  
+  // Determine the actual test mode to use for database operations
+  const actualTestMode = testModeFromQuery || testType;
+  console.log('🔍 TEST MODE: URL testType:', testType, 'Query testMode:', testModeFromQuery, 'Final testMode:', actualTestMode);
   
   console.log('🔗 URL PARAMS: testType:', testType, 'subjectId:', subjectId, 'sectionId:', sectionId, 'sessionId:', sessionId);
   console.log('🔗 QUERY PARAMS: sessionId:', sessionIdFromQuery);
@@ -747,7 +752,7 @@ const TestTaking: React.FC = () => {
         const sessionIdToUse = await SessionService.createSession(
           user.id,
           properDisplayName, // Use mapped product type, not raw selectedProduct
-          testType as 'diagnostic' | 'practice' | 'drill',
+          actualTestMode, // Use specific test mode (practice_1, practice_2, etc.)
           sectionName,
           questions.length,
           timeLimitSeconds

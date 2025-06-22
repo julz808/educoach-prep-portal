@@ -169,13 +169,34 @@ const PracticeTests: React.FC = () => {
             const dbProductType = getDbProductType(selectedProduct);
             console.log('🔍 PRACTICE: Query will use productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
             
-            const progressData = await SessionService.getUserProgress(
-              user.id, 
-              dbProductType,
-              'practice'
-            );
-            setSectionProgress(progressData);
-            console.log('📊 Practice progress loaded:', progressData);
+            // Load progress for all practice test modes
+            const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+            const allProgressData: Record<string, any> = {};
+            
+            for (const testMode of practiceTestModes) {
+              try {
+                const progressData = await SessionService.getUserProgress(
+                  user.id, 
+                  dbProductType,
+                  testMode
+                );
+                
+                // Prefix section names with test mode to avoid conflicts
+                Object.entries(progressData).forEach(([sectionName, progress]) => {
+                  allProgressData[`${testMode}_${sectionName}`] = {
+                    ...progress,
+                    testMode // Add test mode for lookup
+                  };
+                });
+                
+                console.log(`📊 Practice progress loaded for ${testMode}:`, Object.keys(progressData));
+              } catch (error) {
+                console.error(`Error loading progress for ${testMode}:`, error);
+              }
+            }
+            
+            setSectionProgress(allProgressData);
+            console.log('📊 All practice progress loaded:', allProgressData);
           } catch (error) {
             console.error('Error loading practice progress:', error);
           }
@@ -203,8 +224,27 @@ const PracticeTests: React.FC = () => {
           const dbProductType = getDbProductType(selectedProduct);
           console.log('🔄 PRACTICE: Refreshing with productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
           
-          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'practice');
-          setSectionProgress(progressData);
+          // Load progress for all practice test modes
+          const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+          const allProgressData: Record<string, any> = {};
+          
+          for (const testMode of practiceTestModes) {
+            try {
+              const progressData = await SessionService.getUserProgress(user.id, dbProductType, testMode);
+              
+              // Prefix section names with test mode to avoid conflicts
+              Object.entries(progressData).forEach(([sectionName, progress]) => {
+                allProgressData[`${testMode}_${sectionName}`] = {
+                  ...progress,
+                  testMode
+                };
+              });
+            } catch (error) {
+              console.error(`🔄 PRACTICE: Error refreshing progress for ${testMode}:`, error);
+            }
+          }
+          
+          setSectionProgress(allProgressData);
           console.log('🔄 Practice progress refreshed on focus/mount');
         } catch (error) {
           console.error('Error refreshing practice progress:', error);
@@ -245,9 +285,28 @@ const PracticeTests: React.FC = () => {
           const dbProductType = getDbProductType(selectedProduct);
           console.log('🔄 FORCE REFRESH: Loading fresh practice progress data for:', dbProductType);
           
-          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'practice');
-          setSectionProgress(progressData);
-          console.log('🔄 FORCE REFRESH: Fresh practice progress data loaded:', progressData);
+          // Load progress for all practice test modes
+          const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+          const allProgressData: Record<string, any> = {};
+          
+          for (const testMode of practiceTestModes) {
+            try {
+              const progressData = await SessionService.getUserProgress(user.id, dbProductType, testMode);
+              
+              // Prefix section names with test mode to avoid conflicts
+              Object.entries(progressData).forEach(([sectionName, progress]) => {
+                allProgressData[`${testMode}_${sectionName}`] = {
+                  ...progress,
+                  testMode
+                };
+              });
+            } catch (error) {
+              console.error(`🔄 FORCE REFRESH: Error loading progress for ${testMode}:`, error);
+            }
+          }
+          
+          setSectionProgress(allProgressData);
+          console.log('🔄 FORCE REFRESH: Fresh practice progress data loaded:', allProgressData);
           
           // Clear the refresh parameter from URL
           setSearchParams({});
@@ -264,12 +323,13 @@ const PracticeTests: React.FC = () => {
   // Transform Supabase data to component format - exclude drill and diagnostic modes
   const transformTestMode = (testMode: TestMode): PracticeTest => {
     const sections: TestSection[] = testMode.sections.map((section, index) => {
-      // Get real progress data for this section
-      const progressData = sectionProgress[section.name];
+      // Get real progress data for this section using test-specific key
+      const progressKey = `${testMode.id}_${section.name}`;
+      const progressData = sectionProgress[progressKey];
       let status: 'not-started' | 'in-progress' | 'completed' = 'not-started';
       let score: number | undefined = undefined;
       
-      console.log(`📊 TRANSFORM: Section "${section.name}" progress:`, progressData);
+      console.log(`📊 TRANSFORM: Section "${section.name}" (testMode: ${testMode.id}) progress key: "${progressKey}":`, progressData);
       
       if (progressData) {
         status = progressData.status;
@@ -360,7 +420,14 @@ const PracticeTests: React.FC = () => {
   const practiceTests: PracticeTest[] = testData ? 
     testData.testModes
       .filter(mode => mode.type !== 'drill' && mode.type !== 'diagnostic')
-      .map(transformTestMode) : [];
+      .map(mode => {
+        console.log('🔍 PRACTICE: Processing test mode:', {
+          id: mode.id,
+          name: mode.name,
+          type: mode.type
+        });
+        return transformTestMode(mode);
+      }) : [];
 
   const completedTests = practiceTests.filter(test => test.status === 'completed').length;
   const inProgressTests = practiceTests.filter(test => test.status === 'in-progress').length;
@@ -392,17 +459,25 @@ const PracticeTests: React.FC = () => {
     
     if (!section || section.questions === 0) return;
     
-    // Check if there's an active session for this section
-    const progressData = sectionProgress[section.name];
+    // Check if there's an active session for this section using test-specific key
+    const progressKey = `${testId}_${section.name}`;
+    const progressData = sectionProgress[progressKey];
+    
+    console.log('🔍 PRACTICE: handleStartSection called with:', {
+      testId,
+      sectionId,
+      sectionName: section.name,
+      progressData
+    });
     
     if (progressData && progressData.status === 'in-progress' && progressData.sessionId) {
       // Resume existing session - go to instructions first
       console.log('🔄 Resuming practice session:', progressData.sessionId);
-      navigate(`/test-instructions/practice/${sectionId}/${progressData.sessionId}?sectionName=${encodeURIComponent(section.name)}`);
+      navigate(`/test-instructions/practice/${sectionId}/${progressData.sessionId}?sectionName=${encodeURIComponent(section.name)}&testMode=${testId}`);
     } else {
       // Start new session - go to instructions first
-      console.log('🆕 Starting new practice session for:', section.name);
-      navigate(`/test-instructions/practice/${sectionId}?sectionName=${encodeURIComponent(section.name)}`);
+      console.log('🆕 Starting new practice session for:', section.name, 'testMode:', testId);
+      navigate(`/test-instructions/practice/${sectionId}?sectionName=${encodeURIComponent(section.name)}&testMode=${testId}`);
     }
   };
 
