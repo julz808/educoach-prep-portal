@@ -126,35 +126,42 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       const sessionIdArray = allSessionIds?.map(s => s.id) || [];
       console.log(`🧹 DEV: Found ${sessionIdArray.length} sessions to clean references for`);
 
-      // Step 3: Clear writing_assessments by session_id
-      if (sessionIdArray.length > 0) {
-        console.log('🧹 DEV: Step 3 - Clearing writing_assessments by session_id...');
-        console.log('🧹 DEV: Session IDs to clear:', sessionIdArray);
+      // Step 3: Clear ALL writing_assessments for this user (regardless of session)
+      console.log('🧹 DEV: Step 3 - Clearing ALL writing_assessments for user...');
+      
+      // First check how many writing assessments exist for this user
+      const { data: existingAssessments } = await supabase
+        .from('writing_assessments')
+        .select('id, session_id')
+        .eq('user_id', user.id);
         
-        // First check how many writing assessments exist
-        const { data: existingAssessments } = await supabase
+      console.log(`🧹 DEV: Found ${existingAssessments?.length || 0} writing_assessments to delete for user`);
+      
+      try {
+        const { error: writingError } = await supabase
           .from('writing_assessments')
-          .select('id, session_id')
-          .in('session_id', sessionIdArray);
+          .delete()
+          .eq('user_id', user.id);
+
+        if (writingError && writingError.code !== '42P01') {
+          console.error('❌ DEV: Error clearing writing assessments:', writingError);
+        } else {
+          console.log('✅ DEV: Successfully cleared ALL writing_assessments for user');
           
-        console.log(`🧹 DEV: Found ${existingAssessments?.length || 0} writing_assessments to delete`);
-        
-        try {
-          const { error: writingError } = await supabase
+          // Verify no writing assessments remain
+          const { data: remainingAssessments } = await supabase
             .from('writing_assessments')
-            .delete()
-            .in('session_id', sessionIdArray);
-
-          if (writingError && writingError.code !== '42P01') {
-            console.error('❌ DEV: Error clearing writing assessments:', writingError);
-          } else {
-            console.log('✅ DEV: Successfully cleared writing_assessments');
-          }
-        } catch (e) {
-          console.error('❌ DEV: Exception clearing writing_assessments:', e);
+            .select('id')
+            .eq('user_id', user.id);
+            
+          console.log(`🔍 DEV: Remaining writing_assessments: ${remainingAssessments?.length || 0}`);
         }
+      } catch (e) {
+        console.error('❌ DEV: Exception clearing writing_assessments:', e);
+      }
 
-        // Step 4: Clear test_section_states by test_session_id
+      // Step 4: Clear test_section_states by test_session_id (if we have sessions)
+      if (sessionIdArray.length > 0) {
         console.log('🧹 DEV: Step 4 - Clearing test_section_states by test_session_id...');
         
         // First check how many section states exist
@@ -180,7 +187,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           console.error('❌ DEV: Exception clearing test_section_states:', e);
         }
       } else {
-        console.log('🧹 DEV: No sessions found, skipping foreign key cleanup');
+        console.log('🧹 DEV: No sessions found, skipping test_section_states cleanup');
       }
 
       // Step 5: Clear all user_test_sessions for this user
