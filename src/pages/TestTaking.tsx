@@ -746,7 +746,7 @@ const TestTaking: React.FC = () => {
         
         const sessionIdToUse = await SessionService.createSession(
           user.id,
-          selectedProduct,
+          properDisplayName, // Use mapped product type, not raw selectedProduct
           testType as 'diagnostic' | 'practice' | 'drill',
           sectionName,
           questions.length,
