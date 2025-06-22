@@ -140,6 +140,13 @@ const DiagnosticTests: React.FC = () => {
         console.log('📋 Diagnostic modes loaded:', modes.length, 'modes');
         
         // Load user progress if authenticated
+        console.log('👤 User authentication check:', { 
+          userExists: !!user, 
+          userId: user?.id, 
+          userEmail: user?.email,
+          selectedProduct 
+        });
+        
         if (user) {
           console.log('👤 User is authenticated, loading progress for:', user.id, 'product:', selectedProduct);
           
@@ -246,6 +253,37 @@ const DiagnosticTests: React.FC = () => {
     
     return () => window.removeEventListener('focus', handleFocus);
   }, [user, selectedProduct]);
+
+  // Add manual refresh function for debugging
+  const manualRefresh = async () => {
+    console.log('🔄 MANUAL REFRESH: Starting manual refresh...');
+    if (user) {
+      try {
+        const getDbProductType = (productId: string): string => {
+          const productMap: Record<string, string> = {
+            'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+            'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+            'year-5-naplan': 'Year 5 NAPLAN',
+            'year-7-naplan': 'Year 7 NAPLAN',
+            'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+            'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+          };
+          return productMap[productId] || productId;
+        };
+        
+        const dbProductType = getDbProductType(selectedProduct);
+        console.log('🔄 MANUAL REFRESH: Using productType:', dbProductType);
+        
+        const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
+        setSectionProgress(progressData);
+        console.log('🔄 MANUAL REFRESH: Fresh progress data:', progressData);
+      } catch (error) {
+        console.error('🔄 MANUAL REFRESH: Error:', error);
+      }
+    } else {
+      console.log('🔄 MANUAL REFRESH: No user found');
+    }
+  };
 
   // Handle refresh parameter from navigation
   useEffect(() => {
@@ -889,6 +927,16 @@ const DiagnosticTests: React.FC = () => {
         selectedProduct={selectedProduct} 
         onDataChanged={() => window.location.reload()}
       />
+      
+      {/* Debug Refresh Button */}
+      {!import.meta.env.PROD && (
+        <div className="p-4 bg-yellow-100 border border-yellow-300 rounded-lg mb-6">
+          <p className="text-sm text-yellow-800 mb-2">🐛 Debug: Click to manually refresh progress data</p>
+          <Button onClick={manualRefresh} className="bg-yellow-500 hover:bg-yellow-600">
+            Manual Refresh Progress
+          </Button>
+        </div>
+      )}
 
       {/* Diagnostic Test - Single Column */}
       <div>
