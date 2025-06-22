@@ -100,9 +100,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
 
-      // Always clear test_section_states for ALL test types (not just practice)
-      console.log('🧹 DEV: Clearing test_section_states...');
-      // First get all session IDs for this user
+      // Get all session IDs for this user first
       const { data: sessionIds } = await supabase
         .from('user_test_sessions')
         .select('id')
@@ -110,6 +108,22 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
 
       console.log('🔍 DEV: Found session IDs:', sessionIds);
 
+      // Clear writing_assessments FIRST (they reference user_test_sessions)
+      console.log('🧹 DEV: Clearing writing_assessments...');
+      if (sessionIds && sessionIds.length > 0) {
+        const { error: writingError, count: writingCount } = await supabase
+          .from('writing_assessments')
+          .delete({ count: 'exact' })
+          .in('session_id', sessionIds.map(s => s.id));
+
+        console.log(`🧹 DEV: Cleared ${writingCount || 0} writing_assessments`);
+        if (writingError && writingError.code !== '42P01') {
+          console.warn('Warning clearing writing assessments:', writingError);
+        }
+      }
+
+      // Then clear test_section_states for ALL test types (not just practice)
+      console.log('🧹 DEV: Clearing test_section_states...');
       if (sessionIds && sessionIds.length > 0) {
         const { error: sectionStatesError, count: sectionCount } = await supabase
           .from('test_section_states')
