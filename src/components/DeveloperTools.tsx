@@ -100,62 +100,96 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
 
-      // Get all session IDs for this user first
-      const { data: sessionIds } = await supabase
-        .from('user_test_sessions')
-        .select('id')
-        .eq('user_id', user.id);
+      // Step 1: Clear all question_attempt_history for this user
+      console.log('🧹 DEV: Step 1 - Clearing all question_attempt_history...');
+      try {
+        const { error: attemptsError, count: attemptsCount } = await supabase
+          .from('question_attempt_history')
+          .delete({ count: 'exact' })
+          .eq('user_id', user.id);
 
-      console.log('🔍 DEV: Found session IDs:', sessionIds);
+        console.log(`🧹 DEV: Cleared ${attemptsCount || 0} question attempts`);
+        if (attemptsError) {
+          console.warn('Warning clearing attempt history:', attemptsError);
+        }
+      } catch (e) {
+        console.warn('Error clearing question_attempt_history:', e);
+      }
 
-      // Clear writing_assessments FIRST (they reference user_test_sessions)
-      console.log('🧹 DEV: Clearing writing_assessments...');
-      if (sessionIds && sessionIds.length > 0) {
+      // Step 2: Clear all writing_assessments for this user
+      console.log('🧹 DEV: Step 2 - Clearing all writing_assessments...');
+      try {
         const { error: writingError, count: writingCount } = await supabase
           .from('writing_assessments')
           .delete({ count: 'exact' })
-          .in('session_id', sessionIds.map(s => s.id));
+          .eq('user_id', user.id);
 
         console.log(`🧹 DEV: Cleared ${writingCount || 0} writing_assessments`);
         if (writingError && writingError.code !== '42P01') {
           console.warn('Warning clearing writing assessments:', writingError);
         }
+      } catch (e) {
+        console.warn('Error clearing writing_assessments:', e);
       }
 
-      // Then clear test_section_states for ALL test types (not just practice)
-      console.log('🧹 DEV: Clearing test_section_states...');
-      if (sessionIds && sessionIds.length > 0) {
+      // Step 3: Clear all test_section_states for this user
+      console.log('🧹 DEV: Step 3 - Clearing all test_section_states...');
+      try {
         const { error: sectionStatesError, count: sectionCount } = await supabase
           .from('test_section_states')
           .delete({ count: 'exact' })
-          .in('test_session_id', sessionIds.map(s => s.id));
+          .eq('user_id', user.id);
 
         console.log(`🧹 DEV: Cleared ${sectionCount || 0} test_section_states`);
         if (sectionStatesError) {
           console.warn('Warning clearing section states:', sectionStatesError);
         }
+      } catch (e) {
+        console.warn('Error clearing test_section_states:', e);
       }
 
-      console.log('🧹 DEV: Clearing question_attempt_history...');
-      const { error: attemptsError, count: attemptsCount } = await supabase
-        .from('question_attempt_history')
-        .delete({ count: 'exact' })
-        .eq('user_id', user.id);
-
-      console.log(`🧹 DEV: Cleared ${attemptsCount || 0} question attempts (no session_type filter)`);
-      if (attemptsError) {
-        console.warn('Warning clearing attempt history:', attemptsError);
-      }
-
-      console.log('🧹 DEV: Clearing ALL user_test_sessions for this user...');
+      // Step 4: Clear all user_test_sessions for this user
+      console.log('🧹 DEV: Step 4 - Clearing all user_test_sessions...');
       const { error: sessionsError, count: sessionsCount } = await supabase
         .from('user_test_sessions')
         .delete({ count: 'exact' })
         .eq('user_id', user.id);
 
-      console.log(`🧹 DEV: Cleared ${sessionsCount || 0} user_test_sessions (no filters)`);
+      console.log(`🧹 DEV: Cleared ${sessionsCount || 0} user_test_sessions`);
       if (sessionsError) {
         throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
+      }
+
+      // Step 5: Clear user_progress data
+      console.log('🧹 DEV: Step 5 - Clearing user_progress...');
+      try {
+        const { error: progressError, count: progressCount } = await supabase
+          .from('user_progress')
+          .delete({ count: 'exact' })
+          .eq('user_id', user.id);
+
+        console.log(`🧹 DEV: Cleared ${progressCount || 0} user_progress records`);
+        if (progressError) {
+          console.warn('Warning clearing user progress:', progressError);
+        }
+      } catch (e) {
+        console.warn('Error clearing user_progress:', e);
+      }
+
+      // Step 6: Clear user_sub_skill_performance data
+      console.log('🧹 DEV: Step 6 - Clearing user_sub_skill_performance...');
+      try {
+        const { error: skillError, count: skillCount } = await supabase
+          .from('user_sub_skill_performance')
+          .delete({ count: 'exact' })
+          .eq('user_id', user.id);
+
+        console.log(`🧹 DEV: Cleared ${skillCount || 0} user_sub_skill_performance records`);
+        if (skillError) {
+          console.warn('Warning clearing skill performance:', skillError);
+        }
+      } catch (e) {
+        console.warn('Error clearing user_sub_skill_performance:', e);
       }
 
       console.log('🧹 DEV: Successfully cleared all data');
