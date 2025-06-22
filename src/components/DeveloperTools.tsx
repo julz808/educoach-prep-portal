@@ -100,26 +100,25 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
 
-      if (testType === 'practice') {
-        console.log('🧹 DEV: Clearing test_section_states...');
-        // First get all session IDs for this user
-        const { data: sessionIds } = await supabase
-          .from('user_test_sessions')
-          .select('id')
-          .eq('user_id', user.id);
+      // Always clear test_section_states for ALL test types (not just practice)
+      console.log('🧹 DEV: Clearing test_section_states...');
+      // First get all session IDs for this user
+      const { data: sessionIds } = await supabase
+        .from('user_test_sessions')
+        .select('id')
+        .eq('user_id', user.id);
 
-        console.log('🔍 DEV: Found session IDs:', sessionIds);
+      console.log('🔍 DEV: Found session IDs:', sessionIds);
 
-        if (sessionIds && sessionIds.length > 0) {
-          const { error: sectionStatesError, count: sectionCount } = await supabase
-            .from('test_section_states')
-            .delete({ count: 'exact' })
-            .in('test_session_id', sessionIds.map(s => s.id));
+      if (sessionIds && sessionIds.length > 0) {
+        const { error: sectionStatesError, count: sectionCount } = await supabase
+          .from('test_section_states')
+          .delete({ count: 'exact' })
+          .in('test_session_id', sessionIds.map(s => s.id));
 
-          console.log(`🧹 DEV: Cleared ${sectionCount || 0} test_section_states`);
-          if (sectionStatesError) {
-            console.warn('Warning clearing section states:', sectionStatesError);
-          }
+        console.log(`🧹 DEV: Cleared ${sectionCount || 0} test_section_states`);
+        if (sectionStatesError) {
+          console.warn('Warning clearing section states:', sectionStatesError);
         }
       }
 

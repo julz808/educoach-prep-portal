@@ -1,90 +1,79 @@
+// Debug script to check diagnostic session states
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing Supabase environment variables');
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
 async function debugDiagnosticSessions() {
-  try {
-    console.log('🔍 Debugging diagnostic sessions...');
-    
-    // Get all user_test_sessions for diagnostic mode
-    const { data: sessions, error: sessionsError } = await supabase
-      .from('user_test_sessions')
-      .select('*')
-      .eq('test_mode', 'diagnostic')
-      .order('created_at', { ascending: false });
+  console.log('🔍 Debugging Diagnostic Sessions...\n');
 
-    if (sessionsError) {
-      console.error('❌ Error fetching sessions:', sessionsError);
-      return;
+  // Get all test sessions
+  const { data: sessions, error } = await supabase
+    .from('user_test_sessions')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('Error fetching sessions:', error);
+    return;
+  }
+
+  console.log(`Found ${sessions.length} test sessions:\n`);
+
+  sessions.forEach(session => {
+    console.log('Session:', {
+      id: session.id.substring(0, 8) + '...',
+      user_id: session.user_id.substring(0, 8) + '...',
+      product_type: session.product_type,
+      section_name: session.section_name,
+      test_mode: session.test_mode,
+      status: session.status,
+      questions_answered: session.questions_answered,
+      total_questions: session.total_questions,
+      current_question: session.current_question_index,
+      created: new Date(session.created_at).toLocaleString(),
+      updated: new Date(session.updated_at).toLocaleString()
+    });
+    console.log('---');
+  });
+
+  // Check for duplicate active sessions
+  const activeSessions = sessions.filter(s => s.status === 'active');
+  const sectionGroups = {};
+  
+  activeSessions.forEach(session => {
+    const key = `${session.user_id}-${session.product_type}-${session.section_name}`;
+    if (!sectionGroups[key]) {
+      sectionGroups[key] = [];
     }
+    sectionGroups[key].push(session);
+  });
 
-    console.log(`📊 Found ${sessions?.length || 0} diagnostic sessions:`);
-    
-    if (sessions && sessions.length > 0) {
-      // Group by user and product
-      const grouped = sessions.reduce((acc, session) => {
-        const key = `${session.user_id}_${session.product_type}`;
-        if (!acc[key]) {
-          acc[key] = [];
-        }
-        acc[key].push(session);
-        return acc;
-      }, {});
-
-      Object.entries(grouped).forEach(([key, userSessions]) => {
-        const [userId, productType] = key.split('_');
-        console.log(`\n👤 User: ${userId.slice(0, 8)}... | Product: ${productType}`);
-        console.log(`   Sessions: ${userSessions.length}`);
-        
-        userSessions.forEach((session, index) => {
-          console.log(`   ${index + 1}. Section: "${session.section_name}" | Status: ${session.status} | Score: ${session.final_score} | Questions: ${session.questions_answered}/${session.total_questions}`);
-        });
-
-        // Check if analytics service would find this as "completed"
-        const completedSessions = userSessions.filter(s => s.status === 'completed');
-        console.log(`   ✅ Completed sections: ${completedSessions.length}/${userSessions.length}`);
-        
-        if (completedSessions.length > 0) {
-          console.log(`   🎯 Analytics service would find: ${completedSessions.length} completed diagnostic sessions`);
-          console.log(`   📈 First completed session would be used for analytics`);
-        } else {
-          console.log(`   ❌ Analytics service would find NO completed diagnostics`);
-        }
+  console.log('\n🔍 Checking for duplicate active sessions:');
+  Object.entries(sectionGroups).forEach(([key, sessions]) => {
+    if (sessions.length > 1) {
+      console.log(`\n⚠️  Found ${sessions.length} active sessions for:`, key);
+      sessions.forEach(s => {
+        console.log('  - Session:', s.id.substring(0, 8), 'created:', new Date(s.created_at).toLocaleString());
       });
     }
+  });
 
-    // Check user_progress table for diagnostic_completed flags
-    console.log('\n🔍 Checking user_progress for diagnostic_completed flags...');
-    const { data: progress, error: progressError } = await supabase
-      .from('user_progress')
-      .select('user_id, product_type, diagnostic_completed, total_questions_completed')
-      .eq('diagnostic_completed', true);
-
-    if (progressError) {
-      console.error('❌ Error fetching progress:', progressError);
-      return;
-    }
-
-    console.log(`📊 Found ${progress?.length || 0} users with diagnostic_completed = true:`);
-    progress?.forEach(p => {
-      console.log(`   👤 ${p.user_id.slice(0, 8)}... | ${p.product_type} | Questions: ${p.total_questions_completed}`);
-    });
-
-  } catch (error) {
-    console.error('❌ Error in debug script:', error);
-  }
+  // Check product type distribution
+  console.log('\n📊 Product Type Distribution:');
+  const productTypes = {};
+  sessions.forEach(s => {
+    productTypes[s.product_type] = (productTypes[s.product_type] || 0) + 1;
+  });
+  Object.entries(productTypes).forEach(([type, count]) => {
+    console.log(`  ${type}: ${count} sessions`);
+  });
 }
 
-debugDiagnosticSessions();
+debugDiagnosticSessions().catch(console.error);
