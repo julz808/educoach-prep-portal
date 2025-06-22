@@ -129,34 +129,55 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Step 3: Clear writing_assessments by session_id
       if (sessionIdArray.length > 0) {
         console.log('🧹 DEV: Step 3 - Clearing writing_assessments by session_id...');
+        console.log('🧹 DEV: Session IDs to clear:', sessionIdArray);
+        
+        // First check how many writing assessments exist
+        const { data: existingAssessments } = await supabase
+          .from('writing_assessments')
+          .select('id, session_id')
+          .in('session_id', sessionIdArray);
+          
+        console.log(`🧹 DEV: Found ${existingAssessments?.length || 0} writing_assessments to delete`);
+        
         try {
           const { error: writingError } = await supabase
             .from('writing_assessments')
             .delete()
             .in('session_id', sessionIdArray);
 
-          console.log('🧹 DEV: Cleared writing_assessments');
           if (writingError && writingError.code !== '42P01') {
-            console.warn('Warning clearing writing assessments:', writingError);
+            console.error('❌ DEV: Error clearing writing assessments:', writingError);
+          } else {
+            console.log('✅ DEV: Successfully cleared writing_assessments');
           }
         } catch (e) {
-          console.warn('Error clearing writing_assessments:', e);
+          console.error('❌ DEV: Exception clearing writing_assessments:', e);
         }
 
         // Step 4: Clear test_section_states by test_session_id
         console.log('🧹 DEV: Step 4 - Clearing test_section_states by test_session_id...');
+        
+        // First check how many section states exist
+        const { data: existingStates } = await supabase
+          .from('test_section_states')
+          .select('id, test_session_id')
+          .in('test_session_id', sessionIdArray);
+          
+        console.log(`🧹 DEV: Found ${existingStates?.length || 0} test_section_states to delete`);
+        
         try {
           const { error: sectionStatesError } = await supabase
             .from('test_section_states')
             .delete()
             .in('test_session_id', sessionIdArray);
 
-          console.log('🧹 DEV: Cleared test_section_states');
           if (sectionStatesError) {
-            console.warn('Warning clearing section states:', sectionStatesError);
+            console.error('❌ DEV: Error clearing section states:', sectionStatesError);
+          } else {
+            console.log('✅ DEV: Successfully cleared test_section_states');
           }
         } catch (e) {
-          console.warn('Error clearing test_section_states:', e);
+          console.error('❌ DEV: Exception clearing test_section_states:', e);
         }
       } else {
         console.log('🧹 DEV: No sessions found, skipping foreign key cleanup');
@@ -185,10 +206,21 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           .eq('user_id', user.id);
 
         if (sessionsError) {
-          console.error('🧹 DEV: Error deleting sessions:', sessionsError);
+          console.error('❌ DEV: Error deleting sessions:', sessionsError);
+          
+          // Let's check what's still referencing these sessions
+          console.log('🔍 DEV: Checking what still references sessions...');
+          for (const sessionId of sessionIdArray.slice(0, 3)) {
+            const { data: stillReferenced } = await supabase
+              .from('writing_assessments')
+              .select('id')
+              .eq('session_id', sessionId);
+            console.log(`  Session ${sessionId}: ${stillReferenced?.length || 0} writing_assessments still exist`);
+          }
+          
           throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
         } else {
-          console.log(`🧹 DEV: Successfully deleted ${sessionsToDelete.length} user_test_sessions`);
+          console.log(`✅ DEV: Successfully deleted ${sessionsToDelete.length} user_test_sessions`);
         }
       } else {
         console.log('🧹 DEV: No sessions to delete');
