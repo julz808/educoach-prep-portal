@@ -337,31 +337,10 @@ const DiagnosticTests: React.FC = () => {
       // Get real progress data for this section with improved matching
       let sectionProgressData = progressData[section.name] || progressData[section.id];
       
-      // If no exact match, try partial matching for section names
+      // If no exact match, only try exact ID match - remove partial matching to prevent cross-section contamination
       if (!sectionProgressData) {
-        const progressKeys = Object.keys(progressData);
-        
-        // Look for partial matches (case-insensitive)
-        const partialMatch = progressKeys.find(key => {
-          const keyLower = key.toLowerCase();
-          const sectionLower = section.name.toLowerCase();
-          
-          // Check if either contains the other (for cases like "General Ability - Quantitative" vs "General Ability")
-          return keyLower.includes(sectionLower) || 
-                 sectionLower.includes(keyLower) ||
-                 // Check for common words (but exclude very short words)
-                 keyLower.split(/[\s-]+/).some(word => 
-                   word.length > 3 && sectionLower.includes(word)
-                 ) ||
-                 sectionLower.split(/[\s-]+/).some(word => 
-                   word.length > 3 && keyLower.includes(word)
-                 );
-        });
-        
-        if (partialMatch) {
-          sectionProgressData = progressData[partialMatch];
-          console.log(`🔄 Found partial match for "${section.name}": using progress from "${partialMatch}"`);
-        }
+        console.log(`❌ No exact progress match found for "${section.name}" (id: ${section.id})`);
+        console.log(`🔍 Available progress keys:`, Object.keys(progressData));
       }
       
       console.log(`🔍 Section "${section.name}" (id: ${section.id}):`, {
