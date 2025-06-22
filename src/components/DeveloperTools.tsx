@@ -116,40 +116,54 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.warn('Error clearing question_attempt_history:', e);
       }
 
-      // Step 2: Clear all writing_assessments for this user
-      console.log('🧹 DEV: Step 2 - Clearing all writing_assessments...');
-      try {
-        const { error: writingError } = await supabase
-          .from('writing_assessments')
-          .delete()
-          .eq('user_id', user.id);
+      // Step 2: Get all session IDs first for foreign key references
+      console.log('🧹 DEV: Step 2 - Getting session IDs for foreign key cleanup...');
+      const { data: allSessionIds } = await supabase
+        .from('user_test_sessions')
+        .select('id')
+        .eq('user_id', user.id);
+      
+      const sessionIdArray = allSessionIds?.map(s => s.id) || [];
+      console.log(`🧹 DEV: Found ${sessionIdArray.length} sessions to clean references for`);
 
-        console.log('🧹 DEV: Cleared writing_assessments');
-        if (writingError && writingError.code !== '42P01') {
-          console.warn('Warning clearing writing assessments:', writingError);
+      // Step 3: Clear writing_assessments by session_id
+      if (sessionIdArray.length > 0) {
+        console.log('🧹 DEV: Step 3 - Clearing writing_assessments by session_id...');
+        try {
+          const { error: writingError } = await supabase
+            .from('writing_assessments')
+            .delete()
+            .in('session_id', sessionIdArray);
+
+          console.log('🧹 DEV: Cleared writing_assessments');
+          if (writingError && writingError.code !== '42P01') {
+            console.warn('Warning clearing writing assessments:', writingError);
+          }
+        } catch (e) {
+          console.warn('Error clearing writing_assessments:', e);
         }
-      } catch (e) {
-        console.warn('Error clearing writing_assessments:', e);
+
+        // Step 4: Clear test_section_states by test_session_id
+        console.log('🧹 DEV: Step 4 - Clearing test_section_states by test_session_id...');
+        try {
+          const { error: sectionStatesError } = await supabase
+            .from('test_section_states')
+            .delete()
+            .in('test_session_id', sessionIdArray);
+
+          console.log('🧹 DEV: Cleared test_section_states');
+          if (sectionStatesError) {
+            console.warn('Warning clearing section states:', sectionStatesError);
+          }
+        } catch (e) {
+          console.warn('Error clearing test_section_states:', e);
+        }
+      } else {
+        console.log('🧹 DEV: No sessions found, skipping foreign key cleanup');
       }
 
-      // Step 3: Clear all test_section_states for this user
-      console.log('🧹 DEV: Step 3 - Clearing all test_section_states...');
-      try {
-        const { error: sectionStatesError } = await supabase
-          .from('test_section_states')
-          .delete()
-          .eq('user_id', user.id);
-
-        console.log('🧹 DEV: Cleared test_section_states');
-        if (sectionStatesError) {
-          console.warn('Warning clearing section states:', sectionStatesError);
-        }
-      } catch (e) {
-        console.warn('Error clearing test_section_states:', e);
-      }
-
-      // Step 4: Clear all user_test_sessions for this user
-      console.log('🧹 DEV: Step 4 - Clearing all user_test_sessions...');
+      // Step 5: Clear all user_test_sessions for this user
+      console.log('🧹 DEV: Step 5 - Clearing all user_test_sessions...');
       
       // First check how many sessions exist
       const { data: sessionsToDelete, error: checkError } = await supabase
@@ -180,8 +194,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.log('🧹 DEV: No sessions to delete');
       }
 
-      // Step 5: Clear user_progress data
-      console.log('🧹 DEV: Step 5 - Clearing user_progress...');
+      // Step 6: Clear user_progress data
+      console.log('🧹 DEV: Step 6 - Clearing user_progress...');
       try {
         const { error: progressError } = await supabase
           .from('user_progress')
@@ -196,8 +210,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.warn('Error clearing user_progress:', e);
       }
 
-      // Step 6: Clear user_sub_skill_performance data
-      console.log('🧹 DEV: Step 6 - Clearing user_sub_skill_performance...');
+      // Step 7: Clear user_sub_skill_performance data
+      console.log('🧹 DEV: Step 7 - Clearing user_sub_skill_performance...');
       try {
         const { error: skillError } = await supabase
           .from('user_sub_skill_performance')
