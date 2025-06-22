@@ -89,12 +89,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         
         console.log('🔍 DEV: Existing drill_sessions:', existingDrills);
 
-        const { error: drillSessionsError, count } = await supabase
+        const { error: drillSessionsError } = await supabase
           .from('drill_sessions')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${count || 0} drill_sessions (no product filter)`);
+        console.log('🧹 DEV: Cleared drill_sessions');
         if (drillSessionsError) {
           console.warn('Warning clearing drill sessions:', drillSessionsError);
         }
@@ -103,12 +103,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Step 1: Clear all question_attempt_history for this user
       console.log('🧹 DEV: Step 1 - Clearing all question_attempt_history...');
       try {
-        const { error: attemptsError, count: attemptsCount } = await supabase
+        const { error: attemptsError } = await supabase
           .from('question_attempt_history')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${attemptsCount || 0} question attempts`);
+        console.log('🧹 DEV: Cleared question attempts');
         if (attemptsError) {
           console.warn('Warning clearing attempt history:', attemptsError);
         }
@@ -119,12 +119,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Step 2: Clear all writing_assessments for this user
       console.log('🧹 DEV: Step 2 - Clearing all writing_assessments...');
       try {
-        const { error: writingError, count: writingCount } = await supabase
+        const { error: writingError } = await supabase
           .from('writing_assessments')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${writingCount || 0} writing_assessments`);
+        console.log('🧹 DEV: Cleared writing_assessments');
         if (writingError && writingError.code !== '42P01') {
           console.warn('Warning clearing writing assessments:', writingError);
         }
@@ -135,12 +135,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Step 3: Clear all test_section_states for this user
       console.log('🧹 DEV: Step 3 - Clearing all test_section_states...');
       try {
-        const { error: sectionStatesError, count: sectionCount } = await supabase
+        const { error: sectionStatesError } = await supabase
           .from('test_section_states')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${sectionCount || 0} test_section_states`);
+        console.log('🧹 DEV: Cleared test_section_states');
         if (sectionStatesError) {
           console.warn('Warning clearing section states:', sectionStatesError);
         }
@@ -150,25 +150,45 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
 
       // Step 4: Clear all user_test_sessions for this user
       console.log('🧹 DEV: Step 4 - Clearing all user_test_sessions...');
-      const { error: sessionsError, count: sessionsCount } = await supabase
+      
+      // First check how many sessions exist
+      const { data: existingSessions, error: checkError } = await supabase
         .from('user_test_sessions')
-        .delete({ count: 'exact' })
+        .select('id')
         .eq('user_id', user.id);
+        
+      if (checkError) {
+        console.warn('Warning checking existing sessions:', checkError);
+      }
+      
+      console.log(`🧹 DEV: Found ${existingSessions?.length || 0} sessions to delete`);
+      
+      if (existingSessions && existingSessions.length > 0) {
+        // Delete without count to avoid RLS issues with count queries
+        const { error: sessionsError } = await supabase
+          .from('user_test_sessions')
+          .delete()
+          .eq('user_id', user.id);
 
-      console.log(`🧹 DEV: Cleared ${sessionsCount || 0} user_test_sessions`);
-      if (sessionsError) {
-        throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
+        if (sessionsError) {
+          console.error('🧹 DEV: Error deleting sessions:', sessionsError);
+          throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
+        } else {
+          console.log(`🧹 DEV: Successfully deleted ${existingSessions.length} user_test_sessions`);
+        }
+      } else {
+        console.log('🧹 DEV: No sessions to delete');
       }
 
       // Step 5: Clear user_progress data
       console.log('🧹 DEV: Step 5 - Clearing user_progress...');
       try {
-        const { error: progressError, count: progressCount } = await supabase
+        const { error: progressError } = await supabase
           .from('user_progress')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${progressCount || 0} user_progress records`);
+        console.log('🧹 DEV: Cleared user_progress records');
         if (progressError) {
           console.warn('Warning clearing user progress:', progressError);
         }
@@ -179,12 +199,12 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Step 6: Clear user_sub_skill_performance data
       console.log('🧹 DEV: Step 6 - Clearing user_sub_skill_performance...');
       try {
-        const { error: skillError, count: skillCount } = await supabase
+        const { error: skillError } = await supabase
           .from('user_sub_skill_performance')
-          .delete({ count: 'exact' })
+          .delete()
           .eq('user_id', user.id);
 
-        console.log(`🧹 DEV: Cleared ${skillCount || 0} user_sub_skill_performance records`);
+        console.log('🧹 DEV: Cleared user_sub_skill_performance records');
         if (skillError) {
           console.warn('Warning clearing skill performance:', skillError);
         }
