@@ -160,13 +160,24 @@ const DiagnosticTests: React.FC = () => {
           console.log('🔍 DIAGNOSTIC: Query will use productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
           
           try {
+            console.log('🔍 DIAGNOSTIC: About to call getUserProgress with:', {
+              userId: user.id,
+              productType: dbProductType,
+              testMode: 'diagnostic'
+            });
+            
             const progressData = await SessionService.getUserProgress(
               user.id, 
               dbProductType,
               'diagnostic'
             );
-            setSectionProgress(progressData);
+            
             console.log('📊 Progress data loaded successfully:', progressData);
+            console.log('📊 Progress data type:', typeof progressData);
+            console.log('📊 Progress data keys:', Object.keys(progressData));
+            console.log('📊 Progress data values:', Object.values(progressData));
+            
+            setSectionProgress(progressData);
           } catch (error) {
             console.error('❌ Error loading diagnostic progress:', error);
           }
