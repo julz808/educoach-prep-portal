@@ -327,7 +327,13 @@ const DiagnosticTests: React.FC = () => {
       
       if (sectionProgressData) {
         status = sectionProgressData.status;
-        console.log(`✅ Found progress for "${section.name}": ${status}`);
+        console.log(`✅ Found progress for "${section.name}": ${status} (sessionId: ${sectionProgressData.sessionId})`);
+        console.log(`🔍 Progress details:`, {
+          status: sectionProgressData.status,
+          questionsAnswered: sectionProgressData.questionsAnswered,
+          totalQuestions: sectionProgressData.totalQuestions,
+          sessionId: sectionProgressData.sessionId
+        });
         // Calculate score if completed (this would come from actual test results)
         if (status === 'completed' && sectionProgressData.questionsCompleted > 0) {
           // This is a placeholder - in real implementation, score would come from test results
@@ -335,6 +341,8 @@ const DiagnosticTests: React.FC = () => {
         }
       } else {
         console.log(`❌ No progress found for "${section.name}"`);
+        console.log(`🔍 Available progress keys:`, Object.keys(progressData));
+        console.log(`🔍 Full progress data:`, progressData);
       }
 
       return {
@@ -1074,8 +1082,16 @@ const DiagnosticTests: React.FC = () => {
                                         }
                                       }}
                                     >
-                                      {getSectionButtonIcon(section.status)}
-                                      <span className="ml-1">{getSectionButtonText(section.status)}</span>
+                                      {(() => {
+                                        console.log(`🔘 BUTTON: Rendering button for "${section.name}" with status: "${section.status}"`);
+                                        console.log(`🔘 BUTTON: Button text will be: "${getSectionButtonText(section.status)}"`);
+                                        return (
+                                          <>
+                                            {getSectionButtonIcon(section.status)}
+                                            <span className="ml-1">{getSectionButtonText(section.status)}</span>
+                                          </>
+                                        );
+                                      })()}
                                     </Button>
                                   )}
                                 </div>
