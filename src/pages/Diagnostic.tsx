@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   fetchDiagnosticModes, 
   type TestMode, 
@@ -58,6 +58,7 @@ const DiagnosticTests: React.FC = () => {
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [diagnosticModes, setDiagnosticModes] = useState<TestMode[]>([]);
   const [sectionProgress, setSectionProgress] = useState<Record<string, SectionProgress>>({});
@@ -234,6 +235,45 @@ const DiagnosticTests: React.FC = () => {
     
     return () => window.removeEventListener('focus', handleFocus);
   }, [user, selectedProduct]);
+
+  // Handle refresh parameter from navigation
+  useEffect(() => {
+    const refreshParam = searchParams.get('refresh');
+    if (refreshParam === 'true' && user) {
+      console.log('🔄 FORCE REFRESH: Detected refresh parameter, forcing progress reload...');
+      
+      const forceRefreshProgress = async () => {
+        try {
+          const getDbProductType = (productId: string): string => {
+            const productMap: Record<string, string> = {
+              'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+              'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+              'year-5-naplan': 'Year 5 NAPLAN',
+              'year-7-naplan': 'Year 7 NAPLAN',
+              'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+              'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+            };
+            return productMap[productId] || productId;
+          };
+          
+          const dbProductType = getDbProductType(selectedProduct);
+          console.log('🔄 FORCE REFRESH: Loading fresh progress data for:', dbProductType);
+          
+          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
+          setSectionProgress(progressData);
+          console.log('🔄 FORCE REFRESH: Fresh progress data loaded:', progressData);
+          
+          // Clear the refresh parameter from URL
+          setSearchParams({});
+          console.log('🔄 FORCE REFRESH: Cleared refresh parameter from URL');
+        } catch (error) {
+          console.error('🔄 FORCE REFRESH: Error loading fresh progress:', error);
+        }
+      };
+      
+      forceRefreshProgress();
+    }
+  }, [searchParams, user, selectedProduct, setSearchParams]);
 
   // Transform diagnostic modes to match our new structure with real progress data
   const transformDiagnosticMode = (mode: TestMode, progressData: Record<string, SectionProgress> = {}): DiagnosticTest => {
@@ -599,7 +639,7 @@ const DiagnosticTests: React.FC = () => {
     
     if (confirm('🚨 DEV: Clear all diagnostic progress? This cannot be undone.')) {
       try {
-        // Use the same product mapping function
+        // Use the same product mapping function as the progress loading
         const getDbProductType = (productId: string): string => {
           const productMap: Record<string, string> = {
             'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
@@ -652,6 +692,22 @@ const DiagnosticTests: React.FC = () => {
       try {
         const sections = diagnosticTest?.sections || [];
         
+        // Use the same product mapping function as the progress loading
+        const getDbProductType = (productId: string): string => {
+          const productMap: Record<string, string> = {
+            'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+            'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+            'year-5-naplan': 'Year 5 NAPLAN',
+            'year-7-naplan': 'Year 7 NAPLAN',
+            'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+            'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+          };
+          return productMap[productId] || productId;
+        };
+        
+        const dbProductType = getDbProductType(selectedProduct);
+        console.log('🚨 DEV: Creating mock sessions with dbProductType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+        
         for (let i = 0; i < sections.length; i++) {
           const section = sections[i];
           
@@ -662,7 +718,7 @@ const DiagnosticTests: React.FC = () => {
             const mockScore = Math.floor(Math.random() * 30) + 70;
             sessionData = {
               user_id: user.id,
-              product_type: selectedProduct,
+              product_type: dbProductType,
               test_mode: 'diagnostic',
               section_name: section.name,
               status: 'completed',
@@ -680,7 +736,7 @@ const DiagnosticTests: React.FC = () => {
             const partialProgress = Math.floor(section.questions * 0.4) + 1; // 40-60% through
             sessionData = {
               user_id: user.id,
-              product_type: selectedProduct,
+              product_type: dbProductType,
               test_mode: 'diagnostic',
               section_name: section.name,
               status: 'active',
@@ -723,6 +779,22 @@ const DiagnosticTests: React.FC = () => {
       try {
         const sections = diagnosticTest?.sections || [];
         
+        // Use the same product mapping function as the progress loading
+        const getDbProductType = (productId: string): string => {
+          const productMap: Record<string, string> = {
+            'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+            'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+            'year-5-naplan': 'Year 5 NAPLAN',
+            'year-7-naplan': 'Year 7 NAPLAN',
+            'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+            'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+          };
+          return productMap[productId] || productId;
+        };
+        
+        const dbProductType = getDbProductType(selectedProduct);
+        console.log('🚨 DEV: Creating all completed sessions with dbProductType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
+        
         for (let i = 0; i < sections.length; i++) {
           const section = sections[i];
           const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
@@ -732,7 +804,7 @@ const DiagnosticTests: React.FC = () => {
             .from('user_test_sessions')
             .insert({
               user_id: user.id,
-              product_type: selectedProduct,
+              product_type: dbProductType,
               test_mode: 'diagnostic',
               section_name: section.name,
               status: 'completed',

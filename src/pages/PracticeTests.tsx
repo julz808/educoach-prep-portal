@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   fetchQuestionsFromSupabase, 
   getPlaceholderTestStructure,
@@ -72,6 +72,7 @@ interface PracticeTest {
 const PracticeTests: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [testData, setTestData] = useState<TestType | null>(null);
   const [sectionProgress, setSectionProgress] = useState<Record<string, SectionProgress>>({});
   const [loading, setLoading] = useState(true);
@@ -232,6 +233,33 @@ const PracticeTests: React.FC = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user, selectedProduct]);
+
+  // Handle refresh parameter from navigation
+  useEffect(() => {
+    const refreshParam = searchParams.get('refresh');
+    if (refreshParam === 'true' && user) {
+      console.log('🔄 FORCE REFRESH: Detected refresh parameter, forcing practice progress reload...');
+      
+      const forceRefreshProgress = async () => {
+        try {
+          const dbProductType = getDbProductType(selectedProduct);
+          console.log('🔄 FORCE REFRESH: Loading fresh practice progress data for:', dbProductType);
+          
+          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'practice');
+          setSectionProgress(progressData);
+          console.log('🔄 FORCE REFRESH: Fresh practice progress data loaded:', progressData);
+          
+          // Clear the refresh parameter from URL
+          setSearchParams({});
+          console.log('🔄 FORCE REFRESH: Cleared refresh parameter from URL');
+        } catch (error) {
+          console.error('🔄 FORCE REFRESH: Error loading fresh practice progress:', error);
+        }
+      };
+      
+      forceRefreshProgress();
+    }
+  }, [searchParams, user, selectedProduct, setSearchParams]);
 
   // Transform Supabase data to component format - exclude drill and diagnostic modes
   const transformTestMode = (testMode: TestMode): PracticeTest => {

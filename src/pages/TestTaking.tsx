@@ -1303,20 +1303,33 @@ const TestTaking: React.FC = () => {
     }
   };
 
-  const handleBackToDashboard = () => {
+  const handleBackToDashboard = async () => {
     console.log('🏠 DASHBOARD: Navigating back to dashboard from:', session?.status);
     console.log('🏠 DASHBOARD: Session ID:', session?.id);
     
-    // Navigate to the correct page based on test type
+    // If coming from a completed session, ensure it's marked as completed
+    if (session?.status === 'completed' && session.id) {
+      try {
+        console.log('🏁 DASHBOARD: Ensuring session is marked as completed before navigation');
+        await SessionService.completeSession(session.id);
+        console.log('🏁 DASHBOARD: Session completion verified');
+      } catch (error) {
+        console.error('🏁 DASHBOARD: Error ensuring session completion:', error);
+      }
+    }
+    
+    // Navigate to the correct page based on test type with refresh parameter
+    const refreshParam = session?.status === 'completed' ? '?refresh=true' : '';
+    
     if (testType === 'diagnostic') {
-      navigate('/dashboard/diagnostic');
+      navigate(`/dashboard/diagnostic${refreshParam}`);
     } else if (testType === 'practice') {
-      navigate('/dashboard/practice-tests');
+      navigate(`/dashboard/practice-tests${refreshParam}`);
     } else if (testType === 'drill') {
-      navigate('/dashboard/drill');
+      navigate(`/dashboard/drill${refreshParam}`);
     } else {
       // Fallback to general dashboard
-      navigate('/dashboard');
+      navigate(`/dashboard${refreshParam}`);
     }
   };
 
