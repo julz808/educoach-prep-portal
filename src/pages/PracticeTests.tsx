@@ -467,7 +467,9 @@ const PracticeTests: React.FC = () => {
       testId,
       sectionId,
       sectionName: section.name,
-      progressData
+      progressKey,
+      progressData,
+      allProgressKeys: Object.keys(sectionProgress)
     });
     
     if (progressData && progressData.status === 'in-progress' && progressData.sessionId) {
@@ -493,9 +495,11 @@ const PracticeTests: React.FC = () => {
       
       if (!section) return;
       
-      const progressData = sectionProgress[section.name];
+      // Use test-specific progress key (same as handleStartSection)
+      const progressKey = `${testId}_${section.name}`;
+      const progressData = sectionProgress[progressKey];
+      console.log('📊 VIEW RESULTS: Using progress key:', progressKey);
       console.log('📊 VIEW RESULTS: Section progress data:', progressData);
-      console.log('📊 VIEW RESULTS: All section progress:', sectionProgress);
       
       if (progressData && progressData.sessionId) {
         // Navigate directly to the test taking page in review mode
