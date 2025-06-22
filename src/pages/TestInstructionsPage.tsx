@@ -10,12 +10,14 @@ import {
   fetchQuestionsFromSupabase
 } from '@/services/supabaseQuestionService';
 
-// Map frontend course IDs back to proper display names
+// Map frontend course IDs back to proper display names (same as in TestTaking.tsx)
 const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
   'year-5-naplan': 'Year 5 NAPLAN',
   'year-7-naplan': 'Year 7 NAPLAN',
   'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
+  'acer-year-7': 'ACER Scholarship (Year 7 Entry)',
   'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
+  'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
   'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
 };
@@ -152,12 +154,19 @@ const TestInstructionsPage: React.FC = () => {
   }, [testType, subjectId, sessionId, selectedProduct, sectionName, user]);
 
   const handleStart = () => {
+    // Get testMode from query parameters and forward it
+    const searchParams = new URLSearchParams(window.location.search);
+    const testMode = searchParams.get('testMode');
+    const testModeParam = testMode ? `&testMode=${testMode}` : '';
+    
+    console.log('🔄 INSTRUCTIONS: Forwarding testMode:', testMode);
+    
     if (sessionId) {
       // Resume with session ID
-      navigate(`/test/${testType}/${subjectId}/${sessionId}?sectionName=${encodeURIComponent(sectionName)}`);
+      navigate(`/test/${testType}/${subjectId}/${sessionId}?sectionName=${encodeURIComponent(sectionName)}${testModeParam}`);
     } else {
       // Start new test
-      navigate(`/test/${testType}/${subjectId}?sectionName=${encodeURIComponent(sectionName)}`);
+      navigate(`/test/${testType}/${subjectId}?sectionName=${encodeURIComponent(sectionName)}${testModeParam}`);
     }
   };
 

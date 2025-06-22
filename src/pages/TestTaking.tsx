@@ -87,6 +87,8 @@ const TestTaking: React.FC = () => {
   // Determine the actual test mode to use for database operations
   const actualTestMode = testModeFromQuery || testType;
   console.log('🔍 TEST MODE: URL testType:', testType, 'Query testMode:', testModeFromQuery, 'Final testMode:', actualTestMode);
+  console.log('🔍 TEST MODE: Full URL:', window.location.href);
+  console.log('🔍 TEST MODE: All search params:', Object.fromEntries(searchParams));
   
   console.log('🔗 URL PARAMS: testType:', testType, 'subjectId:', subjectId, 'sectionId:', sectionId, 'sessionId:', sessionId);
   console.log('🔗 QUERY PARAMS: sessionId:', sessionIdFromQuery);
