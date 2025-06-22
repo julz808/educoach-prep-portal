@@ -152,7 +152,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       console.log('🧹 DEV: Step 4 - Clearing all user_test_sessions...');
       
       // First check how many sessions exist
-      const { data: existingSessions, error: checkError } = await supabase
+      const { data: sessionsToDelete, error: checkError } = await supabase
         .from('user_test_sessions')
         .select('id')
         .eq('user_id', user.id);
@@ -161,9 +161,9 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.warn('Warning checking existing sessions:', checkError);
       }
       
-      console.log(`🧹 DEV: Found ${existingSessions?.length || 0} sessions to delete`);
+      console.log(`🧹 DEV: Found ${sessionsToDelete?.length || 0} sessions to delete`);
       
-      if (existingSessions && existingSessions.length > 0) {
+      if (sessionsToDelete && sessionsToDelete.length > 0) {
         // Delete without count to avoid RLS issues with count queries
         const { error: sessionsError } = await supabase
           .from('user_test_sessions')
@@ -174,7 +174,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           console.error('🧹 DEV: Error deleting sessions:', sessionsError);
           throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
         } else {
-          console.log(`🧹 DEV: Successfully deleted ${existingSessions.length} user_test_sessions`);
+          console.log(`🧹 DEV: Successfully deleted ${sessionsToDelete.length} user_test_sessions`);
         }
       } else {
         console.log('🧹 DEV: No sessions to delete');
