@@ -1018,11 +1018,15 @@ export class AnalyticsService {
           }
           
           // For total questions, prioritize question_order length, then stored total_questions
-          if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
-            actualTotalQuestions = session.question_order.length;
-          } else {
-            actualTotalQuestions = session.total_questions || 0;
+          // BUT only for non-writing sections (writing sections already have weighted totals calculated)
+          if (!isWritingSection) {
+            if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
+              actualTotalQuestions = session.question_order.length;
+            } else {
+              actualTotalQuestions = session.total_questions || 0;
+            }
           }
+          // For writing sections, actualTotalQuestions is already set to weighted values above
           
           // If for some reason answers_data exists but questions_answered is 0, count answers_data
           if (questionsAttempted === 0 && session.answers_data && typeof session.answers_data === 'object') {
@@ -1054,13 +1058,14 @@ export class AnalyticsService {
         if (!actualTotalQuestions || actualTotalQuestions === 0) {
           console.log(`⚠️ Section ${session.section_name}: No valid total found, defaulting to standard test sizes`);
           // Use standard test sizes based on section name
+          // For writing sections, use weighted point totals (60 points for VIC selective)
           const standardSizes: Record<string, number> = {
             'Reading Reasoning': 24,
             'General Ability - Verbal': 15,
             'General Ability - Quantitative': 15,
             'Mathematics Reasoning': 18,
-            'Writing': 2,
-            'Written Expression': 2
+            'Writing': 60,        // 2 tasks × 30 points each
+            'Written Expression': 60  // 2 tasks × 30 points each
           };
           actualTotalQuestions = standardSizes[session.section_name] || 20;
         }
