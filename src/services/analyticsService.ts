@@ -1122,7 +1122,7 @@ export class AnalyticsService {
       const overallScore = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
       // Calculate total questions attempted from section breakdown (ensures consistency with weighted scores)
-      const totalQuestionsAttempted = sectionBreakdown.reduce((sum, section) => sum + section.questionsAttempted, 0);
+      let totalQuestionsAttempted = sectionBreakdown.reduce((sum, section) => sum + section.questionsAttempted, 0);
       
       console.log('📊 Calculated totalQuestionsAttempted from sectionBreakdown:', {
         sectionBreakdown: sectionBreakdown.map(s => ({ 
