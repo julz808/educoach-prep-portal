@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BarChart3, Target, BookOpen, Activity, AlertCircle, TrendingUp, TrendingDown, Clock, Award, CheckCircle, XCircle, Flag, Star, Info, Zap, FileText } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useProduct } from '@/context/ProductContext';
@@ -141,6 +142,7 @@ const SpiderChart = ({ data, size = 320, animate = true }: {
 const PerformanceDashboard = () => {
   const { user } = useAuth();
   const { selectedProduct } = useProduct();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPracticeTest, setSelectedPracticeTest] = useState(2);
   const [practiceFilter, setPracticeFilter] = useState('all');
@@ -698,17 +700,10 @@ const PerformanceDashboard = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-3">Complete Your Diagnostic First</h3>
                   <p className="text-slate-600 mb-8 max-w-md mx-auto">You need to complete <strong>all sections</strong> of the diagnostic test to see your detailed performance insights, strengths, and areas for improvement.</p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm text-blue-800">
-                        <div className="font-semibold mb-1">Requirements:</div>
-                        <div>• Complete at least 3 diagnostic sections</div>
-                        <div>• Finish each section to see results</div>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                  <button 
+                    onClick={() => navigate('/diagnostic')}
+                    className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
                     Start Diagnostic Test
                   </button>
                 </div>
@@ -1193,6 +1188,23 @@ const PerformanceDashboard = () => {
           {/* Practice Tests Tab */}
           {activeTab === 'practice' && (
             <div className="space-y-8">
+              {/* Check if user has completed at least one practice test */}
+              {!performanceData.practice?.tests?.some(test => test.status === 'completed') ? (
+                <div className="text-center py-16">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
+                    <FileText className="h-12 w-12 text-teal-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Complete Your First Practice Test</h3>
+                  <p className="text-slate-600 mb-8 max-w-md mx-auto">You need to complete <strong>at least one practice test</strong> to see your detailed performance insights, progress tracking, and improvement recommendations.</p>
+                  <button 
+                    onClick={() => navigate('/practice')}
+                    className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
+                    Start Practice Test
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-8">
               {/* Test Selection Cards */}
               <div className="grid grid-cols-5 gap-4">
                 {(performanceData.practice?.tests || []).map((test, index) => (
@@ -1609,6 +1621,8 @@ const PerformanceDashboard = () => {
                 </div>
               );
               })()}
+                </div>
+              )}
             </div>
           )}
 

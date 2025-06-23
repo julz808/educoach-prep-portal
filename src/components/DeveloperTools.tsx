@@ -403,7 +403,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         for (let i = 0; i < sections.length; i++) {
           const sectionName = sections[i];
           console.log(`🏁 DEV: Creating COMPLETED session for "${sectionName}" (${i+1}/${sections.length})`);
-          await createRealisticSession(dbProductType, sectionName, 'completed', testType);
+          await createRealisticSession(dbProductType, sectionName, 'completed', testModeQuery);
         }
       } else if (testType === 'drill') {
         // Get unique sub-skills and complete them all
@@ -442,7 +442,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     let questions: any[] = [];
     
     try {
-      if (mode === 'practice') {
+      if (mode === 'practice' || mode.startsWith('practice_')) {
         // Use fetchQuestionsFromSupabase for practice tests (works correctly)
         const organizedData = await fetchQuestionsFromSupabase();
         const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
@@ -767,7 +767,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     let questions: any[] = [];
     
     try {
-      if (mode === 'practice') {
+      if (mode === 'practice' || mode.startsWith('practice_')) {
         // Use fetchQuestionsFromSupabase for practice tests (works correctly)
         const organizedData = await fetchQuestionsFromSupabase();
         const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
