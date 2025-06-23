@@ -1152,9 +1152,9 @@ export class AnalyticsService {
         totalQuestionsAttempted = totalQuestions;
       }
 
-      // Calculate overall accuracy based on total questions (same denominator as overall score)
-      const overallAccuracy = totalQuestions > 0 
-        ? Math.round((totalCorrect / totalQuestions) * 100) 
+      // Calculate overall accuracy based on attempted questions (excludes skipped/timed-out questions)
+      const overallAccuracy = totalQuestionsAttempted > 0 
+        ? Math.round((totalCorrect / totalQuestionsAttempted) * 100) 
         : 0;
 
       console.log('📊 Diagnostic totals:', {

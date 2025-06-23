@@ -798,7 +798,7 @@ const PerformanceDashboard = () => {
                         <div className="flex items-center justify-center gap-4">
                           <div className="text-3xl font-bold text-slate-900">
                             {performanceData.diagnostic.totalQuestionsCorrect}
-                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestions}</span>
+                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestionsAttempted}</span>
                           </div>
                           <div className="h-10 w-px bg-slate-200"></div>
                           <div className={`text-3xl font-bold ${
