@@ -1122,26 +1122,53 @@ export class AnalyticsService {
       const overallScore = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
       // Calculate total questions attempted by counting actual responses
+      // For writing sections, use weighted point values instead of raw question count
       let totalQuestionsAttempted = 0;
       
-      // First try to get from question_attempt_history table
+      // Process each session to count attempted questions/points
       for (const session of diagnosticSessions) {
-        const { data: responses, error: respError } = await supabase
-          .from('question_attempt_history')
-          .select('id')
-          .eq('session_id', session.id)
-          .not('user_answer', 'is', null);
+        const isWritingSession = session.section_name?.toLowerCase().includes('writing');
         
-        if (!respError && responses && responses.length > 0) {
-          totalQuestionsAttempted += responses.length;
-        } else {
-          // Fallback: Count answers from session's answers_data field
+        if (isWritingSession) {
+          console.log(`✍️ Processing attempted questions for writing session: ${session.section_name}`);
+          
+          // For writing sections, check if questions were attempted and use weighted points
           if (session.answers_data && typeof session.answers_data === 'object') {
             const answersCount = Object.keys(session.answers_data).length;
-            totalQuestionsAttempted += answersCount;
+            if (answersCount > 0) {
+              // Convert attempted writing tasks to weighted points (30 points per task)
+              const pointsPerTask = 30;
+              totalQuestionsAttempted += answersCount * pointsPerTask;
+              console.log(`✍️ Writing session ${session.section_name}: ${answersCount} tasks attempted = ${answersCount * pointsPerTask} points`);
+            }
           } else if (session.questions_answered) {
-            // Use questions_answered field as last resort
-            totalQuestionsAttempted += session.questions_answered;
+            // Use questions_answered field and convert to points
+            const pointsPerTask = 30;
+            totalQuestionsAttempted += session.questions_answered * pointsPerTask;
+            console.log(`✍️ Writing session ${session.section_name}: ${session.questions_answered} tasks from DB = ${session.questions_answered * pointsPerTask} points`);
+          }
+        } else {
+          // Non-writing sessions: count individual responses
+          const { data: responses, error: respError } = await supabase
+            .from('question_attempt_history')
+            .select('id')
+            .eq('session_id', session.id)
+            .not('user_answer', 'is', null);
+          
+          if (!respError && responses && responses.length > 0) {
+            totalQuestionsAttempted += responses.length;
+            console.log(`📊 Non-writing session ${session.section_name}: ${responses.length} questions attempted`);
+          } else {
+            // Fallback: Count answers from session's answers_data field
+            if (session.answers_data && typeof session.answers_data === 'object') {
+              const answersCount = Object.keys(session.answers_data).length;
+              totalQuestionsAttempted += answersCount;
+              console.log(`📊 Non-writing session ${session.section_name}: ${answersCount} answers from session data`);
+            } else if (session.questions_answered) {
+              // Use questions_answered field as last resort
+              totalQuestionsAttempted += session.questions_answered;
+              console.log(`📊 Non-writing session ${session.section_name}: ${session.questions_answered} from DB field`);
+            }
           }
         }
       }
