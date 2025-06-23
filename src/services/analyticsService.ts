@@ -771,11 +771,22 @@ export class AnalyticsService {
           continue;
         }
 
-        const totalQuestions = questions?.length || 0;
+        // Check if this is a writing sub-skill first
+        const isWritingSubSkill = subSkill.name.toLowerCase().includes('writing') || 
+                                  subSkill.test_sections?.section_name?.toLowerCase().includes('writing');
+        
+        let totalQuestions = questions?.length || 0;
         
         if (totalQuestions === 0) {
           console.log(`⚠️ Sub-skill "${subSkill.name}" has no diagnostic questions`);
           continue;
+        }
+        
+        // For writing sub-skills, convert total questions to weighted points
+        if (isWritingSubSkill) {
+          const pointsPerTask = 30; // VIC selective: 30 points per writing task
+          totalQuestions = totalQuestions * pointsPerTask;
+          console.log(`✍️ Writing sub-skill "${subSkill.name}" total converted to weighted: ${totalQuestions} points (${questions?.length} tasks × ${pointsPerTask} points)`);
         }
 
         // Get user responses for these questions
@@ -792,10 +803,62 @@ export class AnalyticsService {
           console.error(`❌ Error fetching responses for sub-skill ${subSkill.name}:`, responsesError);
           continue;
         }
-
-        // Calculate performance
-        const questionsAttempted = responses?.length || 0;
-        const questionsCorrect = responses?.filter(r => r.is_correct).length || 0;
+        
+        let questionsAttempted = 0;
+        let questionsCorrect = 0;
+        
+        if (isWritingSubSkill) {
+          console.log(`✍️ Processing writing sub-skill: ${subSkill.name}`);
+          
+          // For writing questions, we need to get scores from writing_assessments table
+          const { data: writingAssessments, error: writingError } = await supabase
+            .from('writing_assessments')
+            .select('question_id, total_score, max_possible_score, percentage_score')
+            .eq('user_id', userId)
+            .in('question_id', questionIds);
+          
+          if (writingError) {
+            console.error(`❌ Error fetching writing assessments for ${subSkill.name}:`, writingError);
+          }
+          
+          // For writing sub-skills, use weighted scoring based on actual points
+          if (writingAssessments && writingAssessments.length > 0) {
+            // Use actual point values for writing assessments
+            const totalPossiblePoints = writingAssessments.reduce((sum, w) => sum + (w.max_possible_score || 0), 0);
+            const totalEarnedPoints = writingAssessments.reduce((sum, w) => sum + (w.total_score || 0), 0);
+            
+            questionsAttempted = totalPossiblePoints;  // Use total possible points as "questions attempted"
+            questionsCorrect = totalEarnedPoints;      // Use earned points as "questions correct"
+            
+            console.log(`✍️ Writing sub-skill ${subSkill.name} WEIGHTED:`, {
+              earnedPoints: totalEarnedPoints,
+              possiblePoints: totalPossiblePoints,
+              percentage: totalPossiblePoints > 0 ? Math.round((totalEarnedPoints / totalPossiblePoints) * 100) : 0,
+              numAssessments: writingAssessments.length
+            });
+          } else {
+            // Fallback: Use responses but apply weighted scoring for writing
+            const responseCount = responses?.length || 0;
+            const correctResponses = responses?.filter(r => r.is_correct).length || 0;
+            
+            // Convert to weighted points (assume 30 points per writing task for VIC selective)
+            const pointsPerTask = 30;
+            questionsAttempted = responseCount * pointsPerTask;
+            questionsCorrect = correctResponses * pointsPerTask;
+            
+            console.log(`✍️ Writing sub-skill ${subSkill.name} FALLBACK WEIGHTED:`, {
+              originalResponses: responseCount,
+              originalCorrect: correctResponses,
+              weightedAttempted: questionsAttempted,
+              weightedCorrect: questionsCorrect
+            });
+          }
+        } else {
+          // Non-writing questions use standard calculation
+          questionsAttempted = responses?.length || 0;
+          questionsCorrect = responses?.filter(r => r.is_correct).length || 0;
+        }
+        
         const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
 
         // Get section name (use first question's section, they should all be the same)
@@ -881,18 +944,78 @@ export class AnalyticsService {
         let questionsAttempted = 0;
         
         try {
-          // Use the values that were correctly calculated when the session was created
-          // The developer tools already calculated these correctly
-          console.log(`📊 Section ${session.section_name} - Using stored session data:`, {
-            storedCorrectAnswers: session.correct_answers,
-            storedTotalQuestions: session.total_questions,
-            storedQuestionsAnswered: session.questions_answered,
-            questionOrderLength: session.question_order?.length
-          });
+          // Check if this is a writing section and needs special handling
+          const isWritingSection = session.section_name?.toLowerCase().includes('writing');
           
-          // Use stored values which are already correct
-          questionsCorrect = session.correct_answers || 0;
-          questionsAttempted = session.questions_answered || 0;
+          if (isWritingSection) {
+            console.log(`✍️ Processing writing section: ${session.section_name}`);
+            
+            // Get writing assessments for this session
+            const { data: writingAssessments, error: writingError } = await supabase
+              .from('writing_assessments')
+              .select('total_score, max_possible_score, percentage_score')
+              .eq('session_id', sessionId);
+            
+            if (!writingError && writingAssessments && writingAssessments.length > 0) {
+              // For writing sections, use the actual point values instead of treating as individual questions
+              const totalPossibleScore = writingAssessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
+              const totalEarnedScore = writingAssessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
+              
+              // Use the actual point totals for writing sections (e.g., 60 points for VIC selective)
+              actualTotalQuestions = totalPossibleScore;
+              questionsAttempted = totalPossibleScore; // All questions were attempted if assessments exist
+              questionsCorrect = totalEarnedScore;
+              
+              console.log(`✍️ Writing section ${session.section_name} WEIGHTED scores:`, {
+                totalEarnedScore,
+                totalPossibleScore,
+                questionsCorrect,
+                actualTotalQuestions,
+                calculatedPercentage: totalPossibleScore > 0 ? Math.round((totalEarnedScore / totalPossibleScore) * 100) : 0,
+                numAssessments: writingAssessments.length
+              });
+            } else {
+              // Fallback to stored session data for writing sections without assessments
+              console.log(`⚠️ No writing assessments found for section ${session.section_name}, using session data`);
+              
+              // For VIC Selective writing, assume 60 points total (2 tasks × 30 points)
+              // This is a fallback when no assessments are available yet
+              const standardWritingTotal = 60;
+              const storedCorrectAnswers = session.correct_answers || 0;
+              const storedQuestionsAnswered = session.questions_answered || 0;
+              
+              if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
+                // Convert from task count to points (each task worth 30 points for VIC selective)
+                const taskCount = session.question_order.length;
+                actualTotalQuestions = taskCount * 30; // e.g., 2 tasks × 30 points = 60 points
+                questionsAttempted = storedQuestionsAnswered * 30; // answered tasks × 30 points
+                questionsCorrect = storedCorrectAnswers * 30; // correct answers × 30 points (approximate)
+              } else {
+                actualTotalQuestions = standardWritingTotal;
+                questionsAttempted = standardWritingTotal;
+                questionsCorrect = Math.round((storedCorrectAnswers / Math.max(storedQuestionsAnswered, 1)) * standardWritingTotal);
+              }
+              
+              console.log(`✍️ Writing section ${session.section_name} FALLBACK to weighted scoring:`, {
+                originalCorrect: storedCorrectAnswers,
+                originalTotal: session.question_order?.length || session.total_questions,
+                weightedCorrect: questionsCorrect,
+                weightedTotal: actualTotalQuestions
+              });
+            }
+          } else {
+            // Non-writing sections use standard calculation
+            console.log(`📊 Section ${session.section_name} - Using stored session data:`, {
+              storedCorrectAnswers: session.correct_answers,
+              storedTotalQuestions: session.total_questions,
+              storedQuestionsAnswered: session.questions_answered,
+              questionOrderLength: session.question_order?.length
+            });
+            
+            // Use stored values which are already correct
+            questionsCorrect = session.correct_answers || 0;
+            questionsAttempted = session.questions_answered || 0;
+          }
           
           // For total questions, prioritize question_order length, then stored total_questions
           if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {

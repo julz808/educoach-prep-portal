@@ -715,7 +715,7 @@ const PerformanceDashboard = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Summary Cards */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-3 gap-6">
                     {/* Overall Score */}
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                       <div className="text-center">
@@ -741,6 +741,42 @@ const PerformanceDashboard = () => {
                             performanceData.diagnostic.overallScore >= 60 ? 'text-orange-600' : 
                             'text-red-600'
                           }`}>{animatedOverallScore}%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Simple Average Score */}
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                      <div className="text-center">
+                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                          Average Score
+                          <div className="relative inline-block">
+                            <Info size={14} className="text-slate-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                              <div className="font-semibold mb-1">Average Score</div>
+                              <div>Simple average percentage across all test sections, accounting for the weighted importance of writing sections.</div>
+                              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`text-3xl font-bold ${
+                          (() => {
+                            // Calculate simple average across all sections
+                            const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
+                            const averageScore = sectionScores.length > 0 
+                              ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
+                              : 0;
+                            return averageScore >= 80 ? 'text-green-600' : 
+                                   averageScore >= 60 ? 'text-orange-600' : 
+                                   'text-red-600';
+                          })()
+                        }`}>
+                          {(() => {
+                            const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
+                            return sectionScores.length > 0 
+                              ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
+                              : 0;
+                          })()}%
                         </div>
                       </div>
                     </div>
@@ -844,10 +880,9 @@ const PerformanceDashboard = () => {
                             return bValue - aValue;
                           })
                           .map((section, index) => {
-                          // For Writing sections, use default 50% score as requested
-                          const isWritingSection = section.sectionName.toLowerCase().includes('writing');
-                          const displayScore = isWritingSection ? 50 : section.score;
-                          const displayAccuracy = isWritingSection ? 50 : section.accuracy;
+                          // Use actual scores for all sections including writing
+                          const displayScore = section.score;
+                          const displayAccuracy = section.accuracy;
                           
                           return (
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
@@ -861,7 +896,7 @@ const PerformanceDashboard = () => {
                                       ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
                                       : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
                                   }`}>
-                                    {animatedSectionScores[section.sectionName] || 0}%
+                                    {animatedSectionScores[section.sectionName] !== undefined ? animatedSectionScores[section.sectionName] : (sectionView === 'score' ? displayScore : displayAccuracy)}%
                                   </div>
                                   <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                     <div 
