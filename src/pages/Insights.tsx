@@ -754,7 +754,7 @@ const PerformanceDashboard = () => {
                             <Info size={14} className="text-slate-400 cursor-help" />
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                               <div className="font-semibold mb-1">Average Score</div>
-                              <div>Simple average percentage across all test sections, accounting for the weighted importance of writing sections.</div>
+                              <div>Simple average percentage across all test sections.</div>
                               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                             </div>
                           </div>
@@ -798,7 +798,7 @@ const PerformanceDashboard = () => {
                         <div className="flex items-center justify-center gap-4">
                           <div className="text-3xl font-bold text-slate-900">
                             {performanceData.diagnostic.totalQuestionsCorrect}
-                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestionsAttempted}</span>
+                            <span className="text-slate-600">/{performanceData.diagnostic.totalQuestions}</span>
                           </div>
                           <div className="h-10 w-px bg-slate-200"></div>
                           <div className={`text-3xl font-bold ${
