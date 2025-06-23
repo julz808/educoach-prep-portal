@@ -10,37 +10,30 @@ const PRODUCT_ID_TO_TYPE: Record<string, string> = {
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
 };
 
-// Get real practice test data using direct database queries (like diagnostic approach)
-async function getRealPracticeTestData(userId: string, productType: string, testNumber: number, session: any) {
-  console.log(`\n🔄 PRACTICE TEST INSIGHTS: Getting real data for test ${testNumber} session ${session.id}`);
-  console.log(`🔄 PRACTICE TEST INSIGHTS: Function called with:`, {
+// Get real test data using unified approach for all test types (diagnostic, practice, drill)
+async function getRealTestData(userId: string, productType: string, sessionId: string, testType: string = 'practice', testNumber?: number) {
+  console.log(`\n🔄 ${testType.toUpperCase()} INSIGHTS: Getting real data for session ${sessionId}`);
+  console.log(`🔄 ${testType.toUpperCase()} INSIGHTS: Function called with:`, {
     userId,
     productType,
-    testNumber,
-    sessionId: session?.id,
-    sessionStatus: session?.status,
-    sessionScore: session?.final_score
+    sessionId,
+    testType,
+    testNumber
   });
   
   try {
-    // Define the practice test mode based on test number
-    const practiceTestMode = `practice_${testNumber}`;
-    
-    console.log(`📊 Practice test details:`, {
-      testNumber,
-      practiceTestMode,
-      sessionId: session.id,
-      sessionStatus: session.status,
-      sessionScore: session.final_score,
-      questionOrderLength: session.question_order?.length || 'null',
-      answersDataSize: Object.keys(session.answers_data || {}).length
+    console.log(`📊 ${testType} test details:`, {
+      sessionId,
+      testType,
+      testNumber
     });
     
     // Get ALL question attempts for this specific session
     console.log(`🔍 Querying question_attempt_history for:`, {
       userId,
-      sessionId: session.id,
-      sessionIdType: typeof session.id
+      sessionId,
+      sessionIdType: typeof sessionId,
+      testType
     });
     
     let { data: questionAttempts, error: attemptsError } = await supabase
@@ -48,26 +41,13 @@ async function getRealPracticeTestData(userId: string, productType: string, test
       .select(`
         question_id,
         user_answer,
-        correct_answer,
         is_correct,
-        time_spent,
+        time_spent_seconds,
         session_id,
-        user_id,
-        questions!inner(
-          id,
-          section_name,
-          sub_skill,
-          test_mode,
-          format,
-          max_points,
-          sub_skills!inner(
-            name,
-            test_sections!inner(section_name)
-          )
-        )
+        user_id
       `)
       .eq('user_id', userId)
-      .eq('session_id', session.id);
+      .eq('session_id', sessionId);
     
     if (attemptsError) {
       console.error('❌ Error fetching question attempts:', attemptsError);
@@ -76,59 +56,49 @@ async function getRealPracticeTestData(userId: string, productType: string, test
     
     console.log(`📊 Question attempts query result:`, {
       found: questionAttempts?.length || 0,
-      sessionId: session.id,
-      userId
+      sessionId,
+      userId,
+      error: attemptsError,
+      sampleAttempt: questionAttempts?.[0]
     });
     
     if (!questionAttempts || questionAttempts.length === 0) {
-      console.log(`⚠️ No question attempts found for session ${session.id}, trying fallback approach...`);
+      console.log(`⚠️ No question attempts found for session ${sessionId}`);
+      console.log(`🔄 No granular insights available for ${testType} - session may be from before individual recording was implemented`);
       
-      // FALLBACK: Try to find any question attempts for this user and practice test mode
-      const { data: allAttempts, error: allAttemptsError } = await supabase
-        .from('question_attempt_history')
-        .select(`
-          session_id,
-          question_id,
-          user_answer,
-          correct_answer,
-          is_correct,
-          created_at,
-          questions!inner(
-            id,
-            section_name,
-            sub_skill,
-            test_mode,
-            format,
-            max_points,
-            sub_skills!inner(
-              name,
-              test_sections!inner(section_name)
-            )
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('questions.test_mode', practiceTestMode)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      
-      console.log(`🔍 Fallback query for ${practiceTestMode}:`, {
-        found: allAttempts?.length || 0,
-        error: allAttemptsError
-      });
-      
-      if (allAttempts && allAttempts.length > 0) {
-        console.log(`📊 Found ${allAttempts.length} attempts for ${practiceTestMode}, using most recent session`);
-        questionAttempts = allAttempts;
-      } else {
-        console.log(`⚠️ No question attempts found for ${practiceTestMode} either`);
-        console.log(`🔄 Trying session-based approach using session data...`);
-        
-        // LAST RESORT: Use session data directly if no question attempts exist
-        return await getSessionBasedPracticeData(userId, productType, testNumber, session);
-      }
+      // Return null for old sessions without individual question attempts
+      return null;
     }
     
-    console.log(`📊 Found ${questionAttempts.length} question attempts for session ${session.id}`);
+    console.log(`📊 Found ${questionAttempts.length} question attempts for session ${sessionId}`);
+    
+    // Get question details for all attempted questions
+    const questionIds = questionAttempts.map(attempt => attempt.question_id);
+    console.log(`🔍 Getting question details for ${questionIds.length} questions`);
+    
+    let { data: questionDetails, error: questionsError } = await supabase
+      .from('questions')
+      .select(`
+        id,
+        section_name,
+        sub_skill,
+        test_mode,
+        max_points
+      `)
+      .in('id', questionIds);
+    
+    if (questionsError) {
+      console.error('❌ Error fetching question details:', questionsError);
+      return null;
+    }
+    
+    console.log(`📊 Got details for ${questionDetails?.length || 0} questions`);
+    
+    // Create a map for quick lookup
+    const questionDetailsMap = new Map();
+    questionDetails?.forEach(q => {
+      questionDetailsMap.set(q.id, q);
+    });
     
     // Group question attempts by sub-skill for analysis
     const subSkillStats = new Map();
@@ -140,9 +110,14 @@ async function getRealPracticeTestData(userId: string, productType: string, test
     let totalEarnedPoints = 0;
     
     questionAttempts.forEach(attempt => {
-      const question = attempt.questions;
-      const subSkillName = question.sub_skills?.name || question.sub_skill || 'Unknown Sub-skill';
-      const sectionName = question.section_name || question.sub_skills?.test_sections?.section_name || 'Unknown Section';
+      const question = questionDetailsMap.get(attempt.question_id);
+      if (!question) {
+        console.warn(`⚠️ No question details found for question ${attempt.question_id}`);
+        return;
+      }
+      
+      const subSkillName = question.sub_skill || 'Unknown Sub-skill';
+      const sectionName = question.section_name || 'Unknown Section';
       const maxPoints = question.max_points || 1;
       const earnedPoints = attempt.is_correct ? maxPoints : 0;
       
@@ -203,8 +178,8 @@ async function getRealPracticeTestData(userId: string, productType: string, test
       sectionName: section.sectionName,
       score: section.maxPoints > 0 ? Math.round((section.earnedPoints / section.maxPoints) * 100) : 0,
       accuracy: section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0,
-      questionsCorrect: section.earnedPoints, // Use earned points for weighted scoring
-      questionsTotal: section.maxPoints, // Use max points for weighted scoring
+      questionsCorrect: section.questionsCorrect, // Use actual correct question count for display
+      questionsTotal: section.questionsTotal, // Use actual total question count for display
       questionsAttempted: section.questionsAttempted
     }));
     
@@ -214,8 +189,8 @@ async function getRealPracticeTestData(userId: string, productType: string, test
       subSkillName: subSkill.subSkillName,
       score: subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0,
       accuracy: subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0,
-      questionsCorrect: subSkill.earnedPoints, // Use earned points for weighted scoring
-      questionsTotal: subSkill.maxPoints, // Use max points for weighted scoring
+      questionsCorrect: subSkill.questionsCorrect, // Use actual correct question count for display
+      questionsTotal: subSkill.questionsTotal, // Use actual total question count for display
       questionsAttempted: subSkill.questionsAttempted
     }));
     
@@ -224,10 +199,21 @@ async function getRealPracticeTestData(userId: string, productType: string, test
       sectionBreakdown.map(section => [section.sectionName, section.score])
     );
     
+    // Calculate overall scores using question counts for consistency with display
     const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
     const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
     
-    console.log(`🎯 PRACTICE TEST RESULTS for test ${testNumber}:`, {
+    console.log(`📊 Overall calculation details:`, {
+      totalMaxPoints,
+      totalEarnedPoints,
+      totalQuestionsAttempted,
+      totalQuestionsCorrect,
+      overallScore,
+      overallAccuracy
+    });
+    
+    console.log(`🎯 ${testType.toUpperCase()} RESULTS:`, {
+      sessionId,
       totalMaxPoints,
       totalEarnedPoints,
       totalQuestionsAttempted,
@@ -243,9 +229,11 @@ async function getRealPracticeTestData(userId: string, productType: string, test
     ));
     
     return {
-      totalQuestions: totalMaxPoints,
+      totalQuestions: totalQuestionsAttempted,
       questionsAttempted: totalQuestionsAttempted,
-      questionsCorrect: totalEarnedPoints, // Use earned points for weighted scoring
+      questionsCorrect: totalQuestionsCorrect,
+      totalMaxPoints,
+      totalEarnedPoints,
       overallScore,
       overallAccuracy,
       sectionScores,
@@ -254,7 +242,7 @@ async function getRealPracticeTestData(userId: string, productType: string, test
     };
     
   } catch (error) {
-    console.error(`❌ Error in getRealPracticeTestData for practice test ${testNumber}:`, error);
+    console.error(`❌ Error in getRealTestData for ${testType}:`, error);
     console.error(`❌ Error details:`, {
       name: error?.name,
       message: error?.message,
@@ -329,6 +317,10 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     const correctAnswers = session.correct_answers || 0;
     const finalScore = session.final_score || 0;
     
+    // For existing sessions without detailed data, use the practice questions structure
+    const totalMaxPoints = practiceQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+    const estimatedCorrectPoints = Math.round((finalScore / 100) * totalMaxPoints);
+    
     console.log(`📊 Session data summary:`, {
       totalQuestions,
       questionsAnswered,
@@ -363,17 +355,17 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     
     // Distribute the session's performance across sections proportionally
     const sectionBreakdown = Array.from(sectionStats.values()).map(section => {
-      const sectionProportion = section.maxPoints / practiceQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-      const estimatedCorrect = Math.round(correctAnswers * sectionProportion);
+      const sectionProportion = section.maxPoints / totalMaxPoints;
+      const sectionCorrectPoints = Math.round(estimatedCorrectPoints * sectionProportion);
       const estimatedAttempted = Math.round(questionsAnswered * sectionProportion);
-      const score = section.maxPoints > 0 ? Math.round((estimatedCorrect / section.maxPoints) * 100) : 0;
-      const accuracy = estimatedAttempted > 0 ? Math.round((estimatedCorrect / estimatedAttempted) * 100) : 0;
+      const score = section.maxPoints > 0 ? Math.round((sectionCorrectPoints / section.maxPoints) * 100) : 0;
+      const accuracy = estimatedAttempted > 0 ? Math.round((sectionCorrectPoints / estimatedAttempted) * 100) : 0;
       
       return {
         sectionName: section.sectionName,
         score,
         accuracy,
-        questionsCorrect: estimatedCorrect,
+        questionsCorrect: sectionCorrectPoints,
         questionsTotal: section.maxPoints,
         questionsAttempted: estimatedAttempted
       };
@@ -402,18 +394,18 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     });
     
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
-      const subSkillProportion = subSkill.maxPoints / practiceQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-      const estimatedCorrect = Math.round(correctAnswers * subSkillProportion);
+      const subSkillProportion = subSkill.maxPoints / totalMaxPoints;
+      const subSkillCorrectPoints = Math.round(estimatedCorrectPoints * subSkillProportion);
       const estimatedAttempted = Math.round(questionsAnswered * subSkillProportion);
-      const score = subSkill.maxPoints > 0 ? Math.round((estimatedCorrect / subSkill.maxPoints) * 100) : 0;
-      const accuracy = estimatedAttempted > 0 ? Math.round((estimatedCorrect / estimatedAttempted) * 100) : 0;
+      const score = subSkill.maxPoints > 0 ? Math.round((subSkillCorrectPoints / subSkill.maxPoints) * 100) : 0;
+      const accuracy = estimatedAttempted > 0 ? Math.round((subSkillCorrectPoints / estimatedAttempted) * 100) : 0;
       
       return {
         sectionName: subSkill.sectionName,
         subSkillName: subSkill.subSkillName,
         score,
         accuracy,
-        questionsCorrect: estimatedCorrect,
+        questionsCorrect: subSkillCorrectPoints,
         questionsTotal: subSkill.maxPoints,
         questionsAttempted: estimatedAttempted
       };
@@ -423,13 +415,11 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
       sectionBreakdown.map(section => [section.sectionName, section.score])
     );
     
-    const totalMaxPoints = practiceQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-    const totalEarnedPoints = Math.round((finalScore / 100) * totalMaxPoints);
-    const overallAccuracy = questionsAnswered > 0 ? Math.round((correctAnswers / questionsAnswered) * 100) : 0;
+    const overallAccuracy = questionsAnswered > 0 ? Math.round((estimatedCorrectPoints / questionsAnswered) * 100) : 0;
     
     console.log(`🎯 SESSION-BASED RESULTS for test ${testNumber}:`, {
       totalMaxPoints,
-      totalEarnedPoints,
+      estimatedCorrectPoints,
       questionsAnswered,
       correctAnswers,
       finalScore,
@@ -441,7 +431,7 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     return {
       totalQuestions: totalMaxPoints,
       questionsAttempted: questionsAnswered,
-      questionsCorrect: totalEarnedPoints,
+      questionsCorrect: estimatedCorrectPoints,
       overallScore: finalScore,
       overallAccuracy,
       sectionScores,
@@ -1368,43 +1358,89 @@ export class AnalyticsService {
       })));
       
       for (let i = 1; i <= 5; i++) {
-        let session = null;
+        // Find ALL sessions for this practice test number (since we now create per-section sessions)
+        const testMode = `practice_${i}`;
+        const testSessions = specificModeSessions.filter(s => 
+          s.test_mode === testMode && s.status === 'completed'
+        );
         
-        // First try to find by specific test_mode (practice_1, practice_2, practice_3, practice_4, practice_5)
-        session = specificModeSessions.find(s => s.test_mode === `practice_${i}`);
+        console.log(`🔍 Test ${i}: found ${testSessions.length} sessions with test_mode=${testMode}`);
         
-        // If not found and we have generic 'practice' sessions, assign by creation order
-        if (!session && sortedGenericSessions.length >= i) {
-          session = sortedGenericSessions[i - 1]; // 0-based index for i-th test
-          console.log(`📊 Assigning generic session at index ${i-1} to Test ${i}`);
+        let aggregatedTestData = null;
+        
+        if (testSessions.length > 0) {
+          console.log(`📊 Aggregating data from ${testSessions.length} sessions for Test ${i}...`);
+          
+          // Aggregate data from all sections for this practice test
+          const allSectionBreakdowns = [];
+          const allSubSkillBreakdowns = [];
+          const allSectionScores = {};
+          let totalQuestions = 0;
+          let totalQuestionsAttempted = 0;
+          let totalQuestionsCorrect = 0;
+          let totalMaxPoints = 0;
+          let totalEarnedPoints = 0;
+          
+          for (const session of testSessions) {
+            try {
+              const sectionData = await getRealTestData(userId, productType, session.id, 'practice', i);
+              if (sectionData) {
+                allSectionBreakdowns.push(...sectionData.sectionBreakdown);
+                allSubSkillBreakdowns.push(...sectionData.subSkillBreakdown);
+                Object.assign(allSectionScores, sectionData.sectionScores);
+                totalQuestions += sectionData.totalQuestions || 0;
+                totalQuestionsAttempted += sectionData.questionsAttempted || 0;
+                totalQuestionsCorrect += sectionData.questionsCorrect || 0;
+                totalMaxPoints += sectionData.totalMaxPoints || 0;
+                totalEarnedPoints += sectionData.totalEarnedPoints || 0;
+              }
+            } catch (error) {
+              console.error(`❌ Error getting data for session ${session.id}:`, error);
+            }
+          }
+          
+          // Calculate overall scores using earned points for score, questions for accuracy
+          const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+          const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
+          
+          aggregatedTestData = {
+            testNumber: i,
+            score: overallScore,
+            status: 'completed',
+            completedAt: testSessions[testSessions.length - 1]?.completed_at,
+            sectionScores: allSectionScores,
+            sectionBreakdown: allSectionBreakdowns,
+            subSkillBreakdown: allSubSkillBreakdowns,
+            totalQuestions: totalQuestions,
+            questionsAttempted: totalQuestionsAttempted,
+            questionsCorrect: totalQuestionsCorrect,
+            overallAccuracy: overallAccuracy
+          };
+          
+          console.log(`📊 Aggregated Test ${i} data:`, {
+            totalSessions: testSessions.length,
+            totalQuestions,
+            overallScore,
+            sectionCount: allSectionBreakdowns.length
+          });
+        } else {
+          // No completed sessions found for this test
+          aggregatedTestData = {
+            testNumber: i,
+            score: null,
+            status: 'not-started',
+            completedAt: null,
+            sectionScores: {},
+            sectionBreakdown: [],
+            subSkillBreakdown: [],
+            totalQuestions: null,
+            questionsAttempted: null,
+            questionsCorrect: null
+          };
         }
-            
-        console.log(`🔍 Test ${i}: found session with test_mode=${session?.test_mode}, score=${session?.final_score}, status=${session?.status}`);
         
-        // Get REAL question counts and user performance for this specific practice test
-        let realQuestionData = null;
-        if (session && session.status === 'completed') {
-          console.log(`📊 Getting real data for Test ${i}...`);
-          realQuestionData = await getRealPracticeTestData(userId, productType, i, session);
-          console.log(`📊 Real data for Test ${i}:`, realQuestionData);
-        }
-        
-        const testData = {
-          testNumber: i,
-          score: realQuestionData?.overallScore || session?.final_score || null,
-          status: session ? (session.status === 'completed' ? 'completed' as const : session.status === 'active' ? 'in-progress' as const : 'not-started' as const) : 'not-started' as const,
-          completedAt: session?.completed_at || null,
-          sectionScores: realQuestionData?.sectionScores || (session?.section_scores as Record<string, number>) || {},
-          // Add real data for practice test insights
-          totalQuestions: realQuestionData?.totalQuestions || null,
-          questionsAttempted: realQuestionData?.questionsAttempted || null,
-          questionsCorrect: realQuestionData?.questionsCorrect || null,
-          sectionBreakdown: realQuestionData?.sectionBreakdown || [],
-          subSkillBreakdown: realQuestionData?.subSkillBreakdown || [],
-        };
-        
-        console.log(`📊 Final test data for Test ${i}:`, testData);
-        tests.push(testData);
+        console.log(`📊 Final test data for Test ${i}:`, aggregatedTestData);
+        tests.push(aggregatedTestData);
       }
 
       // Progress over time (only completed tests)

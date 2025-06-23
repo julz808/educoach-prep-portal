@@ -366,18 +366,46 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     
     try {
       // Get available sections/questions from the database with detailed logging
-      const testModeQuery = testType === 'practice' ? 'practice_1' : testType;
-      console.log(`🏁 DEV: Querying questions with product_type='${dbProductType}', test_mode='${testModeQuery}'`);
+      let availableQuestions: any[] = [];
       
-      const { data: availableQuestions, error: queryError } = await supabase
-        .from('questions')
-        .select('section_name, sub_skill_id, difficulty, id')
-        .eq('product_type', dbProductType)
-        .eq('test_mode', testModeQuery);
-
-      if (queryError) {
-        console.error(`❌ DEV: Error querying questions:`, queryError);
-        throw queryError;
+      if (testType === 'practice') {
+        // For practice tests, we need to get questions from ALL practice modes (practice_1, practice_2, etc.)
+        console.log(`🏁 DEV: Querying ALL practice test questions for product_type='${dbProductType}'`);
+        
+        const { data: allPracticeQuestions, error: queryError } = await supabase
+          .from('questions')
+          .select('section_name, sub_skill_id, difficulty, id, test_mode')
+          .eq('product_type', dbProductType)
+          .like('test_mode', 'practice_%');
+          
+        if (queryError) {
+          console.error(`❌ DEV: Error querying practice questions:`, queryError);
+          throw queryError;
+        }
+        
+        availableQuestions = allPracticeQuestions || [];
+        console.log(`🏁 DEV: Found ${availableQuestions.length} total practice questions across all modes`);
+        
+        // Log which test modes were found
+        const testModes = [...new Set(availableQuestions.map(q => q.test_mode))];
+        console.log(`🏁 DEV: Found questions in test modes:`, testModes);
+      } else {
+        // For diagnostic and drill, use the original query
+        const testModeQuery = testType;
+        console.log(`🏁 DEV: Querying questions with product_type='${dbProductType}', test_mode='${testModeQuery}'`);
+        
+        const { data: questions, error: queryError } = await supabase
+          .from('questions')
+          .select('section_name, sub_skill_id, difficulty, id')
+          .eq('product_type', dbProductType)
+          .eq('test_mode', testModeQuery);
+          
+        if (queryError) {
+          console.error(`❌ DEV: Error querying questions:`, queryError);
+          throw queryError;
+        }
+        
+        availableQuestions = questions || [];
       }
 
       console.log(`🏁 DEV: Found ${availableQuestions?.length || 0} questions for ${testType}`);
@@ -395,15 +423,32 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         return;
       }
 
-      if (testType === 'diagnostic' || testType === 'practice') {
-        // Get unique sections and complete them all
+      if (testType === 'diagnostic') {
+        // Diagnostic should work per section
         const sections = [...new Set(availableQuestions.map(q => q.section_name))].filter(Boolean);
-        console.log(`🏁 DEV: Completing all ${sections.length} sections with realistic test data:`, sections);
+        console.log(`🏁 DEV: Completing all ${sections.length} diagnostic sections with realistic test data:`, sections);
 
         for (let i = 0; i < sections.length; i++) {
           const sectionName = sections[i];
-          console.log(`🏁 DEV: Creating COMPLETED session for "${sectionName}" (${i+1}/${sections.length})`);
-          await createRealisticSession(dbProductType, sectionName, 'completed', testModeQuery);
+          console.log(`🏁 DEV: Creating COMPLETED diagnostic session for "${sectionName}" (${i+1}/${sections.length})`);
+          await createRealisticSession(dbProductType, sectionName, 'completed', 'diagnostic');
+        }
+      } else if (testType === 'practice') {
+        // For practice tests, we need to complete ALL practice tests (1-5) and ALL sections
+        const sections = [...new Set(availableQuestions.map(q => q.section_name))].filter(Boolean);
+        const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+        
+        console.log(`🏁 DEV: Completing all ${practiceTestModes.length} practice tests x ${sections.length} sections = ${practiceTestModes.length * sections.length} total sessions`);
+        console.log(`🏁 DEV: Practice test modes:`, practiceTestModes);
+        console.log(`🏁 DEV: Sections:`, sections);
+
+        for (const practiceMode of practiceTestModes) {
+          console.log(`🏁 DEV: Creating sessions for ${practiceMode}`);
+          for (let i = 0; i < sections.length; i++) {
+            const sectionName = sections[i];
+            console.log(`🏁 DEV: Creating COMPLETED ${practiceMode} session for "${sectionName}" (${i+1}/${sections.length})`);
+            await createRealisticSession(dbProductType, sectionName, 'completed', practiceMode);
+          }
         }
       } else if (testType === 'drill') {
         // Get unique sub-skills and complete them all
@@ -738,7 +783,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           user_id: user.id,
           question_id: question.id,
           session_id: sessionResult.id,
-          session_type: mode, // 'diagnostic', 'practice', or 'drill'
+          session_type: mode.startsWith('practice_') ? 'practice' : mode, // Normalize practice_1, practice_2, etc. to 'practice'
           user_answer: userAnswerLetter,
           is_correct: isCorrect,
           is_flagged: flaggedQuestions.includes(qIndex.toString()),

@@ -13,6 +13,7 @@ import {
   type OrganizedQuestion 
 } from '@/services/supabaseQuestionService';
 import { SessionService, type TestSession } from '@/services/sessionService';
+import { TestSessionService } from '@/services/testSessionService';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
 import { ScoringService } from '@/services/scoringService';
 import { supabase } from '@/integrations/supabase/client';
@@ -751,13 +752,13 @@ const TestTaking: React.FC = () => {
         
         console.log('🆕 TIMER: Calculated time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
         
-        const sessionIdToUse = await SessionService.createSession(
+        const sessionIdToUse = await TestSessionService.createOrResumeSession(
           user.id,
           properDisplayName, // Use mapped product type, not raw selectedProduct
-          actualTestMode, // Use specific test mode (practice_1, practice_2, etc.)
+          actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
           sectionName,
           questions.length,
-          timeLimitSeconds
+          questions.map(q => q.id)
         );
 
         // Check if this is actually resuming an existing session
@@ -1064,6 +1065,45 @@ const TestTaking: React.FC = () => {
         );
 
         console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
+        
+        // ADDITIONALLY: Record individual question attempt for insights (practice tests and drills)
+        if (user && (updatedSession.type === 'practice' || updatedSession.type === 'drill')) {
+          try {
+            const currentQuestion = updatedSession.questions[updatedSession.currentQuestion];
+            const selectedAnswer = stringAnswers[updatedSession.currentQuestion.toString()];
+            const isCorrect = answerIndex === currentQuestion.correctAnswer;
+            
+            console.log('📊 QUESTION-ATTEMPT: Recording individual question attempt for insights:', {
+              questionId: currentQuestion.id,
+              sessionId: updatedSession.id,
+              selectedAnswer,
+              correctAnswer: currentQuestion.correctAnswer,
+              isCorrect,
+              subSkill: currentQuestion.subSkill,
+              topic: currentQuestion.topic
+            });
+            
+            // Record individual question attempt to question_attempt_history table
+            const { error: attemptError } = await supabase.rpc('save_question_attempt', {
+              p_user_id: user.id,
+              p_question_id: currentQuestion.id,
+              p_session_id: updatedSession.id,
+              p_user_answer: selectedAnswer,
+              p_is_correct: isCorrect,
+              p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
+              p_is_skipped: false,
+              p_time_spent_seconds: 30
+            });
+            
+            if (attemptError) {
+              console.error('❌ QUESTION-ATTEMPT: Error recording question attempt:', attemptError);
+            } else {
+              console.log('✅ QUESTION-ATTEMPT: Individual question attempt recorded successfully');
+            }
+          } catch (questionAttemptError) {
+            console.error('❌ QUESTION-ATTEMPT: Failed to record individual question attempt:', questionAttemptError);
+          }
+        }
       } catch (error) {
         console.error('❌ IMMEDIATE-SAVE FAILED:', error);
         console.error('❌ IMMEDIATE-SAVE FAILED: Error details:', JSON.stringify(error, null, 2));
@@ -1105,6 +1145,42 @@ const TestTaking: React.FC = () => {
     if (isWrittenResponse) {
       console.log('💾 NEXT-SAVE: Saving written response before moving to next question');
       await saveProgress(session); // Use current session state
+      
+      // ADDITIONALLY: Record individual written response attempt for insights (practice tests and drills)
+      if (user && (session.type === 'practice' || session.type === 'drill')) {
+        try {
+          const textAnswer = session.textAnswers[session.currentQuestion];
+          if (textAnswer && textAnswer.trim().length > 0) {
+            console.log('📊 WRITTEN-ATTEMPT: Recording written response attempt for insights:', {
+              questionId: currentQuestion.id,
+              sessionId: session.id,
+              textLength: textAnswer.length,
+              subSkill: currentQuestion.subSkill,
+              topic: currentQuestion.topic
+            });
+            
+            // Record written response attempt to question_attempt_history table
+            const { error: attemptError } = await supabase.rpc('save_question_attempt', {
+              p_user_id: user.id,
+              p_question_id: currentQuestion.id,
+              p_session_id: session.id,
+              p_user_answer: textAnswer.substring(0, 500), // Truncate if too long
+              p_is_correct: false, // Will be determined by writing assessment later
+              p_is_flagged: session.flaggedQuestions.has(session.currentQuestion),
+              p_is_skipped: false,
+              p_time_spent_seconds: 60
+            });
+            
+            if (attemptError) {
+              console.error('❌ WRITTEN-ATTEMPT: Error recording written response attempt:', attemptError);
+            } else {
+              console.log('✅ WRITTEN-ATTEMPT: Written response attempt recorded successfully');
+            }
+          }
+        } catch (writtenAttemptError) {
+          console.error('❌ WRITTEN-ATTEMPT: Failed to record written response attempt:', writtenAttemptError);
+        }
+      }
     }
     
     setSession(prev => {

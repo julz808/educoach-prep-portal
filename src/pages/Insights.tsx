@@ -1602,7 +1602,10 @@ const PerformanceDashboard = () => {
                                     />
                                   </div>
                                   <div className="text-xs text-slate-500">
-                                    {subSkill.questionsCorrect}/{subSkill.questionsTotal}
+                                    {subSkillView === 'score' 
+                                      ? <span>{subSkill.questionsCorrect}/{subSkill.questionsTotal}</span>
+                                      : <span>{subSkill.questionsCorrect}/{subSkill.questionsAttempted}</span>
+                                    }
                                   </div>
                                 </div>
                               </div>
