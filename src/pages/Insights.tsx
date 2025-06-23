@@ -119,7 +119,7 @@ const SpiderChart = ({ data, size = 320, animate = true }: {
               animation: animate ? `fadeInSlideUp 1s ease-out ${i * 0.1 + 0.8}s both` : 'none'
             }}
           >
-            <div className="text-sm font-medium text-slate-700 leading-tight">
+            <div className="text-base font-medium text-slate-700 leading-tight">
               {item.label.split('\n').map((line, idx) => (
                 <div key={idx}>{line}</div>
               ))}
@@ -888,7 +888,7 @@ const PerformanceDashboard = () => {
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-slate-900 text-sm">{section.sectionName}</h4>
+                                  <h4 className="font-medium text-slate-900 text-base">{section.sectionName}</h4>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                   <div className={`text-base font-semibold ${
@@ -931,11 +931,92 @@ const PerformanceDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Sub-Skills Performance */}
+                  {/* Sub-Skill Overview */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Top 5 Strengths */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                      <div className="px-6 py-4 border-b border-slate-200">
+                        <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          Top 5 Sub-Skills
+                        </h3>
+                      </div>
+                      <div className="p-6">
+                        <div className="space-y-4">
+                          {(performanceData.diagnostic?.strengths || []).slice(0, 5).map((item, index) => (
+                            <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
+                              <div className="flex-1">
+                                <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
+                                <p className="text-sm text-slate-600">{item.sectionName}</p>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="text-lg font-semibold text-green-600">{Math.round(item.accuracy)}%</div>
+                                <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                  <div 
+                                    className="h-full rounded-full bg-green-500"
+                                    style={{ width: `${item.accuracy}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!performanceData.diagnostic?.strengths || performanceData.diagnostic.strengths.length === 0) && (
+                            <div className="text-center py-8 text-slate-500">
+                              <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              Complete more questions to see your top sub-skills
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Top 5 Areas for Improvement */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                      <div className="px-6 py-4 border-b border-slate-200">
+                        <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                          <XCircle className="w-5 h-5 text-red-600" />
+                          Bottom 5 Sub-Skills
+                        </h3>
+                      </div>
+                      <div className="p-6">
+                        <div className="space-y-4">
+                          {(performanceData.diagnostic?.weaknesses || []).slice(0, 5).map((item, index) => (
+                            <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
+                              <div className="flex-1">
+                                <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
+                                <p className="text-sm text-slate-600">{item.sectionName}</p>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className={`text-lg font-semibold ${
+                                  item.accuracy >= 60 ? 'text-orange-600' : 'text-red-600'
+                                }`}>{Math.round(item.accuracy)}%</div>
+                                <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                  <div 
+                                    className={`h-full rounded-full ${
+                                      item.accuracy >= 60 ? 'bg-orange-500' : 'bg-red-500'
+                                    }`}
+                                    style={{ width: `${item.accuracy}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!performanceData.diagnostic?.weaknesses || performanceData.diagnostic.weaknesses.length === 0) && (
+                            <div className="text-center py-8 text-slate-500">
+                              <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              Complete more questions to see your bottom sub-skills
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Sub-Skills Performance */}
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
+                        <h3 className="text-lg font-semibold text-slate-900">Detailed Sub-Skills Performance</h3>
                         <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
                           <button
                             onClick={() => setSubSkillView('score')}
