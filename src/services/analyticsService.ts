@@ -10,6 +10,74 @@ const PRODUCT_ID_TO_TYPE: Record<string, string> = {
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
 };
 
+// Helper function to get total questions available for a practice test
+async function getTotalQuestionsAvailable(productType: string, testType: string, testNumber?: number) {
+  try {
+    const testMode = testNumber ? `${testType}_${testNumber}` : testType;
+    
+    console.log(`🔍 Getting total questions available for ${testMode}`);
+    
+    const { data: allQuestions, error } = await supabase
+      .from('questions')
+      .select(`
+        id,
+        section_name,
+        sub_skill,
+        max_points
+      `)
+      .eq('product_type', productType)
+      .eq('test_mode', testMode);
+    
+    if (error) {
+      console.error('❌ Error fetching total questions:', error);
+      return { sectionTotals: new Map(), subSkillTotals: new Map(), totalAvailable: 0 };
+    }
+    
+    const sectionTotals = new Map<string, number>();
+    const subSkillTotals = new Map<string, { total: number, section: string }>();
+    
+    // First, count questions by section and create a mapping of sub-skills to sections
+    const sectionSubSkillCounts = new Map<string, Map<string, number>>();
+    
+    allQuestions?.forEach(question => {
+      const sectionName = question.section_name || 'Unknown Section';
+      const subSkillName = question.sub_skill || 'Unknown Sub-skill';
+      
+      // Count by section
+      sectionTotals.set(sectionName, (sectionTotals.get(sectionName) || 0) + 1);
+      
+      // Count by sub-skill within each section
+      if (!sectionSubSkillCounts.has(sectionName)) {
+        sectionSubSkillCounts.set(sectionName, new Map());
+      }
+      const sectionMap = sectionSubSkillCounts.get(sectionName)!;
+      sectionMap.set(subSkillName, (sectionMap.get(subSkillName) || 0) + 1);
+    });
+    
+    // Build sub-skill totals from section-specific counts
+    sectionSubSkillCounts.forEach((subSkillMap, sectionName) => {
+      subSkillMap.forEach((count, subSkillName) => {
+        subSkillTotals.set(subSkillName, { 
+          total: count, 
+          section: sectionName 
+        });
+      });
+    });
+    
+    console.log(`📊 Total questions available:`, {
+      totalQuestions: allQuestions?.length || 0,
+      sectionsCount: sectionTotals.size,
+      subSkillsCount: subSkillTotals.size,
+      sectionBreakdown: Object.fromEntries(sectionTotals)
+    });
+    
+    return { sectionTotals, subSkillTotals, totalAvailable: allQuestions?.length || 0 };
+  } catch (error) {
+    console.error('❌ Error in getTotalQuestionsAvailable:', error);
+    return { sectionTotals: new Map(), subSkillTotals: new Map(), totalAvailable: 0 };
+  }
+}
+
 // Get real test data using unified approach for all test types (diagnostic, practice, drill)
 async function getRealTestData(userId: string, productType: string, sessionId: string, testType: string = 'practice', testNumber?: number) {
   console.log(`\n🔄 ${testType.toUpperCase()} INSIGHTS: Getting real data for session ${sessionId}`);
@@ -71,6 +139,9 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     }
     
     console.log(`📊 Found ${questionAttempts.length} question attempts for session ${sessionId}`);
+    
+    // Get total questions available for this test to calculate correct denominators
+    const { sectionTotals, subSkillTotals, totalAvailable } = await getTotalQuestionsAvailable(productType, testType, testNumber);
     
     // Get question details for all attempted questions
     const questionIds = questionAttempts.map(attempt => attempt.question_id);
@@ -143,7 +214,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       }
       
       const subSkillData = subSkillStats.get(subSkillName);
-      subSkillData.questionsTotal++;
       subSkillData.questionsAttempted++;
       subSkillData.maxPoints += maxPoints;
       subSkillData.earnedPoints += earnedPoints;
@@ -164,7 +234,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       }
       
       const sectionData = sectionStats.get(sectionName);
-      sectionData.questionsTotal++;
       sectionData.questionsAttempted++;
       sectionData.maxPoints += maxPoints;
       sectionData.earnedPoints += earnedPoints;
@@ -178,8 +247,8 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       sectionName: section.sectionName,
       score: section.maxPoints > 0 ? Math.round((section.earnedPoints / section.maxPoints) * 100) : 0,
       accuracy: section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0,
-      questionsCorrect: section.questionsCorrect, // Use actual correct question count for display
-      questionsTotal: section.questionsTotal, // Use actual total question count for display
+      questionsCorrect: section.questionsCorrect,
+      questionsTotal: sectionTotals.get(section.sectionName) || section.questionsAttempted, // Use actual total from database
       questionsAttempted: section.questionsAttempted
     }));
     
@@ -189,8 +258,8 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       subSkillName: subSkill.subSkillName,
       score: subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0,
       accuracy: subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0,
-      questionsCorrect: subSkill.questionsCorrect, // Use actual correct question count for display
-      questionsTotal: subSkill.questionsTotal, // Use actual total question count for display
+      questionsCorrect: subSkill.questionsCorrect,
+      questionsTotal: subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted, // Use actual total from database
       questionsAttempted: subSkill.questionsAttempted
     }));
     
@@ -200,7 +269,8 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     );
     
     // Calculate overall scores using question counts for consistency with display
-    const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+    // For overall score, use total available questions as denominator
+    const overallScore = totalAvailable > 0 ? Math.round((totalQuestionsCorrect / totalAvailable) * 100) : 0;
     const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
     
     console.log(`📊 Overall calculation details:`, {
@@ -229,7 +299,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     ));
     
     return {
-      totalQuestions: totalQuestionsAttempted,
+      totalQuestions: totalAvailable || totalQuestionsAttempted,
       questionsAttempted: totalQuestionsAttempted,
       questionsCorrect: totalQuestionsCorrect,
       totalMaxPoints,
@@ -547,6 +617,12 @@ export interface DrillResults {
       difficulty1Accuracy: number;
       difficulty2Accuracy: number;
       difficulty3Accuracy: number;
+      difficulty1Questions: number;
+      difficulty1Correct: number;
+      difficulty2Questions: number;
+      difficulty2Correct: number;
+      difficulty3Questions: number;
+      difficulty3Correct: number;
       recommendedLevel: 1 | 2 | 3;
     }[];
   }[];
@@ -1341,7 +1417,22 @@ export class AnalyticsService {
       
       console.log(`🔍 Found ${specificModeSessions.length} specific mode sessions, ${genericModeSessions.length} generic mode sessions`);
 
-      // Create test results for practice tests 1, 2, 3 only (VIC Selective) with REAL data
+      // Determine which practice tests actually exist in the database
+      const { data: practiceQuestions } = await supabase
+        .from('questions')
+        .select('test_mode')
+        .eq('product_type', productType)
+        .like('test_mode', 'practice_%');
+      
+      const availablePracticeTests = [...new Set(practiceQuestions?.map(q => q.test_mode) || [])]
+        .filter(mode => mode.startsWith('practice_'))
+        .map(mode => parseInt(mode.split('_')[1]))
+        .filter(num => !isNaN(num))
+        .sort();
+      
+      console.log(`📊 Available practice tests in database:`, availablePracticeTests);
+      
+      // Create test results for available practice tests with REAL data
       const tests = [];
       
       // Sort generic sessions by creation date to ensure consistent assignment
@@ -1357,7 +1448,14 @@ export class AnalyticsService {
         created: s.created_at
       })));
       
+      // Loop through all possible test numbers (1-5) but only process those that exist in database
       for (let i = 1; i <= 5; i++) {
+        // Skip if this practice test doesn't exist in the database
+        if (!availablePracticeTests.includes(i)) {
+          console.log(`🔍 Test ${i}: Skipping - not available in database`);
+          continue;
+        }
+        
         // Find ALL sessions for this practice test number (since we now create per-section sessions)
         const testMode = `practice_${i}`;
         const testSessions = specificModeSessions.filter(s => 
@@ -1388,7 +1486,10 @@ export class AnalyticsService {
                 allSectionBreakdowns.push(...sectionData.sectionBreakdown);
                 allSubSkillBreakdowns.push(...sectionData.subSkillBreakdown);
                 Object.assign(allSectionScores, sectionData.sectionScores);
-                totalQuestions += sectionData.totalQuestions || 0;
+                // Only count totalQuestions once (it's the same for all sessions in the practice test)
+                if (totalQuestions === 0) {
+                  totalQuestions = sectionData.totalQuestions || 0;
+                }
                 totalQuestionsAttempted += sectionData.questionsAttempted || 0;
                 totalQuestionsCorrect += sectionData.questionsCorrect || 0;
                 totalMaxPoints += sectionData.totalMaxPoints || 0;
@@ -1796,6 +1897,12 @@ export class AnalyticsService {
             difficulty1Accuracy,
             difficulty2Accuracy,
             difficulty3Accuracy,
+            difficulty1Questions: data.difficultyStats[1].questions,
+            difficulty1Correct: data.difficultyStats[1].correct,
+            difficulty2Questions: data.difficultyStats[2].questions,
+            difficulty2Correct: data.difficultyStats[2].correct,
+            difficulty3Questions: data.difficultyStats[3].questions,
+            difficulty3Correct: data.difficultyStats[3].correct,
             recommendedLevel,
           };
         }),

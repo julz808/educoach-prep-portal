@@ -149,6 +149,7 @@ const PerformanceDashboard = () => {
   const [drillFilter, setDrillFilter] = useState('all');
   const [sectionView, setSectionView] = useState<'score' | 'accuracy'>('score');
   const [subSkillView, setSubSkillView] = useState<'score' | 'accuracy'>('score');
+  const [drillView, setDrillView] = useState<'accuracy' | 'level'>('accuracy');
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData>({
@@ -210,6 +211,15 @@ const PerformanceDashboard = () => {
         const diagnostic = diagnosticResult.status === 'fulfilled' ? diagnosticResult.value : null;
         const practice = practiceResult.status === 'fulfilled' ? practiceResult.value : null;
         const drills = drillsResult.status === 'fulfilled' ? drillsResult.value : null;
+        
+        // Debug drill data
+        console.log('🔧 Drill result status:', drillsResult.status);
+        if (drillsResult.status === 'rejected') {
+          console.error('🔧 Drill result error:', drillsResult.reason);
+        } else {
+          console.log('🔧 Drill data:', drills);
+          console.log('🔧 Drill subSkillBreakdown:', drills?.subSkillBreakdown);
+        }
 
         // Log any failures but don't fail the entire load
         results.forEach((result, index) => {
@@ -1322,7 +1332,7 @@ const PerformanceDashboard = () => {
                 return (
                   <div className="space-y-8">
                     {/* Overall Performance Cards */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-3 gap-6">
                       {/* Overall Score */}
                       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                         <div className="text-center">
@@ -1340,7 +1350,7 @@ const PerformanceDashboard = () => {
                           <div className="flex items-center justify-center gap-4">
                             <div className="text-3xl font-bold text-slate-900">
                               {questionsCorrect}
-                              <span className="text-slate-600">/{totalQuestions}</span>
+                              <span className="text-slate-600">/{totalQuestions || questionsAttempted}</span>
                             </div>
                             <div className="h-10 w-px bg-slate-200"></div>
                             <div className={`text-3xl font-bold ${
@@ -1348,6 +1358,43 @@ const PerformanceDashboard = () => {
                               overallScore >= 60 ? 'text-orange-600' : 
                               'text-red-600'
                             }`}>{overallScore}%</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Average Score */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                        <div className="text-center">
+                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            Average Score
+                            <div className="relative inline-block">
+                              <Info size={14} className="text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                <div className="font-semibold mb-1">Average Score</div>
+                                <div>Simple average percentage across all test sections.</div>
+                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className={`text-3xl font-bold ${
+                            (() => {
+                              // Calculate simple average across all sections
+                              const sectionScores = selectedTest.sectionBreakdown?.map(s => s.score) || [];
+                              const averageScore = sectionScores.length > 0
+                                ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
+                                : 0;
+                              
+                              return averageScore >= 80 ? 'text-green-600' : 
+                                     averageScore >= 60 ? 'text-orange-600' : 
+                                     'text-red-600';
+                            })()
+                          }`}>
+                            {(() => {
+                              const sectionScores = selectedTest.sectionBreakdown?.map(s => s.score) || [];
+                              return sectionScores.length > 0
+                                ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
+                                : 0;
+                            })()}%
                           </div>
                         </div>
                       </div>
@@ -1647,8 +1694,177 @@ const PerformanceDashboard = () => {
                   </button>
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-500">
-                  <p>Drill analysis will be available here when drill data is present.</p>
+                <div className="space-y-8">
+                  {/* Overall Drill Stats */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                      <div className="text-center">
+                        <div className="text-base font-medium text-slate-600 mb-2">Total Questions Drilled</div>
+                        <div className="text-3xl font-bold text-slate-900">{performanceData.drills?.totalQuestions || 0}</div>
+                      </div>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                      <div className="text-center">
+                        <div className="text-base font-medium text-slate-600 mb-2">Overall Accuracy</div>
+                        <div className={`text-3xl font-bold ${
+                          (performanceData.drills?.overallAccuracy || 0) >= 80 ? 'text-green-600' : 
+                          (performanceData.drills?.overallAccuracy || 0) >= 60 ? 'text-orange-600' : 
+                          'text-red-600'
+                        }`}>{performanceData.drills?.overallAccuracy || 0}%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-Skills Performance */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
+                      </div>
+                      
+                      {/* Filter Tabs */}
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { id: 'all', label: 'All Skills' },
+                          { id: 'reading', label: 'Reading Reasoning' },
+                          { id: 'mathematical', label: 'Mathematics Reasoning' },
+                          { id: 'verbal', label: 'General Ability - Verbal' },
+                          { id: 'quantitative', label: 'General Ability - Quantitative' },
+                          { id: 'writing', label: 'Writing' }
+                        ].map((filter) => (
+                          <button
+                            key={filter.id}
+                            onClick={() => setDrillFilter(filter.id)}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                              drillFilter === filter.id
+                                ? 'bg-slate-900 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
+                          >
+                            {filter.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Sub-Skills List for Drills */}
+                    <div className="divide-y divide-slate-100">
+                      {(() => {
+                        // Flatten all sub-skills from all sections into one list
+                        const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
+                          .flatMap(section => 
+                            section.subSkills.map(skill => ({
+                              ...skill,
+                              sectionName: section.sectionName
+                            }))
+                          )
+                          .filter(subSkill => {
+                            if (drillFilter === 'all') return true;
+                            if (drillFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
+                            if (drillFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
+                            if (drillFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
+                            if (drillFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
+                            if (drillFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                            return true;
+                          });
+
+                        return allSubSkills.map((subSkill, index) => {
+                          return (
+                            <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                              <div className="flex items-center gap-6">
+                                {/* Left Section: Sub-skill Info */}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-slate-900 text-sm">{subSkill.subSkillName}</h4>
+                                  <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
+                                </div>
+
+                                {/* Overall Stats */}
+                                <div className="flex items-center gap-3 flex-shrink-0">
+                                  <div className={`text-base font-semibold ${
+                                    subSkill.accuracy >= 80 ? 'text-green-600' : 
+                                    subSkill.accuracy >= 60 ? 'text-orange-600' : 
+                                    'text-red-600'
+                                  }`}>
+                                    {subSkill.accuracy}%
+                                  </div>
+                                  
+                                  <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div 
+                                      key={`${subSkill.subSkillName}-accuracy`}
+                                      className={`h-full rounded-full growToRight ${
+                                        subSkill.accuracy >= 80 ? 'bg-green-500' : 
+                                        subSkill.accuracy >= 60 ? 'bg-orange-500' : 
+                                        'bg-red-500'
+                                      }`}
+                                      style={{ 
+                                        width: `${subSkill.accuracy}%`,
+                                        animationDelay: `${index * 100}ms`
+                                      }}
+                                    />
+                                  </div>
+                                  
+                                  <div className="text-xs text-slate-500 whitespace-nowrap">
+                                    {subSkill.questionsCompleted} questions
+                                  </div>
+                                </div>
+
+                                {/* Vertical Separator */}
+                                <div className="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+
+                                {/* Right Section: Difficulty Breakdown */}
+                                <div className="grid grid-cols-3 gap-8 flex-shrink-0">
+                                  {/* Easy (Level 1) */}
+                                  <div className="text-center">
+                                    <div className="text-xs text-slate-500 mb-2">Easy</div>
+                                    <div className="text-sm font-medium text-slate-700">
+                                      {subSkill.difficulty1Correct || 0}/{subSkill.difficulty1Questions || 0}
+                                    </div>
+                                  </div>
+
+                                  {/* Medium (Level 2) */}
+                                  <div className="text-center">
+                                    <div className="text-xs text-slate-500 mb-2">Medium</div>
+                                    <div className="text-sm font-medium text-slate-700">
+                                      {subSkill.difficulty2Correct || 0}/{subSkill.difficulty2Questions || 0}
+                                    </div>
+                                  </div>
+
+                                  {/* Hard (Level 3) */}
+                                  <div className="text-center">
+                                    <div className="text-xs text-slate-500 mb-2">Hard</div>
+                                    <div className="text-sm font-medium text-slate-700">
+                                      {subSkill.difficulty3Correct || 0}/{subSkill.difficulty3Questions || 0}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    {(() => {
+                      const hasFilteredResults = (performanceData.drills?.subSkillBreakdown || [])
+                        .flatMap(section => section.subSkills.map(skill => ({ ...skill, sectionName: section.sectionName })))
+                        .filter(subSkill => {
+                          if (drillFilter === 'all') return true;
+                          if (drillFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
+                          if (drillFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
+                          if (drillFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
+                          if (drillFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
+                          if (drillFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                          return true;
+                        }).length > 0;
+
+                      return !hasFilteredResults && (
+                        <div className="text-center py-8 text-slate-500">
+                          <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          No sub-skill data available for this filter.
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </div>
               )}
             </div>

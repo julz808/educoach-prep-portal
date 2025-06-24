@@ -434,9 +434,19 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           await createRealisticSession(dbProductType, sectionName, 'completed', 'diagnostic');
         }
       } else if (testType === 'practice') {
-        // For practice tests, we need to complete ALL practice tests (1-5) and ALL sections
+        // For practice tests, we need to complete ALL practice tests and ALL sections
         const sections = [...new Set(availableQuestions.map(q => q.section_name))].filter(Boolean);
-        const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+        
+        // Determine which practice test modes actually exist in the database
+        const allPracticeQuestions = await supabase
+          .from('questions')
+          .select('test_mode')
+          .eq('product_type', dbProductType)
+          .like('test_mode', 'practice_%');
+        
+        const practiceTestModes = [...new Set(allPracticeQuestions.data?.map(q => q.test_mode) || [])]
+          .filter(mode => mode.startsWith('practice_'))
+          .sort();
         
         console.log(`🏁 DEV: Completing all ${practiceTestModes.length} practice tests x ${sections.length} sections = ${practiceTestModes.length * sections.length} total sessions`);
         console.log(`🏁 DEV: Practice test modes:`, practiceTestModes);
