@@ -789,7 +789,7 @@ export const UNIFIED_SUB_SKILLS = {
 // Section to sub-skill mappings based on the authoritative data
 export const SECTION_TO_SUB_SKILLS = {
   // VIC Selective Entry (Year 9 Entry)
-  "Reading Reasoning": [
+  "VIC Selective Entry (Year 9 Entry) - Reading Reasoning": [
     "Inferential Reasoning",
     "Interpretive Comprehension",
     "Vocabulary in Context",
@@ -799,7 +799,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Character Analysis",
     "Theme & Message Analysis"
   ],
-  "Mathematics Reasoning": [
+  "VIC Selective Entry (Year 9 Entry) - Mathematics Reasoning": [
     "Algebraic Reasoning",
     "Geometric & Spatial Reasoning",
     "Data Interpretation and Statistics",
@@ -807,27 +807,27 @@ export const SECTION_TO_SUB_SKILLS = {
     "Logical Mathematical Deduction",
     "Conceptual Understanding"
   ],
-  "General Ability - Verbal": [
+  "VIC Selective Entry (Year 9 Entry) - General Ability - Verbal": [
     "Logical Reasoning & Deduction",
     "Verbal Reasoning & Analogies",
     "Critical Thinking & Problem-Solving",
     "Information Processing & Filtering",
     "Vocabulary in Context"
   ],
-  "General Ability - Quantitative": [
+  "VIC Selective Entry (Year 9 Entry) - General Ability - Quantitative": [
     "Pattern Recognition & Sequences",
     "Numerical Reasoning",
     "Logical Reasoning & Deduction",
     "Spatial Reasoning (2D & 3D)",
     "Critical Thinking & Problem-Solving"
   ],
-  "VIC Writing": [
+  "VIC Selective Entry (Year 9 Entry) - Writing": [
     "Creative Writing",
     "Persuasive Writing"
   ],
   
   // NSW Selective Entry (Year 7 Entry)
-  "NSW Reading": [
+  "NSW Selective Entry (Year 7 Entry) - Reading": [
     "Literal Comprehension",
     "Inferential Reasoning",
     "Critical Analysis & Evaluation",
@@ -837,7 +837,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Theme & Message Analysis",
     "Integration & Synthesis"
   ],
-  "Mathematical Reasoning": [
+  "NSW Selective Entry (Year 7 Entry) - Mathematical Reasoning": [
     "Number Operations & Problem Solving",
     "Algebraic Reasoning",
     "Geometry & Measurement",
@@ -846,7 +846,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Problem-Solving Strategies",
     "Computational Fluency"
   ],
-  "Thinking Skills": [
+  "NSW Selective Entry (Year 7 Entry) - Thinking Skills": [
     "Logical Reasoning & Deduction",
     "Spatial Reasoning (2D & 3D)",
     "Verbal Reasoning & Analogies",
@@ -856,7 +856,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Information Processing & Filtering",
     "Abstract Reasoning"
   ],
-  "NSW Writing": [
+  "NSW Selective Entry (Year 7 Entry) - Writing": [
     "Narrative Writing",
     "Persuasive Writing", 
     "Expository Writing",
@@ -864,7 +864,7 @@ export const SECTION_TO_SUB_SKILLS = {
   ],
 
   // Year 5 NAPLAN
-  "NAPLAN Y5 Reading": [
+  "Year 5 NAPLAN - Reading": [
     "Literal Comprehension",
     "Inferential Reasoning",
     "Interpretive Comprehension",
@@ -873,7 +873,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Critical Analysis & Evaluation",
     "Integration & Synthesis"
   ],
-  "Language Conventions": [
+  "Year 5 NAPLAN - Language Conventions": [
     "Spelling Patterns & Orthographic Knowledge",
     "Grammar & Parts of Speech",
     "Punctuation Usage & Application",
@@ -881,7 +881,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Vocabulary Usage & Word Choice",
     "Proofreading & Error Recognition"
   ],
-  "Numeracy No Calculator": [
+  "Year 5 NAPLAN - Numeracy No Calculator": [
     "Number Sense & Operations",
     "Algebraic Thinking & Patterns",
     "Measurement Concepts",
@@ -890,7 +890,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Mathematical Reasoning",
     "Mental Mathematics Fluency"
   ],
-  "Numeracy Calculator": [
+  "Year 5 NAPLAN - Numeracy Calculator": [
     "Complex Number Operations",
     "Algebraic Problem Solving",
     "Advanced Measurement Applications",
@@ -899,13 +899,13 @@ export const SECTION_TO_SUB_SKILLS = {
     "Multi-Step Problem Solving",
     "Technology Integration"
   ],
-  "NAPLAN Y5 Writing": [
+  "Year 5 NAPLAN - Writing": [
     "Narrative Writing",
     "Persuasive Writing"
   ],
 
   // Year 7 NAPLAN
-  "NAPLAN Y7 Reading": [
+  "Year 7 NAPLAN - Reading": [
     "Advanced Literal Comprehension",
     "Complex Inferential Reasoning",
     "Advanced Interpretive Analysis",
@@ -915,7 +915,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Complex Integration & Synthesis",
     "Meta-Cognitive Reading Strategies"
   ],
-  "NAPLAN Y7 Language Conventions": [
+  "Year 7 NAPLAN - Language Conventions": [
     "Advanced Spelling & Orthography",
     "Sophisticated Grammar",
     "Advanced Punctuation",
@@ -923,7 +923,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Advanced Vocabulary & Usage",
     "Advanced Editing Skills"
   ],
-  "NAPLAN Y7 Numeracy No Calculator": [
+  "Year 7 NAPLAN - Numeracy No Calculator": [
     "Advanced Number Operations",
     "Algebraic Reasoning",
     "Advanced Measurement",
@@ -933,7 +933,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Logical Mathematical Thinking",
     "Mental Mathematics Mastery"
   ],
-  "NAPLAN Y7 Numeracy Calculator": [
+  "Year 7 NAPLAN - Numeracy Calculator": [
     "Complex Computational Applications",
     "Advanced Algebraic Problem Solving",
     "Sophisticated Measurement Applications",
@@ -943,13 +943,13 @@ export const SECTION_TO_SUB_SKILLS = {
     "Mathematical Modelling & Applications",
     "Advanced Technology Integration"
   ],
-  "NAPLAN Y7 Writing": [
+  "Year 7 NAPLAN - Writing": [
     "Narrative Writing",
     "Persuasive Writing"
   ],
 
   // EduTest Scholarship (Year 7 Entry)
-  "Reading Comprehension": [
+  "EduTest Scholarship (Year 7 Entry) - Reading Comprehension": [
     "Literal Comprehension & Detail Extraction",
     "Inferential Reasoning & Implied Meaning",
     "Main Idea & Theme Identification",
@@ -958,7 +958,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Text Structure & Organisation",
     "Cross-Textual Connections"
   ],
-  "Verbal Reasoning": [
+  "EduTest Scholarship (Year 7 Entry) - Verbal Reasoning": [
     "Analogical Reasoning & Word Relationships",
     "Vocabulary & Semantic Knowledge",
     "Logical Deduction & Conditional Reasoning",
@@ -968,7 +968,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Sequential Reasoning & Order",
     "Abstract Thinking & Concept Formation"
   ],
-  "Numerical Reasoning": [
+  "EduTest Scholarship (Year 7 Entry) - Numerical Reasoning": [
     "Number Sequence & Pattern Recognition",
     "Data Interpretation",
     "Proportional Reasoning & Ratios",
@@ -978,7 +978,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Financial Literacy & Practical Applications",
     "Statistical Reasoning & Probability"
   ],
-  "EduTest Mathematics": [
+  "EduTest Scholarship (Year 7 Entry) - Mathematics": [
     "Arithmetic Operations & Number Sense",
     "Algebraic Thinking & Problem Solving",
     "Geometry and Spatial Reasoning",
@@ -988,7 +988,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Word Problem Solving & Application",
     "Time, Money & Practical Mathematics"
   ],
-  "EduTest Written Expression": [
+  "EduTest Scholarship (Year 7 Entry) - Written Expression": [
     "Narrative Writing",
     "Persuasive Writing",
     "Expository Writing",
@@ -997,7 +997,7 @@ export const SECTION_TO_SUB_SKILLS = {
   ],
 
   // ACER Scholarship (Year 7 Entry)
-  "ACER Mathematics": [
+  "ACER Scholarship (Year 7 Entry) - Mathematics": [
     "Mathematical Reasoning and Logic",
     "Quantitative Problem-Solving",
     "Information Processing and Interpretation",
@@ -1006,7 +1006,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Strategic Mathematical Thinking",
     "Applied Mathematical Skills"
   ],
-  "Humanities": [
+  "ACER Scholarship (Year 7 Entry) - Humanities": [
     "Reading Comprehension and Analysis",
     "Critical Interpretation Skills",
     "Literary and Textual Analysis",
@@ -1015,7 +1015,7 @@ export const SECTION_TO_SUB_SKILLS = {
     "Analytical Reasoning",
     "Information Synthesis and Integration"
   ],
-  "ACER Written Expression": [
+  "ACER Scholarship (Year 7 Entry) - Written Expression": [
     "Narrative Writing",
     "Persuasive Writing",
     "Expository Writing",

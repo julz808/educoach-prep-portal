@@ -54,6 +54,9 @@ interface GeneratedQuestion {
   response_type: ResponseType;
   passage_reference: boolean;
   australian_context: boolean;
+  max_points: number; // NEW: Maximum points for this question
+  product_type?: string; // NEW: Product type derived from test_type
+  question_order?: number; // NEW: Sequential order within section
   generation_metadata: {
     generation_timestamp: string;
     attempt_number?: number;
@@ -86,6 +89,85 @@ function getYearLevelFromTestType(testType: string): number {
   if (testType.includes('Year 7')) return 7;
   if (testType.includes('Year 9')) return 9;
   return 7; // Default fallback
+}
+
+/**
+ * Helper function to calculate max_points based on sub_skill and test_type
+ * Based on migration: 20240622000001_populate_max_points.sql
+ */
+function calculateMaxPoints(testType: string, subSkill: string, responseType: ResponseType): number {
+  // Writing questions have higher point values based on product type
+  if (responseType === 'extended_response' || 
+      subSkill.toLowerCase().includes('writing') ||
+      subSkill.toLowerCase().includes('narrative') ||
+      subSkill.toLowerCase().includes('persuasive') ||
+      subSkill.toLowerCase().includes('expository') ||
+      subSkill.toLowerCase().includes('imaginative') ||
+      subSkill.toLowerCase().includes('creative') ||
+      subSkill.toLowerCase().includes('descriptive')) {
+    
+    // NSW Selective Entry (50 points per writing task)
+    if (testType === 'NSW Selective Entry (Year 7 Entry)') {
+      return 50;
+    }
+    
+    // VIC Selective Entry (30 points per writing task)
+    if (testType === 'VIC Selective Entry (Year 9 Entry)') {
+      return 30;
+    }
+    
+    // Year 5 & 7 NAPLAN (48 points per writing task)
+    if (testType === 'Year 5 NAPLAN' || testType === 'Year 7 NAPLAN') {
+      return 48;
+    }
+    
+    // EduTest Scholarship (15 points per writing task)
+    if (testType === 'EduTest Scholarship (Year 7 Entry)') {
+      return 15;
+    }
+    
+    // ACER Scholarship (20 points per writing task)
+    if (testType === 'ACER Scholarship (Year 7 Entry)') {
+      return 20;
+    }
+  }
+  
+  // Default for multiple choice and other questions
+  return 1;
+}
+
+/**
+ * Helper function to derive product_type from test_type
+ * Ensures consistency with database product_type field
+ */
+function getProductTypeFromTestType(testType: string): string {
+  // Return the exact test_type as it should match the database product_type field
+  return testType;
+}
+
+/**
+ * Helper function to get sub_skill_id from sub_skill name
+ * This would ideally query the sub_skills table, but for now we'll use null
+ * TODO: Implement sub_skills table lookup
+ */
+async function getSubSkillId(subSkillName: string, sectionName: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from('sub_skills')
+      .select('id')
+      .eq('name', subSkillName)
+      .single();
+
+    if (error || !data) {
+      console.warn(`⚠️  Could not find sub_skill_id for "${subSkillName}" in section "${sectionName}"`);
+      return null;
+    }
+
+    return data.id;
+  } catch (error) {
+    console.warn(`⚠️  Error looking up sub_skill_id for "${subSkillName}":`, error);
+    return null;
+  }
 }
 
 /**
@@ -143,6 +225,7 @@ export async function storePassage(
 
 /**
  * Stores a generated question in Supabase with optional passage linking
+ * Now includes max_points and other missing database fields
  */
 export async function storeQuestion(
   question: GeneratedQuestion,
@@ -151,9 +234,22 @@ export async function storeQuestion(
   sectionName: string,
   subSkill: string,
   difficulty: number,
-  passageId?: string
+  passageId?: string,
+  questionOrder?: number
 ): Promise<string> {
   try {
+    // Determine response type
+    const responseType: ResponseType = question.answer_options ? 'multiple_choice' : 'extended_response';
+    
+    // Calculate max_points based on question type and test type
+    const maxPoints = calculateMaxPoints(testType, subSkill, responseType);
+    
+    // Get product type
+    const productType = getProductTypeFromTestType(testType);
+    
+    // Try to get sub_skill_id (optional - will be null if not found)
+    const subSkillId = await getSubSkillId(subSkill, sectionName);
+
     const { data, error } = await supabase
       .from('questions')
       .insert({
@@ -161,18 +257,22 @@ export async function storeQuestion(
         test_mode: testMode,
         section_name: sectionName,
         sub_skill: subSkill,
+        sub_skill_id: subSkillId,
         difficulty: difficulty,
         question_text: question.question_text,
         answer_options: question.answer_options,
         correct_answer: question.correct_answer,
         solution: question.solution,
-        response_type: question.answer_options ? 'multiple_choice' : 'extended_response',
+        response_type: responseType,
         has_visual: question.has_visual || false,
         visual_type: question.visual_type || null,
         visual_data: question.visual_data || null,
         visual_svg: question.visual_svg || null,
         passage_id: passageId || null,
         year_level: getYearLevelFromTestType(testType),
+        product_type: productType,
+        max_points: maxPoints,
+        question_order: questionOrder || null,
         generated_by: 'claude-sonnet-4',
         curriculum_aligned: true
       })
@@ -188,7 +288,8 @@ export async function storeQuestion(
     }
 
     const passageInfo = passageId ? ` (linked to passage ${passageId})` : '';
-    console.log(`✅ Stored question: ${subSkill}${passageInfo} (ID: ${data.id})`);
+    const pointsInfo = maxPoints > 1 ? ` [${maxPoints} points]` : '';
+    console.log(`✅ Stored question: ${subSkill}${passageInfo}${pointsInfo} (ID: ${data.id})`);
     return data.id;
   } catch (error) {
     console.error('❌ Failed to store question:', error);
@@ -216,7 +317,7 @@ export async function storePassages(
 }
 
 /**
- * Stores multiple questions with optional passage linking
+ * Stores multiple questions with optional passage linking and question ordering
  */
 export async function storeQuestions(
   questions: Array<{
@@ -224,6 +325,7 @@ export async function storeQuestions(
     subSkill: string;
     difficulty: number;
     passageId?: string;
+    questionOrder?: number;
   }>,
   testType: string,
   testMode: string,
@@ -231,7 +333,10 @@ export async function storeQuestions(
 ): Promise<string[]> {
   const questionIds: string[] = [];
   
-  for (const item of questions) {
+  for (let i = 0; i < questions.length; i++) {
+    const item = questions[i];
+    const questionOrder = item.questionOrder ?? (i + 1); // Default to 1-based ordering
+    
     const questionId = await storeQuestion(
       item.question,
       testType,
@@ -239,7 +344,8 @@ export async function storeQuestions(
       sectionName,
       item.subSkill,
       item.difficulty,
-      item.passageId
+      item.passageId,
+      questionOrder
     );
     questionIds.push(questionId);
   }

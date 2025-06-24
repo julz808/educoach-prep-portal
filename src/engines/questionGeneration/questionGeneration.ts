@@ -10,6 +10,7 @@ import {
 } from '../../data/curriculumData.ts';
 import { buildQuestionPrompt, callClaudeAPIWithRetry, parseClaudeResponse } from './claudePrompts.ts';
 import { validateQuestion } from './validators.ts';
+import { validateQuestionWithPipeline, logValidationResult, type ValidationConfig } from './validationPipeline.ts';
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
@@ -42,6 +43,9 @@ interface GeneratedQuestion {
   response_type: ResponseType;
   passage_reference: boolean;
   australian_context: boolean;
+  max_points: number; // NEW: Maximum points for this question
+  product_type?: string; // NEW: Product type derived from test_type
+  question_order?: number; // NEW: Sequential order within section
   generation_metadata: {
     generation_timestamp: string;
     attempt_number?: number;
@@ -77,6 +81,51 @@ interface ValidationResult {
   errors: string[];
   warnings: string[];
   score?: number;
+}
+
+/**
+ * Helper function to calculate max_points based on sub_skill and test_type
+ * Based on migration: 20240622000001_populate_max_points.sql
+ */
+function calculateMaxPoints(testType: string, subSkill: string, responseType: ResponseType): number {
+  // Writing questions have higher point values based on product type
+  if (responseType === 'extended_response' || 
+      subSkill.toLowerCase().includes('writing') ||
+      subSkill.toLowerCase().includes('narrative') ||
+      subSkill.toLowerCase().includes('persuasive') ||
+      subSkill.toLowerCase().includes('expository') ||
+      subSkill.toLowerCase().includes('imaginative') ||
+      subSkill.toLowerCase().includes('creative') ||
+      subSkill.toLowerCase().includes('descriptive')) {
+    
+    // NSW Selective Entry (50 points per writing task)
+    if (testType === 'NSW Selective Entry (Year 7 Entry)') {
+      return 50;
+    }
+    
+    // VIC Selective Entry (30 points per writing task)
+    if (testType === 'VIC Selective Entry (Year 9 Entry)') {
+      return 30;
+    }
+    
+    // Year 5 & 7 NAPLAN (48 points per writing task)
+    if (testType === 'Year 5 NAPLAN' || testType === 'Year 7 NAPLAN') {
+      return 48;
+    }
+    
+    // EduTest Scholarship (15 points per writing task)
+    if (testType === 'EduTest Scholarship (Year 7 Entry)') {
+      return 15;
+    }
+    
+    // ACER Scholarship (20 points per writing task)
+    if (testType === 'ACER Scholarship (Year 7 Entry)') {
+      return 20;
+    }
+  }
+  
+  // Default for multiple choice and other questions
+  return 1;
 }
 
 /**
@@ -397,12 +446,16 @@ export function updateContextFromQuestion(context: GenerationContext, question: 
 }
 
 /**
- * Validates question content against requirements
+ * Enhanced validation with Claude's self-flagging system
+ * Claude will include "VALIDATION_FLAG" in solution if it detects issues
  */
-function validateQuestionContent(question: GeneratedQuestion, request: SingleQuestionRequest): ValidationResult {
-  const validation = validateQuestion(question);
-  const errors = [...validation.errors];
-  const warnings = [...validation.warnings];
+async function validateQuestionWithHallucinationCheck(question: GeneratedQuestion, request: SingleQuestionRequest): Promise<ValidationResult & { confidence: number }> {
+  const startTime = Date.now();
+  
+  // Step 1: Basic structural validation
+  const basicValidation = validateQuestion(question);
+  const errors = [...basicValidation.errors];
+  const warnings = [...basicValidation.warnings];
   
   // Check response type consistency
   if (request.responseType === 'multiple_choice') {
@@ -418,7 +471,32 @@ function validateQuestionContent(question: GeneratedQuestion, request: SingleQue
     }
   }
   
-  // Check visual consistency
+  // Step 2: Check for Claude's self-flagging (skip for writing sections)
+  const isWritingSection = request.responseType === 'extended_response';
+  const solution = question.solution || '';
+  const hasValidationFlag = !isWritingSection && solution.includes('VALIDATION_FLAG');
+  
+  let confidence = 100;
+  
+  if (hasValidationFlag) {
+    confidence = 0; // Immediate regeneration
+    errors.push('Claude flagged this question as potentially problematic (VALIDATION_FLAG detected)');
+    console.log(`🚨 VALIDATION_FLAG detected - Claude identified issues with this question`);
+    
+    // Extract the solution without the flag for logging
+    const cleanSolution = solution.replace('VALIDATION_FLAG', '').trim();
+    if (cleanSolution.length > 0) {
+      console.log(`📝 Flagged solution preview: ${cleanSolution.substring(0, 100)}...`);
+    }
+  } else if (isWritingSection) {
+    // For writing sections, just check basic requirements
+    if (!solution || solution.trim().length < 10) {
+      errors.push('Writing section requires a meaningful task description');
+      confidence = 50;
+    }
+  }
+  
+  // Step 3: Visual consistency check
   if (request.generateVisual) {
     if (!question.has_visual || !question.visual_svg) {
       errors.push('Question was requested with visual but no visual content provided');
@@ -429,33 +507,20 @@ function validateQuestionContent(question: GeneratedQuestion, request: SingleQue
     }
   }
   
-  // Check sub-skill alignment
-  const subSkillData = UNIFIED_SUB_SKILLS[request.subSkill];
-  if (subSkillData?.visual_required && !question.has_visual) {
-    // Check if this is MVP mode (probability = 0.0 in visual mapping)
-    const visualMapping = SUB_SKILL_VISUAL_MAPPING[request.testType as keyof typeof SUB_SKILL_VISUAL_MAPPING];
-    let isMVPMode = false;
-    
-    if (visualMapping && typeof visualMapping === 'object') {
-      const sectionMapping = (visualMapping as any)[request.sectionName];
-      if (sectionMapping && typeof sectionMapping === 'object') {
-        const subSkillMapping = sectionMapping[request.subSkill];
-        if (subSkillMapping && typeof subSkillMapping === 'object') {
-          // If probability is 0.0, we're in MVP mode - skip visual requirement
-          isMVPMode = (subSkillMapping.probability === 0.0);
-        }
-      }
-    }
-    
-    if (!isMVPMode) {
-      errors.push(`Sub-skill ${request.subSkill} requires visual component but question has none`);
-    }
+  const duration = Date.now() - startTime;
+  const isValid = errors.length === 0 && confidence >= 75;
+  
+  if (hasValidationFlag) {
+    console.log(`🚨 Validation flagged in ${duration}ms - Question will be regenerated`);
+  } else if (!isValid) {
+    console.log(`🔍 Validation failed in ${duration}ms - Confidence: ${confidence}%`);
   }
   
   return {
-    isValid: errors.length === 0,
+    isValid,
     errors,
     warnings,
+    confidence,
     score: Math.max(0, 100 - (errors.length * 20) - (warnings.length * 5))
   };
 }
@@ -495,6 +560,8 @@ export async function generateQuestion(request: SingleQuestionRequest): Promise<
         response_type: request.responseType,
         passage_reference: request.passageContent ? true : false,
         australian_context: false, // Will be determined by validation
+        max_points: calculateMaxPoints(request.testType, request.subSkill, request.responseType),
+        product_type: request.testType, // Use testType as product_type
         generation_metadata: {
           generation_timestamp: new Date().toISOString(),
           attempt_number: attempt,
@@ -503,13 +570,15 @@ export async function generateQuestion(request: SingleQuestionRequest): Promise<
         }
       };
       
-      // Validate question
-      const validation = validateQuestionContent(question, request);
+      // Validate question with enhanced hallucination detection
+      const validation = await validateQuestionWithHallucinationCheck(question, request);
       
       if (validation.isValid) {
+        // Log successful validation for monitoring
+        console.log(`✅ Question validated (confidence: ${validation.confidence}%)`);
         return question;
       } else {
-        console.warn(`Question validation failed on attempt ${attempt}:`, validation.errors);
+        console.warn(`❌ Question validation failed on attempt ${attempt} (confidence: ${validation.confidence}%):`, validation.errors);
         if (attempt === maxAttempts) {
           throw new Error(`Question validation failed after ${maxAttempts} attempts: ${validation.errors.join(', ')}`);
         }

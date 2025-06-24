@@ -32,7 +32,7 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - ✅ Test taking system complete (all modes: diagnostic, practice, drill)
 - ✅ Progress tracking and persistence complete
 - ✅ Dashboard backend integration complete
-- ⏳ Performance analytics and insights in progress
+- ✅ Performance analytics and insights complete
 
 ## Tech Stack
 - **Frontend:** React (Vite, TypeScript, shadcn/ui, TailwindCSS, React Router, TanStack Query)
@@ -65,14 +65,49 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - [x] Dashboard metrics with real backend data
 - [x] Cross-device session synchronization
 - [x] Offline support with sync queue
+- [x] Advanced performance analytics and insights system
+- [x] Comprehensive drill analytics with difficulty levels
+- [x] Practice test insights with proper denominators
+- [x] Dynamic practice test detection and "Finish All" functionality
 
-## Remaining Tasks
-- [ ] Advanced performance analytics and insights
-- [ ] Detailed progress reports and recommendations
+## Remaining Tasks (Next Phase Priorities)
+### Phase 1: Question Generation Engine Improvements
+- [ ] **Schema Compatibility Check**: Verify generation engine populates all current database fields (e.g., max_points column)
+- [ ] Update generation scripts to match current questions table structure
+- [ ] Implement multi-step validation pipeline for generated questions
+- [ ] Add automated quality validation step to catch mathematical errors
+- [ ] Create auto-regeneration logic for failed validations
+- [ ] Add logging and pattern analysis for hallucination detection
+- [ ] Test and tune validation parameters for efficiency
+
+### Phase 2: Generate Questions for All 6 Products
+- [ ] Run generation scripts for NSW Selective Entry
+- [ ] Run generation scripts for Year 5 NAPLAN
+- [ ] Run generation scripts for Year 7 NAPLAN
+- [ ] Run generation scripts for EduTest Scholarship
+- [ ] Run generation scripts for ACER Scholarship
+- [ ] Validate question coverage across all products
+
+### Phase 3: Cross-Product Testing & Validation
+- [ ] Create automated test suite for all products
+- [ ] Test user flows across all 6 products
+- [ ] Validate analytics work correctly for all products
+- [ ] Test product switching and edge cases
+- [ ] Ensure frontend/backend logic works universally
+
+### Phase 4: Stripe Integration & Paywall
+- [ ] Integrate Lovable's Stripe functionality
+- [ ] Implement product access control and paywalls
+- [ ] Create subscription tiers and pricing structure
+- [ ] Add billing management interface
+- [ ] Test payment flows and subscription management
+
+### Future Tasks
 - [ ] Add comprehensive error handling and edge cases
 - [ ] Refactor for best practices and code clarity
 - [ ] Add and improve unit/integration tests
 - [ ] Production deployment preparation
+- [ ] Performance optimization and monitoring
 
 ## Common Commands
 
@@ -144,11 +179,12 @@ Drill: 'drill'
 1. ✅ ~~Connect frontend and backend for test sessions and drills~~
 2. ✅ ~~Implement answer submission and progress tracking~~
 3. ✅ ~~Build dashboard and analytics~~
-4. ⏳ Advanced performance insights and analytics
-5. ⏳ Add comprehensive error handling and edge cases
-6. ⏳ Refactor for best practices and maintainability
-7. ⏳ Expand and improve test coverage
-8. ⏳ Production deployment preparation
+4. ✅ ~~Advanced performance insights and analytics~~
+5. ⏳ **Phase 1: Question Generation Engine Improvements** (Current Focus)
+6. ⏳ **Phase 2: Generate Questions for All 6 Products**
+7. ⏳ **Phase 3: Cross-Product Testing & Validation**
+8. ⏳ **Phase 4: Stripe Integration & Paywall**
+9. ⏳ Error handling, testing, and production readiness
 
 ## Development Guidelines
 
@@ -166,6 +202,17 @@ Drill: 'drill'
 
 ## Recently Completed (Latest)
 
+### Advanced Performance Analytics System
+- ✅ Complete insights implementation for all test modes
+- ✅ Fixed Score vs Accuracy denominators (total available vs attempted)
+- ✅ Comprehensive drill analytics with difficulty level breakdown
+- ✅ Dynamic practice test detection and proper "Finish All" functionality
+- ✅ Accurate overall score calculations using test-specific totals
+- ✅ Added Average Score cards matching diagnostic layout
+- ✅ Structured drill insights with section filtering
+- ✅ Sub-skill performance tracking with proper denominators
+- ✅ Created getTotalQuestionsAvailable() function for accurate analytics
+
 ### Real-time Session Management System
 - ✅ Immediate backend persistence for all user actions
 - ✅ Perfect session resume functionality
@@ -175,9 +222,18 @@ Drill: 'drill'
 - ✅ Enhanced UI status indicators
 - ✅ Cross-platform state synchronization
 
-## Remaining Issues
+## Current Focus Issues
 
-- Advanced analytics queries need optimization
+### Phase 1 Priority Issues
+- Question generation hallucination in Mathematics/Quantitative questions
+- Need validation pipeline to catch impossible/incorrect questions
+- Auto-regeneration needed for failed validations
+- Example issue: UUID 03fdec17-26e8-4852-ac24-e2d5031f8015 (overly complex solution)
+
+### Upcoming Issues
+- Only VIC Selective Entry has generated questions (need other 5 products)
+- Cross-product testing needed once all content is generated
+- Payment integration required before production launch
 - Comprehensive error handling coverage incomplete
 - Unit test coverage needs expansion
 
@@ -211,8 +267,17 @@ claude "The performance analytics are loading slowly. Help optimize the database
 # Best practices
 claude "Review the session management flow and suggest improvements following React/TypeScript best practices"
 
-# Data analysis
+# Data analysis  
 claude "Create performance insights queries that analyze user progress across all test modes"
+
+# Question generation improvements
+claude "Implement validation pipeline for question generation to catch mathematical errors and impossible questions"
+
+# Multi-product question generation
+claude "Run question generation scripts for all 6 products using existing curriculumData.ts configurations"
+
+# Cross-product testing
+claude "Test that all frontend/backend logic works consistently across all 6 products"
 ```
 
 ## Implementation Files
@@ -232,8 +297,8 @@ claude "Create performance insights queries that analyze user progress across al
 - **Offline resilience**: Answer queuing with automatic sync on reconnection
 
 ## Use Claude Code for:
-- Performance optimization of database queries
-- Advanced analytics implementation
-- Error handling and edge case coverage
-- Code review and refactoring
-- Testing strategy development 
+- Question generation validation pipeline implementation (Phase 1 priority)
+- Multi-product question generation execution (Phase 2)
+- Cross-product testing and validation (Phase 3)
+- Stripe integration with Lovable (Phase 4)
+- Error handling and comprehensive testing (Future phases) 

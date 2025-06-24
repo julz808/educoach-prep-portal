@@ -198,11 +198,11 @@ function getDifficultyDistribution(
   }
   
   if (testMode === 'diagnostic') {
-    // Diagnostic: 1 question per difficulty level per sub-skill
+    // Enhanced Diagnostic: 2 questions per difficulty level per sub-skill
     return [
-      { difficulty: 1, count: 1 },
-      { difficulty: 2, count: 1 },
-      { difficulty: 3, count: 1 }
+      { difficulty: 1, count: 2 },
+      { difficulty: 2, count: 2 },
+      { difficulty: 3, count: 2 }
     ];
   }
   
@@ -247,15 +247,20 @@ function adjustSectionConfigForTestMode(
                           sectionName.toLowerCase().includes('written expression');
   
   if (testMode === 'diagnostic') {
-    // Diagnostic: 3 questions per sub-skill (1 easy, 1 medium, 1 hard)
+    // Enhanced Diagnostic: 2 questions per sub-skill per difficulty (6 total per sub-skill)
+    // Writing: 2 questions total (1 per selected sub-skill)
     const questionsPerSubSkill = isWritingSection ? 
-      sectionConfig.questionsPerSubSkill : // Use original for writing
-      3; // 1 per difficulty for non-writing
+      1 : // 1 question per sub-skill for writing (2 sub-skills selected = 2 total)
+      6; // 2 per difficulty for non-writing (2×3 difficulties = 6 per sub-skill)
+    
+    const totalQuestions = isWritingSection ?
+      2 : // Enhanced specification: 2 writing questions total
+      sectionConfig.subSkills.length * questionsPerSubSkill; // All sub-skills for non-writing
     
     return {
       ...sectionConfig,
       questionsPerSubSkill,
-      totalQuestions: sectionConfig.subSkills.length * questionsPerSubSkill
+      totalQuestions
     };
   }
   
@@ -288,7 +293,10 @@ export function getAuthoritativeTestStructure(testType: string): TestStructureIn
   // Convert curriculum data format to generation format
   Object.entries(testStructure).forEach(([sectionName, sectionData]) => {
     if (typeof sectionData === 'object' && 'questions' in sectionData) {
-      const subSkills = SECTION_TO_SUB_SKILLS[sectionName as keyof typeof SECTION_TO_SUB_SKILLS] || [];
+      // Try compound key first (testType - sectionName), then fallback to section name only
+      const compoundKey = `${testType} - ${sectionName}` as keyof typeof SECTION_TO_SUB_SKILLS;
+      const subSkills = SECTION_TO_SUB_SKILLS[compoundKey] || 
+                       SECTION_TO_SUB_SKILLS[sectionName as keyof typeof SECTION_TO_SUB_SKILLS] || [];
       
       if (subSkills.length === 0) {
         console.warn(`⚠️  No sub-skills defined for section "${sectionName}" in SECTION_TO_SUB_SKILLS`);
@@ -344,7 +352,9 @@ export function validateTestStructure(structure: TestStructureInfo): { isValid: 
       errors.push(`Section "${sectionName}" has no sub-skills defined`);
     }
     
-    if (config.questionsPerSubSkill <= 0) {
+    // For writing sections, questionsPerSubSkill can be 0 if there are more sub-skills than questions
+    // The system will randomly select which sub-skills to use
+    if (config.questionsPerSubSkill <= 0 && !config.isWritingSection) {
       errors.push(`Section "${sectionName}" has invalid questions per sub-skill: ${config.questionsPerSubSkill}`);
     }
     

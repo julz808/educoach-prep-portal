@@ -280,19 +280,28 @@ for (const product of products) {
 
 **Diagnostic:**
 - **Requires:** Completed diagnostic
-- **Displays:** Overall score, Section breakdown, Top 5 strengths, Bottom 5 weaknesses
+- **Displays:** Overall score, Average score, Overall accuracy, Section breakdown with Score/Accuracy toggle, Sub-skill performance with proper denominators
 
 **Practice Tests:**
-- **Features:** Test selector, Progress over time, Section analysis
+- **Features:** Test selector with dynamic detection, Overall score, Average score, Overall accuracy cards, Section analysis with Score/Accuracy toggle, Sub-skill performance with total available questions as denominators
 
 **Drills:**
-- **Displays:** Total questions, Overall accuracy, Sub-skill breakdown table
+- **Displays:** Total questions drilled, Overall accuracy, Sub-skill breakdown with section filtering, Difficulty level performance (Easy/Medium/Hard), Structured layout matching practice test insights
 
 ## Critical Implementation Notes
 
 - **Product Types:** Use EXACT strings from product_types array - case sensitive!
 - **Progress Tracking:** Never manually update fields managed by update_progress_on_attempt trigger
 - **Unique Constraints:** Handle with ON CONFLICT clauses
+- **Analytics Denominators:** Score view uses total available questions, Accuracy view uses questions attempted
+- **Practice Test Detection:** Use dynamic database queries to detect available practice tests (1-5) instead of hardcoded arrays
+- **Sub-skill Totals:** Prevent double-counting by properly tracking questions within sections
+
+### Current Development Focus (Phases 1-4)
+- **Question Quality:** Implement validation pipeline to catch mathematical errors and impossible questions
+- **Multi-Product Support:** Generate questions for all 6 products using existing scripts and curriculumData.ts
+- **Universal Code:** Ensure all frontend/backend logic works across all products without modifications
+- **Monetization Ready:** Integrate Stripe via Lovable for subscription-based access to products
 
 ### State Management
 - **Tests:** Use test_section_states for granular save/resume
@@ -356,6 +365,32 @@ WHERE ss.product_type = ?
 ORDER BY ts.section_order, ss.name
 ```
 
+## Question Generation & Validation
+
+### Current Issue
+- **Problem:** Mathematics/Quantitative questions sometimes have hallucinations (impossible/incorrect questions)
+- **Example:** UUID 03fdec17-26e8-4852-ac24-e2d5031f8015 shows overly complex solution due to generation error
+- **Impact:** Affects user experience and test validity
+
+### Validation Pipeline (Phase 1)
+- **Step 0:** **Schema Compatibility Check** - Verify generation engine populates all current database fields (max_points, etc.)
+- **Step 1:** Generate question using existing engine
+- **Step 2:** Automated validation check for mathematical accuracy and logical consistency
+- **Step 3:** Auto-regeneration if validation fails
+- **Step 4:** Manual review queue for persistent failures
+- **Efficiency:** Keep simple and cost-effective, avoid over-complication
+
+### Database Schema Updates Since Last Generation
+- **New Fields:** max_points column and potentially other fields added to questions table
+- **Requirement:** Generation engine must populate ALL current database fields
+- **Risk:** Incomplete data population could break analytics and scoring systems
+- **Action:** Comprehensive audit of generation output vs database requirements
+
+### Multi-Product Generation (Phase 2)
+- **Existing Infrastructure:** Product-specific prompts and curriculumData.ts already configured
+- **Execution:** Run generation scripts (similar to VIC Selective) for remaining 5 products
+- **Products:** NSW Selective, Year 5 NAPLAN, Year 7 NAPLAN, EduTest Scholarship, ACER Scholarship
+
 ## Error Handling
 
 ### Network Failures
@@ -368,4 +403,5 @@ ORDER BY ts.section_order, ss.name
 
 ### Data Validation
 - **Before Start:** Verify question count matches test_sections.question_count
-- **Missing Progress:** Auto-create with zeros 
+- **Missing Progress:** Auto-create with zeros
+- **Question Validation:** Implement automated checks for question quality and correctness 

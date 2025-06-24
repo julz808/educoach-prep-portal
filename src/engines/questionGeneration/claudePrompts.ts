@@ -259,13 +259,22 @@ DATA COMPLETENESS:
 /**
  * Gets context diversity instructions based on generation context
  */
-function getContextDiversityInstructions(context: GenerationContext): string {
+function getContextDiversityInstructions(context: GenerationContext, subSkill?: string): string {
   if (!context) {
     return '';
   }
 
   // Get recent questions for this sub-skill from the context
-  const recentQuestions = context.generatedQuestions?.slice(-10) || [];
+  // First check questionsBySubSkill (which is actually being populated)
+  let recentQuestions: any[] = [];
+  
+  if (subSkill && context.questionsBySubSkill && context.questionsBySubSkill[subSkill]) {
+    recentQuestions = context.questionsBySubSkill[subSkill].slice(-10);
+  } else {
+    // Fallback to generatedQuestions if available
+    recentQuestions = context.generatedQuestions?.slice(-10) || [];
+  }
+  
   const questionExamples = recentQuestions.length > 0 
     ? recentQuestions.map((q, i) => `${i + 1}. ${(q.question_text || q.text || String(q)).substring(0, 150)}...`).join('\n')
     : 'No recent questions recorded yet';
@@ -542,7 +551,7 @@ export function buildQuestionPrompt(request: SingleQuestionRequest): string {
 
   const prompt = `You are an expert designer of Australian educational assessments with deep knowledge of ${testType}. Your task is to generate an authentic question that precisely replicates the difficulty, style, and format of real ${testType} examinations.
 
-${getContextDiversityInstructions(generationContext)}
+${getContextDiversityInstructions(generationContext, subSkill)}
 
 CRITICAL REQUIREMENTS:
 - Generate a question indistinguishable from real ${testType} questions
@@ -590,6 +599,30 @@ ANSWER OPTIONS (Multiple Choice Only):
 - Create realistic distractors reflecting common student misconceptions for ${testType}
 - Ensure roughly even distribution of correct answers across A, B, C, D
 - Avoid "All of the above" or "None of the above" unless authentic to this test type
+
+${!isWritingSection ? `
+CRITICAL QUALITY CONTROL:
+If you detect ANY of the following issues while creating this question, include the exact phrase "VALIDATION_FLAG" at the start of your solution field:
+
+🚨 VALIDATION FLAGS (use "VALIDATION_FLAG" if ANY apply):
+- Your calculated answer doesn't match any of the 4 options you created
+- You need to recalculate or try a different approach during generation  
+- The question seems impossible or has no valid answer
+- You're uncertain about the correctness of the mathematics/logic
+- The answer options don't seem appropriate for the question
+- You notice contradictions in the question or solution
+- The question feels artificially forced or unnatural for this test type
+
+SOLUTION FIELD REQUIREMENTS:
+- Start with "VALIDATION_FLAG" if any above issues detected
+- Provide clear, confident explanation of the correct answer
+- If flagged, still complete the JSON but the question will be regenerated
+` : `
+WRITING SECTION REQUIREMENTS:
+- Provide a simple, clear task instruction only
+- Do not include validation flags for writing prompts
+- Keep the prompt focused and appropriate for the target year level
+`}
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object with these exact fields:

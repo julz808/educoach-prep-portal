@@ -98,6 +98,9 @@ export interface GeneratedQuestion {
   response_type: ResponseType;
   passage_reference: boolean;
   australian_context: boolean;
+  max_points: number; // NEW: Maximum points for this question (1 for MC, 15-50 for writing)
+  product_type?: string; // NEW: Product type derived from test_type
+  question_order?: number; // NEW: Sequential order within section
   generation_metadata: {
     generation_timestamp: string;
     attempt_number?: number;
