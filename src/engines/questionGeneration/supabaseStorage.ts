@@ -159,7 +159,8 @@ async function getSubSkillId(subSkillName: string, sectionName: string): Promise
       .single();
 
     if (error || !data) {
-      console.warn(`⚠️  Could not find sub_skill_id for "${subSkillName}" in section "${sectionName}"`);
+      // Sub-skill lookup is optional - generation can continue without it
+      // console.debug(`Sub-skill ID not found for "${subSkillName}" in section "${sectionName}"`);
       return null;
     }
 

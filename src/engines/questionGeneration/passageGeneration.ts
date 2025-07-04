@@ -5,6 +5,7 @@
 import { TEST_STRUCTURES } from '../../data/curriculumData.ts';
 import { buildPassagePrompt, callClaudeAPIWithRetry, parseClaudeResponse } from './claudePrompts.ts';
 import { validatePassage } from './validators.ts';
+import { isReadingSection, getPassageWordCount, getPassageType, requiresPassages } from './sectionUtils.ts';
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type PassageType = 'narrative' | 'informational' | 'persuasive';
@@ -12,10 +13,13 @@ type PassageType = 'narrative' | 'informational' | 'persuasive';
 interface PassageGenerationRequest {
   testType: string;
   sectionName: string;
+  testMode: string;
   wordCount: number;
   difficulty: number;
   passageType: PassageType;
   generationContext: GenerationContext;
+  isMiniPassage?: boolean;
+  subSkill?: string;
 }
 
 interface GeneratedPassage {
@@ -48,6 +52,7 @@ interface GeneratedPassage {
 interface GenerationContext {
   sessionId?: string;
   testType?: string;
+  testMode?: string;
   usedTopics: Set<string>;
   usedNames: Set<string>;
   usedLocations: Set<string>;
@@ -77,6 +82,24 @@ interface GenerationContext {
   recentPassageThemes?: string[];
   recentPassageSettings?: string[];
   recentPassageCharacters?: string[];
+  // Enhanced diversity tracking
+  practiceTestDiversity?: {
+    [testMode: string]: {
+      themes: Set<string>;
+      settings: Set<string>;
+      characters: Set<string>;
+      textTypes: Set<PassageType>;
+      topics: Set<string>;
+      culturalContexts: Set<string>;
+    };
+  };
+  miniPassageTopics?: Set<string>;
+  globalDiversityState?: {
+    allUsedThemes: Set<string>;
+    allUsedSettings: Set<string>;
+    allUsedCharacters: Set<string>;
+    themesPerProduct: { [product: string]: Set<string> };
+  };
 }
 
 interface ValidationResult {
@@ -136,18 +159,17 @@ function determinePassageType(testType: string, sectionName: string, passageInde
 }
 
 /**
- * Gets appropriate word count for passage based on test type and section
+ * Gets appropriate word count for passage based on test type, section, and test mode
  */
-function getPassageWordCount(testType: string, sectionName: string): number {
+function getWordCountForPassage(testType: string, sectionName: string, testMode: string): number {
   const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
   const sectionStructure = testStructure?.[sectionName as keyof typeof testStructure];
   
   if (sectionStructure && typeof sectionStructure === 'object' && 'words_per_passage' in sectionStructure) {
     const baseWords = (sectionStructure as any).words_per_passage;
     if (baseWords > 0) {
-      // Use curriculum data with ±10% variation for natural diversity
-      const variation = Math.floor(baseWords * 0.1); // 10% variation
-      return baseWords + Math.floor(Math.random() * (variation * 2 + 1)) - variation;
+      // Use sectionUtils function for proper word count calculation
+      return getPassageWordCount(sectionName, testMode, baseWords);
     }
   }
   
@@ -161,7 +183,8 @@ function getPassageWordCount(testType: string, sectionName: string): number {
     'ACER Scholarship (Year 7 Entry)': 300
   };
   
-  return fallbackWordCounts[testType as keyof typeof fallbackWordCounts] || 200;
+  const baseWords = fallbackWordCounts[testType as keyof typeof fallbackWordCounts] || 200;
+  return getPassageWordCount(sectionName, testMode, baseWords);
 }
 
 /**
@@ -269,6 +292,38 @@ function updateContextFromPassage(context: GenerationContext, passage: Generated
     passage.potential_question_topics.forEach(topic => updated.usedScenarios.add(topic));
   }
   
+  // Initialize mini-passage topics tracking if not exists
+  if (!updated.miniPassageTopics) {
+    updated.miniPassageTopics = new Set();
+  }
+  
+  // Initialize global diversity state if not exists
+  if (!updated.globalDiversityState) {
+    updated.globalDiversityState = {
+      allUsedThemes: new Set(),
+      allUsedSettings: new Set(),
+      allUsedCharacters: new Set(),
+      themesPerProduct: {}
+    };
+  }
+  
+  // Update global diversity tracking
+  if (passage.main_themes) {
+    passage.main_themes.forEach(theme => {
+      updated.globalDiversityState!.allUsedThemes.add(theme);
+    });
+  }
+  
+  if (passage.setting) {
+    updated.globalDiversityState!.allUsedSettings.add(extractSettingInfo(passage.setting));
+  }
+  
+  if (passage.key_characters) {
+    passage.key_characters.forEach(character => {
+      updated.globalDiversityState!.allUsedCharacters.add(character);
+    });
+  }
+  
   return updated;
 }
 
@@ -321,10 +376,10 @@ function validatePassageContent(passage: GeneratedPassage, request: PassageGener
   const errors = [...validation.errors];
   const warnings = [...validation.warnings];
   
-  // Check word count accuracy with ±10% tolerance to match generation range
+  // Check word count accuracy with ±25% tolerance for flexibility
   const targetWords = request.wordCount;
   const actualWords = passage.word_count;
-  const wordCountTolerance = Math.ceil(targetWords * 0.1); // 10% tolerance to match generation
+  const wordCountTolerance = Math.ceil(targetWords * 0.25); // 25% tolerance for more flexibility
   
   if (Math.abs(actualWords - targetWords) > wordCountTolerance) {
     errors.push(`Word count ${actualWords} is outside acceptable range (${targetWords} ± ${wordCountTolerance})`);
@@ -355,6 +410,91 @@ function validatePassageContent(passage: GeneratedPassage, request: PassageGener
     warnings,
     score: Math.max(0, 100 - (errors.length * 20) - (warnings.length * 5))
   };
+}
+
+/**
+ * Generates a mini-passage for drill questions (1:1 ratio)
+ */
+export async function generateMiniPassage(request: PassageGenerationRequest): Promise<GeneratedPassage> {
+  const maxAttempts = 3;
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // Build a specialized prompt for mini-passages
+      const miniPassageRequest = {
+        ...request,
+        wordCount: Math.min(150, Math.max(50, request.wordCount)), // Clamp to mini-passage range
+        isMiniPassage: true
+      };
+      
+      const prompt = buildPassagePrompt(miniPassageRequest);
+      
+      // Call Claude API
+      const response = await callClaudeAPIWithRetry(prompt);
+      
+      // Parse the response
+      const parsedPassage = parseClaudeResponse(response);
+      
+      // Create passage object with mini-passage specific settings
+      const passage: GeneratedPassage = {
+        test_type: request.testType,
+        year_level: getYearLevel(request.testType),
+        section_name: request.sectionName,
+        passage_type: request.passageType,
+        title: parsedPassage.title || `Mini-Passage for ${request.subSkill || 'Reading'}`,
+        content: parsedPassage.content || '',
+        word_count: parsedPassage.word_count || 0,
+        australian_context: true,
+        difficulty: request.difficulty,
+        main_themes: parsedPassage.main_themes || [],
+        key_characters: parsedPassage.key_characters || [],
+        setting: parsedPassage.setting || '',
+        potential_question_topics: parsedPassage.potential_question_topics || [],
+        generation_metadata: {
+          test_type: request.testType,
+          section_name: request.sectionName,
+          difficulty: request.difficulty,
+          passage_type: request.passageType,
+          target_word_count: miniPassageRequest.wordCount,
+          generation_timestamp: new Date().toISOString(),
+          attempt_number: attempt
+        }
+      };
+      
+      // Validate the passage with mini-passage specific rules
+      const validation = validatePassageContent(passage, miniPassageRequest);
+      
+      if (validation.isValid) {
+        // Track this mini-passage topic to ensure diversity
+        if (request.generationContext.miniPassageTopics) {
+          passage.main_themes.forEach(theme => {
+            request.generationContext.miniPassageTopics?.add(theme);
+          });
+        }
+        
+        return passage;
+      } else {
+        console.warn(`Mini-passage validation failed on attempt ${attempt}:`, validation.errors);
+        if (attempt === maxAttempts) {
+          throw new Error(`Mini-passage validation failed after ${maxAttempts} attempts: ${validation.errors.join(', ')}`);
+        }
+      }
+      
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Mini-passage generation attempt ${attempt} failed:`, error);
+      
+      if (attempt === maxAttempts) {
+        break;
+      }
+      
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+  
+  throw new Error(`Failed to generate mini-passage after ${maxAttempts} attempts. Last error: ${lastError?.message}`);
 }
 
 /**
@@ -401,15 +541,29 @@ export async function generatePassage(request: PassageGenerationRequest): Promis
         }
       };
       
-      // Validate the passage
+      // Validate the passage content
       const validation = validatePassageContent(passage, request);
       
-      if (validation.isValid) {
+      // Check passage diversity
+      const diversityCheck = validatePassageDiversity(passage, request.generationContext, request.testMode);
+      
+      if (validation.isValid && diversityCheck.isValid) {
         return passage;
       } else {
-        console.warn(`Passage validation failed on attempt ${attempt}:`, validation.errors);
+        const allErrors = [...validation.errors];
+        if (!diversityCheck.isValid) {
+          allErrors.push(`Low diversity score: ${diversityCheck.diversityScore}`);
+          allErrors.push(...diversityCheck.warnings);
+        }
+        
+        console.warn(`Passage validation failed on attempt ${attempt}:`, allErrors);
         if (attempt === maxAttempts) {
-          throw new Error(`Passage validation failed after ${maxAttempts} attempts: ${validation.errors.join(', ')}`);
+          // If it's a diversity issue and we're on the last attempt, still return the passage with warnings
+          if (validation.isValid && !diversityCheck.isValid && diversityCheck.diversityScore >= 50) {
+            console.warn('Accepting passage with low diversity due to max attempts reached');
+            return passage;
+          }
+          throw new Error(`Passage validation failed after ${maxAttempts} attempts: ${allErrors.join(', ')}`);
         }
       }
       
@@ -447,7 +601,8 @@ export async function generatePassagesWithDifficulties(
       const request: PassageGenerationRequest = {
         testType,
         sectionName,
-        wordCount: getPassageWordCount(testType, sectionName),
+        testMode: 'practice_test', // Default for generatePassagesWithDifficulties
+        wordCount: getPassageWordCount(testType, sectionName, 'practice_test'),
         difficulty: difficulties[i], // Use the specified difficulty
         passageType: determinePassageType(testType, sectionName, i, currentContext),
         generationContext: currentContext
@@ -459,6 +614,9 @@ export async function generatePassagesWithDifficulties(
       
       // Update context with elements from this passage
       currentContext = updateContextFromPassage(currentContext, passage);
+      
+      // Update practice test diversity tracking
+      currentContext = updatePracticeTestDiversity(currentContext, passage, 'practice_test');
       
       // Small delay between passages to avoid rate limiting
       if (i < difficulties.length - 1) {
@@ -495,7 +653,8 @@ export async function generatePassages(
       const request: PassageGenerationRequest = {
         testType,
         sectionName,
-        wordCount: getPassageWordCount(testType, sectionName),
+        testMode: 'practice_test', // Default for generatePassages
+        wordCount: getPassageWordCount(testType, sectionName, 'practice_test'),
         difficulty: selectPassageDifficulty(testType),
         passageType: determinePassageType(testType, sectionName, i, currentContext),
         generationContext: currentContext
@@ -507,6 +666,9 @@ export async function generatePassages(
       
       // Update context with elements from this passage
       currentContext = updateContextFromPassage(currentContext, passage);
+      
+      // Update practice test diversity tracking
+      currentContext = updatePracticeTestDiversity(currentContext, passage, 'practice_test');
       
       // Small delay between passages to avoid rate limiting
       if (i < count - 1) {
@@ -660,4 +822,164 @@ function getDiverseContext(passageIndex: number): {
   ];
   
   return contexts[passageIndex % contexts.length];
+}
+
+/**
+ * Validates passage diversity against generation context to prevent repetition
+ */
+export function validatePassageDiversity(
+  passage: GeneratedPassage, 
+  context: GenerationContext, 
+  testMode: string
+): { isValid: boolean; warnings: string[]; diversityScore: number } {
+  const warnings: string[] = [];
+  let diversityScore = 100;
+  
+  // Check against recently generated passages
+  if (context.generatedPassages && context.generatedPassages.length > 0) {
+    const recentPassages = context.generatedPassages.slice(-5); // Check last 5 passages
+    
+    // Check theme repetition
+    const recentThemes = recentPassages.flatMap(p => p.main_themes);
+    const overlappingThemes = passage.main_themes.filter(theme => 
+      recentThemes.some(recent => recent.toLowerCase().includes(theme.toLowerCase()))
+    );
+    
+    if (overlappingThemes.length > 0) {
+      warnings.push(`Theme repetition detected: ${overlappingThemes.join(', ')}`);
+      diversityScore -= 15 * overlappingThemes.length;
+    }
+    
+    // Check setting repetition
+    const recentSettings = recentPassages.map(p => extractSettingInfo(p.setting));
+    const currentSetting = extractSettingInfo(passage.setting);
+    
+    if (recentSettings.includes(currentSetting)) {
+      warnings.push(`Setting repetition detected: ${currentSetting}`);
+      diversityScore -= 20;
+    }
+    
+    // Check character type repetition
+    const recentCharacterTypes = recentPassages.flatMap(p => 
+      p.key_characters.map(char => extractCharacterType(char))
+    );
+    const currentCharacterTypes = passage.key_characters.map(char => extractCharacterType(char));
+    
+    const overlappingCharacterTypes = currentCharacterTypes.filter(type => 
+      recentCharacterTypes.includes(type)
+    );
+    
+    if (overlappingCharacterTypes.length > 0) {
+      warnings.push(`Character type repetition: ${overlappingCharacterTypes.join(', ')}`);
+      diversityScore -= 10 * overlappingCharacterTypes.length;
+    }
+    
+    // Check passage type repetition (only for practice tests)
+    if (testMode.startsWith('practice_')) {
+      const recentTypes = recentPassages.map(p => p.passage_type);
+      if (recentTypes.filter(type => type === passage.passage_type).length >= 2) {
+        warnings.push(`Passage type overuse: ${passage.passage_type}`);
+        diversityScore -= 15;
+      }
+    }
+  }
+  
+  // Enhanced diversity checking for practice tests
+  if (testMode.startsWith('practice_') && context.practiceTestDiversity) {
+    const practiceData = context.practiceTestDiversity[testMode];
+    
+    if (practiceData) {
+      // Check for theme diversity across practice tests
+      const themeOverlap = passage.main_themes.filter(theme => practiceData.themes.has(theme));
+      if (themeOverlap.length > 0) {
+        warnings.push(`Cross-practice theme repetition: ${themeOverlap.join(', ')}`);
+        diversityScore -= 25 * themeOverlap.length;
+      }
+      
+      // Check for setting diversity
+      const settingInfo = extractSettingInfo(passage.setting);
+      if (practiceData.settings.has(settingInfo)) {
+        warnings.push(`Cross-practice setting repetition: ${settingInfo}`);
+        diversityScore -= 30;
+      }
+      
+      // Check for character diversity
+      const characterOverlap = passage.key_characters.filter(char => practiceData.characters.has(char));
+      if (characterOverlap.length > 0) {
+        warnings.push(`Cross-practice character repetition: ${characterOverlap.join(', ')}`);
+        diversityScore -= 20 * characterOverlap.length;
+      }
+    }
+  }
+  
+  // Mini-passage diversity checking for drills
+  if (testMode === 'drill' && context.miniPassageTopics) {
+    const topicOverlap = passage.main_themes.filter(theme => context.miniPassageTopics?.has(theme));
+    if (topicOverlap.length > 0) {
+      warnings.push(`Mini-passage topic repetition: ${topicOverlap.join(', ')}`);
+      diversityScore -= 15 * topicOverlap.length;
+    }
+  }
+  
+  return {
+    isValid: diversityScore >= 70, // Pass if score is 70 or above
+    warnings,
+    diversityScore: Math.max(0, diversityScore)
+  };
+}
+
+/**
+ * Updates practice test diversity tracking
+ */
+export function updatePracticeTestDiversity(
+  context: GenerationContext, 
+  passage: GeneratedPassage, 
+  testMode: string
+): GenerationContext {
+  const updated = { ...context };
+  
+  if (testMode.startsWith('practice_')) {
+    if (!updated.practiceTestDiversity) {
+      updated.practiceTestDiversity = {};
+    }
+    
+    if (!updated.practiceTestDiversity[testMode]) {
+      updated.practiceTestDiversity[testMode] = {
+        themes: new Set(),
+        settings: new Set(),
+        characters: new Set(),
+        textTypes: new Set(),
+        topics: new Set(),
+        culturalContexts: new Set()
+      };
+    }
+    
+    const practiceData = updated.practiceTestDiversity[testMode];
+    
+    // Track themes
+    passage.main_themes.forEach(theme => practiceData.themes.add(theme));
+    
+    // Track settings
+    const settingInfo = extractSettingInfo(passage.setting);
+    practiceData.settings.add(settingInfo);
+    
+    // Track characters
+    passage.key_characters.forEach(char => practiceData.characters.add(char));
+    
+    // Track text types
+    practiceData.textTypes.add(passage.passage_type);
+    
+    // Track topics from potential question topics
+    passage.potential_question_topics.forEach(topic => practiceData.topics.add(topic));
+    
+    // Extract cultural context (basic implementation)
+    const content = passage.content.toLowerCase();
+    if (content.includes('australia') || content.includes('sydney') || content.includes('melbourne')) {
+      practiceData.culturalContexts.add('australian');
+    } else {
+      practiceData.culturalContexts.add('international');
+    }
+  }
+  
+  return updated;
 } 

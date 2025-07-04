@@ -23,6 +23,16 @@ import {
 } from './supabaseStorage.ts';
 import { updateContextFromQuestion } from './questionGeneration.ts';
 import { generateQuestion } from './questionGeneration.ts';
+import { 
+  isWritingSection, 
+  isReadingSection, 
+  getDrillQuestionsPerSubSkill, 
+  requiresPassages, 
+  getPassageType, 
+  getSectionResponseType,
+  getQuestionsPerPassage
+} from './sectionUtils.ts';
+import { generateMiniPassage } from './passageGeneration.ts';
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
@@ -179,22 +189,22 @@ function getDifficultyDistribution(
   subSkill: string,
   totalQuestions: number
 ): Array<{ difficulty: number; count: number }> {
-  const isWritingSection = sectionName.toLowerCase().includes('writing') || 
-                          sectionName.toLowerCase().includes('written expression');
-  
-  // More precise reading section identification
-  const isReadingSection = (sectionName.toLowerCase().includes('reading') && 
-                           !sectionName.toLowerCase().includes('mathematics')) || 
-                          sectionName.toLowerCase().includes('comprehension') ||
-                          (sectionName.toLowerCase().includes('reasoning') && 
-                           sectionName.toLowerCase().includes('reading'));
-  
-  // Special case: Reading sections use standard level 2 questions
-  // (difficulty is applied to passages instead)
-  if (isReadingSection) {
-    return [
-      { difficulty: 2, count: totalQuestions } // All questions are standard difficulty
-    ];
+  // Special case: Reading sections - difficulty handling depends on test mode
+  if (isReadingSection(sectionName)) {
+    if (testMode === 'drill') {
+      // For reading drills: 10 easy + 10 medium + 10 hard mini-passages
+      // Difficulty is applied to the mini-passages, not the questions
+      return [
+        { difficulty: 1, count: 10 }, // Easy mini-passages
+        { difficulty: 2, count: 10 }, // Medium mini-passages  
+        { difficulty: 3, count: 10 }  // Hard mini-passages
+      ];
+    } else {
+      // For practice/diagnostic tests: questions are Level 2, difficulty comes from passages
+      return [
+        { difficulty: 2, count: totalQuestions } // All questions are standard difficulty
+      ];
+    }
   }
   
   if (testMode === 'diagnostic') {
@@ -243,17 +253,14 @@ function adjustSectionConfigForTestMode(
   sectionConfig: SectionGenerationConfig,
   testMode: string
 ): SectionGenerationConfig {
-  const isWritingSection = sectionName.toLowerCase().includes('writing') || 
-                          sectionName.toLowerCase().includes('written expression');
-  
   if (testMode === 'diagnostic') {
     // Enhanced Diagnostic: 2 questions per sub-skill per difficulty (6 total per sub-skill)
     // Writing: 2 questions total (1 per selected sub-skill)
-    const questionsPerSubSkill = isWritingSection ? 
+    const questionsPerSubSkill = isWritingSection(sectionName) ? 
       1 : // 1 question per sub-skill for writing (2 sub-skills selected = 2 total)
       6; // 2 per difficulty for non-writing (2×3 difficulties = 6 per sub-skill)
     
-    const totalQuestions = isWritingSection ?
+    const totalQuestions = isWritingSection(sectionName) ?
       2 : // Enhanced specification: 2 writing questions total
       sectionConfig.subSkills.length * questionsPerSubSkill; // All sub-skills for non-writing
     
@@ -265,7 +272,7 @@ function adjustSectionConfigForTestMode(
   }
   
   if (testMode === 'drill') {
-    const questionsPerSubSkill = isWritingSection ? 6 : 30; // 2*3 for writing, 10*3 for others
+    const questionsPerSubSkill = getDrillQuestionsPerSubSkill(sectionName);
     
     return {
       ...sectionConfig,
@@ -680,41 +687,45 @@ async function generateSectionQuestions(
       if (passagesNeeded > 0) {
         console.log(`\n  📖 Generating ${passagesNeeded} additional reading passages...`);
         
-        const isReadingSection = sectionName.toLowerCase().includes('reading') || 
-                                sectionName.toLowerCase().includes('comprehension') ||
-                                sectionName.toLowerCase().includes('reasoning');
-        
-        if (isReadingSection) {
-          console.log(`  🎯 Reading Section: Generating passages with varying difficulty (Level 1-3)`);
-          console.log(`  📚 Questions will all be standard Level 2 difficulty`);
-          
-          // For reading sections, distribute additional passages across difficulty levels
-          const passageDifficulties = [];
-          const passagesPerDifficulty = Math.floor(passagesNeeded / 3);
-          const remainder = passagesNeeded % 3;
-          
-          // Create difficulty distribution for additional passages
-          for (let i = 0; i < passagesPerDifficulty + (remainder > 0 ? 1 : 0); i++) {
-            passageDifficulties.push(1); // Easy passages
+        if (isReadingSection(sectionName)) {
+          if (request.testMode === 'drill') {
+            // For drill mode, we handle mini-passages differently
+            // Don't pre-generate passages - create them during question generation for 1:1 ratio
+            console.log(`  🎯 Reading Drill Section: Mini-passages will be generated per question (1:1 ratio)`);
+            console.log(`  📚 Each question gets its own mini-passage (50-150 words)`);
+            passageResults = { passages: [], updatedContext: generationContext };
+          } else {
+            console.log(`  🎯 Reading Section: Generating passages with varying difficulty (Level 1-3)`);
+            console.log(`  📚 Questions will all be standard Level 2 difficulty`);
+            
+            // For reading sections, distribute additional passages across difficulty levels
+            const passageDifficulties = [];
+            const passagesPerDifficulty = Math.floor(passagesNeeded / 3);
+            const remainder = passagesNeeded % 3;
+            
+            // Create difficulty distribution for additional passages
+            for (let i = 0; i < passagesPerDifficulty + (remainder > 0 ? 1 : 0); i++) {
+              passageDifficulties.push(1); // Easy passages
+            }
+            for (let i = 0; i < passagesPerDifficulty + (remainder > 1 ? 1 : 0); i++) {
+              passageDifficulties.push(2); // Medium passages
+            }
+            for (let i = 0; i < passagesPerDifficulty; i++) {
+              passageDifficulties.push(3); // Hard passages
+            }
+            
+            console.log(`  📊 Additional passage difficulty distribution: ${passageDifficulties.filter(d => d === 1).length}x Level 1, ${passageDifficulties.filter(d => d === 2).length}x Level 2, ${passageDifficulties.filter(d => d === 3).length}x Level 3`);
+            
+            // Generate additional passages with specific difficulties
+            passageResults = await generatePassagesWithDifficulties(
+              request.testType,
+              sectionName,
+              passageDifficulties,
+              generationContext
+            );
           }
-          for (let i = 0; i < passagesPerDifficulty + (remainder > 1 ? 1 : 0); i++) {
-            passageDifficulties.push(2); // Medium passages
-          }
-          for (let i = 0; i < passagesPerDifficulty; i++) {
-            passageDifficulties.push(3); // Hard passages
-          }
           
-          console.log(`  📊 Additional passage difficulty distribution: ${passageDifficulties.filter(d => d === 1).length}x Level 1, ${passageDifficulties.filter(d => d === 2).length}x Level 2, ${passageDifficulties.filter(d => d === 3).length}x Level 3`);
-          
-          // Generate additional passages with specific difficulties
-          passageResults = await generatePassagesWithDifficulties(
-            request.testType,
-            sectionName,
-            passageDifficulties,
-            generationContext
-          );
-          
-          if (passageResults.passages.length === 0) {
+          if (passageResults.passages.length === 0 && request.testMode !== 'drill') {
             throw new Error(`Failed to generate additional passages for ${sectionName}`);
           }
           
@@ -830,12 +841,49 @@ async function generateSectionQuestions(
         for (const { difficulty, count } of difficultyDistribution) {
           for (let i = 0; i < count; i++) {
             try {
-              // Use round-robin across all available passages (existing + new)
+              // Use round-robin across all available passages (existing + new) or generate mini-passage for drills
               let passageContent = '';
               let passageId = '';
               let passageDifficulty = difficulty; // Default to question difficulty
               
-              if (allPassages.length > 0) {
+              if (request.testMode === 'drill' && isReadingSection(sectionName)) {
+                // For drill mode reading sections, generate a mini-passage per question
+                console.log(`        📖 Generating mini-passage for ${subSkill} drill question...`);
+                
+                try {
+                  const miniPassageRequest = {
+                    testType: request.testType,
+                    sectionName,
+                    testMode: request.testMode,
+                    wordCount: 100, // Mini-passage target
+                    difficulty: difficulty,
+                    passageType: 'informational' as PassageType, // Default for drill questions
+                    generationContext,
+                    isMiniPassage: true,
+                    subSkill
+                  };
+                  
+                  const miniPassage = await generateMiniPassage(miniPassageRequest);
+                  passageContent = miniPassage.content;
+                  passageDifficulty = miniPassage.difficulty;
+                  
+                  // Store the mini-passage in the database
+                  const storedPassageId = await storePassage(
+                    miniPassage,
+                    request.testType,
+                    request.testMode,
+                    sectionName
+                  );
+                  passageId = storedPassageId;
+                  
+                  console.log(`        ✅ Generated mini-passage "${miniPassage.title}" (${miniPassage.word_count} words)`);
+                  
+                } catch (error) {
+                  console.warn(`        ⚠️ Failed to generate mini-passage, proceeding without: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                }
+                
+              } else if (allPassages.length > 0) {
+                // For non-drill mode or non-reading sections, use existing passages
                 const passageIndex = globalQuestionIndex % allPassages.length;
                 const selectedPassage = allPassages[passageIndex];
                 passageContent = selectedPassage.content;

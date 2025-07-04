@@ -1,0 +1,1177 @@
+COMPREHENSIVE QUESTION AUDIT
+===========================
+
+Expected counts per test type:
+- Diagnostic: As per TEST_STRUCTURES
+- Practice Tests (1-5): Same as diagnostic
+- Drills: 6 questions per Writing sub-skill, 30 per Academic sub-skill
+
+================================================================================
+AUDITING: VIC Selective Entry (Year 9 Entry)
+================================================================================
+
+------------------------------------------------------------
+SECTION: Reading Reasoning
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 50 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: -2 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_2:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_3:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_4:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+  practice_5:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Character Analysis: 30 questions
+    - Theme & Message Analysis: 30 questions
+    - Inferential Reasoning: 30 questions
+    - Vocabulary in Context: 30 questions
+    - Interpretive Comprehension: 30 questions
+    - Text Structure Analysis: 30 questions
+    - Critical Analysis & Evaluation: 30 questions
+    - Integration & Synthesis: 30 questions
+
+------------------------------------------------------------
+SECTION: Mathematics Reasoning
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 60 questions
+  Actual: 36 questions
+  ⚠️  MISMATCH: -24 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_2:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_3:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_4:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+  practice_5:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Logical Mathematical Deduction: 30 questions
+    - Algebraic Reasoning: 30 questions
+    - Numerical Operations: 30 questions
+    - Data Interpretation and Statistics: 30 questions
+    - Geometric & Spatial Reasoning: 30 questions
+    - Conceptual Understanding: 30 questions
+
+------------------------------------------------------------
+SECTION: General Ability - Verbal
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 60 questions
+  Actual: 30 questions
+  ⚠️  MISMATCH: -30 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_2:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_3:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_4:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+  practice_5:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Verbal Reasoning & Analogies: 30 questions
+    - Logical Reasoning & Deduction: 30 questions
+    - Information Processing & Filtering: 30 questions
+    - Critical Thinking & Problem-Solving: 30 questions
+    - Vocabulary in Context: 30 questions
+
+------------------------------------------------------------
+SECTION: General Ability - Quantitative
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 50 questions
+  Actual: 31 questions
+  ⚠️  MISMATCH: -19 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_2:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_3:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_4:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+  practice_5:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Pattern Recognition & Sequences: 30 questions
+    - Numerical Reasoning: 30 questions
+    - Logical Reasoning & Deduction: 30 questions
+    - Spatial Reasoning (2D & 3D): 30 questions
+    - Critical Thinking & Problem-Solving: 30 questions
+
+------------------------------------------------------------
+SECTION: Writing
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 2 questions
+  Actual: 2 questions
+  ✅ Match!
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_2:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_3:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_4:
+    Expected: 2 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -2 questions
+  practice_5:
+    Expected: 2 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -2 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Persuasive Writing: 6 questions
+    - Creative Writing: 6 questions
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 1332
+Total Actual Questions: 1545
+Overall Difference: 213
+Total Mismatches Found: 14
+
+================================================================================
+AUDITING: NSW Selective Entry (Year 7 Entry)
+================================================================================
+
+------------------------------------------------------------
+SECTION: Reading
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 30 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: +18 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_2:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_3:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_4:
+    Expected: 30 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -30 questions
+  practice_5:
+    Expected: 30 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -30 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Inferential Reasoning: 30 questions
+    - Critical Analysis & Evaluation: 28 questions
+    - Literal Comprehension: 30 questions
+    - Vocabulary in Context: 29 questions
+    - Text Structure Analysis: 29 questions
+    - Character Analysis: 29 questions
+    - Theme & Message Analysis: 30 questions
+    - Integration & Synthesis: 30 questions
+
+------------------------------------------------------------
+SECTION: Mathematical Reasoning
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 35 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +7 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 35 questions
+    Actual: 32 questions
+    ⚠️  MISMATCH: -3 questions
+  practice_2:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_3:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_4:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+  practice_5:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Algebraic Reasoning: 30 questions
+    - Number Operations & Problem Solving: 30 questions
+    - Geometry & Measurement: 30 questions
+    - Statistics & Probability: 1 questions
+
+------------------------------------------------------------
+SECTION: Thinking Skills
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 40 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: +8 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_2:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_3:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_4:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+  practice_5:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Abstract Reasoning: 30 questions
+    - Logical Reasoning & Deduction: 30 questions
+    - Spatial Reasoning (2D & 3D): 30 questions
+    - Verbal Reasoning & Analogies: 30 questions
+    - Pattern Recognition & Sequences: 30 questions
+    - Critical Thinking & Problem-Solving: 30 questions
+    - Numerical Reasoning: 30 questions
+    - Information Processing & Filtering: 30 questions
+
+------------------------------------------------------------
+SECTION: Writing
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 1 questions
+  Actual: 12 questions
+  ⚠️  MISMATCH: +11 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_2:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_3:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_4:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_5:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Narrative Writing: 6 questions
+    - Persuasive Writing: 6 questions
+    - Expository Writing: 6 questions
+    - Imaginative Writing: 6 questions
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 636
+Total Actual Questions: 1055
+Overall Difference: 419
+Total Mismatches Found: 13
+
+================================================================================
+AUDITING: Year 5 NAPLAN
+================================================================================
+
+------------------------------------------------------------
+SECTION: Writing
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 1 questions
+  Actual: 12 questions
+  ⚠️  MISMATCH: +11 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_2:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_3:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_4:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_5:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Narrative Writing: 6 questions
+    - Persuasive Writing: 6 questions
+
+------------------------------------------------------------
+SECTION: Reading
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 40 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +2 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 40 questions
+    Actual: 37 questions
+    ⚠️  MISMATCH: -3 questions
+  practice_2:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_3:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_4:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+  practice_5:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Literal Comprehension: 47 questions
+    - Interpretive Comprehension: 60 questions
+    - Vocabulary in Context: 57 questions
+    - Critical Analysis & Evaluation: 60 questions
+    - Text Structure Analysis: 60 questions
+    - Inferential Reasoning: 60 questions
+    - Integration & Synthesis: 59 questions
+
+------------------------------------------------------------
+SECTION: Language Conventions
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 40 questions
+  Actual: 36 questions
+  ⚠️  MISMATCH: -4 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 40 questions
+    Actual: 39 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_2:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_3:
+    Expected: 40 questions
+    Actual: 40 questions
+    ✅ Match!
+  practice_4:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+  practice_5:
+    Expected: 40 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -40 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Spelling Patterns & Orthographic Knowledge: 60 questions
+    - Vocabulary Usage & Word Choice: 41 questions
+    - Grammar & Parts of Speech: 60 questions
+    - Punctuation Usage & Application: 60 questions
+    - Syntax & Sentence Construction: 60 questions
+    - Proofreading & Error Recognition: 8 questions
+
+------------------------------------------------------------
+SECTION: Numeracy No Calculator
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 25 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +17 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 25 questions
+    Actual: 24 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_2:
+    Expected: 25 questions
+    Actual: 24 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_3:
+    Expected: 25 questions
+    Actual: 25 questions
+    ✅ Match!
+  practice_4:
+    Expected: 25 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -25 questions
+  practice_5:
+    Expected: 25 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -25 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Mental Mathematics Fluency: 30 questions
+    - Geometric Reasoning: 30 questions
+    - Algebraic Thinking & Patterns: 30 questions
+    - Number Sense & Operations: 30 questions
+    - Measurement Concepts: 30 questions
+    - Data Interpretation: 30 questions
+    - Mathematical Reasoning: 30 questions
+
+------------------------------------------------------------
+SECTION: Numeracy Calculator
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 25 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +17 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 25 questions
+    Actual: 25 questions
+    ✅ Match!
+  practice_2:
+    Expected: 25 questions
+    Actual: 25 questions
+    ✅ Match!
+  practice_3:
+    Expected: 25 questions
+    Actual: 25 questions
+    ✅ Match!
+  practice_4:
+    Expected: 25 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -25 questions
+  practice_5:
+    Expected: 25 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -25 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Statistical Analysis: 2 questions
+    - Complex Number Operations: 30 questions
+    - Geometric Problem Solving: 1 questions
+    - Technology Integration: 1 questions
+    - Algebraic Problem Solving: 30 questions
+    - Advanced Measurement Applications: 22 questions
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 786
+Total Actual Questions: 1561
+Overall Difference: 775
+Total Mismatches Found: 19
+
+⚠️  WARNING: Database total (1685) doesn't match calculated total (1561)
+
+================================================================================
+AUDITING: Year 7 NAPLAN
+================================================================================
+
+------------------------------------------------------------
+SECTION: Writing
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 1 questions
+  Actual: 12 questions
+  ⚠️  MISMATCH: +11 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_2:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_3:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_4:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_5:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Narrative Writing: 6 questions
+    - Persuasive Writing: 6 questions
+
+------------------------------------------------------------
+SECTION: Reading
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 50 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: -2 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 50 questions
+    Actual: 49 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_2:
+    Expected: 50 questions
+    Actual: 48 questions
+    ⚠️  MISMATCH: -2 questions
+  practice_3:
+    Expected: 50 questions
+    Actual: 49 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_4:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+  practice_5:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Advanced Literal Comprehension: 30 questions
+    - Complex Inferential Reasoning: 30 questions
+    - Advanced Interpretive Analysis: 30 questions
+    - Advanced Vocabulary Analysis: 30 questions
+    - Sophisticated Text Structure Analysis: 30 questions
+    - Critical Evaluation & Analysis: 30 questions
+    - Complex Integration & Synthesis: 30 questions
+    - Meta-Cognitive Reading Strategies: 30 questions
+
+------------------------------------------------------------
+SECTION: Language Conventions
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 45 questions
+  Actual: 36 questions
+  ⚠️  MISMATCH: -9 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 45 questions
+    Actual: 45 questions
+    ✅ Match!
+  practice_2:
+    Expected: 45 questions
+    Actual: 45 questions
+    ✅ Match!
+  practice_3:
+    Expected: 45 questions
+    Actual: 45 questions
+    ✅ Match!
+  practice_4:
+    Expected: 45 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -45 questions
+  practice_5:
+    Expected: 45 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -45 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Sophisticated Grammar: 30 questions
+    - Advanced Spelling & Orthography: 30 questions
+    - Advanced Punctuation: 30 questions
+    - Complex Syntax Analysis: 30 questions
+    - Advanced Vocabulary & Usage: 30 questions
+    - Advanced Editing Skills: 30 questions
+
+------------------------------------------------------------
+SECTION: Numeracy No Calculator
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 30 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: +18 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_2:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_3:
+    Expected: 30 questions
+    Actual: 30 questions
+    ✅ Match!
+  practice_4:
+    Expected: 30 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -30 questions
+  practice_5:
+    Expected: 30 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -30 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Advanced Number Operations: 30 questions
+    - Algebraic Reasoning: 30 questions
+    - Advanced Measurement: 30 questions
+    - Geometric Analysis: 30 questions
+    - Advanced Data Analysis: 25 questions
+    - Logical Mathematical Thinking: 5 questions
+    - Mental Mathematics Mastery: 30 questions
+
+------------------------------------------------------------
+SECTION: Numeracy Calculator
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 35 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: +13 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_2:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_3:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_4:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+  practice_5:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Sophisticated Measurement Applications: 30 questions
+    - Complex Computational Applications: 30 questions
+    - Advanced Algebraic Problem Solving: 30 questions
+    - Complex Statistical Analysis: 30 questions
+    - Advanced Geometric Problem Solving: 30 questions
+    - Multi-Variable Problem Solving: 30 questions
+    - Mathematical Modelling & Applications: 30 questions
+    - Advanced Technology Integration: 30 questions
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 966
+Total Actual Questions: 1523
+Overall Difference: 557
+Total Mismatches Found: 18
+
+================================================================================
+AUDITING: EduTest Scholarship (Year 7 Entry)
+================================================================================
+
+------------------------------------------------------------
+SECTION: Reading Comprehension
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 50 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: -8 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 50 questions
+    Actual: 49 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_2:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_3:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_4:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+  practice_5:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Literal Comprehension & Detail Extraction: 30 questions
+    - Inferential Reasoning & Implied Meaning: 29 questions
+    - Main Idea & Theme Identification: 30 questions
+    - Vocabulary in Context & Word Meaning: 28 questions
+    - Author's Purpose & Intent Analysis: 30 questions
+    - Text Structure & Organisation: 30 questions
+    - Cross-Textual Connections: 30 questions
+
+------------------------------------------------------------
+SECTION: Verbal Reasoning
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 60 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: -12 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_2:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_3:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_4:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+  practice_5:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Analogical Reasoning & Word Relationships: 30 questions
+    - Vocabulary & Semantic Knowledge: 30 questions
+    - Logical Deduction & Conditional Reasoning: 30 questions
+    - Classification and Categorisation: 18 questions
+
+------------------------------------------------------------
+SECTION: Numerical Reasoning
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 50 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: -2 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_2:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_3:
+    Expected: 50 questions
+    Actual: 50 questions
+    ✅ Match!
+  practice_4:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+  practice_5:
+    Expected: 50 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -50 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Proportional Reasoning & Ratios: 30 questions
+    - Number Sequence & Pattern Recognition: 30 questions
+    - Data Interpretation: 30 questions
+    - Logical Problem Solving with Numbers: 30 questions
+    - Mathematical Operations & Calculations: 30 questions
+    - Spatial-Numerical Reasoning: 30 questions
+    - Financial Literacy & Practical Applications: 30 questions
+    - Statistical Reasoning & Probability: 30 questions
+
+------------------------------------------------------------
+SECTION: Mathematics
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 60 questions
+  Actual: 48 questions
+  ⚠️  MISMATCH: -12 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_2:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_3:
+    Expected: 60 questions
+    Actual: 60 questions
+    ✅ Match!
+  practice_4:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+  practice_5:
+    Expected: 60 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -60 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Arithmetic Operations & Number Sense: 30 questions
+    - Time, Money & Practical Mathematics: 11 questions
+    - Fractions, Decimals & Percentages: 30 questions
+    - Algebraic Thinking & Problem Solving: 30 questions
+    - Measurement & Unit Conversion: 30 questions
+    - Geometry and Spatial Reasoning: 30 questions
+    - Statistical Analysis: 30 questions
+    - Word Problem Solving & Application: 30 questions
+
+------------------------------------------------------------
+SECTION: Written Expression
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 2 questions
+  Actual: 12 questions
+  ⚠️  MISMATCH: +10 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_2:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_3:
+    Expected: 2 questions
+    Actual: 2 questions
+    ✅ Match!
+  practice_4:
+    Expected: 2 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -2 questions
+  practice_5:
+    Expected: 2 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -2 questions
+
+DRILLS (by sub-skill):
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 1332
+Total Actual Questions: 1639
+Overall Difference: 307
+Total Mismatches Found: 16
+
+================================================================================
+AUDITING: ACER Scholarship (Year 7 Entry)
+================================================================================
+
+------------------------------------------------------------
+SECTION: Written Expression
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 1 questions
+  Actual: 12 questions
+  ⚠️  MISMATCH: +11 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_2:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_3:
+    Expected: 1 questions
+    Actual: 1 questions
+    ✅ Match!
+  practice_4:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_5:
+    Expected: 1 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -1 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Narrative Writing: 6 questions
+    - Expository Writing: 6 questions
+    - Persuasive Writing: 6 questions
+    - Creative Writing: 6 questions
+
+------------------------------------------------------------
+SECTION: Mathematics
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 35 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +7 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 35 questions
+    Actual: 32 questions
+    ⚠️  MISMATCH: -3 questions
+  practice_2:
+    Expected: 35 questions
+    Actual: 33 questions
+    ⚠️  MISMATCH: -2 questions
+  practice_3:
+    Expected: 35 questions
+    Actual: 34 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_4:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+  practice_5:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Mathematical Reasoning and Logic: 29 questions
+    - Quantitative Problem-Solving: 29 questions
+    - Information Processing and Interpretation: 29 questions
+    - Spatial and Geometric Reasoning: 30 questions
+    - Algebraic and Abstract Thinking: 30 questions
+    - Strategic Mathematical Thinking: 30 questions
+    - Applied Mathematical Skills: 30 questions
+
+------------------------------------------------------------
+SECTION: Humanities
+------------------------------------------------------------
+
+DIAGNOSTIC TEST:
+  Expected: 35 questions
+  Actual: 42 questions
+  ⚠️  MISMATCH: +7 questions
+
+PRACTICE TESTS:
+  practice_1:
+    Expected: 35 questions
+    Actual: 34 questions
+    ⚠️  MISMATCH: -1 questions
+  practice_2:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_3:
+    Expected: 35 questions
+    Actual: 35 questions
+    ✅ Match!
+  practice_4:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+  practice_5:
+    Expected: 35 questions
+    Actual: 0 questions
+    ⚠️  MISMATCH: -35 questions
+
+DRILLS (by sub-skill):
+
+  ⚠️  UNEXPECTED SUB-SKILLS FOUND:
+    - Reading Comprehension and Analysis: 30 questions
+    - Critical Interpretation Skills: 30 questions
+    - Literary and Textual Analysis: 23 questions
+
+------------------------------------------------------------
+SUMMARY:
+------------------------------------------------------------
+Total Expected Questions: 426
+Total Actual Questions: 616
+Overall Difference: 190
+Total Mismatches Found: 13
+
+
+Audit complete!

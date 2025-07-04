@@ -72,6 +72,8 @@ const TEST_MODE_MAPPING: Record<string, { name: string; type: 'practice' | 'dril
   'practice_1': { name: 'Practice Test 1', type: 'practice' },
   'practice_2': { name: 'Practice Test 2', type: 'practice' },
   'practice_3': { name: 'Practice Test 3', type: 'practice' },
+  'practice_4': { name: 'Practice Test 4', type: 'practice' },
+  'practice_5': { name: 'Practice Test 5', type: 'practice' },
   'drill': { name: 'Skill Drills', type: 'drill' },
   'diagnostic': { name: 'Diagnostic Test', type: 'diagnostic' },
 };
@@ -141,7 +143,7 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
     
     // For each test type, fetch each mode separately
     for (const testType of allTestTypes) {
-      for (const testMode of ['practice_1', 'practice_2', 'practice_3', 'drill', 'diagnostic']) {
+      for (const testMode of ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5', 'drill', 'diagnostic']) {
         questionQueries.push(
           supabase
             .from('questions')

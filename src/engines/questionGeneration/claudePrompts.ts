@@ -8,6 +8,7 @@ import {
   SECTION_TO_SUB_SKILLS,
   SUB_SKILL_VISUAL_MAPPING 
 } from '../../data/curriculumData.ts';
+import { selectRelevantTips, formatTipsForExplanation } from './educationalTips.ts';
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
@@ -594,29 +595,92 @@ PASSAGE-BASED QUESTION REQUIREMENTS:
 - Reference specific details, characters, events, or information from the passage
 ` : ''}
 
-ANSWER OPTIONS (Multiple Choice Only):
+ANSWER OPTIONS & DISTRACTOR GENERATION (Multiple Choice Only):
 - Exactly 4 options formatted as: A) option, B) option, C) option, D) option
-- Create realistic distractors reflecting common student misconceptions for ${testType}
 - Ensure roughly even distribution of correct answers across A, B, C, D
 - Avoid "All of the above" or "None of the above" unless authentic to this test type
 
+🎯 DISTRACTOR QUALITY MANDATE - CRITICAL FOR VALID ASSESSMENT:
+For each wrong answer option, you MUST ensure it is:
+1. ✅ Plausible enough that a student might reasonably choose it
+2. ✅ Definitively wrong - cannot be defended as correct under any interpretation
+3. ✅ Based on common student errors, misconceptions, or logical mistakes
+4. ✅ Clear and unambiguous in its incorrectness
+
+🚫 FORBIDDEN DISTRACTOR TYPES - NEVER CREATE THESE:
+- Answers that could be correct under different interpretations of the question
+- Options that are "technically correct" in some contexts but wrong for this specific question
+- Answers that require specialized outside knowledge to eliminate
+- Mathematical results from reasonable alternative methods that could also be valid
+- Partial answers that are "somewhat correct" or "on the right track"
+
+✅ HIGH-QUALITY DISTRACTOR STRATEGIES BY SUBJECT:
+
+**Mathematics:** Common calculation errors (wrong order of operations, sign errors, formula mistakes), reversed operations, using wrong formulas that seem logical
+**Reading Comprehension:** Details from wrong parts of text, reasonable but unsupported inferences, confusing similar concepts from the passage
+**Verbal Reasoning:** Relationships that sound logical but don't match the actual pattern, reversed analogies, category confusion
+**Language Conventions:** Grammar rules that apply in other contexts but not this specific case, common spelling mistakes, punctuation confusion
+
+🔍 MANDATORY SELF-CHECK BEFORE FINALIZING:
+Before completing your response, ask yourself for each wrong option:
+"Could a knowledgeable teacher or student defend this answer as potentially correct?"
+If YES to any option: Revise that distractor until it's clearly wrong but still plausible.
+
+DISTRACTOR AUTHENTICITY FOR ${testType}:
+- Use errors that Year ${yearLevel} students commonly make in ${sectionName}
+- Avoid obvious "throwaway" options that no student would choose
+- Make distractors challenging enough to differentiate student ability levels
+
 ${!isWritingSection ? `
-CRITICAL QUALITY CONTROL:
-If you detect ANY of the following issues while creating this question, include the exact phrase "VALIDATION_FLAG" at the start of your solution field:
+FINAL QUALITY CONTROL - MANDATORY SELF-VERIFICATION:
+Before completing your response, work through this checklist:
 
-🚨 VALIDATION FLAGS (use "VALIDATION_FLAG" if ANY apply):
+🔍 ANSWER UNIQUENESS CHECK:
+✅ EXACTLY ONE CORRECT ANSWER: Verify only one option is definitively correct
+✅ DISTRACTOR VERIFICATION: Re-read each wrong answer and confirm it cannot be defended as correct
+✅ NO AMBIGUITY: Question has only one reasonable interpretation
+✅ AUTHENTIC FOR ${testType}: Question style, difficulty, and content match real ${testType} standards
+
+🔍 MATHEMATICAL/LOGICAL ACCURACY CHECK (if applicable):
+✅ CALCULATION VERIFICATION: Double-check all mathematical work step-by-step
+✅ FORMULA ACCURACY: Ensure correct formulas and procedures are used
+✅ LOGICAL CONSISTENCY: Answer follows logically from given information
+✅ REASONABLE RESULT: Answer makes sense in the context of the problem
+
+🚨 REGENERATION FLAGS (use "VALIDATION_FLAG" if ANY apply):
+- You cannot confidently verify that exactly one answer is correct
 - Your calculated answer doesn't match any of the 4 options you created
-- You need to recalculate or try a different approach during generation  
-- The question seems impossible or has no valid answer
-- You're uncertain about the correctness of the mathematics/logic
-- The answer options don't seem appropriate for the question
-- You notice contradictions in the question or solution
-- The question feels artificially forced or unnatural for this test type
+- You feel uncertain about the mathematical or logical correctness
+- The question seems to have no valid solution or multiple valid solutions
+- You notice any contradictions between question, options, and solution
 
-SOLUTION FIELD REQUIREMENTS:
-- Start with "VALIDATION_FLAG" if any above issues detected
-- Provide clear, confident explanation of the correct answer
-- If flagged, still complete the JSON but the question will be regenerated
+ENHANCED SOLUTION FORMAT - MANDATORY STRUCTURE:
+Your solution must follow this EXACT format to provide educational value:
+
+**Correct Answer: [Letter]**
+[Brief, clear explanation of why this answer is correct]
+
+**Why Other Options Are Wrong:**
+- A: [Specific reason why this option is incorrect]
+- B: [Specific reason why this option is incorrect]  
+- C: [Specific reason why this option is incorrect]
+- D: [Specific reason why this option is incorrect]
+(Note: Skip the letter that is correct)
+
+**Tips for Similar Questions:**
+• [Specific strategy or technique for this type of question]
+• [Pattern recognition or approach that helps with similar problems]  
+• [Common mistake to avoid or verification method]
+
+EDUCATIONAL TIP EXAMPLES FOR ${sectionName} - ${subSkill}:
+${formatTipsForExplanation(selectRelevantTips(sectionName, subSkill))}
+
+SOLUTION REQUIREMENTS:
+- Start with "VALIDATION_FLAG" if any validation issues detected
+- Use the structured format above for ALL solutions
+- Provide specific, actionable tips that transfer to similar questions
+- Focus on teaching strategy, not just explaining this specific answer
+- Make tips appropriate for Year ${yearLevel} students taking ${testType}
 ` : `
 WRITING SECTION REQUIREMENTS:
 - Provide a simple, clear task instruction only
