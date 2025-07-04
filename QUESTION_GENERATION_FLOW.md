@@ -1,579 +1,608 @@
-# Question Generation End-to-End Flow
+# Question Generation End-to-End Flow - Unified System
 
 ## Overview
 
-This document describes the complete end-to-end flow of question generation in the EduCourse platform, from user specification to final database storage with validation.
+This document describes the unified question generation system that generates ALL questions for a section across ALL test modes (practice tests 1-5, diagnostic, and drills) in a single operation, ensuring diversity and preventing duplicates.
+
+## Key Improvements Over Legacy System
+
+- **Unified Generation**: All test modes generated together with shared context
+- **Cross-Mode Diversity**: Prevents duplicate topics/scenarios across practice tests
+- **Shared Passage System**: Pre-generates passages for efficient reuse
+- **Prevention-Based Quality**: Enhanced prompts prevent errors rather than catch them
+- **Educational Value**: Structured explanations with actionable tips
+- **Authoritative Data**: Uses curriculumData.ts as single source of truth
 
 ## Architecture Overview
 
 ```mermaid
 graph TD
-    A[User Specifies Test] --> B[Generation Script]
-    B --> C[Test Structure Engine]
-    C --> D[Question Generation Engine]
-    D --> E[Validation Pipeline]
-    E --> F{Validation Pass?}
-    F -->|No| G[Auto-Regeneration]
-    G --> D
-    F -->|Yes| H[Supabase Storage]
-    H --> I[Database Tables]
-    F -->|Requires Review| J[Manual Review Queue]
+    A[User Specifies Test & Section] --> B[Unified Generation Script]
+    B --> C[Load Authoritative Test Structure]
+    C --> D[Calculate Target Distribution]
+    D --> E{Reading Section?}
+    E -->|Yes| F[Pre-generate Shared Passages]
+    E -->|No| G[Skip Passage Generation]
+    F --> H[Unified Question Generation]
+    G --> H
+    H --> I[Cross-Mode Diversity Tracking]
+    I --> J[VALIDATION_FLAG Check]
+    J --> K{Valid?}
+    K -->|No| L[Auto-Regeneration]
+    L --> H
+    K -->|Yes| M[Store with Test Mode]
+    M --> N[Progress Logging]
+    N --> O{More Questions?}
+    O -->|Yes| H
+    O -->|No| P[Final Report]
 ```
 
 ---
 
-## 1. User Input & Script Creation
+## 1. User Input & Unified Generation
 
-### 1.1 User Specification
-The user specifies what they want to generate:
-- **Test Type**: `'VIC Selective Entry (Year 9 Entry)'`, `'NSW Selective Entry (Year 7 Entry)'`, etc.
-- **Test Mode**: `'diagnostic'`, `'practice_1'`, `'practice_2'`, `'drill'`, etc.
-- **Optional**: Specific sections, difficulty distribution, question counts
+### 1.1 Unified Generation Command
 
-### 1.2 Generation Script
-User creates or runs a generation script (e.g., `generate-vic-selective-practice1.ts`):
+The unified system uses a single command structure for all products and sections:
+
+```bash
+npm run regenerate-section -- --test-type "Test Product Name" --section "Section Name" [options]
+```
+
+### 1.2 Command Parameters
+
+- `--test-type`: Full test product name (must match curriculumData.ts exactly)
+- `--section`: Section to generate (must match curriculumData.ts exactly)
+- `--clean-first`: Delete existing questions before generating (optional)
+- `--skip-confirmation`: Auto-proceed without prompts (optional)
+- `--validate-after`: Run validation checks after generation (optional)
+
+### 1.3 Example Commands
+
+```bash
+# EduTest Scholarship - Verbal Reasoning
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Verbal Reasoning" --skip-confirmation
+
+# VIC Selective Entry - Reading Reasoning with cleanup
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "Reading Reasoning" --clean-first --skip-confirmation
+
+# ACER Scholarship - Humanities (treated as reading comprehension)
+npm run regenerate-section -- --test-type "ACER Scholarship (Year 7 Entry)" --section "Humanities" --skip-confirmation
+```
+
+---
+
+## 2. Authoritative Test Structure
+
+### 2.1 Loading from curriculumData.ts
+
+The system reads exact specifications from `TEST_STRUCTURES`:
 
 ```typescript
-// Example script structure
-import { generateCompleteTest } from '../src/engines/questionGeneration/index.ts';
+const testStructure = TEST_STRUCTURES[testType];
+const sectionStructure = testStructure[sectionName];
 
-async function main() {
-  const result = await generateCompleteTest(
-    'VIC Selective Entry (Year 9 Entry)',  // Test Type
-    'practice_1',                          // Test Mode
-    'Medium'                               // Difficulty (auto-distributed for practice)
-  );
+// Authoritative data includes:
+// - questions: Exact count per practice test
+// - time: Time limit in minutes
+// - format: "Multiple Choice" or "Written Response"
+// - passages: Number of passages (for reading sections)
+// - words_per_passage: Word count per passage
+```
+
+### 2.2 Validation Against Authoritative Data
+
+The system validates all generation parameters:
+
+```typescript
+console.log(`📚 AUTHORITATIVE DATA - ${testType} - ${sectionName}:`);
+console.log(`   Questions per practice test: ${authoritativeQuestions} (FIXED)`);
+console.log(`   Format: ${authoritativeFormat}`);
+console.log(`   Time: ${authoritativeTime} minutes`);
+if (authoritativePassages > 0) {
+  console.log(`   Passages: ${authoritativePassages} passages, ${authoritativeWordsPerPassage} words each`);
 }
 ```
 
-**Script Location**: `/scripts/generate-[product]-[testmode].ts`
+### 2.3 Sub-skill Distribution
+
+Sub-skills are loaded from `SECTION_TO_SUB_SKILLS`:
+- Questions distributed evenly across sub-skills
+- Difficulty levels balanced within each sub-skill
+- Special handling for writing sections (fewer questions)
 
 ---
 
-## 2. Test Structure Engine
+## 3. Unified Question Generation Engine
 
-### 2.1 Authoritative Test Structure
-The script calls `getAuthoritativeTestStructure()` which loads configuration from:
-- **File**: `src/data/curriculumData.ts`
-- **Key Object**: `TEST_STRUCTURES`
+### 3.1 Pre-Generation Phase
+
+#### Target Distribution Calculation
+```typescript
+const targetDistribution = calculateSectionDistribution(testType, sectionName);
+// Returns: { practice_1: 60, practice_2: 60, ..., diagnostic: 48, drill: 240 }
+```
+
+#### Shared Passage Pre-Generation (Reading Sections Only)
+```typescript
+if (isReadingSection(sectionName)) {
+  sharedPassagesMap = await generateSharedPassagesForReading(request, targetDistribution);
+  // Generates: 5 passages × 5 practice tests + 5 diagnostic passages
+}
+```
+
+#### Cross-Mode Context Initialization
+```typescript
+const unifiedContext = initializeUnifiedContext(testType, sectionName, totalQuestions);
+// Tracks: usedTopics, usedScenarios, usedCharacters, usedSettings
+```
+
+### 3.2 Unified Generation Loop
+
+The main generation loop processes all sub-skills with shared context:
 
 ```typescript
-// Example structure
-TEST_STRUCTURES = {
-  'VIC Selective Entry (Year 9 Entry)': {
-    sections: {
-      'Reading Reasoning': {
-        totalQuestions: 35,
-        timeLimit: 30,
-        subSkills: ['Reading Comprehension', 'Inference', 'Vocabulary'],
-        passages: 5,
-        wordsPerPassage: 250
-      },
-      'Mathematics Reasoning': {
-        totalQuestions: 35,
-        timeLimit: 30,
-        subSkills: ['Algebra', 'Geometry', 'Statistics']
-      },
-      'Writing': {
-        totalQuestions: 1,
-        timeLimit: 25,
-        subSkills: ['Creative Writing'],
-        format: 'Written Response'
-      }
+for (const plan of subSkillPlans) {
+  for (const difficultyGroup of plan.difficultyBreakdown) {
+    // Calculate proper test mode assignments
+    const testModeAssignments = calculateTestModeAssignments(difficultyGroup, plan.distribution);
+    
+    for (let i = 0; i < difficultyGroup.count; i++) {
+      const assignedTestMode = testModeAssignments[i];
+      
+      // Generate with diversity tracking
+      const question = await generateQuestion(questionRequest);
+      
+      // Store with correct test mode
+      await storeQuestion(question, testType, assignedTestMode, ...);
     }
   }
 }
 ```
 
-### 2.2 Question Distribution Logic
-The engine automatically calculates:
-- **Questions per sub-skill**: `totalQuestions ÷ subSkills.length`
-- **Difficulty distribution**: Based on test type (e.g., VIC Selective: 10% easy, 35% medium, 55% hard)
-- **Passage requirements**: For reading sections
+### 3.3 Passage Generation Strategies
+
+#### Practice Tests & Diagnostic (Reading Sections)
+- **Strategy**: Pre-generate shared passages
+- **Count**: As per curriculumData (e.g., 5 passages for EduTest)
+- **Length**: As per curriculumData (e.g., 200 words)
+- **Distribution**: ~10 questions per passage
+- **Storage**: Generated once, referenced by multiple questions
+
+#### Drills (Reading Sections)
+- **Strategy**: Generate mini-passages on demand
+- **Count**: 1:1 ratio (one passage per question)
+- **Length**: 100 words (focused content)
+- **Purpose**: Test specific sub-skills with targeted content
+
+#### Non-Reading Sections
+- **No passages required**
+- **Direct question generation**
+- **Focus on subject-specific content**
 
 ---
 
-## 3. Question Generation Engine
+## 4. Enhanced Validation Pipeline
 
-### 3.1 Batch Generation Process
-The main engine (`src/engines/questionGeneration/index.ts`) processes each section:
+### 4.1 VALIDATION_FLAG Self-Flagging System
 
-```typescript
-for (const [sectionName, sectionConfig] of Object.entries(sections)) {
-  // Generate passages if required
-  if (sectionConfig.requiresPassages) {
-    const passages = await generatePassages(sectionName, sectionConfig);
-  }
-  
-  // Generate questions for each sub-skill
-  for (const subSkill of sectionConfig.subSkills) {
-    const questions = await generateQuestionsForSubSkill(
-      testType, testMode, sectionName, subSkill, difficulty
-    );
-  }
-}
-```
-
-### 3.2 Individual Question Generation
-For each question, the engine (`src/engines/questionGeneration/questionGeneration.ts`):
-
-1. **Builds Claude API Prompt** using `buildQuestionPrompt()`
-2. **Calls Claude API** with retry logic via `callClaudeAPIWithRetry()`
-3. **Parses Response** using `parseClaudeResponse()`
-4. **Creates Question Object** with all required database fields
+Claude is instructed to self-flag problematic questions:
 
 ```typescript
-const question: GeneratedQuestion = {
-  question_text: parsedQuestion.question_text,
-  answer_options: parsedQuestion.answer_options,
-  correct_answer: parsedQuestion.correct_answer,
-  solution: parsedQuestion.solution,
-  // ... visual fields ...
-  test_type: request.testType,
-  section_name: request.sectionName,
-  sub_skill: request.subSkill,
-  difficulty: request.difficulty,
-  response_type: request.responseType,
-  max_points: calculateMaxPoints(testType, subSkill, responseType), // NEW
-  product_type: testType, // NEW
-  generation_metadata: {
-    generation_timestamp: new Date().toISOString(),
-    attempt_number: attempt,
-    prompt_length: prompt.length
-  }
-};
-```
-
-### 3.3 Max Points Calculation
-The engine automatically calculates `max_points` based on question type:
-
-```typescript
-function calculateMaxPoints(testType: string, subSkill: string, responseType: ResponseType): number {
-  // Writing questions have higher point values
-  if (responseType === 'extended_response' || subSkill.includes('Writing')) {
-    if (testType === 'NSW Selective Entry (Year 7 Entry)') return 50;
-    if (testType === 'VIC Selective Entry (Year 9 Entry)') return 30;
-    if (testType === 'Year 5 NAPLAN' || testType === 'Year 7 NAPLAN') return 48;
-    if (testType === 'EduTest Scholarship (Year 7 Entry)') return 15;
-    if (testType === 'ACER Scholarship (Year 7 Entry)') return 20;
-  }
-  return 1; // Multiple choice questions
-}
-```
-
----
-
-## 4. Validation Pipeline
-
-### 4.1 Enhanced Generation with Validation
-The enhanced generation system (`src/engines/questionGeneration/enhancedQuestionGeneration.ts`) adds validation:
-
-```typescript
-export async function generateQuestionWithValidation(
-  request: EnhancedQuestionRequest
-): Promise<EnhancedGenerationResult> {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    // Generate question
-    const question = await generateBasicQuestion(request, attempt);
-    
-    // Run validation pipeline
-    const validationResult = await validateQuestionWithPipeline(question);
-    
-    // Check if validation passed
-    if (validationResult.isValid) {
-      return { question, validationResult, regenerationCount, ... };
-    }
-    
-    // Auto-regenerate if validation failed
-    if (validationResult.shouldRegenerate && attempt < maxAttempts) {
-      console.log('Validation failed - regenerating...');
-      continue;
-    }
-  }
-}
-```
-
-### 4.2 Enhanced Self-Flagging Validation System
-The current validation system uses Claude's self-flagging approach for enhanced quality control:
-
-#### Claude Self-Flagging Instructions
-In the prompt generation (`src/engines/questionGeneration/claudePrompts.ts`), Claude is instructed to include a "VALIDATION_FLAG" if it detects any issues:
-
-```typescript
-CRITICAL QUALITY CONTROL:
-If you detect ANY of the following issues while creating this question, include the exact phrase "VALIDATION_FLAG" at the start of your solution field:
-
-🚨 VALIDATION FLAGS (use "VALIDATION_FLAG" if ANY apply):
+🚨 REGENERATION FLAGS (use "VALIDATION_FLAG" if ANY apply):
+- You cannot confidently verify that exactly one answer is correct
 - Your calculated answer doesn't match any of the 4 options you created
-- You need to recalculate or try a different approach during generation  
-- The question seems impossible or has no valid answer
-- You're uncertain about the correctness of your question/solution
-- The math doesn't work out properly
-- The options don't include the correct mathematical result
+- You feel uncertain about the mathematical or logical correctness
+- The question seems to have no valid solution or multiple valid solutions
+- You notice any contradictions between question, options, and solution
 ```
 
-#### Validation Detection Process
-The validation engine (`src/engines/questionGeneration/questionGeneration.ts`) checks for this flag:
+### 4.2 Validation Detection
+
+The system checks for the flag in the solution:
 
 ```typescript
-async function validateQuestionWithHallucinationCheck(question, request) {
-  // Step 1: Basic structural validation
-  const basicValidation = validateQuestion(question);
-  
-  // Step 2: Check for Claude's self-flagging (skip for writing sections)
-  const isWritingSection = request.responseType === 'extended_response';
-  const solution = question.solution || '';
-  const hasValidationFlag = !isWritingSection && solution.includes('VALIDATION_FLAG');
-  
-  let confidence = 100;
-  
-  if (hasValidationFlag) {
-    confidence = 0; // Immediate regeneration
-    errors.push('Claude flagged this question as potentially problematic (VALIDATION_FLAG detected)');
-    console.log(`🚨 VALIDATION_FLAG detected - Claude identified issues with this question`);
-  }
-  
-  return { isValid: errors.length === 0 && confidence >= 75, confidence, errors };
+const hasValidationFlag = solution.includes('VALIDATION_FLAG');
+if (hasValidationFlag) {
+  confidence = 0; // Immediate regeneration
+  errors.push('Claude flagged this question as potentially problematic');
 }
 ```
 
-#### Automatic Regeneration
-When VALIDATION_FLAG is detected:
-- **Confidence set to 0%**: Triggers immediate regeneration
-- **Error logged**: "Claude flagged this question as potentially problematic" 
-- **Solution cleaned**: Flag removed from final solution for logging
-- **Max attempts respected**: Still limited by maximum regeneration attempts
+### 4.3 Mathematical Validation
 
-### 4.3 Validation Configuration
-The validation system now uses a simplified approach:
+For mathematics sections, additional validation ensures accuracy:
+- Independent solution verification
+- Answer option matching
+- Logical consistency checks
+- Reasonable result validation
 
+### 4.4 Distractor Quality Mandates
+
+Enhanced prompts ensure quality distractors:
 ```typescript
-// Multiple choice questions (all subjects) - Self-flagging validation
-{
-  enableSelfFlagging: true,
-  minimumConfidenceThreshold: 75,
-  maxRegenerationAttempts: 3,
-  validateStructure: true
-}
-
-// Writing questions - Basic validation only
-{
-  enableSelfFlagging: false, // Skip for extended response
-  minimumConfidenceThreshold: 50,
-  maxRegenerationAttempts: 2,
-  validateStructure: true
-}
+🎯 DISTRACTOR QUALITY MANDATE - CRITICAL FOR VALID ASSESSMENT:
+For each wrong answer option, you MUST ensure it is:
+1. ✅ Plausible enough that a student might reasonably choose it
+2. ✅ Definitively wrong - cannot be defended as correct under any interpretation
 ```
-
-### 4.4 Validation Results
-The simplified validation returns:
-- **isValid**: Whether question passes all checks (structural + confidence >= 75%)
-- **confidence**: 0-100 confidence score (0 if VALIDATION_FLAG detected)
-- **errors**: Critical issues requiring regeneration
-- **warnings**: Minor structural issues
-- **score**: Overall quality score based on errors and warnings
 
 ---
 
-## 5. Auto-Regeneration Logic
+## 5. Cross-Mode Diversity System
 
-### 5.1 Regeneration Criteria
-Questions are auto-regenerated if:
-- **VALIDATION_FLAG detected** (Claude self-flagged the question)
-- **Structural validation fails** (missing fields, invalid format)
-- **Confidence below threshold** (default 75%)
-- **Attempt count < max attempts** (default 3)
+### 5.1 Diversity Tracking Components
 
-### 5.2 Regeneration Process
+The unified context tracks:
+- **Topics**: Science, history, sports, technology, etc.
+- **Scenarios**: School, home, workplace, outdoor settings
+- **Characters**: Names, professions, backgrounds
+- **Settings**: Urban, rural, historical, contemporary
+- **Writing Styles**: Narrative, informational, persuasive
+
+### 5.2 Context Management
+
 ```typescript
-for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-  // Generate question
-  const question = await generateQuestion(request);
-  
-  // Validate with hallucination check
-  const validation = await validateQuestionWithHallucinationCheck(question, request);
-  
-  if (validation.isValid) {
-    console.log(`✅ Question validated (confidence: ${validation.confidence}%)`);
-    return question;
-  } else {
-    console.warn(`❌ Question validation failed on attempt ${attempt} (confidence: ${validation.confidence}%):`, validation.errors);
-    if (attempt === maxAttempts) {
-      throw new Error(`Question validation failed after ${maxAttempts} attempts: ${validation.errors.join(', ')}`);
+const contextVariation = createEnhancedContextVariation(
+  unifiedContext,
+  plan.subSkill,
+  difficultyGroup.difficulty,
+  allQuestions.length
+);
+```
+
+The system:
+- Maintains global tracking across all test modes
+- Rotates used elements periodically
+- Ensures no repetition within practice tests
+- Maximizes variety across the entire section
+
+### 5.3 Diversity Metrics
+
+Final report includes:
+```typescript
+📊 GENERATION RESULTS:
+   Questions Generated: 588
+   Diversity Score: 94/100
+   Topic Variety: High (47 unique topics)
+   Scenario Variety: High (32 unique scenarios)
+```
+
+---
+
+## 6. Test Mode Assignment
+
+### 6.1 Proper Distribution Algorithm
+
+Questions are assigned to test modes BEFORE database storage:
+
+```typescript
+function calculateTestModeAssignments(difficultyGroup, subSkillDistribution) {
+  // For practice tests: distribute evenly across practice_1 through practice_5
+  if (difficultyGroup.testModes.includes('practice_1')) {
+    const basePerTest = Math.floor(totalQuestions / 5);
+    const remainder = totalQuestions % 5;
+    
+    // Create balanced assignment
+    for (let i = 0; i < 5; i++) {
+      const count = basePerTest + (i < remainder ? 1 : 0);
+      // Add assignments for practice_{i+1}
     }
   }
+  
+  // Shuffle to avoid predictable patterns
+  return shuffleArray(assignments);
 }
 ```
 
-### 5.3 Failure Handling
-If max attempts reached:
-- **VALIDATION_FLAG failures**: Throw error and stop generation (critical quality issue)
-- **Structural failures**: Throw error and stop generation (missing required fields)
-- **Low confidence**: Throw error with detailed failure reasons
-- **Log patterns**: All failures logged with confidence scores and error details
+### 6.2 Storage with Correct Test Mode
+
+```typescript
+// Each question stored with its assigned test mode
+const questionId = await storeQuestion(
+  generatedQuestion,
+  testType,
+  assignedTestMode, // e.g., "practice_3", not always "practice_1"
+  sectionName,
+  subSkill,
+  difficulty
+);
+```
 
 ---
 
-## 6. Supabase Storage
+## 7. Requirements Compliance
 
-### 6.1 Database Storage Process
-The storage engine (`src/engines/questionGeneration/supabaseStorage.ts`) handles database insertion:
+### 7.1 Writing Sections
 
+**Drill Quantity**: Always 6 questions per sub-skill
+- 2 Easy (difficulty 1)
+- 2 Medium (difficulty 2)
+- 2 Hard (difficulty 3)
+
+**Key Implementation**:
 ```typescript
-export async function storeQuestion(
-  question: GeneratedQuestion,
-  testType: string,
-  testMode: string,
-  sectionName: string,
-  subSkill: string,
-  difficulty: number,
-  passageId?: string,
-  questionOrder?: number
-): Promise<string>
-```
-
-### 6.2 Database Field Mapping
-The storage function maps all question fields to database columns:
-
-```typescript
-const { data, error } = await supabase
-  .from('questions')
-  .insert({
-    // Core fields
-    test_type: testType,
-    test_mode: testMode,
-    section_name: sectionName,
-    sub_skill: subSkill,
-    sub_skill_id: await getSubSkillId(subSkill), // UUID lookup
-    difficulty: difficulty,
-    
-    // Question content
-    question_text: question.question_text,
-    answer_options: question.answer_options,
-    correct_answer: question.correct_answer,
-    solution: question.solution,
-    response_type: responseType,
-    
-    // Visual content
-    has_visual: question.has_visual,
-    visual_type: question.visual_type,
-    visual_data: question.visual_data,
-    visual_svg: question.visual_svg,
-    
-    // Relationships
-    passage_id: passageId,
-    
-    // Metadata
-    year_level: getYearLevelFromTestType(testType),
-    product_type: getProductTypeFromTestType(testType),
-    max_points: calculateMaxPoints(testType, subSkill, responseType),
-    question_order: questionOrder,
-    generated_by: 'claude-sonnet-4',
-    curriculum_aligned: true
-  });
-```
-
-### 6.3 Database Tables
-
-#### Primary Table: `questions`
-All generated questions are stored in the main questions table with these key fields:
-- **Core**: `id`, `test_type`, `test_mode`, `section_name`, `sub_skill`
-- **Content**: `question_text`, `answer_options`, `correct_answer`, `solution`
-- **Scoring**: `max_points`, `response_type`, `difficulty`
-- **Metadata**: `product_type`, `year_level`, `generated_by`, `created_at`
-
-#### Supporting Table: `passages`
-Reading passages are stored separately and linked via `passage_id`:
-- **Content**: `title`, `content`, `word_count`, `passage_type`
-- **Metadata**: `difficulty`, `australian_context`, `test_type`, `section_name`
-
-### 6.4 Storage Validation
-Before storage, the system:
-- **Validates required fields** are populated
-- **Checks foreign key constraints** (passage_id, sub_skill_id)
-- **Logs storage results** with point values and relationships
-- **Returns question ID** for batch tracking
-
----
-
-## 7. Generation Scripts and Workflow
-
-### 7.1 Script Structure
-Generation scripts follow a standard pattern:
-
-```typescript
-#!/usr/bin/env node
-import dotenv from 'dotenv';
-dotenv.config();
-
-import { generateCompleteTest, getAuthoritativeTestStructure } from '../src/engines/questionGeneration/index.ts';
-
-async function main() {
-  // 1. Load test structure
-  const testStructure = getAuthoritativeTestStructure('VIC Selective Entry (Year 9 Entry)');
-  
-  // 2. Display structure and progress
-  console.log('Test Structure:', testStructure);
-  
-  // 3. Generate complete test
-  const result = await generateCompleteTest(
-    'VIC Selective Entry (Year 9 Entry)',
-    'practice_1',
-    'Medium'
-  );
-  
-  // 4. Display results
-  console.log('Generation Complete:', result);
+if (isWritingSection(sectionName)) {
+  return 6; // Never 30
 }
-
-main().catch(console.error);
 ```
 
-### 7.2 Available Scripts
-Current generation scripts in `/scripts/`:
-- `generate-vic-selective-diagnostic.ts`
-- `generate-vic-selective-practice1.ts`
-- `generate-vic-selective-practice3.ts`
-- `generate-vic-selective-drill.ts`
+### 7.2 Reading/Humanities Sections
 
-### 7.3 Running Scripts
-```bash
-# Run specific generation script
-npx tsx scripts/generate-vic-selective-practice1.ts
-
-# Run with environment variables
-CLAUDE_API_KEY=your_key npx tsx scripts/generate-vic-selective-practice1.ts
-```
-
----
-
-## 8. Error Handling and Recovery
-
-### 8.1 Generation Errors
-- **API Rate Limits**: Automatic retry with exponential backoff
-- **Parsing Errors**: Retry with different prompt variations
-- **Validation Failures**: Auto-regeneration up to max attempts
-- **Storage Errors**: Transaction rollback and error logging
-
-### 8.2 Logging and Monitoring
+**ACER Humanities**: Treated as reading comprehension
 ```typescript
-// Generation logging
-console.log(`✅ Stored question: ${subSkill} [${maxPoints} points] (ID: ${questionId})`);
-
-// Validation logging
-logValidationResult({
-  questionId: questionId,
-  testType: testType,
-  subSkill: subSkill,
-  validationResult: result,
-  timestamp: new Date().toISOString()
-});
+const readingSections = [
+  'Reading',
+  'Reading Reasoning', 
+  'Reading Comprehension',
+  'Humanities' // ACER Humanities is treated as reading comprehension
+];
 ```
 
-### 8.3 Quality Metrics
-The system tracks:
-- **Generation success rate** per test type/section
-- **Validation pass rate** and confidence scores
-- **Regeneration frequency** and failure patterns
-- **Storage success rate** and performance
+**Passage Requirements**:
+- Practice/Diagnostic: Shared passages (multiple questions per passage)
+- Drills: Mini-passages (1:1 ratio)
 
----
+### 7.3 Australian Context
 
-## 9. Configuration and Customization
+**Enforced Requirements**:
+- UK/Australian spelling: colour, centre, realise, metre, analyse
+- Currency: Australian dollars (AUD)
+- Geography: Australian cities, states, landmarks
+- Education: Year levels (not grades)
+- Culture: Local sports, holidays, customs
 
-### 9.1 Test Structure Configuration
-**IMPORTANT**: `src/data/curriculumData.ts` is the authoritative source of truth:
-- **DO NOT MODIFY** - Contains all possible sub-skills and test structures
-- For writing sections with more sub-skills than questions, system randomly selects which sub-skills to use
-- Question counts, time limits, and passage requirements are definitive
-- Sub-skill mappings in `SECTION_TO_SUB_SKILLS` must match section names in `TEST_STRUCTURES`
-
-### 9.2 Validation Configuration
-Validation is now standardized with self-flagging:
+**Implementation in Prompts**:
 ```typescript
-// All multiple choice questions use same validation approach
-const validation = await validateQuestionWithHallucinationCheck(question, request);
-
-// Writing questions skip VALIDATION_FLAG check
-const isWritingSection = request.responseType === 'extended_response';
-const hasValidationFlag = !isWritingSection && solution.includes('VALIDATION_FLAG');
+- Use UK/Australian spelling throughout ("colour", "realise", "centre", "metre", "analyse")
+- Set monetary values in Australian dollars (AUD)
+- Use Australian geographical locations and cultural references where appropriate
 ```
-
-### 9.3 Generation Parameters
-Scripts can customize:
-- **Batch size**: Questions generated per API call
-- **Max attempts**: Regeneration limits
-- **Difficulty override**: Force specific difficulty distribution
-- **Visual generation**: Enable/disable visual questions
 
 ---
 
-## 10. Quality Assurance and Testing
+## 8. Generation Scripts for All Products
 
-### 10.1 Schema Compatibility Testing
-```bash
-npx tsx scripts/test-schema-compatibility.ts
-```
-Verifies all database fields are properly populated.
+### 8.1 Unified Commands by Product
 
-### 10.2 Validation Pipeline Testing
+#### VIC Selective Entry (Year 9 Entry)
 ```bash
-npx tsx scripts/test-validation-simple.ts
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "Reading Reasoning"
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "Mathematics Reasoning"
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "General Ability - Verbal"
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "General Ability - Quantitative"
+npm run regenerate-section -- --test-type "VIC Selective Entry (Year 9 Entry)" --section "Writing"
 ```
-Tests validation pipeline with known problematic questions.
 
-### 10.3 End-to-End Testing
+#### NSW Selective Entry (Year 7 Entry)
 ```bash
-npx tsx scripts/test-full-generation.ts
+npm run regenerate-section -- --test-type "NSW Selective Entry (Year 7 Entry)" --section "Reading"
+npm run regenerate-section -- --test-type "NSW Selective Entry (Year 7 Entry)" --section "Mathematical Reasoning"
+npm run regenerate-section -- --test-type "NSW Selective Entry (Year 7 Entry)" --section "Thinking Skills"
+npm run regenerate-section -- --test-type "NSW Selective Entry (Year 7 Entry)" --section "Writing"
 ```
-Complete generation test with validation and storage.
+
+#### Year 5 & 7 NAPLAN
+```bash
+npm run regenerate-section -- --test-type "Year 5 NAPLAN" --section "Writing"
+npm run regenerate-section -- --test-type "Year 5 NAPLAN" --section "Reading"
+npm run regenerate-section -- --test-type "Year 5 NAPLAN" --section "Language Conventions"
+npm run regenerate-section -- --test-type "Year 5 NAPLAN" --section "Numeracy No Calculator"
+npm run regenerate-section -- --test-type "Year 5 NAPLAN" --section "Numeracy Calculator"
+```
+
+#### EduTest Scholarship (Year 7 Entry)
+```bash
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Reading Comprehension"
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Verbal Reasoning"
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Numerical Reasoning"
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Mathematics"
+npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "Written Expression"
+```
+
+#### ACER Scholarship (Year 7 Entry)
+```bash
+npm run regenerate-section -- --test-type "ACER Scholarship (Year 7 Entry)" --section "Written Expression"
+npm run regenerate-section -- --test-type "ACER Scholarship (Year 7 Entry)" --section "Mathematics"
+npm run regenerate-section -- --test-type "ACER Scholarship (Year 7 Entry)" --section "Humanities"  # Treated as reading
+```
+
+### 8.2 Batch Processing
+
+For complete product generation:
+```bash
+# Generate all sections for a product
+for section in "Reading Comprehension" "Verbal Reasoning" "Numerical Reasoning" "Mathematics" "Written Expression"; do
+  npm run regenerate-section -- --test-type "EduTest Scholarship (Year 7 Entry)" --section "$section" --skip-confirmation
+done
+```
 
 ---
 
-## 11. Production Deployment
+## 9. Progress Monitoring
 
-### 11.1 Environment Setup
-Required environment variables:
+### 9.1 Real-time Progress Display
+
+The system shows detailed progress during generation:
+
+```
+🚀 Starting unified generation for Verbal Reasoning in EduTest Scholarship (Year 7 Entry)
+📊 Target distribution for Verbal Reasoning:
+   practice_1: 60 questions
+   practice_2: 60 questions
+   practice_3: 60 questions
+   practice_4: 60 questions
+   practice_5: 60 questions
+   diagnostic: 48 questions
+   drill: 240 questions
+   TOTAL: 588 questions
+
+🔄 Generating questions for Analogical Reasoning & Word Relationships...
+   Difficulty 1: 12 questions
+      Distribution: practice_1:2, practice_2:3, practice_3:2, practice_4:3, practice_5:2
+   ✅ Generated question 1/588 (0%) - practice_2
+   ✅ Generated question 2/588 (0%) - practice_5
+   ✅ Generated question 3/588 (1%) - practice_1
+```
+
+### 9.2 Validation Logging
+
+```
+✅ Question validated (confidence: 100%)
+🚨 VALIDATION_FLAG detected - Claude identified issues with this question
+❌ Question validation failed on attempt 2 (confidence: 45%): ["Mathematical discrepancy detected"]
+```
+
+### 9.3 Final Generation Report
+
+```
+🎉 REGENERATION SUMMARY:
+   Status: SUCCESS
+   Questions Generated: 588
+   Diversity Score: 94/100
+   Total Duration: 1247s
+   Errors: 0
+   Warnings: 2
+
+📊 DISTRIBUTION BY TEST MODE:
+   practice_1: 60 questions
+   practice_2: 60 questions
+   practice_3: 60 questions
+   practice_4: 60 questions
+   practice_5: 60 questions
+   diagnostic: 48 questions
+   drill: 240 questions
+
+🎯 SUB-SKILL BREAKDOWN:
+   Analogical Reasoning & Word Relationships: 71 questions (diversity: 92/100)
+   Vocabulary & Semantic Knowledge: 71 questions (diversity: 95/100)
+   [... more sub-skills ...]
+
+✅ Section regeneration completed successfully!
+   - All test modes now have fresh, diverse questions
+   - Zero duplicates across practice tests, drills, and diagnostic
+   - Enhanced educational explanations with actionable tips
+```
+
+---
+
+## 10. Quality Assurance
+
+### 10.1 Built-in Quality Checks
+
+#### Authoritative Data Validation
+- Verifies question counts match curriculumData.ts
+- Validates sub-skill alignment
+- Checks passage requirements
+
+#### Cross-Mode Diversity Verification
+- Ensures no duplicate topics across practice tests
+- Validates character name uniqueness
+- Checks scenario variety
+
+#### Test Mode Distribution Balance
+- Verifies even distribution across practice tests
+- Validates difficulty progression
+- Checks sub-skill coverage
+
+#### Australian Context Compliance
+- Validates spelling conventions
+- Checks currency formatting
+- Verifies cultural appropriateness
+
+### 10.2 Educational Value Enhancement
+
+#### Structured Solution Format
+```
+**Correct Answer: [Letter]**
+[Clear explanation of why this answer is correct]
+
+**Why Other Options Are Wrong:**
+- A: [Specific reason why incorrect]
+- B: [Specific reason why incorrect]
+- C: [Specific reason why incorrect]
+- D: [Specific reason why incorrect]
+
+**Tips for Similar Questions:**
+• [Strategy for this type of question]
+• [Pattern recognition technique]
+• [Common mistake to avoid]
+```
+
+#### Subject-Specific Tips
+- Over 200 actionable strategies organized by subject
+- Tips tailored to sub-skill and difficulty level
+- Age-appropriate guidance for students
+
+---
+
+## 11. Error Handling and Recovery
+
+### 11.1 Automatic Recovery Mechanisms
+
+- **API Rate Limits**: Exponential backoff with retry
+- **Validation Failures**: Auto-regeneration up to 3 attempts
+- **Passage Generation Errors**: Fallback to standalone questions
+- **Storage Failures**: Transaction rollback with detailed logging
+
+### 11.2 Manual Intervention Points
+
+- **Persistent Validation Failures**: Logged for manual review
+- **Diversity Threshold Breaches**: Warning with continuation option
+- **API Quota Exhaustion**: Graceful pause with resume capability
+
+---
+
+## 12. Production Deployment
+
+### 12.1 Environment Requirements
+
 ```bash
+# Required environment variables
 VITE_CLAUDE_API_KEY=your_anthropic_api_key
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 11.2 Deployment Checklist
-- [ ] Environment variables configured
-- [ ] Database schema up to date with migrations
-- [ ] Test structure data populated in `curriculumData.ts`
-- [ ] Validation pipeline tested and configured
-- [ ] Generation scripts tested for target products
-- [ ] Error logging and monitoring enabled
+### 12.2 Pre-Deployment Checklist
 
-### 11.3 Monitoring and Maintenance
-- **Track generation metrics** and success rates
-- **Monitor validation failures** for pattern analysis
-- **Review manual review queue** regularly
-- **Update test structures** as curriculum changes
-- **Optimize prompts** based on quality feedback
+- [ ] Verify curriculumData.ts is up to date
+- [ ] Test unified generation for sample section
+- [ ] Validate passage generation for reading sections
+- [ ] Check Australian context compliance
+- [ ] Review validation thresholds
+- [ ] Test error recovery mechanisms
+
+### 12.3 Monitoring Production Generation
+
+- Track generation success rates by product/section
+- Monitor validation failure patterns
+- Review diversity metrics trends
+- Analyze generation time performance
+- Audit Australian context compliance
 
 ---
 
 ## Summary
 
-The question generation system provides a complete end-to-end solution from user specification to database storage, with enhanced quality assurance through Claude's self-flagging validation system. The system is designed to be:
+The unified question generation system represents a significant advancement in educational content creation:
 
-- **Scalable**: Handles all 6 test products with consistent quality
-- **Reliable**: Self-flagging validation catches hallucinations and errors automatically
-- **Maintainable**: Simplified validation logic with clear separation of concerns
-- **Authoritative**: curriculumData.ts provides definitive test structures
-- **Production-Ready**: Complete error handling, monitoring, and background generation
+**Architectural Improvements**:
+- Single operation generates all test modes with shared context
+- Pre-generated shared passages for efficient question creation
+- Cross-mode diversity tracking prevents content repetition
+- Proper test mode assignment before database storage
 
-## Key Improvements in Current System
+**Quality Enhancements**:
+- VALIDATION_FLAG self-flagging catches problems early
+- Prevention-based prompts reduce error rates
+- Enhanced educational value with structured explanations
+- Australian context fully integrated
 
-1. **Self-Flagging Validation**: Claude uses "VALIDATION_FLAG" to self-report problematic questions
-2. **Simplified Architecture**: Removed complex multi-step validation in favor of intelligent self-checking
-3. **Authoritative Configuration**: curriculumData.ts as read-only source of truth
-4. **Enhanced Context Tracking**: Fixed variety mechanism using `questionsBySubSkill` 
-5. **Universal Coverage**: VALIDATION_FLAG system works across all test products and sections
-6. **Background Generation**: Scripts can run in background with live progress updates
+**Operational Benefits**:
+- Simplified command structure for all products
+- Real-time progress monitoring
+- Comprehensive final reports
+- Automatic error recovery
 
-The system is now production-ready for generating comprehensive question banks across all 6 test products.
+The system is production-ready for generating high-quality, diverse question banks across all 6 test products while maintaining strict quality standards and educational value.

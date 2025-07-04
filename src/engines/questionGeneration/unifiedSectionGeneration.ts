@@ -109,6 +109,7 @@ interface UnifiedSectionResult {
  * Calculate target distribution for all test modes in a section
  */
 function calculateSectionDistribution(testType: string, sectionName: string): TestModeDistribution {
+  // AUTHORITATIVE: Get section structure from curriculum data
   const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
   const sectionStructure = testStructure?.[sectionName as keyof typeof testStructure];
   
@@ -116,30 +117,48 @@ function calculateSectionDistribution(testType: string, sectionName: string): Te
     throw new Error(`Invalid section structure for ${testType} - ${sectionName}`);
   }
   
-  const baseQuestions = (sectionStructure as any).questions;
+  // AUTHORITATIVE: Use exact question counts from curriculum data
+  const authoritativeQuestions = (sectionStructure as any).questions;
+  const authoritativeFormat = (sectionStructure as any).format;
+  const authoritativeTime = (sectionStructure as any).time;
+  const authoritativePassages = (sectionStructure as any).passages || 0;
+  const authoritativeWordsPerPassage = (sectionStructure as any).words_per_passage || 0;
   
-  // Calculate questions per test mode based on section type
-  let practiceQuestions = baseQuestions;
-  let diagnosticQuestions = baseQuestions;
-  let drillQuestions = 0;
+  console.log(`📚 AUTHORITATIVE DATA - ${testType} - ${sectionName}:`);
+  console.log(`   Questions per practice test: ${authoritativeQuestions} (FIXED)`);
+  console.log(`   Format: ${authoritativeFormat}`);
+  console.log(`   Time: ${authoritativeTime} minutes`);
+  if (authoritativePassages > 0) {
+    console.log(`   Passages: ${authoritativePassages} passages, ${authoritativeWordsPerPassage} words each`);
+  }
   
   // Get sub-skills for this section
   const compoundKey = `${testType} - ${sectionName}` as keyof typeof SECTION_TO_SUB_SKILLS;
   const subSkills = SECTION_TO_SUB_SKILLS[compoundKey] || 
                    SECTION_TO_SUB_SKILLS[sectionName as keyof typeof SECTION_TO_SUB_SKILLS] || [];
   
+  console.log(`   Sub-skills: ${subSkills.length} (${subSkills.join(', ')})`);
+  
+  // AUTHORITATIVE: Practice questions come directly from curriculum data
+  const practiceQuestions = authoritativeQuestions;
+  
+  // Calculate diagnostic and drill based on authoritative practice count and section type
+  let diagnosticQuestions: number;
+  let drillQuestions: number;
+  
   if (isWritingSection(sectionName)) {
-    // Writing sections: fewer questions overall
-    practiceQuestions = 1; // 1 writing prompt per practice test
-    diagnosticQuestions = 2; // 2 writing prompts for diagnostic
+    // Writing sections: special handling
+    diagnosticQuestions = Math.max(1, Math.round(authoritativeQuestions * 0.5)); // 50% for writing due to longer time
     drillQuestions = subSkills.length * 6; // 6 questions per sub-skill (2 easy + 2 medium + 2 hard)
+    console.log(`   Writing section detected: reduced diagnostic count, 6 drill questions per sub-skill`);
   } else {
-    // Non-writing sections: standard distribution
-    diagnosticQuestions = subSkills.length * 6; // 6 questions per sub-skill for diagnostic (2 per difficulty)
+    // Non-writing sections: proportional to practice test size
+    diagnosticQuestions = Math.round(authoritativeQuestions * 0.8); // 80% of practice test size
     drillQuestions = subSkills.length * 30; // 30 questions per sub-skill for drills (10 per difficulty)
+    console.log(`   Standard section: diagnostic = 80% of practice, 30 drill questions per sub-skill`);
   }
   
-  return {
+  const distribution = {
     practice_1: practiceQuestions,
     practice_2: practiceQuestions,
     practice_3: practiceQuestions,
@@ -148,6 +167,15 @@ function calculateSectionDistribution(testType: string, sectionName: string): Te
     diagnostic: diagnosticQuestions,
     drill: drillQuestions
   };
+  
+  const totalQuestions = practiceQuestions * 5 + diagnosticQuestions + drillQuestions;
+  console.log(`📊 CALCULATED DISTRIBUTION:`);
+  console.log(`   Practice: ${practiceQuestions} each × 5 = ${practiceQuestions * 5} total`);
+  console.log(`   Diagnostic: ${diagnosticQuestions}`);
+  console.log(`   Drills: ${drillQuestions} (${subSkills.length} sub-skills × ${drillQuestions / subSkills.length} each)`);
+  console.log(`   GRAND TOTAL: ${totalQuestions} questions`);
+  
+  return distribution;
 }
 
 /**
@@ -526,6 +554,228 @@ function distributeQuestionsAcrossTestModes(
 }
 
 /**
+ * Group questions by their assigned test mode (since they're now correctly stored)
+ */
+function groupQuestionsByTestMode(allQuestions: any[]): Record<string, any[]> {
+  const questionsByTestMode: Record<string, any[]> = {
+    practice_1: [],
+    practice_2: [],
+    practice_3: [],
+    practice_4: [],
+    practice_5: [],
+    diagnostic: [],
+    drill: []
+  };
+  
+  // Group questions by their stored test mode
+  allQuestions.forEach(question => {
+    const testMode = question.test_mode;
+    if (questionsByTestMode[testMode]) {
+      questionsByTestMode[testMode].push(question);
+    }
+  });
+  
+  // Shuffle questions within each test mode for additional variety
+  Object.keys(questionsByTestMode).forEach(testMode => {
+    questionsByTestMode[testMode] = shuffleArray(questionsByTestMode[testMode]);
+  });
+  
+  return questionsByTestMode;
+}
+
+/**
+ * Calculate proper test mode assignments for a difficulty group
+ * Uses round-robin distribution to ensure perfectly balanced assignment
+ */
+function calculateTestModeAssignments(
+  difficultyGroup: { difficulty: number; count: number; testModes: string[] },
+  subSkillDistribution: { practice_1: number; practice_2: number; practice_3: number; practice_4: number; practice_5: number; diagnostic: number; drill: number; }
+): string[] {
+  const assignments: string[] = [];
+  
+  // For practice test modes, use round-robin distribution for perfect balance
+  if (difficultyGroup.testModes.includes('practice_1')) {
+    const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
+    const totalPracticeQuestions = difficultyGroup.count;
+    
+    // Use round-robin assignment for perfect distribution
+    const practiceAssignments: string[] = [];
+    for (let questionIndex = 0; questionIndex < totalPracticeQuestions; questionIndex++) {
+      const testModeIndex = questionIndex % practiceTestModes.length;
+      practiceAssignments.push(practiceTestModes[testModeIndex]);
+    }
+    
+    // Shuffle to avoid predictable ordering (e.g., practice_1, practice_2, practice_3, practice_1...)
+    assignments.push(...shuffleArray(practiceAssignments));
+    
+    console.log(`        Round-robin assignment for ${totalPracticeQuestions} questions:`, 
+      practiceAssignments.reduce((count, mode) => {
+        count[mode] = (count[mode] || 0) + 1;
+        return count;
+      }, {} as Record<string, number>));
+  }
+  
+  // For diagnostic mode
+  if (difficultyGroup.testModes.includes('diagnostic')) {
+    for (let i = 0; i < difficultyGroup.count; i++) {
+      assignments.push('diagnostic');
+    }
+  }
+  
+  // For drill mode
+  if (difficultyGroup.testModes.includes('drill')) {
+    for (let i = 0; i < difficultyGroup.count; i++) {
+      assignments.push('drill');
+    }
+  }
+  
+  // Return assignments (already shuffled within practice test groups)
+  return assignments;
+}
+
+/**
+ * Generate shared passages for reading sections according to curriculum data
+ */
+async function generateSharedPassagesForReading(
+  request: UnifiedSectionRequest,
+  targetDistribution: TestModeDistribution
+): Promise<Map<string, { id: string; content: string }>> {
+  
+  // Get curriculum data for passage specifications
+  const testStructure = TEST_STRUCTURES[request.testType as keyof typeof TEST_STRUCTURES];
+  const sectionStructure = testStructure?.[request.sectionName as keyof typeof testStructure];
+  
+  if (!sectionStructure) {
+    throw new Error(`Section structure not found: ${request.testType} - ${request.sectionName}`);
+  }
+  
+  const authoritativePassages = (sectionStructure as any).passages || 0;
+  const authoritativeWordsPerPassage = (sectionStructure as any).words_per_passage || 200;
+  
+  console.log(`📚 Generating ${authoritativePassages} shared passages (${authoritativeWordsPerPassage} words each)...`);
+  
+  const passagesMap = new Map<string, { id: string; content: string }>();
+  
+  // Generate passages for each practice test
+  for (let practiceNum = 1; practiceNum <= 5; practiceNum++) {
+    const testMode = `practice_${practiceNum}`;
+    
+    for (let passageNum = 1; passageNum <= authoritativePassages; passageNum++) {
+      const passageKey = `${testMode}_passage_${passageNum}`;
+      
+      console.log(`   Generating ${passageKey}...`);
+      
+      try {
+        const passage = await generateMiniPassage({
+          testType: request.testType,
+          sectionName: request.sectionName,
+          testMode: testMode,
+          wordCount: authoritativeWordsPerPassage,
+          difficulty: 2, // Medium difficulty for shared passages
+          passageType: 'informational',
+          generationContext: {}, // Basic context for shared passages
+          isMiniPassage: false,
+          subSkill: `Shared passage ${passageNum} for ${testMode}`
+        });
+        
+        const storedPassageId = await storePassage(
+          passage,
+          request.testType,
+          testMode,
+          request.sectionName
+        );
+        
+        passagesMap.set(passageKey, {
+          id: storedPassageId,
+          content: passage.content
+        });
+        
+        console.log(`   ✅ Generated ${passageKey} (${authoritativeWordsPerPassage} words)`);
+        
+      } catch (error) {
+        console.error(`   ❌ Failed to generate ${passageKey}: ${error}`);
+      }
+    }
+  }
+  
+  // Generate passages for diagnostic test
+  for (let passageNum = 1; passageNum <= authoritativePassages; passageNum++) {
+    const passageKey = `diagnostic_passage_${passageNum}`;
+    
+    console.log(`   Generating ${passageKey}...`);
+    
+    try {
+      const passage = await generateMiniPassage({
+        testType: request.testType,
+        sectionName: request.sectionName,
+        testMode: 'diagnostic',
+        wordCount: authoritativeWordsPerPassage,
+        difficulty: 2, // Medium difficulty for shared passages
+        passageType: 'informational',
+        generationContext: {},
+        isMiniPassage: false,
+        subSkill: `Shared passage ${passageNum} for diagnostic`
+      });
+      
+      const storedPassageId = await storePassage(
+        passage,
+        request.testType,
+        'diagnostic',
+        request.sectionName
+      );
+      
+      passagesMap.set(passageKey, {
+        id: storedPassageId,
+        content: passage.content
+      });
+      
+      console.log(`   ✅ Generated ${passageKey} (${authoritativeWordsPerPassage} words)`);
+      
+    } catch (error) {
+      console.error(`   ❌ Failed to generate ${passageKey}: ${error}`);
+    }
+  }
+  
+  console.log(`📚 Shared passage generation complete: ${passagesMap.size} passages created`);
+  return passagesMap;
+}
+
+/**
+ * Determine which passage a question should use based on curriculum data
+ */
+function getPassageKeyForQuestion(
+  testMode: string,
+  questionIndex: number,
+  targetDistribution: TestModeDistribution
+): string {
+  
+  // For practice tests, distribute questions evenly across passages
+  if (testMode.startsWith('practice_')) {
+    const questionsPerPracticeTest = targetDistribution.practice_1;
+    const passagesPerPracticeTest = 5; // From curriculum data
+    const questionsPerPassage = Math.ceil(questionsPerPracticeTest / passagesPerPracticeTest);
+    
+    // Determine which passage this question should use
+    const practiceQuestionIndex = questionIndex % questionsPerPracticeTest;
+    const passageNumber = Math.floor(practiceQuestionIndex / questionsPerPassage) + 1;
+    
+    return `${testMode}_passage_${Math.min(passageNumber, passagesPerPracticeTest)}`;
+  }
+  
+  // For diagnostic, distribute across passages
+  if (testMode === 'diagnostic') {
+    const diagnosticQuestions = targetDistribution.diagnostic;
+    const passagesForDiagnostic = 5; // From curriculum data
+    const questionsPerPassage = Math.ceil(diagnosticQuestions / passagesForDiagnostic);
+    
+    const passageNumber = Math.floor(questionIndex / questionsPerPassage) + 1;
+    return `diagnostic_passage_${Math.min(passageNumber, passagesForDiagnostic)}`;
+  }
+  
+  return `${testMode}_passage_1`; // Fallback
+}
+
+/**
  * Shuffle array for additional randomization
  */
 function shuffleArray<T>(array: T[]): T[] {
@@ -565,7 +815,15 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
     // Step 3: Initialize unified context
     const unifiedContext = initializeUnifiedContext(request.testType, request.sectionName, totalQuestions);
     
-    // Step 4: Generate questions for each sub-skill with unified diversity tracking
+    // Step 4: Pre-generate shared passages for reading sections
+    let sharedPassagesMap: Map<string, { id: string; content: string }> = new Map();
+    
+    if (isReadingSection(request.sectionName)) {
+      console.log(`\n📚 Pre-generating shared passages for reading section...`);
+      sharedPassagesMap = await generateSharedPassagesForReading(request, targetDistribution);
+    }
+    
+    // Step 5: Generate questions for each sub-skill with unified diversity tracking
     const allQuestions: any[] = [];
     const passageIds: string[] = [];
     const errors: string[] = [];
@@ -577,7 +835,23 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
       for (const difficultyGroup of plan.difficultyBreakdown) {
         console.log(`   Difficulty ${difficultyGroup.difficulty}: ${difficultyGroup.count} questions`);
         
+        // Calculate test mode assignments for this difficulty group
+        const testModeAssignments = calculateTestModeAssignments(difficultyGroup, plan.distribution);
+        
+        // Log the distribution for this difficulty
+        const modeCount = testModeAssignments.reduce((acc, mode) => {
+          acc[mode] = (acc[mode] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        const modeDistribution = Object.entries(modeCount)
+          .map(([mode, count]) => `${mode}:${count}`)
+          .join(', ');
+        console.log(`      Distribution: ${modeDistribution}`);
+        
         for (let i = 0; i < difficultyGroup.count; i++) {
+          // Determine which test mode this specific question should be assigned to
+          const assignedTestMode = testModeAssignments[i];
           try {
             // Create enhanced context variation for diversity
             const contextVariation = createEnhancedContextVariation(
@@ -592,10 +866,10 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
             let passageId = '';
             
             if (isReadingSection(request.sectionName)) {
-              // For reading sections, generate appropriate passages
-              if (difficultyGroup.testModes.includes('drill')) {
-                // Generate mini-passage for drill questions
-                console.log(`        📖 Generating mini-passage for drill question...`);
+              // For reading sections, generate appropriate passages based on test mode
+              if (assignedTestMode === 'drill') {
+                // DRILLS: Generate mini-passage for each question (1:1 ratio)
+                console.log(`        📖 Generating mini-passage for drill question (1:1 ratio)...`);
                 
                 const miniPassage = await generateMiniPassage({
                   testType: request.testType,
@@ -620,8 +894,22 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
                 
                 passageId = storedPassageId;
                 passageIds.push(passageId);
+                
+              } else if (assignedTestMode.startsWith('practice_') || assignedTestMode === 'diagnostic') {
+                // PRACTICE/DIAGNOSTIC: Use pre-generated shared passages
+                const passageKey = getPassageKeyForQuestion(assignedTestMode, allQuestions.length, targetDistribution);
+                const sharedPassage = sharedPassagesMap.get(passageKey);
+                
+                if (sharedPassage) {
+                  passageContent = sharedPassage.content;
+                  passageId = sharedPassage.id;
+                  console.log(`        📚 Using shared passage: ${passageKey}`);
+                } else {
+                  console.log(`        ⚠️  WARNING: No shared passage found for ${passageKey}, generating standalone question`);
+                  passageContent = '';
+                  passageId = '';
+                }
               }
-              // For practice/diagnostic, passages would be generated separately and reused
             }
             
             // Generate the question
@@ -631,26 +919,27 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
               subSkill: plan.subSkill,
               difficulty: difficultyGroup.difficulty,
               responseType: getSectionResponseType(request.sectionName),
-              generateVisual: false,
+              generateVisual: false, // Visual generation disabled per requirements
               generationContext: contextVariation,
               passageContent
             };
             
             const generatedQuestion = await generateQuestion(questionRequest);
             
-            // Store question in database
+            // Store question in database with correct test mode
             const questionId = await storeQuestion(
               generatedQuestion,
               request.testType,
-              difficultyGroup.testModes[0], // Use first test mode for storage
+              assignedTestMode, // Use properly assigned test mode
               request.sectionName,
               plan.subSkill,
               difficultyGroup.difficulty,
               passageId || undefined
             );
             
-            // Update question with database ID
+            // Update question with database ID and test mode
             generatedQuestion.id = questionId;
+            generatedQuestion.test_mode = assignedTestMode;
             
             // Add to collection
             allQuestions.push(generatedQuestion);
@@ -658,7 +947,7 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
             // Update unified context for diversity tracking
             updateUnifiedContext(unifiedContext, generatedQuestion, plan.subSkill);
             
-            console.log(`        ✅ Generated question ${allQuestions.length}/${totalQuestions} (${Math.round(allQuestions.length / totalQuestions * 100)}%)`);
+            console.log(`        ✅ Generated question ${allQuestions.length}/${totalQuestions} (${Math.round(allQuestions.length / totalQuestions * 100)}%) - ${assignedTestMode}`);
             
             // Progress-based delay to avoid rate limiting
             const delay = 1000 + Math.random() * 1000; // 1-2 seconds
@@ -668,14 +957,20 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
             const errorMessage = `Failed to generate question for ${plan.subSkill} (difficulty ${difficultyGroup.difficulty}): ${error instanceof Error ? error.message : 'Unknown error'}`;
             errors.push(errorMessage);
             console.error(`        ❌ ${errorMessage}`);
+            
+            // For VALIDATION_FLAG errors, add a warning but continue
+            if (error instanceof Error && error.message.includes('VALIDATION_FLAG')) {
+              warnings.push(`Question skipped due to validation flag: ${plan.subSkill} (difficulty ${difficultyGroup.difficulty})`);
+              console.warn(`        ⚠️  Skipping question due to validation flag - will continue with remaining questions`);
+            }
           }
         }
       }
     }
     
-    // Step 5: Distribute questions across test modes
-    console.log(`\n📋 Distributing ${allQuestions.length} questions across test modes...`);
-    const questionsByTestMode = distributeQuestionsAcrossTestModes(allQuestions, subSkillPlans);
+    // Step 5: Group questions by test mode (they're already correctly assigned)
+    console.log(`\n📋 Grouping ${allQuestions.length} questions by test mode...`);
+    const questionsByTestMode = groupQuestionsByTestMode(allQuestions);
     
     console.log(`📊 Final distribution:`);
     Object.entries(questionsByTestMode).forEach(([mode, questions]) => {
@@ -693,6 +988,14 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
     
     console.log(`\n🎉 Unified generation complete!`);
     console.log(`✅ Generated: ${allQuestions.length}/${totalQuestions} questions`);
+    
+    // Report missing questions if any
+    const missingQuestions = totalQuestions - allQuestions.length;
+    if (missingQuestions > 0) {
+      console.log(`⚠️  Missing: ${missingQuestions} questions (likely due to validation flags or generation failures)`);
+      console.log(`   These questions will need to be generated manually or via retry`);
+    }
+    
     console.log(`🎯 Diversity Score: ${finalDiversityMetrics.overallScore}/100`);
     console.log(`📖 Passages Created: ${passageIds.length}`);
     console.log(`⚠️  Errors: ${errors.length}`);

@@ -317,22 +317,22 @@ const TestTaking: React.FC = () => {
       
       console.log('🔍 Practice: Found test type with modes:', currentTestType.testModes.map(tm => ({ id: tm.id, name: tm.name, sections: tm.sections.length })));
 
-      // Find the section by ID across all practice modes (practice_1, practice_2, practice_3)
+      // Find the section in the SPECIFIC practice mode requested (actualTestMode)
       let foundSection = null;
-      for (const testMode of currentTestType.testModes) {
-        // Check for practice modes: practice_1, practice_2, practice_3, etc.
-        if (testMode.id && (testMode.id.startsWith('practice_') || testMode.name.toLowerCase().includes('practice'))) {
-          console.log('🔍 Checking practice mode:', testMode.name, 'with', testMode.sections.length, 'sections');
-          foundSection = testMode.sections.find(section => 
-            section.id === subjectId || 
-            section.name.toLowerCase().includes(subjectId.toLowerCase()) ||
-            subjectId.toLowerCase().includes(section.name.toLowerCase())
-          );
-          if (foundSection && foundSection.questions.length > 0) {
-            console.log('✅ Found section in practice mode:', testMode.name, 'section:', foundSection.name, 'questions:', foundSection.questions.length);
-            break;
-          }
+      const targetTestMode = currentTestType.testModes.find(mode => mode.id === actualTestMode);
+      
+      if (targetTestMode) {
+        console.log('🔍 Loading specific practice mode:', targetTestMode.name, 'with', targetTestMode.sections.length, 'sections');
+        foundSection = targetTestMode.sections.find(section => 
+          section.id === subjectId || 
+          section.name.toLowerCase().includes(subjectId.toLowerCase()) ||
+          subjectId.toLowerCase().includes(section.name.toLowerCase())
+        );
+        if (foundSection && foundSection.questions.length > 0) {
+          console.log('✅ Found section in specific practice mode:', targetTestMode.name, 'section:', foundSection.name, 'questions:', foundSection.questions.length);
         }
+      } else {
+        console.error('🔍 Practice: Target test mode not found:', actualTestMode);
       }
 
       if (!foundSection || foundSection.questions.length === 0) {

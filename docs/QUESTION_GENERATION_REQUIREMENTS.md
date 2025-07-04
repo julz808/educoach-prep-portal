@@ -148,21 +148,27 @@ This document provides comprehensive requirements for generating questions acros
 - **Topics:** Ensure broad coverage across subject areas
 - **Text Types:** Balance narrative, informational, and persuasive passages
 
-## Australian Context Requirements
+## Content Standards and Context Requirements
 
-### Mandatory Australian Elements
-- **Currency:** Australian dollars (AUD)
-- **Geography:** Australian cities, states, landmarks
-- **Spelling:** Australian English (colour, centre, realise, etc.)
-- **Culture:** Australian holidays, sports, customs
-- **Education:** Australian school terms, year levels
-- **Wildlife:** Native Australian animals where relevant
-- **History:** Australian historical events and figures where appropriate
+### Mandatory Language Standards
+- **Spelling:** UK/Australian English consistently (colour, centre, realise, metre, analyse)
+- **Grammar:** Standard Australian English conventions
+- **Currency:** Use context-appropriate currency (not restricted to AUD)
+- **Measurements:** Metric system with Australian terminology
 
-### Balanced International Content
-- **Global Perspectives:** Include international content for broader education
-- **Cultural Diversity:** Represent various cultures while maintaining Australian focus
-- **Universal Themes:** Use themes that resonate with Australian students
+### Content Diversity and International Perspective
+- **Global Settings:** Use diverse international and Australian locations
+- **Cultural Variety:** Include characters and scenarios from various cultural backgrounds
+- **Universal Themes:** Focus on content that engages and educates students globally
+- **Local Relevance:** Include some Australian content as part of natural diversity
+- **Accessibility:** Ensure content is accessible to students from diverse backgrounds
+
+### Balanced Content Approach
+- **No Geographic Restrictions:** Questions can be set anywhere in the world
+- **Cultural Inclusivity:** Represent various cultures, ethnicities, and perspectives
+- **Educational Value:** Prioritize learning outcomes over geographic specificity
+- **Student Engagement:** Use scenarios and contexts that resonate with the target age group
+- **Content Flexibility:** Allow international examples while maintaining language standards
 
 ## Quality Validation Rules
 

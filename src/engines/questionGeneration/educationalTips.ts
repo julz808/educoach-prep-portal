@@ -94,7 +94,7 @@ export const READING_COMPREHENSION_TIPS: SubjectTips = {
       "Consider whether the author's reasoning is logical and well-supported",
       "Distinguish between facts (can be proven) and opinions (personal beliefs or judgments)"
     ],
-    'Author's Purpose & Perspective': [
+    'Author\'s Purpose & Perspective': [
       "Pay attention to the author's tone and word choices to understand their viewpoint",
       "Look for bias indicators - one-sided language or unfair generalizations",
       "Consider what the author emphasizes and what they choose to leave out",

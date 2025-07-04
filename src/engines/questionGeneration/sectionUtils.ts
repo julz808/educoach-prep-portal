@@ -150,20 +150,31 @@ export function getSectionResponseType(sectionName: string): 'multiple_choice' |
 }
 
 /**
+ * Determines if Australian context should be included (not mandatory)
+ * Note: UK/Australian spelling is always enforced regardless of this function
+ */
+export function preferAustralianContext(sectionName: string, testType: string): boolean {
+  // NAPLAN tests benefit from some Australian context but it's not mandatory
+  if (testType.includes('NAPLAN')) {
+    return true; // Prefer but don't require
+  }
+  
+  // Some mathematics word problems may benefit from Australian context
+  if (isMathSection(sectionName)) {
+    return true; // Prefer but don't require
+  }
+  
+  // All other sections can use international content freely
+  return false;
+}
+
+/**
+ * @deprecated Use preferAustralianContext instead
  * Determines if Australian context is mandatory for the section
  */
 export function requiresAustralianContext(sectionName: string, testType: string): boolean {
-  // All NAPLAN tests strongly prefer Australian context
-  if (testType.includes('NAPLAN')) {
-    return true;
-  }
-  
-  // Mathematics word problems should use Australian context
-  if (isMathSection(sectionName)) {
-    return true;
-  }
-  
-  // Reading passages benefit from Australian context but can be international
+  // No sections require mandatory Australian context anymore
+  // Only UK/Australian spelling is mandatory
   return false;
 }
 

@@ -10,7 +10,6 @@ import { config } from 'dotenv';
 config();
 
 import { generateUnifiedSection } from '../src/engines/questionGeneration/unifiedSectionGeneration.ts';
-import { cleanupQuestions } from './cleanup-questions-by-product.ts';
 
 interface RegenerationRequest {
   testType: string;
@@ -59,33 +58,10 @@ export async function regenerateSection(request: RegenerationRequest): Promise<R
     // Step 1: Cleanup existing questions if requested
     if (request.cleanFirst) {
       console.log('🧹 STEP 1: Cleaning existing questions...');
-      
-      if (!request.skipConfirmation) {
-        console.log('⚠️  This will delete existing questions for this section.');
-        console.log('   Continue? This action cannot be undone.');
-        console.log('   Use --skip-confirmation to bypass this prompt in automation');
-        
-        // In a real implementation, you'd want to add actual user confirmation
-        // For now, we'll proceed with a warning
-        console.log('   Proceeding with cleanup...');
-      }
-      
-      const cleanupResult = await cleanupQuestions({
-        testType: request.testType,
-        sectionName: request.sectionName,
-        dryRun: false
-      });
-      
-      result.cleanupResult = cleanupResult;
-      
-      if (cleanupResult.errors.length > 0) {
-        result.errors.push(...cleanupResult.errors);
-        console.error('❌ Cleanup failed - aborting regeneration');
-        result.duration = Date.now() - startTime;
-        return result;
-      }
-      
-      console.log(`✅ Cleanup complete: ${cleanupResult.deleted} questions removed`);
+      console.log('⚠️  Cleanup functionality temporarily disabled - manual cleanup required');
+      console.log('   Use the cleanup script separately:');
+      console.log(`   npm run cleanup-questions -- --test-type "${request.testType}" --section "${request.sectionName}"`);
+      console.log('   Continuing with generation...');
     }
     
     // Step 2: Generate unified section
@@ -329,7 +305,7 @@ Common Sections:
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     console.error('❌ Script failed:', error);
     process.exit(1);

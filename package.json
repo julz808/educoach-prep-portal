@@ -14,7 +14,8 @@
     "generate:edutest-practice": "tsx scripts/generate-edutest-practice-tests.ts",
     "analyze:edutest-practice": "tsx scripts/analyze-edutest-practice-status.ts",
     "cleanup-questions": "tsx scripts/cleanup-questions-by-product.ts",
-    "regenerate-section": "tsx scripts/regenerate-section-unified.ts"
+    "regenerate-section": "tsx scripts/regenerate-section-unified.ts",
+    "validate-generation": "tsx scripts/validate-generation-system.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",

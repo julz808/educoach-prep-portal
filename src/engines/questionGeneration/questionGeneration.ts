@@ -529,7 +529,7 @@ async function validateQuestionWithHallucinationCheck(question: GeneratedQuestio
  * Generates a single question
  */
 export async function generateQuestion(request: SingleQuestionRequest): Promise<GeneratedQuestion> {
-  const maxAttempts = 3;
+  const maxAttempts = 5; // Increased from 3 to 5 to handle validation flags better
   let lastError: Error | null = null;
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
