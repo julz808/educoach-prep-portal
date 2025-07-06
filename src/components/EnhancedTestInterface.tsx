@@ -80,8 +80,12 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   const [warningsShown, setWarningsShown] = useState<Set<number>>(new Set());
   const [writingAssessment, setWritingAssessment] = useState<any>(null);
   const [loadingAssessment, setLoadingAssessment] = useState(false);
+  const [showDrillFeedback, setShowDrillFeedback] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
+  
+  // Check if this is drill mode (only drill mode has showFeedback but not review mode)
+  const isDrillMode = showFeedback && !isReviewMode;
   
   // Check if all questions in this test are writing questions
   const isWritingSection = questions.length > 0 && questions.every(q => 
@@ -119,6 +123,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   useEffect(() => {
     setSelectedAnswer(answers[currentQuestionIndex] ?? null);
     setTextAnswer(textAnswers[currentQuestionIndex] ?? '');
+    // Reset drill feedback when question changes
+    setShowDrillFeedback(false);
   }, [currentQuestionIndex, answers, textAnswers]);
 
   // Load writing assessment for current question in review mode
@@ -190,7 +196,8 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showFeedback || isReviewMode) return; // Don't allow selection in review mode
+    // Don't allow selection in review mode or when drill feedback is being shown
+    if (isReviewMode || (isDrillMode && showDrillFeedback)) return;
     setSelectedAnswer(answerIndex);
     onAnswer(answerIndex);
   };
@@ -200,6 +207,17 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     if (onTextAnswer) {
       onTextAnswer(text);
     }
+  };
+
+  const handleNextQuestion = () => {
+    // For drill mode, show feedback when user clicks next (after they've answered)
+    if (isDrillMode && selectedAnswer !== null && !showDrillFeedback) {
+      setShowDrillFeedback(true);
+      return; // Don't advance to next question yet, just show feedback
+    }
+    
+    // For non-drill modes or when feedback is already shown, proceed to next question
+    onNext();
   };
 
   const getQuestionStatus = (questionIndex: number) => {
@@ -296,7 +314,10 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   const getOptionClassName = (index: number) => {
     const baseClass = "w-full p-4 text-left rounded-xl border-2 transition-all duration-200 group hover:border-edu-teal/60";
     
-    if (showFeedback) {
+    // For drill mode, use showDrillFeedback state; for review mode, use showFeedback prop
+    const shouldShowAnswerFeedback = isDrillMode ? showDrillFeedback : showFeedback;
+    
+    if (shouldShowAnswerFeedback) {
       if (index === currentQuestion?.correctAnswer) {
         return cn(baseClass, "border-green-500 bg-green-50 hover:border-green-500");
       }
@@ -434,10 +455,22 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           ) : (
                             <Button
                               size="sm"
-                              onClick={onNext}
-                              className="w-10 h-10 p-0 rounded-full bg-edu-teal hover:bg-edu-teal/90 text-white transition-colors"
+                              onClick={handleNextQuestion}
+                              className={cn(
+                                "rounded-full bg-edu-teal hover:bg-edu-teal/90 text-white transition-colors",
+                                isDrillMode && selectedAnswer !== null && !showDrillFeedback 
+                                  ? "px-4 h-10 font-medium text-sm" 
+                                  : "w-10 h-10 p-0"
+                              )}
                             >
-                              <ArrowRight size={16} />
+                              {isDrillMode && selectedAnswer !== null && !showDrillFeedback ? (
+                                <>
+                                  <ArrowRight size={14} className="mr-1.5" />
+                                  Show Answer
+                                </>
+                              ) : (
+                                <ArrowRight size={16} />
+                              )}
                             </Button>
                           )}
                         </div>
@@ -487,7 +520,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           <button
                             key={index}
                             onClick={() => handleAnswerSelect(index)}
-                            disabled={showFeedback || isReviewMode}
+                            disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                             className={cn(getOptionClassName(index), "min-h-[60px]")}
                           >
                             <div className="flex items-center space-x-3 h-full">
@@ -578,10 +611,22 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         ) : (
                           <Button
                             size="sm"
-                            onClick={onNext}
-                            className="w-10 h-10 p-0 rounded-full bg-edu-teal hover:bg-edu-teal/90 text-white transition-colors"
+                            onClick={handleNextQuestion}
+                            className={cn(
+                              "rounded-full bg-edu-teal hover:bg-edu-teal/90 text-white transition-colors",
+                              isDrillMode && selectedAnswer !== null && !showDrillFeedback 
+                                ? "px-4 h-10 font-medium text-sm" 
+                                : "w-10 h-10 p-0"
+                            )}
                           >
-                            <ArrowRight size={16} />
+                            {isDrillMode && selectedAnswer !== null && !showDrillFeedback ? (
+                              <>
+                                <ArrowRight size={14} className="mr-1.5" />
+                                Show Answer
+                              </>
+                            ) : (
+                              <ArrowRight size={16} />
+                            )}
                           </Button>
                         )}
                       </div>
@@ -623,7 +668,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         <button
                           key={index}
                           onClick={() => handleAnswerSelect(index)}
-                          disabled={showFeedback && !isReviewMode}
+                          disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                           className={cn(getOptionClassName(index), "min-h-[68px]")}
                         >
                           <div className="flex items-center space-x-4 h-full">
@@ -643,7 +688,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   )}
 
                   {/* Feedback Section */}
-                  {showFeedback && (
+                  {((isDrillMode && showDrillFeedback) || (!isDrillMode && showFeedback)) && (
                     <>
                       {/* Multiple Choice Feedback */}
                       {!isWrittenResponse && currentQuestion?.explanation && (
@@ -660,7 +705,33 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                               <h3 className="font-semibold text-edu-navy mb-2">
                                 {selectedAnswer === currentQuestion?.correctAnswer ? "Correct!" : "Not quite right"}
                               </h3>
-                              <p className="text-edu-navy/80 leading-relaxed">{formatExplanationText(currentQuestion?.explanation)}</p>
+                              <div className="text-edu-navy/80 leading-relaxed whitespace-pre-line">
+                                {formatExplanationText(currentQuestion?.explanation)
+                                  .split(/(\*\*(?:Correct Answer:|Why Other Options Are Wrong:|Tips for Similar Questions:)[^*]*\*\*)/)
+                                  .map((part, index) => {
+                                    // Only make section headers bold, not random text
+                                    if (part.match(/^\*\*(?:Correct Answer:|Why Other Options Are Wrong:|Tips for Similar Questions:)/)) {
+                                      return (
+                                        <strong key={index} className="font-semibold text-edu-navy">
+                                          {part.replace(/\*\*/g, '')}
+                                        </strong>
+                                      );
+                                    }
+                                    return part;
+                                  })}
+                              </div>
+                              {/* For drill mode, show a button to continue to next question */}
+                              {isDrillMode && showDrillFeedback && (
+                                <div className="mt-4">
+                                  <Button
+                                    onClick={onNext}
+                                    className="bg-edu-teal hover:bg-edu-teal/90 text-white px-4 py-2 rounded-lg"
+                                  >
+                                    <ArrowRight size={16} className="mr-2" />
+                                    Continue to Next Question
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

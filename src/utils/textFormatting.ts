@@ -228,17 +228,34 @@ export const formatPassageText = (text: string): string => {
 };
 
 /**
- * Formats explanation text for feedback
+ * Formats explanation text for feedback with proper structure and sections
  */
 export const formatExplanationText = (text: string): string => {
   if (!text) return '';
   
-  return text
-    // Basic formatting similar to question text but more conservative
-    .replace(/[ \t]+/g, ' ')
-    .replace(/(\d+)\.\s+(\d+)/g, '$1.$2')
-    .replace(/\s+([,.!?;:])/g, '$1')
-    .replace(/([.!?])\s*([A-Z])/g, '$1 $2')
-    .replace(/([,:;])\s*([a-zA-Z])/g, '$1 $2')
+  // Basic cleanup only - don't add random formatting
+  let formatted = text
+    .replace(/[ \t]+/g, ' ') // Normalize spaces
+    .replace(/(\d+)\.\s+(\d+)/g, '$1.$2') // Fix decimal numbers
+    .replace(/\$\s+(\d)/g, '$$$1') // Fix currency
+    .replace(/(\d+)\s*%/g, '$1%') // Fix percentages
+    .replace(/(\d)\s*([+\-×÷=])\s*(\d)/g, '$1 $2 $3') // Fix math operators
+    .replace(/\.\s+([A-Z])/g, '. $1') // Fix sentence spacing
     .trim();
+
+  // Only format specific sections that should be bold
+  formatted = formatted
+    // Add line breaks before main section headers
+    .replace(/(\*\*Correct Answer:\s*[A-Z]\*\*)/g, '\n\n$1')
+    .replace(/(\*\*Why Other Options Are Wrong:\*\*)/g, '\n\n$1')
+    .replace(/(\*\*Tips for Similar Questions:\*\*)/g, '\n\n$1')
+    
+    // Add line breaks before option explanations (- A:, - B:, etc.)
+    .replace(/\s*-\s*([A-Z]):/g, '\n\n$1:')
+    
+    // Clean up excessive line breaks
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return formatted;
 }; 
