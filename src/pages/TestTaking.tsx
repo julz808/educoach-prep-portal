@@ -18,6 +18,7 @@ import { WritingAssessmentService } from '@/services/writingAssessmentService';
 import { ScoringService } from '@/services/scoringService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
+import { calculateTimeAllocation, shouldShowImmediateAnswerFeedback, shouldHaveTimer } from '@/utils/timeAllocation';
 
 // Map frontend course IDs back to proper display names (same as in TestInstructionsPage)
 const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
@@ -143,69 +144,15 @@ const TestTaking: React.FC = () => {
   
   console.log('🔍 REVIEW MODE: isReviewMode =', isReviewMode, 'from searchParams.review =', searchParams.get('review'));
 
-  // Get time limit from curriculum data
-  const getSectionTimeLimit = (productType: string, sectionName: string): number => {
-    console.log('🕐 TIMER: Getting time for product:', productType, 'section:', sectionName);
-    console.log('🕐 TIMER: Available products in TEST_STRUCTURES:', Object.keys(TEST_STRUCTURES));
+  // Get time limit using new time allocation system
+  // NEW TIME ALLOCATION RULES:
+  // - Practice tests: Use curriculumData.ts times
+  // - Diagnostic tests: Pro-rate from practice, round up to nearest 5 min
+  // - Drill tests: No timer (null), immediate answer reveal
+  const getTimeAllocation = (productType: string, sectionName: string, testMode: string, questionCount?: number): { timeMinutes: number | null; reason: string } => {
+    console.log('⏰ TIME ALLOCATION: Getting time for:', { productType, sectionName, testMode, questionCount });
     
-    const testStructure = TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES];
-    if (!testStructure) {
-      console.log('🕐 ERROR: No test structure found for product:', productType);
-      console.log('🕐 ERROR: Available products:', Object.keys(TEST_STRUCTURES));
-      return 30;
-    }
-    
-    console.log('🕐 TIMER: Found test structure for', productType);
-
-    const availableSections = Object.keys(testStructure);
-    console.log('🕐 Available sections:', availableSections);
-
-    // Function to safely get time from section data
-    const getTime = (sectionData: any): number | null => {
-      if (sectionData && typeof sectionData === 'object' && typeof sectionData.time === 'number') {
-        return sectionData.time;
-      }
-      return null;
-    };
-
-    // 1. Try exact match (case-sensitive)
-    let sectionData = (testStructure as any)[sectionName];
-    let time = getTime(sectionData);
-    if (time !== null) {
-      console.log('🕐 ✅ EXACT MATCH:', sectionName, '→', time, 'minutes');
-      return time;
-    }
-
-    // 2. Try exact match (case-insensitive)
-    const sectionLower = sectionName.toLowerCase();
-    for (const key of availableSections) {
-      if (key.toLowerCase() === sectionLower) {
-        sectionData = (testStructure as any)[key];
-        time = getTime(sectionData);
-        if (time !== null) {
-          console.log('🕐 ✅ CASE-INSENSITIVE MATCH:', key, '→', time, 'minutes');
-          return time;
-        }
-      }
-    }
-
-    // 3. Try partial matches (both directions)
-    for (const key of availableSections) {
-      const keyLower = key.toLowerCase();
-      if (keyLower.includes(sectionLower) || sectionLower.includes(keyLower)) {
-        sectionData = (testStructure as any)[key];
-        time = getTime(sectionData);
-        if (time !== null) {
-          console.log('🕐 ✅ PARTIAL MATCH:', key, '→', time, 'minutes');
-          return time;
-        }
-      }
-    }
-
-    console.log('🕐 ❌ NO MATCH FOUND for section:', sectionName, 'in product:', productType);
-    console.log('🕐 ❌ Available sections were:', availableSections);
-    console.log('🕐 ❌ Using default 30 minutes');
-    return 30;
+    return calculateTimeAllocation(productType, sectionName, testMode, questionCount);
   };
 
   // Load questions for the section
@@ -685,7 +632,7 @@ const TestTaking: React.FC = () => {
               subjectName: sectionName,
               sectionName: savedSession.sectionName,
               questions,
-              timeLimit: Math.ceil(savedSession.timeRemainingSeconds / 60),
+              timeLimit: savedSession.timeRemainingSeconds > 0 ? Math.ceil(savedSession.timeRemainingSeconds / 60) : 0,
               currentQuestion: isReviewMode ? 0 : savedSession.currentQuestionIndex, // Start from first question in review mode
               answers,
               textAnswers,
@@ -747,8 +694,12 @@ const TestTaking: React.FC = () => {
         console.log('🆕 TIMER: properDisplayName =', properDisplayName);
         console.log('🆕 TIMER: sectionName =', sectionName);
         
-        const timeLimitMinutes = getSectionTimeLimit(properDisplayName, sectionName);
-        const timeLimitSeconds = timeLimitMinutes * 60;
+        const timeAllocation = getTimeAllocation(properDisplayName, sectionName, actualTestMode, questions.length);
+        const timeLimitMinutes = timeAllocation.timeMinutes;
+        const timeLimitSeconds = timeLimitMinutes ? timeLimitMinutes * 60 : 0;
+        
+        console.log('⏰ TIME ALLOCATION: Result:', timeAllocation);
+        console.log('⏰ TIME ALLOCATION: Final time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
         
         console.log('🆕 TIMER: Calculated time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
         
@@ -795,7 +746,7 @@ const TestTaking: React.FC = () => {
             subjectName: sectionName,
             sectionName: existingSession.sectionName,
             questions,
-            timeLimit: Math.ceil(existingSession.timeRemainingSeconds / 60),
+            timeLimit: existingSession.timeRemainingSeconds > 0 ? Math.ceil(existingSession.timeRemainingSeconds / 60) : 0,
             currentQuestion: isReviewMode ? 0 : existingSession.currentQuestionIndex, // Start from first question in review mode
             answers,
             textAnswers,
@@ -839,7 +790,7 @@ const TestTaking: React.FC = () => {
           subjectName: sectionName,
           sectionName,
           questions,
-          timeLimit: timeLimitMinutes,
+          timeLimit: timeLimitMinutes || 0,
           currentQuestion: 0,
           answers: {},
           textAnswers: {},
@@ -849,7 +800,7 @@ const TestTaking: React.FC = () => {
         };
 
         setSession(newSession);
-        setTimeRemaining(timeLimitSeconds);
+        setTimeRemaining(timeLimitSeconds || 0);
         console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
         console.log('🔍 DEBUG: New session questions maxPoints:', newSession.questions.map(q => ({ 
           id: q.id, 
@@ -949,9 +900,15 @@ const TestTaking: React.FC = () => {
   // - Multiple choice: Save immediately after selection
   // - Written response: Save on next/exit only
 
-  // Timer countdown
+  // Timer countdown - only for test modes that have timers
   useEffect(() => {
     if (!session || session.status !== 'in-progress') return;
+    
+    // Check if this test mode should have a timer
+    if (!shouldHaveTimer(actualTestMode)) {
+      console.log('⏰ TIMER: Skipping timer for drill mode');
+      return;
+    }
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
@@ -964,7 +921,7 @@ const TestTaking: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [session?.status]);
+  }, [session?.status, actualTestMode]);
 
   const handleAnswer = (answerIndex: number) => {
     console.log('🎯 HANDLEANSWER: Function called with answerIndex:', answerIndex);
@@ -1551,7 +1508,7 @@ const TestTaking: React.FC = () => {
       <EnhancedTestInterface
         questions={session.questions}
         currentQuestionIndex={session.currentQuestion}
-        timeRemaining={timeRemaining}
+        timeRemaining={shouldHaveTimer(actualTestMode) ? timeRemaining : undefined}
         onAnswer={handleAnswer}
         onTextAnswer={handleTextAnswer}
         onNext={handleNext}
@@ -1561,7 +1518,7 @@ const TestTaking: React.FC = () => {
         answers={session.answers}
         textAnswers={session.textAnswers}
         flaggedQuestions={session.flaggedQuestions}
-        showFeedback={false}
+        showFeedback={shouldShowImmediateAnswerFeedback(actualTestMode)}
         isReviewMode={false}
         testTitle={session.sectionName}
         onFinish={handleFinish}

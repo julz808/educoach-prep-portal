@@ -213,7 +213,7 @@ async function generateBasicQuestion(
   attempt: number
 ): Promise<GeneratedQuestion> {
   // Build the prompt
-  const prompt = buildQuestionPrompt({
+  const prompt = await buildQuestionPrompt({
     testType: request.testType,
     sectionName: request.sectionName,
     subSkill: request.subSkill,

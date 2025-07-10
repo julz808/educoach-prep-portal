@@ -5,6 +5,7 @@
 // Integrates with the main generation engine as the authoritative storage layer
 
 import { supabase } from '../../integrations/supabase/client.ts';
+import { validateQuestionWithPipeline } from './validationPipeline.ts';
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
@@ -175,10 +176,17 @@ async function getSubSkillId(subSkillName: string, sectionName: string): Promise
  * Helper function to determine passage type from generation metadata
  */
 function getPassageType(passage: GeneratedPassage): string {
+  // Use the actual passage_type from the passage object first
+  if (passage.passage_type) {
+    return passage.passage_type;
+  }
+  
+  // Fall back to metadata
   if (passage.generation_metadata && typeof passage.generation_metadata === 'object') {
     const metadata = passage.generation_metadata as any;
     return metadata.passage_type || 'informational';
   }
+  
   return 'informational';
 }
 
@@ -241,6 +249,30 @@ export async function storeQuestion(
   try {
     // Determine response type
     const responseType: ResponseType = question.answer_options ? 'multiple_choice' : 'extended_response';
+    
+    // Validate question before storage
+    const questionToValidate = {
+      question_text: question.question_text,
+      answer_options: question.answer_options,
+      correct_answer: question.correct_answer,
+      solution: question.solution,
+      response_type: responseType,
+      sub_skill: subSkill,
+      section_name: sectionName,
+      test_type: testType,
+      difficulty: difficulty
+    };
+    
+    const validationResult = await validateQuestionWithPipeline(questionToValidate);
+    
+    if (!validationResult.isValid) {
+      console.error(`❌ Question validation failed: ${validationResult.errors.join(', ')}`);
+      throw new Error(`Question validation failed: ${validationResult.errors.join(', ')}`);
+    }
+    
+    if (validationResult.confidence < 85) {
+      console.warn(`⚠️  Low confidence question (${validationResult.confidence}%): ${validationResult.warnings.join(', ')}`);
+    }
     
     // Calculate max_points based on question type and test type
     const maxPoints = calculateMaxPoints(testType, subSkill, responseType);

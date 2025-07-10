@@ -535,7 +535,7 @@ export async function generateQuestion(request: SingleQuestionRequest): Promise<
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       // Build the prompt
-      const prompt = buildQuestionPrompt(request);
+      const prompt = await buildQuestionPrompt(request);
       
       // Call Claude API
       const response = await callClaudeAPIWithRetry(prompt);

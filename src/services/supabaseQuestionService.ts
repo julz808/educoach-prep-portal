@@ -377,16 +377,34 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
     
     // Fetch all drill questions for this test type
-    const { data: drillQuestions, error } = await supabase
-      .from('questions')
-      .select('*')
-      .eq('test_type', dbTestType)
-      .eq('test_mode', 'drill');
+    // We need to fetch questions by section to ensure we get all of them
+    // because Reading Comprehension questions were created later and fall outside the default 1000 limit
+    
+    // First, get all sections for this test type
+    const sections = ['Mathematics', 'Verbal Reasoning', 'Numerical Reasoning', 'Reading Comprehension', 'Written Expression'];
+    let allDrillQuestions: Question[] = [];
+    
+    // Fetch questions for each section separately to ensure we get all of them
+    for (const section of sections) {
+      const { data: sectionQuestions, error: sectionError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('test_type', dbTestType)
+        .eq('test_mode', 'drill')
+        .eq('section_name', section);
+        
+      if (sectionError) {
+        console.error(`🔧 DEBUG: Error fetching ${section} questions:`, sectionError);
+        continue;
+      }
       
-    if (error) {
-      console.error('🔧 DEBUG: Error fetching drill questions:', error);
-      return [];
+      if (sectionQuestions && sectionQuestions.length > 0) {
+        console.log(`🔧 DEBUG: Found ${sectionQuestions.length} questions for ${section}`);
+        allDrillQuestions = [...allDrillQuestions, ...sectionQuestions];
+      }
     }
+    
+    const drillQuestions = allDrillQuestions;
     
     if (!drillQuestions || drillQuestions.length === 0) {
       console.log('🔧 DEBUG: No drill questions found for test type:', dbTestType);
@@ -394,6 +412,14 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     }
     
     console.log('🔧 DEBUG: Found', drillQuestions.length, 'drill questions');
+    
+    // Add specific logging for Reading Comprehension
+    const readingCompQuestions = drillQuestions.filter(q => q.section_name === 'Reading Comprehension');
+    console.log('🔧 DEBUG: Reading Comprehension questions:', readingCompQuestions.length);
+    
+    // Log unique sub-skills for Reading Comprehension
+    const readingSubSkills = new Set(readingCompQuestions.map(q => q.sub_skill));
+    console.log('🔧 DEBUG: Reading Comprehension sub-skills:', Array.from(readingSubSkills));
     
     // Fetch passages for questions that have passage_id
     const passageIds = drillQuestions

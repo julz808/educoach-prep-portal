@@ -6,9 +6,21 @@ import { TEST_STRUCTURES } from '../../data/curriculumData.ts';
 import { buildPassagePrompt, callClaudeAPIWithRetry, parseClaudeResponse } from './claudePrompts.ts';
 import { validatePassage } from './validators.ts';
 import { isReadingSection, getPassageWordCount, getPassageType, requiresPassages } from './sectionUtils.ts';
+import { selectWritingStyle, generateStyleInstructions } from './writingStyleCycling.ts';
+// Dynamic import to handle module loading issues with tsx
+let topicCyclingManager: any;
+let getDifficultyModifiers: any;
+
+async function initializeTopicCycling() {
+  if (!topicCyclingManager) {
+    const module = await import('../../../scripts/enhanced-topic-cycling-system.ts');
+    topicCyclingManager = module.topicCyclingManager;
+    getDifficultyModifiers = module.getDifficultyModifiers;
+  }
+}
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
-type PassageType = 'narrative' | 'informational' | 'persuasive';
+type PassageType = 'narrative' | 'informational' | 'persuasive' | 'procedural' | 'descriptive';
 
 interface PassageGenerationRequest {
   testType: string;
@@ -20,6 +32,10 @@ interface PassageGenerationRequest {
   generationContext: GenerationContext;
   isMiniPassage?: boolean;
   subSkill?: string;
+  selectedTopic?: string;
+  suggestedCharacterNames?: Array<{ firstName: string; surname: string; gender: 'male' | 'female' }>;
+  writingStyle?: any; // Selected writing style object
+  styleInstructions?: string; // Generated style instructions for Claude
 }
 
 interface GeneratedPassage {
@@ -57,6 +73,7 @@ interface GenerationContext {
   usedNames: Set<string>;
   usedLocations: Set<string>;
   usedScenarios: Set<string>;
+  usedWritingStyles?: Set<string>; // Track used writing styles
   passageBank?: any[];
   questionBank?: any[];
   generatedQuestions?: any[];
@@ -70,6 +87,7 @@ interface GenerationContext {
   lastUpdate?: string;
   lastPassageType?: PassageType;
   passageTypeRotation?: number;
+  passageTypeCycling?: Map<string, any>; // Enhanced cycling tracking
   generatedPassages?: {
     title: string;
     content: string;
@@ -123,39 +141,58 @@ function getYearLevel(testType: string): number {
  * Determines appropriate passage type based on test requirements with systematic diversity
  * Ensures we cycle through different types and don't repeat the same type consecutively
  */
-function determinePassageType(testType: string, sectionName: string, passageIndex: number = 0, generationContext?: GenerationContext): PassageType {
-  // Test-specific passage type preferences
+function determinePassageType(
+  testType: string, 
+  sectionName: string, 
+  passageIndex: number = 0,
+  generationContext?: GenerationContext,
+  isMinPassage: boolean = false
+): PassageType {
+  
+  // FIXED: All test types now support all 3 passage types
   const typePreferences = {
-    'Year 5 NAPLAN': ['narrative', 'informational'],
-    'Year 7 NAPLAN': ['narrative', 'informational', 'persuasive'],
     'VIC Selective Entry (Year 9 Entry)': ['narrative', 'informational', 'persuasive'],
     'NSW Selective Entry (Year 7 Entry)': ['informational', 'narrative', 'persuasive'],
-    'EduTest Scholarship (Year 7 Entry)': ['informational', 'narrative'],
+    'Year 5 NAPLAN': ['narrative', 'informational', 'persuasive'], // FIXED: Added persuasive
+    'Year 7 NAPLAN': ['narrative', 'informational', 'persuasive'],
+    'EduTest Scholarship (Year 7 Entry)': ['informational', 'narrative', 'persuasive'], // FIXED: Added persuasive
     'ACER Scholarship (Year 7 Entry)': ['informational', 'persuasive', 'narrative']
   };
 
-  const preferences = typePreferences[testType as keyof typeof typePreferences] || ['informational', 'narrative'];
+  const preferences = typePreferences[testType as keyof typeof typePreferences] || ['informational', 'narrative', 'persuasive'];
   
-  // If we have generation context, use smart cycling to avoid repetition
-  if (generationContext) {
-    const lastType = generationContext.lastPassageType;
-    const typeRotation = generationContext.passageTypeRotation || 0;
-    
-    // If last passage was the same type as what we'd normally pick, choose the next one
-    const normalChoice = preferences[passageIndex % preferences.length];
-    
-    if (lastType === normalChoice && preferences.length > 1) {
-      // Find a different type from preferences
-      const availableTypes = preferences.filter(type => type !== lastType);
-      const rotatedIndex = typeRotation % availableTypes.length;
-      return availableTypes[rotatedIndex] as PassageType;
-    }
-    
-    return normalChoice as PassageType;
+  // Enhanced cycling with separate tracking for mini vs full passages
+  const contextKey = `${testType}:${sectionName}:${isMinPassage ? 'mini' : 'full'}`;
+  
+  // Initialize passageTypeCycling if not exists
+  if (!generationContext) {
+    return preferences[passageIndex % preferences.length] as PassageType;
   }
   
-  // Fallback: Systematically cycle through types for diversity (rather than random)
-  return preferences[passageIndex % preferences.length] as PassageType;
+  if (!generationContext.passageTypeCycling) {
+    generationContext.passageTypeCycling = new Map();
+  }
+  
+  const currentIndex = generationContext.passageTypeCycling.get(contextKey) || 0;
+  let selectedType = preferences[currentIndex % preferences.length];
+  
+  // Anti-repetition logic
+  const lastTypeKey = `${contextKey}:last`;
+  const lastType = generationContext.passageTypeCycling.get(lastTypeKey);
+  
+  if (lastType === selectedType && preferences.length > 1) {
+    const nextIndex = (currentIndex + 1) % preferences.length;
+    selectedType = preferences[nextIndex];
+    generationContext.passageTypeCycling.set(contextKey, nextIndex + 1);
+  } else {
+    generationContext.passageTypeCycling.set(contextKey, currentIndex + 1);
+  }
+  
+  generationContext.passageTypeCycling.set(lastTypeKey, selectedType);
+  
+  console.log(`📝 ${testType} ${isMinPassage ? 'mini' : 'full'} passage: ${selectedType} (cycle: ${currentIndex + 1})`);
+  
+  return selectedType as PassageType;
 }
 
 /**
@@ -421,14 +458,60 @@ export async function generateMiniPassage(request: PassageGenerationRequest): Pr
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      // Build a specialized prompt for mini-passages
-      const miniPassageRequest = {
-        ...request,
-        wordCount: Math.min(150, Math.max(50, request.wordCount)), // Clamp to mini-passage range
-        isMiniPassage: true
+      // Initialize topic cycling system
+      await initializeTopicCycling();
+      
+      // Get next topic using sequential cycling based on sub-skill compatibility
+      const yearLevel = getYearLevel(request.testType);
+      const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(
+        request.subSkill || 'DEFAULT',
+        yearLevel
+      );
+      
+      console.log(`📚 Sequential topic selected for ${textType} mini passage: ${topic}`);
+      console.log(`   Sub-skill: ${request.subSkill} | Year Level: ${yearLevel}`);
+      
+      // Get character names if narrative passage
+      let suggestedCharacterNames;
+      if (textType === 'narrative') {
+        // Get 1-2 character names for mini passages
+        const nameCount = Math.random() > 0.5 ? 1 : 2;
+        suggestedCharacterNames = topicCyclingManager.getMultipleCharacterNames(nameCount);
+        console.log(`   👥 Character names: ${suggestedCharacterNames.map(n => `${n.firstName} ${n.surname}`).join(', ')}`);
+      }
+      
+      // Initialize writing style tracking if needed
+      if (!request.generationContext.usedWritingStyles) {
+        request.generationContext.usedWritingStyles = new Set();
+      }
+      
+      // Select writing style for this passage
+      const styleContext = {
+        textType: textType as 'narrative' | 'informational' | 'persuasive' | 'procedural' | 'descriptive',
+        difficulty: request.difficulty,
+        yearLevel: yearLevel,
+        usedStyles: request.generationContext.usedWritingStyles,
+        subSkill: request.subSkill
       };
       
-      const prompt = buildPassagePrompt(miniPassageRequest);
+      const selectedStyle = selectWritingStyle(styleContext);
+      const styleInstructions = generateStyleInstructions(selectedStyle, 120);
+      
+      console.log(`   ✍️  Prose style: ${selectedStyle.style} (${selectedStyle.sentence_pattern})`);
+      
+      // Always use 120 words for drills (mini passages)
+      const miniPassageRequest = {
+        ...request,
+        wordCount: 120, // Fixed for mini passages
+        passageType: textType as PassageType,
+        isMiniPassage: true,
+        selectedTopic: topic,
+        suggestedCharacterNames,
+        writingStyle: selectedStyle,
+        styleInstructions: styleInstructions
+      };
+      
+      const prompt = await buildPassagePrompt(miniPassageRequest);
       
       // Call Claude API
       const response = await callClaudeAPIWithRetry(prompt);
@@ -506,8 +589,68 @@ export async function generatePassage(request: PassageGenerationRequest): Promis
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
+      // Initialize topic cycling system
+      await initializeTopicCycling();
+      
+      // Use the requested word count (120 for drills, curriculum count for practice/diagnostic)
+      const yearLevel = getYearLevel(request.testType);
+      const correctWordCount = request.wordCount || topicCyclingManager.getPassageLength(
+        request.testType,
+        request.testMode,
+        { TEST_STRUCTURES }
+      );
+      
+      // Get next topic using sequential cycling based on sub-skill compatibility
+      const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(
+        request.subSkill || 'DEFAULT',
+        yearLevel
+      );
+      
+      console.log(`📚 Sequential topic selected for ${textType} passage: ${topic}`);
+      console.log(`   Sub-skill: ${request.subSkill} | Year Level: ${yearLevel} | Word Count: ${correctWordCount}`);
+      
+      // Get character names if narrative passage
+      let suggestedCharacterNames;
+      if (textType === 'narrative') {
+        // Get 2-4 character names for full passages
+        const nameCount = Math.floor(Math.random() * 3) + 2; // 2-4 characters
+        suggestedCharacterNames = topicCyclingManager.getMultipleCharacterNames(nameCount);
+        console.log(`   👥 Character names: ${suggestedCharacterNames.map(n => `${n.firstName} ${n.surname}`).join(', ')}`);
+      }
+      
+      // Initialize writing style tracking if needed
+      if (!request.generationContext.usedWritingStyles) {
+        request.generationContext.usedWritingStyles = new Set();
+      }
+      
+      // Select writing style for this passage
+      const styleContext = {
+        textType: textType as 'narrative' | 'informational' | 'persuasive' | 'procedural' | 'descriptive',
+        difficulty: request.difficulty,
+        yearLevel: yearLevel,
+        usedStyles: request.generationContext.usedWritingStyles,
+        subSkill: request.subSkill
+      };
+      
+      const selectedStyle = selectWritingStyle(styleContext);
+      const styleInstructions = generateStyleInstructions(selectedStyle, correctWordCount);
+      
+      console.log(`   ✍️  Prose style: ${selectedStyle.style} (${selectedStyle.sentence_pattern})`);
+      
+      // Add topic and correct word count to request
+      const requestWithTopic = {
+        ...request,
+        wordCount: correctWordCount,
+        passageType: textType as PassageType,
+        selectedTopic: topic,
+        suggestedCharacterNames,
+        writingStyle: selectedStyle,
+        styleInstructions: styleInstructions
+      };
+      
+      
       // Build the prompt
-      const prompt = buildPassagePrompt(request);
+      const prompt = await buildPassagePrompt(requestWithTopic);
       
       // Call Claude API
       const response = await callClaudeAPIWithRetry(prompt);
@@ -517,25 +660,25 @@ export async function generatePassage(request: PassageGenerationRequest): Promis
       
       // Create passage object
       const passage: GeneratedPassage = {
-        test_type: request.testType,
-        year_level: getYearLevel(request.testType),
-        section_name: request.sectionName,
-        passage_type: request.passageType,
+        test_type: requestWithTopic.testType,
+        year_level: getYearLevel(requestWithTopic.testType),
+        section_name: requestWithTopic.sectionName,
+        passage_type: requestWithTopic.passageType,
         title: parsedPassage.title || 'Untitled Passage',
         content: parsedPassage.content || '',
         word_count: parsedPassage.word_count || 0,
         australian_context: true,
-        difficulty: request.difficulty,
+        difficulty: requestWithTopic.difficulty,
         main_themes: parsedPassage.main_themes || [],
         key_characters: parsedPassage.key_characters || [],
         setting: parsedPassage.setting || '',
         potential_question_topics: parsedPassage.potential_question_topics || [],
         generation_metadata: {
-          test_type: request.testType,
-          section_name: request.sectionName,
-          difficulty: request.difficulty,
-          passage_type: request.passageType,
-          target_word_count: request.wordCount,
+          test_type: requestWithTopic.testType,
+          section_name: requestWithTopic.sectionName,
+          difficulty: requestWithTopic.difficulty,
+          passage_type: requestWithTopic.passageType,
+          target_word_count: requestWithTopic.wordCount,
           generation_timestamp: new Date().toISOString(),
           attempt_number: attempt
         }

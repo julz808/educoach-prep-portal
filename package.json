@@ -15,7 +15,18 @@
     "analyze:edutest-practice": "tsx scripts/analyze-edutest-practice-status.ts",
     "cleanup-questions": "tsx scripts/cleanup-questions-by-product.ts",
     "regenerate-section": "tsx scripts/regenerate-section-unified.ts",
-    "validate-generation": "tsx scripts/validate-generation-system.ts"
+    "validate-generation": "tsx scripts/validate-generation-system.ts",
+    "generate-missing-verbal": "tsx scripts/generate-missing-verbal-reasoning.ts",
+    "generate-all-edutest": "tsx scripts/generate-all-edutest-sections.ts",
+    "audit-edutest": "tsx scripts/audit-edutest-questions.ts",
+    "fix-edutest": "tsx scripts/fix-edutest-generation.ts",
+    "redistribute-edutest": "tsx scripts/generate-redistribution-sql.ts",
+    "generate-product": "tsx scripts/generate-test-product.ts",
+    "generate-nsw-selective": "tsx scripts/generate-test-product.ts \"NSW Selective Entry (Year 7 Entry)\"",
+    "generate-vic-selective": "tsx scripts/generate-test-product.ts \"VIC Selective Entry (Year 9 Entry)\"",
+    "generate-year5-naplan": "tsx scripts/generate-test-product.ts \"Year 5 NAPLAN\"",
+    "generate-year7-naplan": "tsx scripts/generate-test-product.ts \"Year 7 NAPLAN\"",
+    "generate-acer-scholarship": "tsx scripts/generate-test-product.ts \"ACER Scholarship (Year 7 Entry)\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",

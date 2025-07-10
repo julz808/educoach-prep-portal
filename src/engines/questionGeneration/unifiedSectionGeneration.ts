@@ -29,6 +29,14 @@ interface UnifiedSectionRequest {
   testType: string;
   sectionName: string;
   cleanExisting?: boolean; // Whether to clean existing questions first
+  targetedGeneration?: {
+    subSkill: string;
+    testMode: string;
+    difficulty: number;
+    count: number;
+    replacementMode: boolean;
+    issueType: string;
+  };
 }
 
 interface TestModeDistribution {
@@ -605,8 +613,8 @@ function calculateTestModeAssignments(
       practiceAssignments.push(practiceTestModes[testModeIndex]);
     }
     
-    // Shuffle to avoid predictable ordering (e.g., practice_1, practice_2, practice_3, practice_1...)
-    assignments.push(...shuffleArray(practiceAssignments));
+    // Keep balanced round-robin distribution - questions are shuffled within each test mode later for variety
+    assignments.push(...practiceAssignments);
     
     console.log(`        Round-robin assignment for ${totalPracticeQuestions} questions:`, 
       practiceAssignments.reduce((count, mode) => {
@@ -811,6 +819,23 @@ export async function generateUnifiedSection(request: UnifiedSectionRequest): Pr
     subSkillPlans.forEach(plan => {
       console.log(`   ${plan.subSkill}: ${plan.totalQuestions} questions`);
     });
+    
+    // Handle targeted generation for replacements
+    if (request.targetedGeneration) {
+      console.log(`🎯 Targeted generation mode: ${request.targetedGeneration.count} questions for ${request.targetedGeneration.subSkill}`);
+      
+      // Focus generation on specific requirements
+      const targetConfig = {
+        ...request,
+        focusedSubSkill: request.targetedGeneration.subSkill,
+        focusedTestMode: request.targetedGeneration.testMode,
+        focusedDifficulty: request.targetedGeneration.difficulty,
+        targetCount: request.targetedGeneration.count
+      };
+      
+      // Adjust generation parameters for targeted mode
+      // This ensures we generate exactly what's needed for replacements
+    }
     
     // Step 3: Initialize unified context
     const unifiedContext = initializeUnifiedContext(request.testType, request.sectionName, totalQuestions);

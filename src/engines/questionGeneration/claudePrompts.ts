@@ -9,6 +9,18 @@ import {
   SUB_SKILL_VISUAL_MAPPING 
 } from '../../data/curriculumData.ts';
 import { selectRelevantTips, formatTipsForExplanation } from './educationalTips.ts';
+import { isReadingSection } from './sectionUtils.ts';
+// Dynamic import to handle module loading issues with tsx
+let getDifficultyModifiers: any;
+let topicCyclingManager: any;
+
+async function initializeDifficultyModifiers() {
+  if (!getDifficultyModifiers) {
+    const module = await import('../../../scripts/enhanced-topic-cycling-system.ts');
+    getDifficultyModifiers = module.getDifficultyModifiers;
+    topicCyclingManager = module.topicCyclingManager;
+  }
+}
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
@@ -31,6 +43,10 @@ interface PassageGenerationRequest {
   difficulty: number;
   passageType: 'narrative' | 'informational' | 'persuasive';
   generationContext: GenerationContext;
+  selectedTopic?: string;
+  suggestedCharacterNames?: Array<{ firstName: string; surname: string; gender: 'male' | 'female' }>;
+  writingStyle?: any; // Selected writing style object
+  styleInstructions?: string; // Generated style instructions for Claude
 }
 
 interface GenerationContext {
@@ -260,6 +276,58 @@ DATA COMPLETENESS:
 /**
  * Gets context diversity instructions based on generation context
  */
+/**
+ * Gets mathematical validation requirements for prompts
+ */
+function getMathematicalValidationRequirements(sectionName: string): string {
+  const mathSections = ['Mathematics', 'Numerical Reasoning'];
+  const mathSubSkills = [
+    'Geometry and Spatial Reasoning',
+    'Measurement & Unit Conversion',
+    'Fractions, Decimals & Percentages',
+    'Word Problem Solving & Application',
+    'Number Sequence & Pattern Recognition',
+    'Mathematical Operations & Calculations',
+    'Code Breaking & Pattern Recognition'
+  ];
+  
+  // Check if this requires mathematical validation
+  const requiresValidation = mathSections.includes(sectionName) || 
+    mathSubSkills.some(skill => sectionName.includes(skill));
+  
+  if (!requiresValidation) return '';
+  
+  return `
+🔬 MANDATORY MATHEMATICAL VERIFICATION PROTOCOL
+
+Before finalizing your response, you MUST complete this verification checklist:
+
+✅ STEP-BY-STEP VERIFICATION:
+1. Work through the problem completely from scratch
+2. Double-check each calculation independently  
+3. Verify your final answer matches exactly ONE of the provided options
+4. Confirm no mathematical errors or impossible results
+
+🚫 CRITICAL STOP CONDITIONS - REGENERATE IF ANY APPLY:
+- Your calculated answer doesn't match any option exactly
+- You feel uncertain about any calculation step
+- Multiple options seem potentially correct
+- You need to "recalculate" or "try again" during solving
+- The problem seems to have no solution or multiple valid solutions
+- You notice ANY contradiction between question, options, and solution
+
+⚠️ HALLUCINATION PREVENTION:
+- NEVER use phrases like "let me recalculate", "wait, let me", "actually, let me"
+- If you catch an error, START COMPLETELY OVER rather than patching
+- Your explanation must flow logically without hesitation or correction
+- Be certain of your mathematical work before writing the solution
+
+VERIFICATION STATEMENT REQUIRED:
+End your solution with: "Mathematical verification: Confirmed"
+If you cannot make this statement with complete confidence, regenerate the question.
+`;
+}
+
 function getContextDiversityInstructions(context: GenerationContext, subSkill?: string): string {
   if (!context) {
     return '';
@@ -366,7 +434,14 @@ Create a ${requestedType} passage that would make an educator say "This is refre
 - Use different character demographics and backgrounds
 - Select a distinct geographical or cultural setting
 - Employ varied sentence structures and paragraph organization
-- Ensure the opening paragraph feels fresh and engaging`;
+- Ensure the opening paragraph feels fresh and engaging
+
+**✨ OPENING DIVERSITY REQUIREMENTS:**
+- AVOID starting with character full names (e.g., "Sophie Martin walked...")
+- Use varied opening techniques: dialogue, action, setting, question, or mystery
+- Create intrigue before revealing character identities
+- Examples: "The screen flickered...", "'This changes everything,'...", "Deep beneath the surface..."
+- Introduce characters naturally through context and action`;
 
   return avoidanceInstructions;
 }
@@ -398,6 +473,21 @@ function getApproachSpecificGuidance(approach: string, seed: number): { title: s
 }
 
 /**
+ * Gets content diversity requirements based on generation context and passage content
+ */
+function getContentDiversityRequirements(generationContext?: any, passageContent?: string): string {
+  if (!generationContext) return '';
+  
+  return `
+📚 CONTENT DIVERSITY REQUIREMENTS:
+- Ensure this question uses different themes, contexts, and scenarios from recent questions
+- Vary question structure and approach to maintain student engagement
+- Use diverse examples and real-world applications when appropriate
+- Avoid repetitive patterns in question format and presentation
+`;
+}
+
+/**
  * Gets randomization directive to break patterns
  */
 function getRandomizationDirective(seed: number, questionIndex: number): string {
@@ -412,6 +502,51 @@ function getRandomizationDirective(seed: number, questionIndex: number): string 
   
   const directiveIndex = (seed + questionIndex) % directives.length;
   return directives[directiveIndex];
+}
+
+/**
+ * Generates topic guidance for drill questions to ensure diversity
+ */
+async function generateTopicGuidanceForDrill(subSkill: string, yearLevel: number): Promise<string> {
+  try {
+    // Initialize topic cycling manager
+    await initializeDifficultyModifiers();
+    
+    if (!topicCyclingManager) {
+      return 'No topic guidance available - generate diverse content naturally.';
+    }
+    
+    // Get next topic for this sub-skill
+    const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(subSkill, yearLevel);
+    
+    return `
+🎯 MANDATORY TOPIC GUIDANCE FOR DRILL MINI-PASSAGE:
+Your mini-passage MUST be centered around this specific topic: "${topic}"
+
+Text Type: ${textType}
+This topic was selected using our sequential cycling system to ensure maximum diversity.
+
+TOPIC INTEGRATION REQUIREMENTS:
+- Make "${topic}" the central focus of your mini-passage
+- Ensure the topic is clearly evident throughout the 50-150 word passage
+- Use the topic naturally within the ${textType} format
+- Don't just mention the topic - make it the core subject matter
+- Adapt the topic appropriately for Year ${yearLevel} level comprehension
+
+CRITICAL: This topic selection prevents repetitive content and ensures each drill question has unique, engaging content. You MUST build your mini-passage around this specific topic.
+`;
+  } catch (error) {
+    console.error('Error generating topic guidance for drill:', error);
+    return `
+🎯 TOPIC DIVERSITY REQUIREMENT:
+Generate a unique mini-passage topic that is completely different from common topics like:
+- Great Barrier Reef, saltwater crocodiles, echidnas, origami
+- Australian animals (kangaroos, koalas, wombats, etc.)
+- Sydney Opera House, Uluru, Aboriginal culture
+
+Choose fresh, diverse topics covering science, technology, world cultures, history, nature, or human achievements.
+`;
+  }
 }
 
 /**
@@ -516,7 +651,7 @@ CRITICAL: This is a writing section. Create a simple, clear task instruction ONL
 /**
  * Builds a prompt for individual question generation
  */
-export function buildQuestionPrompt(request: SingleQuestionRequest): string {
+export async function buildQuestionPrompt(request: SingleQuestionRequest): Promise<string> {
   const {
     testType,
     sectionName,
@@ -553,6 +688,10 @@ export function buildQuestionPrompt(request: SingleQuestionRequest): string {
   const prompt = `You are an expert designer of Australian educational assessments with deep knowledge of ${testType}. Your task is to generate an authentic question that precisely replicates the difficulty, style, and format of real ${testType} examinations.
 
 ${getContextDiversityInstructions(generationContext, subSkill)}
+
+${getMathematicalValidationRequirements(sectionName)}
+
+${getContentDiversityRequirements(generationContext, passageContent)}
 
 CRITICAL REQUIREMENTS:
 - Generate a question indistinguishable from real ${testType} questions
@@ -709,18 +848,60 @@ IMPORTANT: Return ONLY the JSON object, no additional text or formatting.`;
 /**
  * Builds a prompt for passage generation
  */
-export function buildPassagePrompt(request: PassageGenerationRequest): string {
+export async function buildPassagePrompt(request: PassageGenerationRequest): Promise<string> {
   const {
     testType,
     sectionName,
     wordCount,
     difficulty,
     passageType,
-    generationContext
+    generationContext,
+    selectedTopic,
+    suggestedCharacterNames,
+    styleInstructions
   } = request;
 
   const yearLevel = getYearLevel(testType);
   const difficultyCalibration = getDifficultyCalibration(testType, difficulty);
+  
+  // Initialize and get difficulty modifiers for year level and difficulty
+  await initializeDifficultyModifiers();
+  const difficultyModifiers = getDifficultyModifiers(yearLevel, difficulty);
+
+  // Topic guidance from topic pool selection
+  const topicGuidance = selectedTopic ? `
+🎯 MANDATORY TOPIC GUIDANCE:
+Your passage MUST be centered around this specific topic: "${selectedTopic}"
+
+This topic was carefully selected from our diverse topic pool to ensure content variety. You must build your entire passage around this theme while maintaining authentic ${passageType} style.
+
+TOPIC INTEGRATION REQUIREMENTS:
+- Make the selected topic the central focus of your passage
+- Ensure the topic is clearly evident throughout the content
+- Use the topic naturally within the ${passageType} format
+- Don't just mention the topic - make it the core subject matter
+- Adapt the topic appropriately for ${testType} standards (Year ${yearLevel} level)
+
+` : '';
+
+  // Character name guidance for narrative passages
+  const characterNameGuidance = (passageType === 'narrative' && suggestedCharacterNames && suggestedCharacterNames.length > 0) ? `
+🎭 CHARACTER NAME SUGGESTIONS:
+You have these diverse character names available (use naturally in the narrative):
+${suggestedCharacterNames.map((char, i) => `- ${char.firstName} ${char.surname} (${char.gender})`).join('\n')}
+
+NARRATIVE FLOW GUIDELINES:
+- Use names naturally within the story context - AVOID starting with full names
+- Vary your opening approaches: action, dialogue, description, or reflection
+- You can introduce characters gradually (e.g., "The young researcher...", then reveal the name later)
+- Consider starting with: setting, action, dialogue, or internal thoughts
+- Mix first names, last names, and descriptive references naturally
+
+EXAMPLES OF NATURAL OPENINGS:
+- "The laboratory door creaked as someone entered..." (then introduce the character)
+- "'We need to hurry,' whispered a voice in the darkness..." (dialogue first)
+- "Every morning brought new discoveries..." (setting/theme first)
+` : '';
 
   // Get style-specific guidance
   let styleGuidance = '';
@@ -789,9 +970,28 @@ TEST TYPE: ${testType}
 YEAR LEVEL: ${yearLevel}
 DIFFICULTY ${difficulty}: ${difficultyCalibration}
 
+🎯 DIFFICULTY & YEAR LEVEL GUIDANCE:
+${difficultyModifiers}
+
+The passage difficulty should be appropriate for:
+- Students taking ${testType}
+- Year ${yearLevel} reading comprehension level
+- Difficulty ${difficulty} expectations (${difficultyCalibration})
+
+${topicGuidance}
+
+${characterNameGuidance}
+
 ${styleGuidance}
 
 ${contentRequirements}
+
+${styleInstructions ? `
+🎨 WRITING STYLE & TONE REQUIREMENTS:
+${styleInstructions}
+
+The above style guidance is MANDATORY. You must follow these specific writing style requirements to ensure diverse, authentic passages that avoid repetitive patterns.
+` : ''}
 
 CRITICAL REQUIREMENTS:
 - Create a passage indistinguishable from real ${testType} reading passages
@@ -808,10 +1008,13 @@ ${getPassageDiversityInstructions(generationContext, passageType)}
 
 CONTENT FLEXIBILITY:
 - Draw from diverse global settings, cultures, and perspectives
-- Use topics and contexts that are engaging and relevant
-- Include diverse character names from various cultural backgrounds
-- Focus on universal themes and concepts
-- Ensure content is accessible to diverse readers
+- Use topics and contexts that are universally engaging and relevant
+- Include diverse character names from various cultural backgrounds  
+- Focus on universal themes rather than country-specific references
+- Ensure content is accessible to international readers
+- While using Australian spelling, avoid overly Australian-specific contexts
+- Prefer global examples over local ones (e.g., "national park" vs "Kakadu")
+- Use sports and activities familiar to international students
 
 QUALITY STANDARDS:
 - Age-appropriate content for Year ${yearLevel} students
@@ -957,7 +1160,37 @@ export function parseClaudeResponse(response: ClaudeAPIResponse): any {
     }
 
     const jsonString = jsonMatch[0];
-    const parsedJson = JSON.parse(jsonString);
+    
+    // Clean up undefined values that would break JSON parsing
+    const cleanedJsonString = jsonString
+      .replace(/"has_visual":\s*undefined/g, '"has_visual": false')
+      .replace(/"visual_type":\s*undefined/g, '"visual_type": null')
+      .replace(/"visual_data":\s*undefined/g, '"visual_data": null')
+      .replace(/"visual_svg":\s*undefined/g, '"visual_svg": null')
+      .replace(/:\s*undefined/g, ': null');
+    
+    const parsedJson = JSON.parse(cleanedJsonString);
+    
+    // Post-process to normalize the correct_answer field
+    if (parsedJson.correct_answer && parsedJson.answer_options && Array.isArray(parsedJson.answer_options)) {
+      const correctAnswer = parsedJson.correct_answer.trim();
+      
+      // If correct_answer is just a letter (A, B, C, D), that's perfect
+      const letterMatch = correctAnswer.match(/^([A-D])\)?\s*$/i);
+      if (letterMatch) {
+        parsedJson.correct_answer = letterMatch[1].toUpperCase();
+      } else {
+        // If correct_answer contains the full option text, try to extract the letter
+        for (let i = 0; i < parsedJson.answer_options.length; i++) {
+          const option = parsedJson.answer_options[i].trim();
+          if (correctAnswer === option || correctAnswer.toLowerCase() === option.toLowerCase()) {
+            // Convert to letter format (A, B, C, D)
+            parsedJson.correct_answer = String.fromCharCode(65 + i); // A=65, B=66, etc.
+            break;
+          }
+        }
+      }
+    }
     
     return parsedJson;
   } catch (error) {

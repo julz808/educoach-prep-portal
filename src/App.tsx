@@ -16,9 +16,7 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import CourseDetail from "./pages/CourseDetail";
-import QuestionGenerationDemo from "./pages/QuestionGenerationDemo";
 import EduTestGenerator from "./pages/EduTestGenerator";
-import SVGQuestionDemo from "./components/SVGQuestionDemo";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
@@ -47,9 +45,7 @@ const App = () => {
                       <Route path="/" element={<Landing />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/course/:slug" element={<CourseDetail />} />
-                      <Route path="/question-generation-demo" element={<QuestionGenerationDemo />} />
                       <Route path="/edutest-generator" element={<EduTestGenerator />} />
-                      <Route path="/svg-demo" element={<SVGQuestionDemo />} />
                       <Route path="/auth/callback" element={<AuthCallback />} />
                       <Route path="/auth/reset-password" element={<ResetPassword />} />
                       <Route element={<ProtectedRoute />}>

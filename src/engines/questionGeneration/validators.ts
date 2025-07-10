@@ -4,7 +4,7 @@
 
 // Define types inline to avoid runtime import issues with TypeScript interfaces
 type ResponseType = 'multiple_choice' | 'extended_response';
-type PassageType = 'narrative' | 'informational' | 'persuasive';
+type PassageType = 'narrative' | 'informational' | 'persuasive' | 'procedural' | 'descriptive';
 
 interface GeneratedQuestion {
   id?: string;
@@ -261,8 +261,8 @@ export function validatePassage(passage: GeneratedPassage, expectedWordCount?: n
 
   if (!passage.passage_type) {
     errors.push('Passage type is required');
-  } else if (!['narrative', 'informational', 'persuasive'].includes(passage.passage_type)) {
-    errors.push('Passage type must be narrative, informational, or persuasive');
+  } else if (!['narrative', 'informational', 'persuasive', 'procedural', 'descriptive'].includes(passage.passage_type)) {
+    errors.push('Passage type must be narrative, informational, persuasive, procedural, or descriptive');
   }
 
   // 2. Check word count accuracy
