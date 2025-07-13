@@ -143,7 +143,7 @@ const PerformanceDashboard = () => {
   const { user } = useAuth();
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('diagnostic');
   const [selectedPracticeTest, setSelectedPracticeTest] = useState(2);
   const [practiceFilter, setPracticeFilter] = useState('all');
   const [drillFilter, setDrillFilter] = useState('all');
@@ -480,7 +480,6 @@ const PerformanceDashboard = () => {
         <div className="flex justify-center mb-8">
           <div className="flex space-x-2 bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
             {[
-              { id: 'overview', label: 'Overall', icon: <BarChart3 size={18} /> },
               { id: 'diagnostic', label: 'Diagnostic', icon: <Activity size={18} /> },
               { id: 'practice', label: 'Practice Tests', icon: <FileText size={18} /> },
               { id: 'drills', label: 'Drills', icon: <Target size={18} /> }
@@ -505,200 +504,6 @@ const PerformanceDashboard = () => {
 
         {/* Tab Content */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-8">
-          {/* Overall Tab */}
-          {activeTab === 'overview' && (
-            <div className="space-y-8">
-              {(() => {
-                const hasOverallData = performanceData.overall?.questionsCompleted > 0;
-                const hasDiagnosticData = performanceData.diagnostic;
-                const hasPracticeData = performanceData.practice?.tests?.some(test => test.status === 'completed');
-                const hasDrillData = performanceData.drills?.subSkillBreakdown?.some(section => 
-                  section.subSkills.some(skill => skill.questionsCompleted > 0)
-                );
-                
-                const hasAnyData = hasOverallData || hasDiagnosticData || hasPracticeData || hasDrillData;
-                
-                return !hasAnyData ? (
-                <div className="text-center py-16">
-                  <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
-                    <BarChart3 className="h-12 w-12 text-teal-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Start Your Learning Journey</h3>
-                  <p className="text-slate-600 mb-8 max-w-md mx-auto">Complete some activities to see your overall performance insights. Your progress across all test modes will be summarized here.</p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm text-blue-800">
-                        <div className="font-semibold mb-1">To see overall insights:</div>
-                        <div>• Complete diagnostic sections, OR</div>
-                        <div>• Complete a practice test, OR</div>
-                        <div>• Answer drill questions</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 justify-center">
-                    <button className="px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold">
-                      Start Diagnostic
-                    </button>
-                    <button className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-semibold">
-                      Practice Skills
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-6">Overall Performance</h2>
-              
-              {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Questions Completed
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Questions Completed</div>
-                          <div>Total number of questions you have completed across all tests and drills.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.questionsCompleted || 0}</div>
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Overall Accuracy
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Overall Accuracy</div>
-                          <div>Average percentage of questions answered correctly across all tests and drills.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.overallAccuracy || 0}%</div>
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Average Test Score
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Average Test Score</div>
-                          <div>Average score across diagnostic and practice tests.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.averageTestScore || '-'}%</div>
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                      Study Time
-                      <div className="relative inline-block">
-                        <Info size={14} className="text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                          <div className="font-semibold mb-1">Study Time</div>
-                          <div>Total time spent studying across all activities.</div>
-                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">{performanceData.overall?.studyTimeHours || 0}h</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Strengths and Weaknesses */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Top 5 Strengths */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      Top 5 Strengths
-                    </h3>
-                  </div>
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      {(performanceData.diagnostic?.strengths || []).slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                          <div className="flex-1">
-                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
-                            <p className="text-sm text-slate-600">{item.questionsAttempted} questions</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="text-lg font-semibold text-green-600">{Math.round(item.accuracy)}%</div>
-                            <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
-                              <div 
-                                className="h-full rounded-full bg-green-500"
-                                style={{ width: `${item.accuracy}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Top 5 Weaknesses */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                      <XCircle className="w-5 h-5 text-red-600" />
-                      Top 5 Areas for Improvement
-                    </h3>
-                  </div>
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      {(performanceData.diagnostic?.weaknesses || []).slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                          <div className="flex-1">
-                            <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
-                            <p className="text-sm text-slate-600">{item.questionsAttempted} questions</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className={`text-lg font-semibold ${
-                              item.accuracy >= 60 ? 'text-orange-600' : 'text-red-600'
-                            }`}>{Math.round(item.accuracy)}%</div>
-                            <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full ${
-                                  item.accuracy >= 60 ? 'bg-orange-500' : 'bg-red-500'
-                                }`}
-                                style={{ width: `${item.accuracy}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {(!performanceData.diagnostic?.weaknesses || performanceData.diagnostic.weaknesses.length === 0) && (
-                        <div className="text-center py-8 text-slate-500">
-                          <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          Complete more questions to see areas for improvement
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                </div>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
 
           {/* Diagnostic Tab */}
           {activeTab === 'diagnostic' && (
@@ -1080,17 +885,28 @@ const PerformanceDashboard = () => {
                         const mappedSkills = allSkills.map(skill => {
                           const sectionName = skill.sectionName || 'Unknown Section';
                           
-                          // Map section names to filter categories
+                          // Map section names to filter categories (all test types)
                           let category = 'all';
-                          if (sectionName === 'Reading Reasoning') {
+                          const lowerSectionName = sectionName.toLowerCase();
+                          
+                          // Reading categories
+                          if (lowerSectionName.includes('reading')) {
                             category = 'reading';
-                          } else if (sectionName === 'Mathematics Reasoning') {
+                          }
+                          // Mathematics categories  
+                          else if (lowerSectionName.includes('mathematics') || lowerSectionName.includes('mathematical') || lowerSectionName.includes('numeracy')) {
                             category = 'mathematical';
-                          } else if (sectionName === 'General Ability - Verbal') {
+                          }
+                          // Verbal/Language categories
+                          else if (lowerSectionName.includes('verbal') || lowerSectionName.includes('language') || lowerSectionName.includes('thinking skills')) {
                             category = 'verbal';
-                          } else if (sectionName === 'General Ability - Quantitative') {
+                          }
+                          // Quantitative/Numerical categories
+                          else if (lowerSectionName.includes('quantitative') || lowerSectionName.includes('numerical')) {
                             category = 'quantitative';
-                          } else if (sectionName === 'Writing') {
+                          }
+                          // Writing categories
+                          else if (lowerSectionName.includes('writing') || lowerSectionName.includes('written expression')) {
                             category = 'writing';
                           }
                           
@@ -1223,7 +1039,7 @@ const PerformanceDashboard = () => {
                     onClick={() => test.status === 'completed' && setSelectedPracticeTest(test.testNumber)}
                     className={`relative p-4 rounded-xl border ${
                       selectedPracticeTest === test.testNumber
-                        ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white border-transparent shadow-lg scale-105 transform'
+                        ? 'bg-white border-2 border-teal-500 shadow-lg scale-105 transform'
                         : test.status === 'completed'
                         ? 'bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-105 transform'
                         : 'bg-white border-slate-200 shadow-sm opacity-60'
@@ -1231,21 +1047,19 @@ const PerformanceDashboard = () => {
                   >
                     <div className="text-center">
                       <h3 className={`text-lg font-bold mb-2 ${
-                        selectedPracticeTest === test.testNumber ? 'text-white' : 'text-slate-900'
+                        selectedPracticeTest === test.testNumber ? 'text-teal-700' : 'text-slate-900'
                       }`}>
                         Test {test.testNumber}
                       </h3>
                       {test.status === 'completed' && test.score !== null ? (
                         <>
                           <div className={`text-2xl font-bold mb-1 ${
-                            selectedPracticeTest === test.testNumber 
-                              ? 'text-white' 
-                              : test.score >= 80 ? 'text-green-600' : test.score >= 60 ? 'text-orange-600' : 'text-red-600'
+                            test.score >= 80 ? 'text-green-600' : test.score >= 60 ? 'text-orange-600' : 'text-red-600'
                           }`}>
                             {test.score}%
                           </div>
                           <p className={`text-sm font-medium ${
-                            selectedPracticeTest === test.testNumber ? 'text-white/90' : 'text-slate-600'
+                            selectedPracticeTest === test.testNumber ? 'text-teal-600' : 'text-slate-600'
                           }`}>
                             {new Date(test.completedAt).toLocaleDateString('en-US', { 
                               month: 'short', 
@@ -1608,12 +1422,39 @@ const PerformanceDashboard = () => {
                       {(selectedTest.subSkillBreakdown || [])
                         .filter(subSkill => {
                           if (practiceFilter === 'all') return true;
-                          if (practiceFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
-                          if (practiceFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
-                          if (practiceFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
-                          if (practiceFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
-                          if (practiceFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                          
+                          const lowerSectionName = subSkill.sectionName.toLowerCase();
+                          
+                          // Universal section filtering for all test types
+                          if (practiceFilter === 'reading') {
+                            return lowerSectionName.includes('reading');
+                          }
+                          if (practiceFilter === 'mathematical') {
+                            return lowerSectionName.includes('mathematics') || 
+                                   lowerSectionName.includes('mathematical') || 
+                                   lowerSectionName.includes('numeracy');
+                          }
+                          if (practiceFilter === 'verbal') {
+                            return lowerSectionName.includes('verbal') || 
+                                   lowerSectionName.includes('language') || 
+                                   lowerSectionName.includes('thinking skills');
+                          }
+                          if (practiceFilter === 'quantitative') {
+                            return lowerSectionName.includes('quantitative') || 
+                                   lowerSectionName.includes('numerical');
+                          }
+                          if (practiceFilter === 'writing') {
+                            return lowerSectionName.includes('writing') || 
+                                   lowerSectionName.includes('written expression');
+                          }
+                          
                           return true;
+                        })
+                        .sort((a, b) => {
+                          // Sort by score/accuracy depending on current view (best to worst)
+                          const aValue = subSkillView === 'score' ? a.score : a.accuracy;
+                          const bValue = subSkillView === 'score' ? b.score : b.accuracy;
+                          return bValue - aValue; // Highest to lowest (best first)
                         })
                         .map((subSkill, index) => {
                           const displayScore = subSkill.score;
@@ -1696,7 +1537,7 @@ const PerformanceDashboard = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Overall Drill Stats */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-3 gap-6">
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                       <div className="text-center">
                         <div className="text-base font-medium text-slate-600 mb-2">Total Questions Drilled</div>
@@ -1711,6 +1552,23 @@ const PerformanceDashboard = () => {
                           (performanceData.drills?.overallAccuracy || 0) >= 60 ? 'text-orange-600' : 
                           'text-red-600'
                         }`}>{performanceData.drills?.overallAccuracy || 0}%</div>
+                      </div>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                      <div className="text-center">
+                        <div className="text-base font-medium text-slate-600 mb-2">Total Score</div>
+                        <div className={`text-3xl font-bold ${
+                          performanceData.drills?.overallAccuracy && performanceData.drills.overallAccuracy >= 80 ? 'text-green-600' : 
+                          performanceData.drills?.overallAccuracy && performanceData.drills.overallAccuracy >= 60 ? 'text-orange-600' : 
+                          'text-red-600'
+                        }`}>
+                          {(() => {
+                            const totalQuestions = performanceData.drills?.totalQuestions || 0;
+                            const accuracy = performanceData.drills?.overallAccuracy || 0;
+                            const correctAnswers = Math.round((accuracy / 100) * totalQuestions);
+                            return `${correctAnswers}/${totalQuestions}`;
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1760,12 +1618,37 @@ const PerformanceDashboard = () => {
                           )
                           .filter(subSkill => {
                             if (drillFilter === 'all') return true;
-                            if (drillFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
-                            if (drillFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
-                            if (drillFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
-                            if (drillFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
-                            if (drillFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                            
+                            const lowerSectionName = subSkill.sectionName.toLowerCase();
+                            
+                            // Universal section filtering for all test types
+                            if (drillFilter === 'reading') {
+                              return lowerSectionName.includes('reading');
+                            }
+                            if (drillFilter === 'mathematical') {
+                              return lowerSectionName.includes('mathematics') || 
+                                     lowerSectionName.includes('mathematical') || 
+                                     lowerSectionName.includes('numeracy');
+                            }
+                            if (drillFilter === 'verbal') {
+                              return lowerSectionName.includes('verbal') || 
+                                     lowerSectionName.includes('language') || 
+                                     lowerSectionName.includes('thinking skills');
+                            }
+                            if (drillFilter === 'quantitative') {
+                              return lowerSectionName.includes('quantitative') || 
+                                     lowerSectionName.includes('numerical');
+                            }
+                            if (drillFilter === 'writing') {
+                              return lowerSectionName.includes('writing') || 
+                                     lowerSectionName.includes('written expression');
+                            }
+                            
                             return true;
+                          })
+                          .sort((a, b) => {
+                            // Sort by accuracy (best to worst) for drill results
+                            return (b.accuracy || 0) - (a.accuracy || 0); // Highest to lowest (best first)
                           });
 
                         return allSubSkills.map((subSkill, index) => {
@@ -1849,11 +1732,32 @@ const PerformanceDashboard = () => {
                         .flatMap(section => section.subSkills.map(skill => ({ ...skill, sectionName: section.sectionName })))
                         .filter(subSkill => {
                           if (drillFilter === 'all') return true;
-                          if (drillFilter === 'reading') return subSkill.sectionName.toLowerCase().includes('reading');
-                          if (drillFilter === 'mathematical') return subSkill.sectionName.toLowerCase().includes('mathematics');
-                          if (drillFilter === 'verbal') return subSkill.sectionName.toLowerCase().includes('verbal');
-                          if (drillFilter === 'quantitative') return subSkill.sectionName.toLowerCase().includes('quantitative');
-                          if (drillFilter === 'writing') return subSkill.sectionName.toLowerCase().includes('writing');
+                          
+                          const lowerSectionName = subSkill.sectionName.toLowerCase();
+                          
+                          // Universal section filtering for all test types
+                          if (drillFilter === 'reading') {
+                            return lowerSectionName.includes('reading');
+                          }
+                          if (drillFilter === 'mathematical') {
+                            return lowerSectionName.includes('mathematics') || 
+                                   lowerSectionName.includes('mathematical') || 
+                                   lowerSectionName.includes('numeracy');
+                          }
+                          if (drillFilter === 'verbal') {
+                            return lowerSectionName.includes('verbal') || 
+                                   lowerSectionName.includes('language') || 
+                                   lowerSectionName.includes('thinking skills');
+                          }
+                          if (drillFilter === 'quantitative') {
+                            return lowerSectionName.includes('quantitative') || 
+                                   lowerSectionName.includes('numerical');
+                          }
+                          if (drillFilter === 'writing') {
+                            return lowerSectionName.includes('writing') || 
+                                   lowerSectionName.includes('written expression');
+                          }
+                          
                           return true;
                         }).length > 0;
 

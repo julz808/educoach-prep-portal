@@ -158,7 +158,8 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-20 w-auto object-contain"
+                  className="h-24 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate('/dashboard')}
                 />
               )}
               <Button
@@ -183,10 +184,7 @@ const Layout: React.FC = () => {
                 <SelectContent>
                   {allProducts.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{product.name}</span>
-                        <span className="text-xs text-muted-foreground">{product.description}</span>
-                      </div>
+                      <span className="font-medium">{product.name}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -354,7 +352,8 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-10 w-auto object-contain"
+              className="h-12 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/dashboard')}
             />
           </div>
           
@@ -387,7 +386,11 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-16 w-auto object-contain"
+                  className="h-20 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => {
+                    navigate('/dashboard');
+                    setSidebarOpen(false);
+                  }}
                 />
                 <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
                   <X size={20} />

@@ -14,11 +14,13 @@ import {
 } from '@/services/supabaseQuestionService';
 import { SessionService, type TestSession } from '@/services/sessionService';
 import { TestSessionService } from '@/services/testSessionService';
+import { DrillSessionService } from '@/services/drillSessionService';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
 import { ScoringService } from '@/services/scoringService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { calculateTimeAllocation, shouldShowImmediateAnswerFeedback, shouldHaveTimer } from '@/utils/timeAllocation';
+import { getOrCreateSubSkillUUID } from '@/utils/uuidUtils';
 
 // Map frontend course IDs back to proper display names (same as in TestInstructionsPage)
 const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
@@ -48,6 +50,19 @@ interface Question {
   userTextAnswer?: string; // For written responses
   maxPoints: number; // Maximum points for this question (1 for MC, varies for writing)
 }
+
+// Map frontend product IDs to database product_type values
+const getDbProductType = (productId: string): string => {
+  const productMap: Record<string, string> = {
+    'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+    'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+    'year-5-naplan': 'Year 5 NAPLAN',
+    'year-7-naplan': 'Year 7 NAPLAN',
+    'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+    'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
+  };
+  return productMap[productId] || productId;
+};
 
 interface TestSessionState {
   id: string;
@@ -435,55 +450,57 @@ const TestTaking: React.FC = () => {
 
   // Load drill session from drill_sessions table
   const loadDrillSession = async (sessionId: string) => {
-    console.log('🔧 DRILL: Loading drill session:', sessionId);
+    console.log('🎯 DRILL: Loading drill session using DrillSessionService:', sessionId);
     
-    const { data, error } = await supabase
-      .from('drill_sessions')
-      .select('*')
-      .eq('id', sessionId)
-      .single();
+    try {
+      console.log('🎯 DRILL: Calling DrillSessionService.getSessionForResume with:', sessionId);
+      const drillSessionData = await DrillSessionService.getSessionForResume(sessionId);
+      console.log('🎯 DRILL: DrillSessionService returned:', drillSessionData);
+      
+      if (!drillSessionData) {
+        console.log('🎯 DRILL: No drill session found:', sessionId);
+        return null;
+      }
 
-    if (error) {
-      console.error('🔧 DRILL: Error loading drill session:', error);
+      console.log('🎯 DRILL: Drill session data loaded:', {
+        questionsTotal: drillSessionData.questionsTotal,
+        questionsAnswered: drillSessionData.questionsAnswered,
+        questionsCorrect: drillSessionData.questionsCorrect,
+        status: drillSessionData.status,
+        sessionCompleteRatio: `${drillSessionData.questionsAnswered}/${drillSessionData.questionsTotal}`
+      });
+
+      // Get the skill name from URL parameters for a better display name
+      const skillName = searchParams.get('skill') || 'Drill Practice';
+      
+      // Convert drill session to TestSession format
+      console.log('🎯 DRILL: Raw drill session answers data:', drillSessionData.answersData);
+      console.log('🎯 DRILL: Drill session status:', drillSessionData.status);
+      console.log('🎯 DRILL: Questions answered/total:', drillSessionData.questionsAnswered, '/', drillSessionData.questionsTotal);
+      
+      const drillSession: TestSession = {
+        id: drillSessionData.sessionId,
+        userId: drillSessionData.userId,
+        productType: drillSessionData.productType,
+        testMode: 'drill',
+        sectionName: skillName, // Use the readable skill name instead of UUID
+        currentQuestionIndex: drillSessionData.questionsAnswered || 0,
+        answers: drillSessionData.answersData || {},
+        textAnswers: {},
+        flaggedQuestions: [],
+        timeRemainingSeconds: 1800, // Default 30 minutes for drills
+        totalQuestions: drillSessionData.questionsTotal || 0,
+        status: drillSessionData.status === 'completed' ? 'completed' : 'active',
+        createdAt: drillSessionData.startedAt,
+        updatedAt: drillSessionData.startedAt
+      };
+
+      console.log('🎯 DRILL: Converted drill session:', drillSession);
+      return drillSession;
+    } catch (error) {
+      console.error('🎯 DRILL: Error loading drill session:', error);
       return null;
     }
-    
-    if (!data) {
-      console.log('🔧 DRILL: No drill session found:', sessionId);
-      return null;
-    }
-
-    console.log('🔧 DRILL: Raw drill session data:', data);
-    console.log('🔧 DRILL: Session analysis:', {
-      questions_total: data.questions_total,
-      questions_answered: data.questions_answered,
-      status: data.status,
-      session_complete_ratio: `${data.questions_answered}/${data.questions_total}`
-    });
-
-    // Get the skill name from URL parameters for a better display name
-    const skillName = searchParams.get('skill') || 'Drill Practice';
-    
-    // Convert drill session to TestSession format
-    const drillSession: TestSession = {
-      id: data.id,
-      userId: data.user_id,
-      productType: data.product_type,
-      testMode: 'drill',
-      sectionName: skillName, // Use the readable skill name instead of UUID
-      currentQuestionIndex: data.questions_answered || 0,
-      answers: data.answers_data || {},
-      textAnswers: {},
-      flaggedQuestions: [],
-      timeRemainingSeconds: 1800, // Default 30 minutes for drills
-      totalQuestions: data.questions_total || 0,
-      status: data.status === 'completed' ? 'completed' : 'active',
-      createdAt: data.created_at,
-      updatedAt: data.updated_at || data.created_at
-    };
-
-    console.log('🔧 DRILL: Converted drill session:', drillSession);
-    return drillSession;
   };
 
   // Initialize session
@@ -504,12 +521,15 @@ const TestTaking: React.FC = () => {
         
         // If we have a sessionId, try to resume
         if (actualSessionId) {
-          console.log('🔄 Attempting to resume session:', actualSessionId);
+          console.log('🔄 Attempting to resume session:', actualSessionId, 'for testType:', testType);
+          console.log('🔄 Is drill session?', testType === 'drill');
           
           // Load session based on test type
           const savedSession = testType === 'drill' ? 
             await loadDrillSession(actualSessionId) : 
             await SessionService.loadSession(actualSessionId);
+            
+          console.log('🔄 Session loaded result:', savedSession);
           
           console.log('🔄 RESUME: Session loaded?', !!savedSession);
           console.log('🔄 RESUME: Session answers:', savedSession?.answers);
@@ -532,35 +552,27 @@ const TestTaking: React.FC = () => {
             console.log('🔄 RESUME: Saved answers to convert:', savedSession.answers);
             
             Object.entries(savedSession.answers).forEach(([qIndex, optionText]) => {
-              // For drill sessions, the key might be question ID (UUID) instead of index
-              let questionIndex: number;
-              let question: any;
+              // Both drill sessions and regular sessions use question index as key
+              const questionIndex = parseInt(qIndex);
+              const question = questions[questionIndex];
               
-              if (testType === 'drill') {
-                // For drill sessions, the key is question ID, find the question by ID
-                question = questions.find(q => q.id === qIndex);
-                questionIndex = questions.findIndex(q => q.id === qIndex);
-                console.log(`🔧 DRILL: Processing answer for question ID ${qIndex} (index ${questionIndex}):`, {
-                  savedOptionText: optionText,
-                  questionFound: !!question,
-                  questionText: question?.text?.substring(0, 50) + '...',
-                });
-              } else {
-                // For regular sessions, the key is question index
-                questionIndex = parseInt(qIndex);
-                question = questions[questionIndex];
-                console.log(`🔄 RESUME: Processing answer for question ${questionIndex}:`, {
-                  savedOptionText: optionText,
-                  questionExists: !!question,
-                  questionText: question?.text?.substring(0, 50) + '...',
-                });
-              }
+              console.log(`🔄 RESUME: Processing answer for question ${questionIndex}:`, {
+                savedOptionText: optionText,
+                questionExists: !!question,
+                questionText: question?.text?.substring(0, 50) + '...',
+                testType: testType
+              });
               
               if (question && question.options && questionIndex >= 0) {
                 let answerIndex = -1;
                 
-                // For drill sessions, optionText might be a letter (A, B, C, D)
-                if (testType === 'drill' && typeof optionText === 'string' && optionText.length === 1 && /[A-D]/.test(optionText)) {
+                // Handle different answer formats
+                if (typeof optionText === 'number') {
+                  // If optionText is already a number, use it directly as the answer index
+                  answerIndex = optionText;
+                  console.log('🔄 RESUME: Numeric answer used directly:', optionText, '→', answerIndex);
+                } else if (testType === 'drill' && typeof optionText === 'string' && optionText.length === 1 && /[A-D]/.test(optionText)) {
+                  // For drill sessions, optionText might be a letter (A, B, C, D)
                   answerIndex = optionText.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
                   console.log('🔧 DRILL: Letter answer conversion:', optionText, '→', answerIndex);
                 } else {
@@ -703,17 +715,54 @@ const TestTaking: React.FC = () => {
         
         console.log('🆕 TIMER: Calculated time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
         
-        const sessionIdToUse = await TestSessionService.createOrResumeSession(
-          user.id,
-          properDisplayName, // Use mapped product type, not raw selectedProduct
-          actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
-          sectionName,
-          questions.length,
-          questions.map(q => q.id)
-        );
+        let sessionIdToUse: string;
+        let existingSession: any = null;
 
-        // Check if this is actually resuming an existing session
-        const existingSession = await SessionService.loadSession(sessionIdToUse);
+        if (testType === 'drill') {
+          // For drill sessions, use DrillSessionService
+          // Find the first question with a valid subSkillId (UUID), or create one from the sub_skill text
+          const subSkillText = questions[0]?.subSkill || sectionName;
+          const firstQuestionWithUUID = questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
+          
+          // Use utility function to get or create a proper UUID
+          const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
+          console.log('🎯 DRILL: SubSkill UUID for', subSkillText, '→', actualSubSkillId);
+          
+          const difficulty = parseInt(searchParams.get('difficulty') === 'easy' ? '1' : 
+                                   searchParams.get('difficulty') === 'medium' ? '2' : '3');
+          
+          console.log('🎯 DRILL: Creating/resuming drill session:', {
+            subSkillId: actualSubSkillId,
+            difficulty,
+            productType: properDisplayName,
+            questionCount: questions.length
+          });
+          
+          sessionIdToUse = await DrillSessionService.createOrResumeSession(
+            user.id,
+            actualSubSkillId,
+            properDisplayName,
+            difficulty,
+            questions.map(q => q.id),
+            questions.length
+          );
+          
+          // Check if this is actually resuming an existing drill session
+          existingSession = await loadDrillSession(sessionIdToUse);
+        } else {
+          // For regular sessions, use TestSessionService  
+          sessionIdToUse = await TestSessionService.createOrResumeSession(
+            user.id,
+            properDisplayName, // Use mapped product type, not raw selectedProduct
+            actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
+            sectionName,
+            questions.length,
+            questions.map(q => q.id)
+          );
+
+          // Check if this is actually resuming an existing session
+          existingSession = await SessionService.loadSession(sessionIdToUse);
+        }
         
         if (existingSession && existingSession.currentQuestionIndex > 0) {
           // This is an existing session we should resume
@@ -1012,14 +1061,40 @@ const TestTaking: React.FC = () => {
           stringTextAnswers
         });
 
-        await SessionService.saveProgress(
-          updatedSession.id,
-          updatedSession.currentQuestion,
-          stringAnswers,
-          flaggedQuestions,
-          timeRemaining,
-          stringTextAnswers
-        );
+        // Use different save logic for drill vs regular sessions
+        if (updatedSession.type === 'drill') {
+          // For drill sessions, update drill-specific progress
+          const questionsAnswered = Object.keys(stringAnswers).length;
+          const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
+            const question = updatedSession.questions[parseInt(Object.keys(stringAnswers)[index])];
+            const answerIndex = answer.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
+            return answerIndex === question.correctAnswer;
+          }).length;
+          
+          console.log('💾 DRILL-SAVE: Updating drill session progress:', {
+            sessionId: updatedSession.id,
+            questionsAnswered,
+            questionsCorrect,
+            answers: stringAnswers
+          });
+          
+          await DrillSessionService.updateProgress(
+            updatedSession.id,
+            questionsAnswered,
+            questionsCorrect,
+            stringAnswers
+          );
+        } else {
+          // For regular sessions, use existing logic
+          await SessionService.saveProgress(
+            updatedSession.id,
+            updatedSession.currentQuestion,
+            stringAnswers,
+            flaggedQuestions,
+            timeRemaining,
+            stringTextAnswers
+          );
+        }
 
         console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
         
@@ -1041,22 +1116,38 @@ const TestTaking: React.FC = () => {
             });
             
             // Record individual question attempt to question_attempt_history table
-            const { error: attemptError } = await supabase.rpc('save_question_attempt', {
-              p_user_id: user.id,
-              p_question_id: currentQuestion.id,
-              p_session_id: updatedSession.id,
-              p_user_answer: selectedAnswer,
-              p_is_correct: isCorrect,
-              p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
-              p_is_skipped: false,
-              p_time_spent_seconds: 30
-            });
-            
-            if (attemptError) {
-              console.error('❌ QUESTION-ATTEMPT: Error recording question attempt:', attemptError);
+            if (updatedSession.type === 'drill') {
+              // Use DrillSessionService for drill question responses
+              await DrillSessionService.recordQuestionResponse(
+                user.id,
+                currentQuestion.id,
+                updatedSession.id,
+                getDbProductType(selectedProduct),
+                selectedAnswer,
+                isCorrect,
+                30, // time spent seconds
+                updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
+                false // is_skipped
+              );
             } else {
-              console.log('✅ QUESTION-ATTEMPT: Individual question attempt recorded successfully');
+              // Use existing RPC for practice tests
+              const { error: attemptError } = await supabase.rpc('save_question_attempt', {
+                p_user_id: user.id,
+                p_question_id: currentQuestion.id,
+                p_session_id: updatedSession.id,
+                p_user_answer: selectedAnswer,
+                p_is_correct: isCorrect,
+                p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
+                p_is_skipped: false,
+                p_time_spent_seconds: 30
+              });
+              
+              if (attemptError) {
+                console.error('📊 QUESTION-ATTEMPT: Error recording attempt:', attemptError);
+              }
             }
+            
+            console.log('✅ QUESTION-ATTEMPT: Individual question attempt recorded successfully');
           } catch (questionAttemptError) {
             console.error('❌ QUESTION-ATTEMPT: Failed to record individual question attempt:', questionAttemptError);
           }
@@ -1225,9 +1316,39 @@ const TestTaking: React.FC = () => {
       setWritingProcessingStatus('Reviewing your writing responses...');
       await processWritingAssessments();
       
-      // Mark as completed
+      // Mark as completed - use different logic for drill vs regular sessions
       setWritingProcessingStatus('Finalizing your results...');
-      await SessionService.completeSession(session.id);
+      if (session.type === 'drill') {
+        // For drill sessions, complete using DrillSessionService
+        const questionsAnswered = Object.keys(session.answers).length;
+        const questionsCorrect = Object.values(session.answers).filter((answer, index) => {
+          const question = session.questions[parseInt(Object.keys(session.answers)[index])];
+          // Handle both number and string answer formats
+          let answerIndex: number;
+          if (typeof answer === 'string') {
+            answerIndex = answer.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
+          } else {
+            answerIndex = Number(answer); // Use numeric answer directly
+          }
+          return answerIndex === question.correctAnswer;
+        }).length;
+        
+        console.log('🏁 DRILL-COMPLETE: Completing drill session:', {
+          sessionId: session.id,
+          questionsAnswered,
+          questionsCorrect
+        });
+        
+        await DrillSessionService.completeSession(
+          session.id,
+          questionsAnswered,
+          questionsCorrect,
+          session.answers
+        );
+      } else {
+        // For regular sessions, use existing logic
+        await SessionService.completeSession(session.id);
+      }
       
       // Calculate final score using ScoringService
       setWritingProcessingStatus('Calculating final scores...');

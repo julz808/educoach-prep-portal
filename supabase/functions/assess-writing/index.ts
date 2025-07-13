@@ -111,7 +111,7 @@ REQUIRED JSON RESPONSE:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 2000,
         temperature: 0.1,
         messages: [{
@@ -176,7 +176,7 @@ REQUIRED JSON RESPONSE:
       strengths: Array.isArray(parsedResponse.strengths) ? parsedResponse.strengths.slice(0, 5) : [],
       improvements: Array.isArray(parsedResponse.improvements) ? parsedResponse.improvements.slice(0, 5) : [],
       processingMetadata: {
-        modelVersion: 'claude-sonnet-4-20250514',
+        modelVersion: 'claude-3-5-sonnet-20241022',
         processingTimeMs: 0,
         promptTokens: claudeData.usage?.input_tokens,
         responseTokens: claudeData.usage?.output_tokens

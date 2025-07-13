@@ -504,7 +504,7 @@ const PracticeTests: React.FC = () => {
       if (progressData && progressData.sessionId) {
         // Navigate directly to the test taking page in review mode
         console.log('📊 Viewing results for section:', section.name, 'sessionId:', progressData.sessionId);
-        const targetUrl = `/test/practice/${sectionId}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(section.name)}`;
+        const targetUrl = `/test/practice/${sectionId}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(section.name)}&testMode=${testId}`;
         console.log('📊 VIEW RESULTS: Navigating to URL:', targetUrl);
         console.log('📊 VIEW RESULTS: URL breakdown:', {
           testType: 'practice',
@@ -753,7 +753,7 @@ const PracticeTests: React.FC = () => {
                             <Button 
                               size="sm"
                               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
-                              onClick={() => handleViewResults(test.id)}
+                              onClick={() => setExpandedTest(expandedTest === test.id ? null : test.id)}
                             >
                               <BarChart3 size={14} className="mr-1" />
                               View Results

@@ -902,6 +902,18 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                                 {testScore.answeredQuestions}/{testScore.totalQuestions}
                               </span>
                             </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Accuracy:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {testScore.correctAnswers}/{testScore.answeredQuestions}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Accuracy %:</span>
+                              <span className="font-semibold text-edu-navy">
+                                {testScore.answeredQuestions > 0 ? Math.round((testScore.correctAnswers / testScore.answeredQuestions) * 100) : 0}%
+                              </span>
+                            </div>
                           </>
                         ) : (
                           // Fallback to simple question count

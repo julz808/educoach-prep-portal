@@ -518,7 +518,7 @@ export const UNIFIED_SUB_SKILLS = {
     "description": "Interpreting complex data sets and statistical information",
     "visual_required": true
   },
-  "Mathematical Modelling": {
+  "Mathematical Modelling (Core)": {
     "description": "Creating mathematical models to represent real-world situations",
     "visual_required": false
   },

@@ -33,6 +33,9 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - ✅ Progress tracking and persistence complete
 - ✅ Dashboard backend integration complete
 - ✅ Performance analytics and insights complete
+- ✅ Drill session management system with UUID handling
+- ✅ Complete DrillSessionService with database functions
+- ✅ Fixed drill session UUID errors for questions with NULL sub_skill_id
 
 ## Tech Stack
 - **Frontend:** React (Vite, TypeScript, shadcn/ui, TailwindCSS, React Router, TanStack Query)
@@ -71,29 +74,32 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - [x] Dynamic practice test detection and "Finish All" functionality
 
 ## Remaining Tasks (Next Phase Priorities)
-### Phase 1: Question Generation Engine Improvements
-- [ ] **Schema Compatibility Check**: Verify generation engine populates all current database fields (e.g., max_points column)
-- [ ] Update generation scripts to match current questions table structure
-- [ ] Implement multi-step validation pipeline for generated questions
-- [ ] Add automated quality validation step to catch mathematical errors
-- [ ] Create auto-regeneration logic for failed validations
-- [ ] Add logging and pattern analysis for hallucination detection
-- [ ] Test and tune validation parameters for efficiency
+### Phase 1: Production Readiness (Current Focus)
+- [ ] Complete tasks from ProductionReady.md and ProductionReadyImplementationPlan.md
+- [ ] Comprehensive error handling and edge case coverage
+- [ ] Unit and integration test implementation
+- [ ] Performance optimization and monitoring setup
+- [ ] Security audit and vulnerability assessment
+- [ ] Browser compatibility testing
+- [ ] Mobile responsiveness validation
+- [ ] Accessibility compliance (WCAG)
 
-### Phase 2: Generate Questions for All 6 Products
-- [ ] Run generation scripts for NSW Selective Entry
-- [ ] Run generation scripts for Year 5 NAPLAN
-- [ ] Run generation scripts for Year 7 NAPLAN
-- [ ] Run generation scripts for EduTest Scholarship
-- [ ] Run generation scripts for ACER Scholarship
-- [ ] Validate question coverage across all products
-
-### Phase 3: Cross-Product Testing & Validation
+### Phase 2: End-to-End Testing & Validation
 - [ ] Create automated test suite for all products
 - [ ] Test user flows across all 6 products
 - [ ] Validate analytics work correctly for all products
 - [ ] Test product switching and edge cases
 - [ ] Ensure frontend/backend logic works universally
+- [ ] Load testing and performance validation
+- [ ] Cross-browser and cross-device testing
+
+### Phase 3: Deployment & Infrastructure
+- [ ] Vercel deployment configuration and setup
+- [ ] Environment variable management
+- [ ] CI/CD pipeline implementation
+- [ ] Database backup and recovery procedures
+- [ ] Monitoring and alerting systems
+- [ ] SSL certificate and domain configuration
 
 ### Phase 4: Stripe Integration & Paywall
 - [ ] Integrate Lovable's Stripe functionality
@@ -101,13 +107,13 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 - [ ] Create subscription tiers and pricing structure
 - [ ] Add billing management interface
 - [ ] Test payment flows and subscription management
+- [ ] Handle subscription lifecycle events
 
-### Future Tasks
-- [ ] Add comprehensive error handling and edge cases
-- [ ] Refactor for best practices and code clarity
-- [ ] Add and improve unit/integration tests
-- [ ] Production deployment preparation
-- [ ] Performance optimization and monitoring
+### Future Phases (Deferred)
+- [ ] Question Generation Engine Improvements (already implemented)
+- [ ] Generate Questions for All 6 Products (sufficient content exists)
+- [ ] Advanced analytics and reporting features
+- [ ] User engagement and retention features
 
 ## Common Commands
 
@@ -180,11 +186,12 @@ Drill: 'drill'
 2. ✅ ~~Implement answer submission and progress tracking~~
 3. ✅ ~~Build dashboard and analytics~~
 4. ✅ ~~Advanced performance insights and analytics~~
-5. ⏳ **Phase 1: Question Generation Engine Improvements** (Current Focus)
-6. ⏳ **Phase 2: Generate Questions for All 6 Products**
-7. ⏳ **Phase 3: Cross-Product Testing & Validation**
-8. ⏳ **Phase 4: Stripe Integration & Paywall**
-9. ⏳ Error handling, testing, and production readiness
+5. ✅ ~~Fix drill session management and UUID handling~~
+6. 🎯 **Production Readiness Tasks** (Current Focus)
+7. ⏳ **End-to-End Testing & Validation**
+8. ⏳ **Vercel Deployment Setup**
+9. ⏳ **Stripe Integration & Paywall**
+10. ⏳ Question generation improvements (deferred - already implemented)
 
 ## Development Guidelines
 
@@ -201,6 +208,16 @@ Drill: 'drill'
 - **Focus on enhancing existing tables** rather than creating new ones
 
 ## Recently Completed (Latest)
+
+### Drill Session Management System (January 2025)
+- ✅ Created comprehensive DrillSessionService TypeScript class
+- ✅ Implemented 5 database functions for drill session management
+- ✅ Fixed UUID handling for questions with NULL sub_skill_id values
+- ✅ Added deterministic UUID generation from sub_skill text
+- ✅ Resolved "invalid input syntax for type uuid" errors
+- ✅ Updated both TestTaking.tsx and Drill.tsx for consistency
+- ✅ Proper foreign key constraint handling and error management
+- ✅ Complete drill session state persistence and resume functionality
 
 ### Advanced Performance Analytics System
 - ✅ Complete insights implementation for all test modes
@@ -224,18 +241,26 @@ Drill: 'drill'
 
 ## Current Focus Issues
 
-### Phase 1 Priority Issues
-- Question generation hallucination in Mathematics/Quantitative questions
-- Need validation pipeline to catch impossible/incorrect questions
-- Auto-regeneration needed for failed validations
-- Example issue: UUID 03fdec17-26e8-4852-ac24-e2d5031f8015 (overly complex solution)
+### Production Readiness Priority Issues
+- Complete comprehensive error handling and edge case coverage
+- Implement unit and integration test suite
+- Optimize performance and add monitoring
+- Security audit and vulnerability assessment
+- Browser compatibility and mobile responsiveness testing
+- Accessibility compliance implementation
 
-### Upcoming Issues
-- Only VIC Selective Entry has generated questions (need other 5 products)
-- Cross-product testing needed once all content is generated
-- Payment integration required before production launch
-- Comprehensive error handling coverage incomplete
-- Unit test coverage needs expansion
+### Deployment & Integration Issues
+- Vercel deployment configuration and environment setup
+- Stripe integration for payment processing and paywalls
+- End-to-end testing across all 6 products
+- Cross-platform and cross-device validation
+- Database backup and recovery procedures
+- CI/CD pipeline implementation
+
+### Deferred Issues (Lower Priority)
+- Question generation hallucination in Mathematics/Quantitative questions (sufficient content exists)
+- Validation pipeline for generated questions (can be improved later)
+- Only VIC Selective Entry has extensive generated questions (other products have sufficient content)
 
 ## Testing Approach
 
@@ -287,6 +312,10 @@ claude "Test that all frontend/backend logic works consistently across all 6 pro
 - `REALTIME_SESSION_IMPLEMENTATION.md` - Complete technical documentation for session system
 - `supabase-realtime-functions.sql` - Database functions for real-time operations
 - `test-realtime-session.md` - Testing guide for session functionality
+- `ProductionReady.md` - Production readiness checklist and requirements
+- `ProductionReadyImplementationPlan.md` - Detailed implementation plan for production tasks
+- `/supabase/migrations/20250713000001_add_drill_session_functions.sql` - Drill session database functions
+- `/src/services/drillSessionService.ts` - TypeScript service for drill session management
 
 ## Architecture Notes
 
@@ -297,8 +326,9 @@ claude "Test that all frontend/backend logic works consistently across all 6 pro
 - **Offline resilience**: Answer queuing with automatic sync on reconnection
 
 ## Use Claude Code for:
-- Question generation validation pipeline implementation (Phase 1 priority)
-- Multi-product question generation execution (Phase 2)
-- Cross-product testing and validation (Phase 3)
+- Production readiness tasks implementation (Phase 1 priority)
+- End-to-end testing and validation (Phase 2)
+- Vercel deployment setup and configuration (Phase 3)
 - Stripe integration with Lovable (Phase 4)
-- Error handling and comprehensive testing (Future phases) 
+- Performance optimization and monitoring (Phase 5)
+- Question generation improvements (Future phases - deferred) 

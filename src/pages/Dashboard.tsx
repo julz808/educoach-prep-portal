@@ -156,7 +156,15 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Total Study Time',
-      value: `${dashboardMetrics.totalStudyTimeHours}h`,
+      value: (() => {
+        const totalHours = dashboardMetrics.totalStudyTimeHours;
+        const hours = Math.floor(totalHours);
+        const minutes = Math.round((totalHours % 1) * 60);
+        if (hours === 0 && minutes === 0) return '0m';
+        if (hours === 0) return `${minutes}m`;
+        if (minutes === 0) return `${hours}h`;
+        return `${hours}h ${minutes}m`;
+      })(),
       icon: <Clock className="text-white" size={24} />,
       color: {
         bg: 'bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200',
@@ -260,7 +268,7 @@ const Dashboard: React.FC = () => {
           <CardContent className="space-y-6 px-8 pb-8">
             <div className="text-center space-y-4">
               <div className={`p-4 rounded-xl ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Completed</div>
+                <div className={`text-sm mb-1 ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Attempted</div>
                 <div className={`text-xl font-bold ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-700' : 'text-orange-900'}`}>
                   {dashboardMetrics.drill.subSkillsCompleted}/{dashboardMetrics.drill.totalSubSkills}
                 </div>

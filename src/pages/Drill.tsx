@@ -24,7 +24,9 @@ import {
 } from '@/services/supabaseQuestionService';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { DrillSessionService } from '@/services/drillSessionService';
 import { DeveloperTools } from '@/components/DeveloperTools';
+import { getOrCreateSubSkillUUID } from '@/utils/uuidUtils';
 
 // Map frontend product IDs to database product_type values
 const getDbProductType = (productId: string): string => {
@@ -41,9 +43,9 @@ const getDbProductType = (productId: string): string => {
 };
 
 interface SubSkillProgress {
-  easy: { completed: number; total: number; bestScore?: number };
-  medium: { completed: number; total: number; bestScore?: number };
-  hard: { completed: number; total: number; bestScore?: number };
+  easy: { completed: number; total: number; bestScore?: number; correctAnswers?: number; sessionId?: string; isCompleted?: boolean };
+  medium: { completed: number; total: number; bestScore?: number; correctAnswers?: number; sessionId?: string; isCompleted?: boolean };
+  hard: { completed: number; total: number; bestScore?: number; correctAnswers?: number; sessionId?: string; isCompleted?: boolean };
 }
 
 interface SubSkill {
@@ -55,6 +57,7 @@ interface SubSkill {
   isRecommended?: boolean;
   totalQuestions: number;
   completedQuestions: number;
+  isComplete?: boolean; // True when all three difficulties are completed
 }
 
 interface SkillArea {
@@ -119,15 +122,18 @@ const Drill: React.FC = () => {
         }
 
         const difficultyKey = session.difficulty === 1 ? 'easy' : session.difficulty === 2 ? 'medium' : 'hard';
-        const accuracy = session.questions_answered > 0 ? Math.round((session.questions_correct / session.questions_answered) * 100) : 0;
+        // Calculate score as percentage of total questions, not just attempted ones
+        const totalScore = session.questions_total > 0 ? Math.round((session.questions_correct / session.questions_total) * 100) : 0;
         
-        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, accuracy=${accuracy}%`);
+        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, totalScore=${totalScore}%`);
         
         progressMap[session.sub_skill_id][difficultyKey] = {
           completed: session.questions_answered || 0,
           total: session.questions_total || 0,
-          bestScore: session.status === 'completed' ? accuracy : undefined,
-          sessionId: session.id // Store session ID for navigation
+          bestScore: session.status === 'completed' ? totalScore : undefined,
+          correctAnswers: session.questions_correct || 0,
+          sessionId: session.id, // Store session ID for navigation
+          isCompleted: session.status === 'completed' // Track completion status
         };
       });
 
@@ -246,8 +252,11 @@ const Drill: React.FC = () => {
             // Get real progress data from database
             // Note: section.id is constructed but we need to match against the actual sub_skill_id from questions
             // Extract the actual sub_skill_id (UUID) from the questions in this section
-            const actualSubSkillId = section.questions.length > 0 && section.questions[0].subSkillId ? 
-              section.questions[0].subSkillId : section.name;
+            const subSkillText = section.questions[0]?.subSkill || section.name;
+            const firstQuestionWithUUID = section.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
+            
+            // Use same utility function as TestTaking.tsx to ensure UUID consistency
+            const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
             
             console.log(`🔧 DRILL: Looking for progress with actualSubSkillId: "${actualSubSkillId}" (section.id: "${section.id}", section.name: "${section.name}")`);
             console.log(`🔧 DRILL: Available progress keys:`, Object.keys(progressData));
@@ -269,9 +278,9 @@ const Drill: React.FC = () => {
             // Default if still no match
             if (!realProgress) {
               realProgress = {
-                easy: { completed: 0, total: easyTotal, bestScore: undefined },
-                medium: { completed: 0, total: mediumTotal, bestScore: undefined },
-                hard: { completed: 0, total: hardTotal, bestScore: undefined }
+                easy: { completed: 0, total: easyTotal, bestScore: undefined, correctAnswers: 0, isCompleted: false },
+                medium: { completed: 0, total: mediumTotal, bestScore: undefined, correctAnswers: 0, isCompleted: false },
+                hard: { completed: 0, total: hardTotal, bestScore: undefined, correctAnswers: 0, isCompleted: false }
               };
               console.log(`🔧 DRILL: No progress found, using default:`, realProgress);
             } else {
@@ -293,7 +302,8 @@ const Drill: React.FC = () => {
               progress: realProgress,
               isRecommended: false, // Could be calculated based on performance
               totalQuestions: totalQuestions,
-              completedQuestions: realProgress.easy.completed + realProgress.medium.completed + realProgress.hard.completed
+              completedQuestions: realProgress.easy.completed + realProgress.medium.completed + realProgress.hard.completed,
+              isComplete: isSubSkillComplete(realProgress) // New field to track if all difficulties are done
             };
 
             skillArea.subSkills.push(subSkill);
@@ -396,8 +406,8 @@ const Drill: React.FC = () => {
     setCurrentView('sub-skill');
   };
 
-  const startDrill = (difficulty: 'easy' | 'medium' | 'hard') => {
-    if (!selectedSubSkill || !selectedSkillArea) return;
+  const startDrill = async (difficulty: 'easy' | 'medium' | 'hard') => {
+    if (!selectedSubSkill || !selectedSkillArea || !user) return;
     
     const questions = selectedSubSkill.questions;
     if (questions.length === 0) return;
@@ -409,35 +419,63 @@ const Drill: React.FC = () => {
     // Filter questions by actual difficulty level from database
     const availableQuestions = questions.filter(q => q.difficulty === targetDifficulty);
     
-    console.log(`🔧 DEBUG: Filtering ${difficulty} questions (difficulty=${targetDifficulty}):`, availableQuestions.length, 'found out of', questions.length, 'total');
+    console.log(`🎯 DRILL: Starting ${difficulty} drill (difficulty=${targetDifficulty}):`, availableQuestions.length, 'questions available');
     
     if (availableQuestions.length > 0) {
-      // Check if there's an existing session for this sub-skill and difficulty
-      const actualSubSkillId = selectedSubSkill.questions.length > 0 && selectedSubSkill.questions[0].subSkillId ? 
-        selectedSubSkill.questions[0].subSkillId : selectedSubSkill.name;
-      
-      const progressData = drillProgress[actualSubSkillId];
-      const difficultyProgress = progressData?.[difficulty];
-      
-      console.log(`🔧 DRILL: Looking for existing session - subSkillId: ${actualSubSkillId}, difficulty: ${difficulty}`);
-      console.log(`🔧 DRILL: Progress data:`, difficultyProgress);
-      
-      let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
-      
-      if (difficultyProgress?.sessionId) {
-        // Add session ID for resume/review
-        navigationUrl += `&sessionId=${difficultyProgress.sessionId}`;
-        console.log(`🔧 DRILL: Adding session ID to navigation: ${difficultyProgress.sessionId}`);
+      try {
+        // Get the actual sub-skill ID from the questions
+        const subSkillText = selectedSubSkill.questions[0]?.subSkill || selectedSubSkill.name;
+        const firstQuestionWithUUID = selectedSubSkill.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
         
-        // Add review mode for completed sessions
-        if (difficultyProgress.completed === difficultyProgress.total && difficultyProgress.total > 0) {
-          navigationUrl += '&review=true';
-          console.log(`🔧 DRILL: Session is completed, adding review mode`);
+        // Use utility function to get or create a proper UUID
+        const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
+        console.log('🎯 DRILL: SubSkill UUID for', subSkillText, '→', actualSubSkillId);
+        
+        const dbProductType = getDbProductType(selectedProduct);
+        
+        console.log(`🎯 DRILL: Checking for existing session:`, {
+          userId: user.id,
+          subSkillId: actualSubSkillId,
+          difficulty: targetDifficulty,
+          productType: dbProductType
+        });
+        
+        // Check for existing active session using DrillSessionService
+        const existingSession = await DrillSessionService.getActiveSession(
+          user.id,
+          actualSubSkillId,
+          targetDifficulty,
+          dbProductType
+        );
+        
+        let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
+        
+        if (existingSession) {
+          console.log(`🎯 DRILL: Found existing session:`, existingSession);
+          
+          // Add session ID for resume/review
+          navigationUrl += `&sessionId=${existingSession.sessionId}`;
+          
+          // Add review mode for completed sessions
+          if (existingSession.status === 'completed' || 
+              (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
+            navigationUrl += '&review=true';
+            console.log(`🎯 DRILL: Session is completed, adding review mode`);
+          } else {
+            console.log(`🎯 DRILL: Session in progress (${existingSession.questionsAnswered}/${existingSession.questionsTotal}), will resume`);
+          }
+        } else {
+          console.log(`🎯 DRILL: No existing session found, will create new one`);
         }
+        
+        console.log(`🎯 DRILL: Navigating to: ${navigationUrl}`);
+        navigate(navigationUrl);
+      } catch (error) {
+        console.error('🎯 DRILL: Error checking/creating drill session:', error);
+        // Fallback to old navigation method
+        let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
+        navigate(navigationUrl);
       }
-      
-      console.log(`🔧 DRILL: Navigating to: ${navigationUrl}`);
-      navigate(navigationUrl);
     } else {
       console.warn(`No ${difficulty} questions available for ${selectedSubSkill.name}`);
       // Could show a message to the user here
@@ -458,6 +496,11 @@ const Drill: React.FC = () => {
 
   const getProgressPercentage = (completed: number, total: number) => {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
+  };
+
+  // Check if a sub-skill is completely finished (all three difficulties completed)
+  const isSubSkillComplete = (progress: SubSkillProgress) => {
+    return progress.easy.isCompleted && progress.medium.isCompleted && progress.hard.isCompleted;
   };
 
   const getTotalCompleted = () => {
@@ -574,7 +617,9 @@ const Drill: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold capitalize mb-2">{level}</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        {data.completed}/{data.total} questions completed
+                        {data.completed === 0 ? 'Not attempted' : 
+                         data.isCompleted ? `Score: ${data.correctAnswers}/${data.total}` : 
+                         `In progress: ${data.completed}/${data.total}`}
                       </p>
                       
                       {/* Progress Circle */}
@@ -589,7 +634,7 @@ const Drill: React.FC = () => {
                           <path
                             className="stroke-current text-edu-teal"
                             strokeWidth="3"
-                            strokeDasharray={`${getProgressPercentage(data.completed, data.total)}, 100`}
+                            strokeDasharray={`${data.bestScore || 0}, 100`}
                             strokeLinecap="round"
                             fill="none"
                             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -597,16 +642,16 @@ const Drill: React.FC = () => {
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xl font-bold">
-                            {getProgressPercentage(data.completed, data.total)}%
+                            {data.bestScore || 0}%
                           </span>
                         </div>
                       </div>
 
                       {/* Fixed height container for badge to prevent layout shift */}
                       <div className="h-8 flex items-center justify-center mb-4">
-                        {data.bestScore && (
+                        {data.bestScore && data.completed > 0 && (
                           <Badge variant="outline" className={cn(config.badgeClass)}>
-                            Best Score: {data.bestScore}%
+                            Score: {data.correctAnswers || 0}/{data.total} ({data.bestScore}%)
                           </Badge>
                         )}
                       </div>
@@ -619,7 +664,7 @@ const Drill: React.FC = () => {
                     >
                       <Play size={16} className="mr-2" />
                       {data.completed === 0 ? 'Start Practice' : 
-                       data.completed < data.total ? 'Continue Practice' : 'Review Questions'}
+                       data.isCompleted ? 'View Results' : 'Continue Practice'}
                     </Button>
                   </CardContent>
                 </Card>
@@ -804,7 +849,7 @@ const Drill: React.FC = () => {
                                   className={cn(
                                     "p-4 rounded-lg border-2 transition-all duration-200 relative",
                                     subSkill.totalQuestions > 0 ? "hover:shadow-md cursor-pointer" : "opacity-60",
-                                    subSkill.completedQuestions === subSkill.totalQuestions && subSkill.totalQuestions > 0
+                                    subSkill.isComplete
                                       ? "border-emerald-200 bg-emerald-50/30"
                                       : subSkill.completedQuestions > 0
                                       ? "border-amber-200 bg-amber-50/30"
@@ -831,13 +876,13 @@ const Drill: React.FC = () => {
                                     </div>
                                     
                                     <div className="ml-4 flex items-center space-x-3">
-                                      {subSkill.completedQuestions === subSkill.totalQuestions && subSkill.totalQuestions > 0 && (
+                                      {subSkill.isComplete && (
                                         <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
                                           <CheckCircle2 size={12} className="mr-1" />
                                           Complete
                                         </Badge>
                                       )}
-                                      {subSkill.completedQuestions > 0 && subSkill.completedQuestions < subSkill.totalQuestions && (
+                                      {subSkill.completedQuestions > 0 && !subSkill.isComplete && (
                                         <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                                           In Progress
                                         </Badge>
@@ -855,9 +900,9 @@ const Drill: React.FC = () => {
                                             "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
                                             subSkill.completedQuestions === 0 
                                               ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
-                                              : subSkill.completedQuestions < subSkill.totalQuestions
-                                              ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
-                                              : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
+                                              : subSkill.isComplete
+                                              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
+                                              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
                                           )}
                                           onClick={(e) => {
                                             e.stopPropagation();
@@ -866,7 +911,7 @@ const Drill: React.FC = () => {
                                         >
                                           <Play size={14} className="mr-1" />
                                           {subSkill.completedQuestions === 0 ? 'Start Practice' : 
-                                           subSkill.completedQuestions < subSkill.totalQuestions ? 'Resume Practice' : 'Review'}
+                                           subSkill.isComplete ? 'View Results' : 'Resume Practice'}
                                         </Button>
                                       )}
                                     </div>

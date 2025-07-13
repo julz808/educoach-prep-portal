@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { TEST_STRUCTURES } from '@/data/curriculumData';
 
 // Map frontend product IDs to database product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
@@ -42,36 +43,41 @@ async function getTotalQuestionsAvailable(productType: string, testType: string,
     allQuestions?.forEach(question => {
       const sectionName = question.section_name || 'Unknown Section';
       const subSkillName = question.sub_skill || 'Unknown Sub-skill';
+      const points = question.max_points || 1; // Use max_points, default to 1 if not set
       
-      // Count by section
-      sectionTotals.set(sectionName, (sectionTotals.get(sectionName) || 0) + 1);
+      // Sum max_points by section instead of counting questions
+      sectionTotals.set(sectionName, (sectionTotals.get(sectionName) || 0) + points);
       
-      // Count by sub-skill within each section
+      // Sum max_points by sub-skill within each section
       if (!sectionSubSkillCounts.has(sectionName)) {
         sectionSubSkillCounts.set(sectionName, new Map());
       }
       const sectionMap = sectionSubSkillCounts.get(sectionName)!;
-      sectionMap.set(subSkillName, (sectionMap.get(subSkillName) || 0) + 1);
+      sectionMap.set(subSkillName, (sectionMap.get(subSkillName) || 0) + points);
     });
     
-    // Build sub-skill totals from section-specific counts
+    // Build sub-skill totals from section-specific points
     sectionSubSkillCounts.forEach((subSkillMap, sectionName) => {
-      subSkillMap.forEach((count, subSkillName) => {
+      subSkillMap.forEach((points, subSkillName) => {
         subSkillTotals.set(subSkillName, { 
-          total: count, 
+          total: points, 
           section: sectionName 
         });
       });
     });
     
-    console.log(`📊 Total questions available:`, {
+    // Calculate total max_points across all questions
+    const totalMaxPoints = allQuestions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
+    
+    console.log(`📊 Total points available:`, {
       totalQuestions: allQuestions?.length || 0,
+      totalMaxPoints,
       sectionsCount: sectionTotals.size,
       subSkillsCount: subSkillTotals.size,
       sectionBreakdown: Object.fromEntries(sectionTotals)
     });
     
-    return { sectionTotals, subSkillTotals, totalAvailable: allQuestions?.length || 0 };
+    return { sectionTotals, subSkillTotals, totalAvailable: totalMaxPoints };
   } catch (error) {
     console.error('❌ Error in getTotalQuestionsAvailable:', error);
     return { sectionTotals: new Map(), subSkillTotals: new Map(), totalAvailable: 0 };
@@ -719,6 +725,126 @@ export class AnalyticsService {
     }
   }
 
+  // Helper function to process sub-skills from questions table
+  private static async processSubSkillFromQuestions(
+    subSkillName: string, 
+    sectionName: string, 
+    productType: string, 
+    userId: string, 
+    subSkillPerformance: any[]
+  ) {
+    // Get all diagnostic questions for this sub-skill
+    const { data: questions, error: questionsError } = await supabase
+      .from('questions')
+      .select('id, section_name, max_points')
+      .eq('sub_skill', subSkillName)
+      .eq('test_mode', 'diagnostic')
+      .eq('product_type', productType);
+
+    if (questionsError) {
+      console.error(`❌ Error fetching questions for sub-skill ${subSkillName}:`, questionsError);
+      return;
+    }
+
+    // Check if this is a writing sub-skill
+    const isWritingSubSkill = subSkillName.toLowerCase().includes('writing') || 
+                              sectionName?.toLowerCase().includes('writing');
+    
+    // Calculate total max_points for this sub-skill
+    let totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
+    
+    if (totalPoints === 0) {
+      console.log(`⚠️ Sub-skill "${subSkillName}" has no diagnostic questions`);
+      return;
+    }
+    
+    console.log(`📊 Sub-skill "${subSkillName}" total points: ${totalPoints} (from ${questions?.length} questions)`);
+    
+    // Note: We now use actual max_points from database instead of manual conversion
+
+    // Get user responses for these questions
+    const questionIds = questions?.map(q => q.id) || [];
+    
+    const { data: responses, error: responsesError } = await supabase
+      .from('question_attempt_history')
+      .select('question_id, is_correct, user_answer')
+      .eq('user_id', userId)
+      .eq('session_type', 'diagnostic')
+      .in('question_id', questionIds);
+
+    if (responsesError) {
+      console.error(`❌ Error fetching responses for sub-skill ${subSkillName}:`, responsesError);
+      return;
+    }
+    
+    let questionsAttempted = 0;
+    let questionsCorrect = 0;
+    
+    if (isWritingSubSkill) {
+      console.log(`✍️ Processing writing sub-skill: ${subSkillName}`);
+      
+      // For writing questions, get scores from writing_assessments table
+      const { data: writingAssessments, error: writingError } = await supabase
+        .from('writing_assessments')
+        .select('question_id, total_score, max_possible_score, percentage_score')
+        .eq('user_id', userId)
+        .in('question_id', questionIds);
+      
+      if (writingError) {
+        console.error(`❌ Error fetching writing assessments for ${subSkillName}:`, writingError);
+      }
+      
+      // Use weighted scoring for writing assessments
+      if (writingAssessments && writingAssessments.length > 0) {
+        const totalPossiblePoints = writingAssessments.reduce((sum, w) => sum + (w.max_possible_score || 0), 0);
+        const totalEarnedPoints = writingAssessments.reduce((sum, w) => sum + (w.total_score || 0), 0);
+        
+        questionsAttempted = totalPossiblePoints;
+        questionsCorrect = totalEarnedPoints;
+        
+        console.log(`✍️ Writing sub-skill ${subSkillName} WEIGHTED:`, {
+          earnedPoints: totalEarnedPoints,
+          possiblePoints: totalPossiblePoints,
+          percentage: totalPossiblePoints > 0 ? Math.round((totalEarnedPoints / totalPossiblePoints) * 100) : 0,
+          numAssessments: writingAssessments.length
+        });
+      } else {
+        // Fallback: Use responses but apply weighted scoring for writing
+        const responseCount = responses?.length || 0;
+        const correctResponses = responses?.filter(r => r.is_correct).length || 0;
+        
+        const pointsPerTask = 30;
+        questionsAttempted = responseCount * pointsPerTask;
+        questionsCorrect = correctResponses * pointsPerTask;
+        
+        console.log(`✍️ Writing sub-skill ${subSkillName} FALLBACK WEIGHTED:`, {
+          originalResponses: responseCount,
+          originalCorrect: correctResponses,
+          weightedAttempted: questionsAttempted,
+          weightedCorrect: questionsCorrect
+        });
+      }
+    } else {
+      // Non-writing questions use standard calculation
+      questionsAttempted = responses?.length || 0;
+      questionsCorrect = responses?.filter(r => r.is_correct).length || 0;
+    }
+    
+    const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
+
+    subSkillPerformance.push({
+      subSkill: subSkillName,
+      subSkillId: null, // No ID when coming from questions table
+      questionsTotal: totalPoints,
+      questionsAttempted,
+      questionsCorrect,
+      accuracy,
+      sectionName
+    });
+
+    console.log(`📊 Sub-skill "${subSkillName}": ${questionsCorrect}/${questionsAttempted}/${totalPoints} (${accuracy}%) in ${sectionName}`);
+  }
+
   static async getDiagnosticResults(userId: string, productId: string): Promise<DiagnosticResults | null> {
     const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
     console.log('🎯 Analytics: Fetching diagnostic results for', userId, productType, `(mapped from ${productId})`);
@@ -823,8 +949,22 @@ export class AnalyticsService {
         created: s.created_at
       })));
       
-      // For now, allow any completed diagnostic sections to show results
-      // We can adjust this threshold later based on actual usage
+      // Check if ALL diagnostic sections are completed before showing insights
+      const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
+      const completedSectionNames = diagnosticSessions.map(s => s.section_name);
+      const missingSections = expectedSections.filter(section => !completedSectionNames.includes(section));
+      
+      console.log(`📊 Expected sections for ${productType}:`, expectedSections);
+      console.log(`📊 Completed sections:`, completedSectionNames);
+      console.log(`📊 Missing sections:`, missingSections);
+      
+      if (missingSections.length > 0) {
+        console.log(`ℹ️ Diagnostic insights not available - missing ${missingSections.length} sections: ${missingSections.join(', ')}`);
+        return null;
+      }
+      
+      console.log('✅ All diagnostic sections completed - showing insights');
+      
       if (diagnosticSessions.length === 0) {
         console.log('ℹ️ No completed diagnostic sections found');
         return null;
@@ -833,7 +973,7 @@ export class AnalyticsService {
       // COMPLETELY REBUILD sub-skill performance calculation
       console.log('📊 Rebuilding sub-skill performance from database...');
       
-      // Step 1: Get ALL sub-skills for this product type
+      // Step 1: Try to get sub-skills from sub_skills table first
       const { data: subSkillsData, error: subSkillsError } = await supabase
         .from('sub_skills')
         .select(`
@@ -849,16 +989,49 @@ export class AnalyticsService {
         throw subSkillsError;
       }
 
-      console.log(`📊 Found ${subSkillsData?.length || 0} sub-skills for ${productType}`);
+      console.log(`📊 Found ${subSkillsData?.length || 0} sub-skills from sub_skills table for ${productType}`);
 
-      // Step 2: For each sub-skill, get all diagnostic questions
+      // Step 2: If no sub-skills found in sub_skills table, get them directly from questions
       const subSkillPerformance = [];
+      
+      if (!subSkillsData || subSkillsData.length === 0) {
+        console.log(`📊 No sub-skills in sub_skills table for ${productType}, checking questions table...`);
+        
+        // Get unique sub-skills directly from diagnostic questions
+        const { data: questionSubSkills, error: questionError } = await supabase
+          .from('questions')
+          .select('sub_skill, section_name')
+          .eq('product_type', productType)
+          .eq('test_mode', 'diagnostic')
+          .not('sub_skill', 'is', null);
+
+        if (questionError) {
+          console.error('❌ Error fetching sub-skills from questions:', questionError);
+          throw questionError;
+        }
+
+        // Create unique sub-skills from questions
+        const uniqueSubSkills = new Map<string, string>();
+        questionSubSkills?.forEach(q => {
+          if (q.sub_skill) {
+            uniqueSubSkills.set(q.sub_skill, q.section_name);
+          }
+        });
+
+        console.log(`📊 Found ${uniqueSubSkills.size} unique sub-skills from questions table`);
+
+        // Process each unique sub-skill
+        for (const [subSkillName, sectionName] of uniqueSubSkills) {
+          await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance);
+        }
+      } else {
+        // Process sub-skills from sub_skills table (original logic)
       
       for (const subSkill of subSkillsData || []) {
         // Get all diagnostic questions for this sub-skill
         const { data: questions, error: questionsError } = await supabase
           .from('questions')
-          .select('id, section_name')
+          .select('id, section_name, max_points')
           .eq('sub_skill_id', subSkill.id)
           .eq('test_mode', 'diagnostic')
           .eq('product_type', productType);
@@ -868,23 +1041,17 @@ export class AnalyticsService {
           continue;
         }
 
-        // Check if this is a writing sub-skill first
-        const isWritingSubSkill = subSkill.name.toLowerCase().includes('writing') || 
-                                  subSkill.test_sections?.section_name?.toLowerCase().includes('writing');
+        // Calculate total max_points for this sub-skill
+        let totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
         
-        let totalQuestions = questions?.length || 0;
-        
-        if (totalQuestions === 0) {
+        if (totalPoints === 0) {
           console.log(`⚠️ Sub-skill "${subSkill.name}" has no diagnostic questions`);
           continue;
         }
         
-        // For writing sub-skills, convert total questions to weighted points
-        if (isWritingSubSkill) {
-          const pointsPerTask = 30; // VIC selective: 30 points per writing task
-          totalQuestions = totalQuestions * pointsPerTask;
-          console.log(`✍️ Writing sub-skill "${subSkill.name}" total converted to weighted: ${totalQuestions} points (${questions?.length} tasks × ${pointsPerTask} points)`);
-        }
+        console.log(`📊 Sub-skill "${subSkill.name}" total points: ${totalPoints} (from ${questions?.length} questions)`);
+        
+        // Note: We now use actual max_points from database instead of manual conversion
 
         // Get user responses for these questions
         const questionIds = questions?.map(q => q.id) || [];
@@ -964,15 +1131,16 @@ export class AnalyticsService {
         subSkillPerformance.push({
           subSkill: subSkill.name,
           subSkillId: subSkill.id,
-          questionsTotal: totalQuestions,
+          questionsTotal: totalPoints,
           questionsAttempted,
           questionsCorrect,
           accuracy,
           sectionName
         });
 
-        console.log(`📊 Sub-skill "${subSkill.name}": ${questionsCorrect}/${questionsAttempted}/${totalQuestions} (${accuracy}%) in ${sectionName}`);
+        console.log(`📊 Sub-skill "${subSkill.name}": ${questionsCorrect}/${questionsAttempted}/${totalPoints} (${accuracy}%) in ${sectionName}`);
       }
+      } // End of else block for sub_skills table processing
 
       console.log(`📊 Calculated performance for ${subSkillPerformance.length} sub-skills with questions`);
 
@@ -1114,13 +1282,28 @@ export class AnalyticsService {
             questionsAttempted = session.questions_answered || 0;
           }
           
-          // For total questions, prioritize question_order length, then stored total_questions
+          // For total points, get actual max_points from questions in this section
           // BUT only for non-writing sections (writing sections already have weighted totals calculated)
           if (!isWritingSection) {
-            if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
-              actualTotalQuestions = session.question_order.length;
+            // Query the actual questions for this section to get real max_points total
+            const { data: sectionQuestions, error: sectionQError } = await supabase
+              .from('questions')
+              .select('max_points')
+              .eq('product_type', productType)
+              .eq('test_mode', 'diagnostic')
+              .eq('section_name', session.section_name);
+              
+            if (!sectionQError && sectionQuestions && sectionQuestions.length > 0) {
+              actualTotalQuestions = sectionQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+              console.log(`📊 Section ${session.section_name} - Calculated max_points total: ${actualTotalQuestions} (from ${sectionQuestions.length} questions)`);
             } else {
-              actualTotalQuestions = session.total_questions || 0;
+              // Fallback to question count if max_points query fails
+              if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
+                actualTotalQuestions = session.question_order.length;
+              } else {
+                actualTotalQuestions = session.total_questions || 0;
+              }
+              console.log(`📊 Section ${session.section_name} - Fallback to question count: ${actualTotalQuestions}`);
             }
           }
           // For writing sections, actualTotalQuestions is already set to weighted values above
@@ -1138,12 +1321,36 @@ export class AnalyticsService {
         } catch (error) {
           console.error('Error in VIEW RESULTS calculation:', error);
           
-          // Final fallback
+          // Final fallback - try to get actual max_points, otherwise use question count
           if (actualTotalQuestions === 0) {
-            if (session.question_order && Array.isArray(session.question_order)) {
-              actualTotalQuestions = session.question_order.length;
-            } else {
-              actualTotalQuestions = session.total_questions || 0;
+            try {
+              const { data: sectionQuestions, error: sectionQError } = await supabase
+                .from('questions')
+                .select('max_points')
+                .eq('product_type', productType)
+                .eq('test_mode', 'diagnostic')
+                .eq('section_name', session.section_name);
+                
+              if (!sectionQError && sectionQuestions && sectionQuestions.length > 0) {
+                actualTotalQuestions = sectionQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+                console.log(`📊 Section ${session.section_name} - Fallback calculated max_points total: ${actualTotalQuestions}`);
+              } else {
+                // Last resort: use question count
+                if (session.question_order && Array.isArray(session.question_order)) {
+                  actualTotalQuestions = session.question_order.length;
+                } else {
+                  actualTotalQuestions = session.total_questions || 0;
+                }
+                console.log(`📊 Section ${session.section_name} - Final fallback to question count: ${actualTotalQuestions}`);
+              }
+            } catch (fallbackError) {
+              console.error(`❌ Fallback max_points query failed for ${session.section_name}:`, fallbackError);
+              // Ultimate fallback
+              if (session.question_order && Array.isArray(session.question_order)) {
+                actualTotalQuestions = session.question_order.length;
+              } else {
+                actualTotalQuestions = session.total_questions || 0;
+              }
             }
           }
           
@@ -1156,15 +1363,50 @@ export class AnalyticsService {
           console.log(`⚠️ Section ${session.section_name}: No valid total found, defaulting to standard test sizes`);
           // Use standard test sizes based on section name
           // For writing sections, use weighted point totals (60 points for VIC selective)
-          const standardSizes: Record<string, number> = {
-            'Reading Reasoning': 24,
-            'General Ability - Verbal': 15,
-            'General Ability - Quantitative': 15,
-            'Mathematics Reasoning': 18,
-            'Writing': 60,        // 2 tasks × 30 points each
-            'Written Expression': 60  // 2 tasks × 30 points each
+          // Test-type-aware question counts from actual database analysis
+          const getStandardSizeForSection = (sectionName: string, productType: string): number => {
+            // Define section max_points by test type (based on actual database values)
+            const sectionPoints: Record<string, Record<string, number>> = {
+              'VIC Selective Entry (Year 9 Entry)': {
+                'Mathematics Reasoning': 36,
+                'General Ability - Verbal': 30,
+                'General Ability - Quantitative': 31,
+                'Writing': 60
+              },
+              'NSW Selective Entry (Year 7 Entry)': {
+                'Mathematical Reasoning': 42,
+                'Thinking Skills': 48,
+                'Writing': 600
+              },
+              'EduTest Scholarship (Year 7 Entry)': {
+                'Mathematics': 60,
+                'Verbal Reasoning': 60,
+                'Reading Comprehension': 50,
+                'Numerical Reasoning': 50,
+                'Written Expression': 30
+              },
+              'ACER Scholarship (Year 7 Entry)': {
+                'Mathematics': 42,
+                'Written Expression': 240
+              },
+              'Year 5 NAPLAN': {
+                'Writing': 576,
+                'Language Conventions': 36,
+                'Numeracy No Calculator': 42,
+                'Numeracy Calculator': 42
+              },
+              'Year 7 NAPLAN': {
+                'Numeracy No Calculator': 48,
+                'Numeracy Calculator': 48,
+                'Writing': 576,
+                'Language Conventions': 36
+              }
+            };
+            
+            return sectionPoints[productType]?.[sectionName] || 20; // Default fallback
           };
-          actualTotalQuestions = standardSizes[session.section_name] || 20;
+          
+          actualTotalQuestions = getStandardSizeForSection(session.section_name, productType);
         }
         
         // Calculate final scores
@@ -1468,6 +1710,23 @@ export class AnalyticsService {
         
         if (testSessions.length > 0) {
           console.log(`📊 Aggregating data from ${testSessions.length} sessions for Test ${i}...`);
+          
+          // Check if ALL sections of this practice test are completed
+          const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
+          const completedSectionsForThisTest = testSessions.map(s => s.section_name);
+          const missingSectionsForThisTest = expectedSections.filter(section => !completedSectionsForThisTest.includes(section));
+          
+          console.log(`📊 Test ${i} - Expected sections:`, expectedSections);
+          console.log(`📊 Test ${i} - Completed sections:`, completedSectionsForThisTest);
+          console.log(`📊 Test ${i} - Missing sections:`, missingSectionsForThisTest);
+          
+          if (missingSectionsForThisTest.length > 0) {
+            console.log(`ℹ️ Test ${i} insights not available - missing ${missingSectionsForThisTest.length} sections: ${missingSectionsForThisTest.join(', ')}`);
+            // Don't include this test in results - user needs to complete all sections
+            continue;
+          }
+          
+          console.log(`✅ Test ${i} - All sections completed - showing insights`);
           
           // Aggregate data from all sections for this practice test
           const allSectionBreakdowns = [];
@@ -1796,16 +2055,10 @@ export class AnalyticsService {
     }
 
     try {
-      // Get all completed drill sessions
+      // Get all completed drill sessions (without sub_skills join since we use generated UUIDs)
       const { data: drillSessions, error: drillsError } = await supabase
         .from('drill_sessions')
-        .select(`
-          *,
-          sub_skills!inner(
-            name,
-            test_sections!inner(section_name)
-          )
-        `)
+        .select('*')
         .eq('user_id', userId)
         .eq('product_type', productType)
         .eq('status', 'completed');
@@ -1816,10 +2069,48 @@ export class AnalyticsService {
       }
 
       console.log(`📊 Found ${drillSessions?.length || 0} completed drill sessions`);
-      console.log('🔍 Drill sessions details:', drillSessions?.map(s => ({
+
+      if (!drillSessions || drillSessions.length === 0) {
+        console.log('📊 No completed drill sessions found');
+        return {
+          totalQuestions: 0,
+          overallAccuracy: 0,
+          subSkillBreakdown: [],
+          recentActivity: [],
+        };
+      }
+
+      // Get sub-skill information from questions for each session
+      const sessionsWithSubSkillInfo = await Promise.all(
+        drillSessions.map(async (session) => {
+          if (!session.question_ids || session.question_ids.length === 0) {
+            return { ...session, subSkillName: 'Unknown', sectionName: 'Unknown' };
+          }
+
+          // Get the first question to extract sub-skill and section info
+          const { data: questionData, error: questionError } = await supabase
+            .from('questions')
+            .select('sub_skill, section_name')
+            .eq('id', session.question_ids[0])
+            .single();
+
+          if (questionError || !questionData) {
+            console.log(`❌ Could not get question info for session ${session.id}:`, questionError);
+            return { ...session, subSkillName: 'Unknown', sectionName: 'Unknown' };
+          }
+
+          return {
+            ...session,
+            subSkillName: questionData.sub_skill || 'Unknown',
+            sectionName: questionData.section_name || 'Unknown'
+          };
+        })
+      );
+
+      console.log('🔍 Drill sessions with sub-skill info:', sessionsWithSubSkillInfo.map(s => ({
         id: s.id,
-        subSkill: s.sub_skills?.name,
-        section: s.sub_skills?.test_sections?.section_name,
+        subSkill: s.subSkillName,
+        section: s.sectionName,
         difficulty: s.difficulty,
         questions: s.questions_answered,
         correct: s.questions_correct,
@@ -1827,21 +2118,21 @@ export class AnalyticsService {
       })));
 
       // Calculate totals
-      const totalQuestions = drillSessions?.reduce((sum, session) => sum + (session.questions_answered || 0), 0) || 0;
-      const totalCorrect = drillSessions?.reduce((sum, session) => sum + (session.questions_correct || 0), 0) || 0;
+      const totalQuestions = sessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_answered || 0), 0);
+      const totalCorrect = sessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_correct || 0), 0);
       const overallAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
       // Group by section and sub-skill
       const sectionMap = new Map<string, Map<string, {
-        sessions: Array<typeof drillSessions[0]>;
+        sessions: Array<typeof sessionsWithSubSkillInfo[0]>;
         totalQuestions: number;
         totalCorrect: number;
         difficultyStats: Record<number, { questions: number; correct: number }>;
       }>>();
 
-      drillSessions?.forEach(session => {
-        const sectionName = session.sub_skills?.test_sections?.section_name || 'Unknown';
-        const subSkillName = session.sub_skills?.name || 'Unknown';
+      sessionsWithSubSkillInfo.forEach(session => {
+        const sectionName = session.sectionName;
+        const subSkillName = session.subSkillName;
         const difficulty = session.difficulty || 1;
 
         if (!sectionMap.has(sectionName)) {
@@ -1909,11 +2200,11 @@ export class AnalyticsService {
       }));
 
       // Recent activity (last 10 drill sessions)
-      const recentActivity = (drillSessions || [])
+      const recentActivity = sessionsWithSubSkillInfo
         .sort((a, b) => new Date(b.completed_at || b.started_at).getTime() - new Date(a.completed_at || a.started_at).getTime())
         .slice(0, 10)
         .map(session => ({
-          subSkillName: session.sub_skills?.name || 'Unknown',
+          subSkillName: session.subSkillName,
           difficulty: session.difficulty || 1,
           accuracy: session.questions_answered > 0 
             ? Math.round((session.questions_correct / session.questions_answered) * 100) 

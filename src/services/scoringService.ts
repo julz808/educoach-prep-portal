@@ -25,6 +25,7 @@ export interface TestScore {
   sectionScores: Record<string, SectionScore>;
   answeredQuestions: number;
   totalQuestions: number;
+  correctAnswers: number; // Number of questions answered correctly (for accuracy calculation)
 }
 
 interface Question {
@@ -172,6 +173,8 @@ export class ScoringService {
       sectionCount: Object.keys(sectionScores).length
     });
 
+    const correctAnswers = questionScores.filter(q => q.isCorrect).length;
+
     return {
       totalEarnedPoints,
       totalMaxPoints,
@@ -179,7 +182,8 @@ export class ScoringService {
       questionScores,
       sectionScores,
       answeredQuestions,
-      totalQuestions: questions.length
+      totalQuestions: questions.length,
+      correctAnswers
     };
   }
 

@@ -13,6 +13,7 @@ export interface DashboardMetrics {
   totalStudyTimeHours: number;
   currentStreak: number;
   averageScore: string; // percentage or '-'
+  overallAccuracy: string; // percentage or '-'
   questionsAvailable: number;
   lastActivityDate: string | null;
   
@@ -32,7 +33,7 @@ export interface DashboardMetrics {
   };
   
   drill: {
-    subSkillsCompleted: number;
+    subSkillsCompleted: number; // Actually "attempted" sub-skills, not completed
     totalSubSkills: number;
     hasActiveSession: boolean;
     activeSessionId: string | null;
@@ -74,14 +75,21 @@ export async function fetchDashboardMetrics(
   console.log('📊 DASHBOARD: Fetching metrics for user:', userId, 'product:', dbProductType);
   
   // 1. Get basic user progress (auto-updated by triggers)
-  const { data: userProgress } = await supabase
+  const { data: userProgress, error: progressError } = await supabase
     .from('user_progress')
     .select('*')
     .eq('user_id', userId)
     .eq('product_type', dbProductType)
     .single();
   
-  console.log('📊 DASHBOARD: User progress data:', userProgress);
+  console.log('📊 DASHBOARD: User progress query result:', { userProgress, progressError });
+  
+  // If no user_progress record exists, it means the user hasn't done any activities yet
+  if (progressError && progressError.code === 'PGRST116') {
+    console.log('📊 DASHBOARD: No user_progress record found, user has not started any activities yet');
+  } else if (progressError) {
+    console.error('📊 DASHBOARD: Error fetching user progress:', progressError);
+  }
   
   // 2. Get total questions available for this product
   const { count: questionsAvailable } = await supabase
@@ -89,25 +97,32 @@ export async function fetchDashboardMetrics(
     .select('id', { count: 'exact', head: true })
     .eq('product_type', dbProductType);
   
-  // 3. Calculate average score from completed test sessions (diagnostic and practice only)
+  // 3. Calculate average score from ALL completed test sections (diagnostic and practice)
   const { data: completedSessions } = await supabase
     .from('user_test_sessions')
-    .select('final_score, test_mode')
+    .select('final_score, test_mode, section_name')
     .eq('user_id', userId)
     .eq('product_type', dbProductType)
     .eq('status', 'completed')
-    .in('test_mode', ['diagnostic', 'practice'])
     .not('final_score', 'is', null);
   
   let averageScore = '-';
   if (completedSessions && completedSessions.length > 0) {
-    const scores = completedSessions
+    // Filter for diagnostic and practice sessions only and get ALL section scores
+    const practiceAndDiagnosticSessions = completedSessions.filter(s => 
+      s.test_mode === 'diagnostic' || 
+      s.test_mode === 'practice' || 
+      s.test_mode?.startsWith('practice_')
+    );
+    
+    const scores = practiceAndDiagnosticSessions
       .map(s => s.final_score)
       .filter((score): score is number => typeof score === 'number');
     
     if (scores.length > 0) {
       const avg = scores.reduce((sum, score) => sum + score, 0) / scores.length;
       averageScore = Math.round(avg).toString();
+      console.log('📊 DASHBOARD: Average score calculated from', scores.length, 'sections:', averageScore);
     }
   }
   
@@ -115,6 +130,24 @@ export async function fetchDashboardMetrics(
   let overallAccuracy = '-';
   if (userProgress?.overall_accuracy !== null && userProgress?.overall_accuracy !== undefined) {
     overallAccuracy = Math.round(userProgress.overall_accuracy).toString();
+  } else {
+    console.log('📊 DASHBOARD: No overall_accuracy in user_progress, calculating manually...');
+    
+    // Fallback: Calculate accuracy manually from all completed sessions
+    if (completedSessions && completedSessions.length > 0) {
+      const practiceAndDiagnosticSessions = completedSessions.filter(s => 
+        s.test_mode === 'diagnostic' || 
+        s.test_mode === 'practice' || 
+        s.test_mode?.startsWith('practice_')
+      );
+      
+      if (practiceAndDiagnosticSessions.length > 0) {
+        const totalScore = practiceAndDiagnosticSessions.reduce((sum, s) => sum + (s.final_score || 0), 0);
+        const avgAccuracy = totalScore / practiceAndDiagnosticSessions.length;
+        overallAccuracy = Math.round(avgAccuracy).toString();
+        console.log('📊 DASHBOARD: Calculated overall accuracy:', overallAccuracy);
+      }
+    }
   }
   
   // 4. Diagnostic progress - count unique completed sections
@@ -148,62 +181,184 @@ export async function fetchDashboardMetrics(
     .limit(1)
     .single();
   
-  // 5. Practice tests progress
-  const { data: practiceTestSessions } = await supabase
+  // 5. Practice tests progress - check for FULLY completed practice tests (all sections done)
+  const { data: allPracticeTestSessions, error: practiceError } = await supabase
     .from('user_test_sessions')
-    .select('section_name, test_number, created_at')
+    .select('test_number, section_name, test_mode, status, created_at')
     .eq('user_id', userId)
     .eq('product_type', dbProductType)
-    .eq('test_mode', 'practice')
-    .eq('status', 'completed')
     .order('created_at');
   
-  // Group by test_number to count complete practice tests
-  const testsByNumber = new Map<string, Set<string>>();
-  const requiredSections = ['General Ability - Verbal', 'General Ability - Quantitative', 'Writing', 'Mathematics Reasoning', 'Reading Reasoning'];
+  // Filter for practice sessions only
+  const practiceSessionsOnly = allPracticeTestSessions?.filter(s => 
+    s.test_mode === 'practice' || s.test_mode?.startsWith('practice_')
+  ) || [];
   
-  practiceTestSessions?.forEach(session => {
-    const testNumber = session.test_number || 'practice_1';
-    if (!testsByNumber.has(testNumber)) {
-      testsByNumber.set(testNumber, new Set());
+  console.log('📊 DASHBOARD: All practice sessions:', practiceSessionsOnly);
+  console.log('📊 DASHBOARD: Raw ALL test sessions (first 10):', allPracticeTestSessions?.slice(0, 10).map(s => ({
+    test_mode: s.test_mode,
+    test_number: s.test_number,
+    section_name: s.section_name,
+    status: s.status,
+    created_at: s.created_at
+  })));
+  
+  console.log('📊 DASHBOARD: Filtered practice sessions only:', practiceSessionsOnly.map(s => ({
+    test_mode: s.test_mode,
+    test_number: s.test_number,
+    section_name: s.section_name,
+    status: s.status
+  })));
+  
+  console.log('📊 DASHBOARD: User has sessions with these test identifiers:', 
+    [...new Set(practiceSessionsOnly.map(s => 
+      s.test_mode?.startsWith('practice_') ? s.test_mode : s.test_number || 'practice_1'
+    ))]
+  );
+  
+  // Get the actual test structure to know how many sections each practice test should have
+  const { data: testStructureData } = await supabase
+    .from('questions')
+    .select('section_name, test_mode')
+    .eq('product_type', dbProductType)
+    .not('section_name', 'is', null);
+  
+  // Group by test mode to see section counts
+  const testModeStructure = new Map<string, Set<string>>();
+  testStructureData?.forEach(q => {
+    if (q.test_mode?.startsWith('practice_') || q.test_mode === 'practice') {
+      if (!testModeStructure.has(q.test_mode)) {
+        testModeStructure.set(q.test_mode, new Set());
+      }
+      testModeStructure.get(q.test_mode)!.add(q.section_name);
     }
-    testsByNumber.get(testNumber)!.add(session.section_name);
   });
   
-  const completedPracticeTests = Array.from(testsByNumber.values()).filter(
-    sections => requiredSections.every(req => sections.has(req))
-  ).length;
+  const structureForLogging = Object.fromEntries(Array.from(testModeStructure.entries()).map(([mode, sections]) => 
+    [mode, Array.from(sections)]
+  ));
+  console.log('📊 DASHBOARD: Practice test structure by mode:', structureForLogging);
+  console.log('📊 DASHBOARD: Available practice test modes in questions table:', Object.keys(structureForLogging));
+  
+  // Group user sessions by practice test identifier
+  const practiceTestGroups = new Map<string, any[]>();
+  
+  practiceSessionsOnly.forEach(session => {
+    const testId = session.test_mode?.startsWith('practice_') 
+      ? session.test_mode 
+      : session.test_number || 'practice_1';
+    
+    if (!practiceTestGroups.has(testId)) {
+      practiceTestGroups.set(testId, []);
+    }
+    practiceTestGroups.get(testId)!.push(session);
+  });
+  
+  // Count practice tests where ALL sections for that test mode are completed
+  let completedPracticeTests = 0;
+  
+  // If no practice test structure exists in questions table, use a fallback approach
+  const hasQuestionStructure = testModeStructure.size > 0;
+  
+  if (hasQuestionStructure) {
+    // Use the questions table structure to validate completion
+    for (const [testId, sessions] of practiceTestGroups) {
+      const completedSections = sessions
+        .filter(s => s.status === 'completed')
+        .map(s => s.section_name);
+      
+      const requiredSectionsForThisTest = testModeStructure.get(testId);
+      
+      if (requiredSectionsForThisTest) {
+        const hasAllSections = Array.from(requiredSectionsForThisTest).every(required => 
+          completedSections.includes(required)
+        );
+        
+        if (hasAllSections) {
+          completedPracticeTests++;
+        }
+        
+        console.log(`📊 DASHBOARD: Practice test ${testId}:`, {
+          totalSessions: sessions.length,
+          completedSections,
+          requiredSections: Array.from(requiredSectionsForThisTest),
+          hasAllSections
+        });
+      }
+    }
+  } else {
+    // Fallback: No questions structure exists, so count tests based on user activity
+    console.log('📊 DASHBOARD: No practice questions found in database, using fallback logic');
+    
+    for (const [testId, sessions] of practiceTestGroups) {
+      const completedSessions = sessions.filter(s => s.status === 'completed');
+      const totalSessions = sessions.length;
+      
+      console.log(`📊 DASHBOARD: Practice test ${testId} (fallback):`, {
+        totalSessions,
+        completedSessions: completedSessions.length,
+        sectionsCompleted: completedSessions.map(s => s.section_name)
+      });
+      
+      // If the user has completed ANY sections for this practice test, count it as complete
+      // This matches the practice tests page behavior where it shows "Completed"
+      if (completedSessions.length > 0) {
+        completedPracticeTests++;
+        console.log(`📊 DASHBOARD: Counting practice test ${testId} as completed (fallback)`);
+      }
+    }
+  }
+  
+  console.log('📊 DASHBOARD: Final practice test count:', completedPracticeTests);
   
   // Check for active practice session
-  const { data: activePracticeSession } = await supabase
+  const { data: allActiveSessions } = await supabase
     .from('user_test_sessions')
-    .select('id')
+    .select('id, test_mode')
     .eq('user_id', userId)
     .eq('product_type', dbProductType)
-    .eq('test_mode', 'practice')
-    .eq('status', 'active')
-    .limit(1)
-    .single();
+    .eq('status', 'active');
   
-  // 6. Drill progress - count completed sub-skills
-  const { data: completedDrillSessions } = await supabase
+  const activePracticeSession = allActiveSessions?.find(s => 
+    s.test_mode === 'practice' || s.test_mode?.startsWith('practice_')
+  ) || null;
+  
+  // 6. Drill progress - count attempted sub-skills (not completed)
+  const { data: attemptedDrillSessions } = await supabase
     .from('drill_sessions')
-    .select('sub_skill_id')
+    .select('question_ids')
     .eq('user_id', userId)
     .eq('product_type', dbProductType)
-    .eq('status', 'completed');
+    .in('status', ['completed', 'active']);
   
-  const uniqueCompletedSubSkills = [...new Set(completedDrillSessions?.map(s => s.sub_skill_id) || [])];
+  // Get sub-skill names from questions that were attempted in drill sessions
+  const attemptedQuestionIds = new Set<string>();
+  attemptedDrillSessions?.forEach(session => {
+    if (session.question_ids && Array.isArray(session.question_ids)) {
+      session.question_ids.forEach(id => attemptedQuestionIds.add(id));
+    }
+  });
   
-  // Get total available sub-skills
+  let uniqueAttemptedSubSkills = 0;
+  if (attemptedQuestionIds.size > 0) {
+    const { data: attemptedQuestions } = await supabase
+      .from('questions')
+      .select('sub_skill')
+      .in('id', Array.from(attemptedQuestionIds))
+      .not('sub_skill', 'is', null);
+    
+    uniqueAttemptedSubSkills = [...new Set(attemptedQuestions?.map(q => q.sub_skill) || [])].length;
+  }
+  
+  // Get total available sub-skills (unique sub_skill names for this product)
   const { data: allSubSkills } = await supabase
     .from('questions')
-    .select('sub_skill_id')
+    .select('sub_skill')
     .eq('product_type', dbProductType)
     .eq('test_mode', 'drill')
-    .not('sub_skill_id', 'is', null);
+    .not('sub_skill', 'is', null);
   
-  const totalSubSkills = [...new Set(allSubSkills?.map(s => s.sub_skill_id) || [])].length;
+  const totalSubSkills = [...new Set(allSubSkills?.map(q => q.sub_skill) || [])].length;
   
   // Check for active drill session
   const { data: activeDrillSession } = await supabase
@@ -289,7 +444,7 @@ export async function fetchDashboardMetrics(
     },
     
     drill: {
-      subSkillsCompleted: uniqueCompletedSubSkills.length,
+      subSkillsCompleted: uniqueAttemptedSubSkills,
       totalSubSkills,
       hasActiveSession: !!activeDrillSession,
       activeSessionId: activeDrillSession?.id ?? null,
