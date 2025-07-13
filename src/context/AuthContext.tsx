@@ -90,8 +90,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       });
       
-      // Redirect to auth page
-      window.location.href = '/auth';
+      // Redirect to auth page with full URL
+      const baseUrl = window.location.origin;
+      window.location.href = `${baseUrl}/auth`;
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Failed to sign out. Please try again.');
@@ -101,7 +102,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localStorage.removeItem(key);
         }
       });
-      window.location.href = '/auth';
+      const baseUrl = window.location.origin;
+      window.location.href = `${baseUrl}/auth`;
     }
   };
 
