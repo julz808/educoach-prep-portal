@@ -155,7 +155,7 @@ EduCourse is an Australian test preparation platform for Year 5–10 students, o
 
 ## Environment Variables
 
-- `VITE_CLAUDE_API_KEY` — Anthropic Claude API key (for question generation)
+- `CLAUDE_API_KEY — Anthropic Claude API key (server-side only, for Edge Functions)
 - `CLAUDE_API_KEY` — Non-Vite version for Node.js scripts
 - `VITE_SUPABASE_URL` — Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` — Supabase anon/public key

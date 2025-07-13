@@ -3,10 +3,15 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { withRateLimit } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+    ? 'https://educoach-prep-portal-2.vercel.app' 
+    : '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Credentials': 'true'
 };
 
 interface QuestionGenerationRequest {
@@ -28,6 +33,18 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  // Apply rate limiting
+  return await withRateLimit(
+    req,
+    'question-generation',
+    async () => {
+      return await handleQuestionGeneration(req);
+    },
+    corsHeaders
+  );
+});
+
+async function handleQuestionGeneration(req: Request): Promise<Response> {
   try {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
@@ -246,4 +263,4 @@ Return as JSON array with this structure:
       }
     );
   }
-}); 
+}

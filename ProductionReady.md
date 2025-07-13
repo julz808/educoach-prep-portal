@@ -223,7 +223,7 @@ ON user_test_sessions(user_id, status);
 # Set these in Vercel dashboard
 VITE_SUPABASE_URL=your_production_url
 VITE_SUPABASE_ANON_KEY=your_production_anon_key
-VITE_CLAUDE_API_KEY=your_claude_api_key
+CLAUDE_API_KEY=your_claude_api_key
 ```
 
 #### 7.1.2 Basic Security Headers (Optional)

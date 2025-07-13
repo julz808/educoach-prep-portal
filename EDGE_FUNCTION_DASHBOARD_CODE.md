@@ -1,11 +1,189 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { withRateLimit } from '../_shared/rateLimiter.ts'
+# Edge Function Code for Dashboard Deployment
+
+## Fixed generate-questions Function Code
+
+Copy and paste this code into the Supabase Edge Function dashboard editor:
+
+```typescript
+// Supabase Edge Function - Question Generation API
+// Provides secure server-side question generation with Claude 4 integration
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-    ? 'https://educoach-prep-portal-2.vercel.app' 
-    : '*',
+  'Access-Control-Allow-Origin': '*', // Will update after getting Vercel domain
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Credentials': 'true'
+};
+
+interface QuestionGenerationRequest {
+  testType: string;
+  yearLevel: string;
+  sectionName: string;
+  subSkill: string;
+  difficulty: number;
+  questionCount: number;
+  passageId?: string;
+  visualRequired?: boolean;
+  australianContext?: boolean;
+  testMode?: string;
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Verify the user
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      throw new Error('Invalid authentication');
+    }
+
+    // Parse request body
+    const requestData: QuestionGenerationRequest = await req.json();
+
+    // Validate request
+    if (!requestData.testType || !requestData.sectionName || !requestData.subSkill) {
+      throw new Error('Missing required fields: testType, sectionName, subSkill');
+    }
+
+    // Claude 4 API configuration
+    const CLAUDE_API_KEY = Deno.env.get('CLAUDE_API_KEY');
+
+    if (!CLAUDE_API_KEY) {
+      throw new Error('Claude API key not configured');
+    }
+
+    // Generate questions using Claude
+    const prompt = `Generate ${requestData.questionCount} multiple-choice questions for Australian ${requestData.testType} assessment.
+
+Requirements:
+- Test Type: ${requestData.testType}
+- Year Level: ${requestData.yearLevel}
+- Section: ${requestData.sectionName}
+- Sub-skill: ${requestData.subSkill}
+- Difficulty Level: ${requestData.difficulty}/3 (1=Easy, 2=Medium, 3=Hard)
+- Australian curriculum aligned
+- Age-appropriate content
+
+Question Format:
+- Multiple choice with 4 options (A, B, C, D)
+- Clear, unambiguous questions
+- Detailed explanations for correct answers
+- Australian context and examples where relevant
+
+Return as JSON with this structure:
+{
+  "questions": [{
+    "questionText": "Question text here",
+    "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
+    "correctAnswer": "A",
+    "explanation": "Detailed explanation of why this is correct",
+    "difficulty": ${requestData.difficulty},
+    "subSkill": "${requestData.subSkill}",
+    "hasVisual": false
+  }]
+}`;
+
+    // Call Claude 4 Sonnet API
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 6000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+    });
+
+    if (!claudeResponse.ok) {
+      const errorText = await claudeResponse.text();
+      throw new Error(`Claude API error: ${claudeResponse.status} - ${errorText}`);
+    }
+
+    const claudeData = await claudeResponse.json();
+    
+    if (!claudeData.content || !claudeData.content[0] || !claudeData.content[0].text) {
+      throw new Error('Invalid response from Claude API');
+    }
+
+    // Parse Claude's response
+    let generatedContent;
+    try {
+      generatedContent = JSON.parse(claudeData.content[0].text);
+    } catch (parseError) {
+      throw new Error(`Failed to parse Claude response: ${parseError.message}`);
+    }
+
+    // Return success response
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: generatedContent
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
+    );
+
+  } catch (error) {
+    console.error('Edge function error:', error);
+    
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || 'Unknown error occurred'
+      }),
+      { 
+        status: 400,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
+    );
+  }
+});
+```
+
+## Fixed assess-writing Function Code
+
+```typescript
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // Will update after getting Vercel domain
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Credentials': 'true'
@@ -17,18 +195,6 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // Apply rate limiting
-  return await withRateLimit(
-    req,
-    'writing-assessment',
-    async () => {
-      return await handleWritingAssessment(req);
-    },
-    corsHeaders
-  );
-});
-
-async function handleWritingAssessment(req: Request): Promise<Response> {
   try {
     // Verify the request is authenticated
     const supabaseClient = createClient(
@@ -98,14 +264,6 @@ STUDENT RESPONSE:
 ASSESSMENT CRITERIA (Total: ${rubric.totalMarks} marks):
 ${criteriaList}
 
-ASSESSMENT GUIDELINES:
-- Apply realistic scoring for ${yearLevel} students under ${rubric.timeMinutes}-minute time pressure
-- Consider age-appropriate expectations for vocabulary, complexity, and technical accuracy
-- Be fair but maintain Australian educational standards
-- Provide constructive, specific feedback for improvement
-- Score whole numbers only (no decimals)
-- Consider the time constraints when evaluating - don't expect perfection in short timeframes
-
 REQUIRED JSON RESPONSE:
 {
   "totalScore": <number 0-${rubric.totalMarks}>,
@@ -118,8 +276,6 @@ REQUIRED JSON RESPONSE:
 }`
 
     // Call Claude API
-    console.log('🤖 Calling Claude API...')
-    
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -153,7 +309,6 @@ REQUIRED JSON RESPONSE:
     // Parse JSON response
     let parsedResponse
     try {
-      // Extract JSON from response (Claude sometimes adds extra text)
       const jsonMatch = content.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0])
@@ -161,7 +316,6 @@ REQUIRED JSON RESPONSE:
         parsedResponse = JSON.parse(content)
       }
     } catch (parseError) {
-      console.error('Error parsing Claude response:', content)
       throw new Error('Invalid JSON response from Claude API')
     }
 
@@ -169,7 +323,6 @@ REQUIRED JSON RESPONSE:
     const totalScore = Math.max(0, Math.min(parsedResponse.totalScore || 0, rubric.totalMarks))
     const criterionScores: Record<string, any> = {}
     
-    // Validate each criterion score
     for (const criterion of rubric.criteria) {
       const criterionResponse = parsedResponse.criterionScores?.[criterion.name]
       const score = Math.max(0, Math.min(criterionResponse?.score || 0, criterion.maxMarks))
@@ -181,7 +334,6 @@ REQUIRED JSON RESPONSE:
       }
     }
 
-    // Calculate percentage
     const percentageScore = rubric.totalMarks > 0 ? Math.round((totalScore / rubric.totalMarks) * 100) : 0
 
     const assessment = {
@@ -200,8 +352,6 @@ REQUIRED JSON RESPONSE:
       }
     }
 
-    console.log('✅ Assessment completed successfully')
-
     return new Response(
       JSON.stringify(assessment),
       {
@@ -210,8 +360,6 @@ REQUIRED JSON RESPONSE:
     )
 
   } catch (error) {
-    console.error('❌ Error in writing assessment:', error)
-    
     return new Response(
       JSON.stringify({ 
         error: 'Assessment failed', 
@@ -223,4 +371,22 @@ REQUIRED JSON RESPONSE:
       }
     )
   }
-}
+})
+```
+
+## Deployment Steps
+
+1. **Deploy generate-questions function:**
+   - Replace the current code with the first code block above
+   - Click "Deploy Function"
+
+2. **Deploy assess-writing function:**
+   - Create new function with name "assess-writing"
+   - Use the second code block above
+   - Click "Deploy Function"
+
+3. **Add API Key Secret:**
+   - Go to Edge Functions → Secrets
+   - Add secret: `CLAUDE_API_KEY` with your API key value
+
+The rate limiting functionality has been removed for dashboard deployment. Once deployed via CLI later, you can add the rate limiting back.
