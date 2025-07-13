@@ -152,15 +152,19 @@ const Layout: React.FC = () => {
       )}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
               {!sidebarCollapsed && (
-                <img 
-                  src="/images/educourse-logo.png" 
-                  alt="EduCourse" 
-                  className="h-48 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                <div 
+                  className="h-32 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                   onClick={() => navigate('/dashboard')}
-                />
+                >
+                  <img 
+                    src="/images/educourse-logo.png" 
+                    alt="EduCourse" 
+                    className="h-48 w-auto object-contain scale-150 -ml-8"
+                  />
+                </div>
               )}
               <Button
                 variant="ghost"
