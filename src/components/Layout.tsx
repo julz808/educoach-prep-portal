@@ -156,13 +156,13 @@ const Layout: React.FC = () => {
             <div className="flex items-center justify-between">
               {!sidebarCollapsed && (
                 <div 
-                  className="h-32 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                  className="h-28 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                   onClick={() => navigate('/dashboard')}
                 >
                   <img 
                     src="/images/educourse-logo.png" 
                     alt="EduCourse" 
-                    className="h-48 w-auto object-contain scale-150 -ml-8"
+                    className="h-40 w-auto object-contain scale-105 -ml-2"
                   />
                 </div>
               )}
