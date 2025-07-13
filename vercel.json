@@ -57,6 +57,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://mcxxiunseawojmojikvb.supabase.co/rest/v1/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
