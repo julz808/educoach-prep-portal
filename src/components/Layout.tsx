@@ -347,12 +347,12 @@ const Layout: React.FC = () => {
               size="sm"
               onClick={() => setSidebarOpen(true)}
             >
-              <Menu size={20} />
+              <Menu size={24} />
             </Button>
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-12 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-16 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -382,18 +382,18 @@ const Layout: React.FC = () => {
         <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)}>
           <aside className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-6 border-b">
+              <div className="flex items-center justify-between p-4 border-b">
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-20 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-28 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
                   }}
                 />
                 <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
-                  <X size={20} />
+                  <X size={24} />
                 </Button>
               </div>
               
