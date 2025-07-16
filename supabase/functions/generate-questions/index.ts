@@ -5,11 +5,27 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withRateLimit } from '../_shared/rateLimiter.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://educourseportal.vercel.app',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Credentials': 'true'
+// Allow multiple origins for Vercel deployments
+const allowedOrigins = [
+  'https://educourseportal.vercel.app',
+  'https://educoach-prep-portal-2.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174'
+];
+
+const getCorsHeaders = (origin: string | null) => {
+  // Check if the origin is allowed
+  const isAllowed = origin && (
+    allowedOrigins.includes(origin) || 
+    origin.includes('.vercel.app') // Allow all Vercel preview deployments
+  );
+  
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Credentials': 'true'
+  };
 };
 
 interface QuestionGenerationRequest {
@@ -26,6 +42,9 @@ interface QuestionGenerationRequest {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -36,13 +55,13 @@ serve(async (req) => {
     req,
     'question-generation',
     async () => {
-      return await handleQuestionGeneration(req);
+      return await handleQuestionGeneration(req, corsHeaders);
     },
     corsHeaders
   );
 });
 
-async function handleQuestionGeneration(req: Request): Promise<Response> {
+async function handleQuestionGeneration(req: Request, corsHeaders: Record<string, string>): Promise<Response> {
   try {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
