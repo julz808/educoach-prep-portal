@@ -11,14 +11,9 @@ const allowedOrigins = [
 ];
 
 const getCorsHeaders = (origin: string | null) => {
-  // Check if the origin is allowed
-  const isAllowed = origin && (
-    allowedOrigins.includes(origin) || 
-    origin.includes('.vercel.app') // Allow all Vercel preview deployments
-  );
-  
+  // TEMPORARY: Allow all origins until deployment is fixed
   return {
-    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Credentials': 'true'
@@ -89,7 +84,14 @@ async function handleWritingAssessment(req: Request, corsHeaders: Record<string,
 
     // Get Claude API key from environment
     const claudeApiKey = Deno.env.get('CLAUDE_API_KEY')
+    console.log('🔍 Claude API Key check:', {
+      exists: !!claudeApiKey,
+      prefix: claudeApiKey?.substring(0, 20) + '...',
+      length: claudeApiKey?.length
+    })
+    
     if (!claudeApiKey) {
+      console.error('❌ Claude API key not found in environment')
       throw new Error('Claude API key not configured')
     }
 
@@ -136,6 +138,11 @@ REQUIRED JSON RESPONSE:
 
     // Call Claude API
     console.log('🤖 Calling Claude API...')
+    console.log('📤 Request details:', {
+      url: 'https://api.anthropic.com/v1/messages',
+      model: 'claude-3-5-sonnet-20241022',
+      keyPrefix: claudeApiKey.substring(0, 20) + '...'
+    })
     
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -155,8 +162,19 @@ REQUIRED JSON RESPONSE:
       })
     })
 
+    console.log('📡 Claude API Response:', {
+      status: claudeResponse.status,
+      statusText: claudeResponse.statusText,
+      headers: Object.fromEntries(claudeResponse.headers.entries())
+    })
+
     if (!claudeResponse.ok) {
       const errorData = await claudeResponse.text()
+      console.error('❌ Claude API Error Details:', {
+        status: claudeResponse.status,
+        statusText: claudeResponse.statusText,
+        errorData: errorData
+      })
       throw new Error(`Claude API error (${claudeResponse.status}): ${errorData}`)
     }
 

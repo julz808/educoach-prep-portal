@@ -1145,7 +1145,9 @@ REQUIRED JSON RESPONSE:
       improvements: wordCount < 50 ? ['Consider developing ideas with more detail'] : ['Continue practicing to improve writing skills'],
       processingMetadata: {
         modelVersion: 'fallback-scoring',
-        processingTimeMs: 0
+        processingTimeMs: 0,
+        promptTokens: undefined,
+        responseTokens: undefined
       }
     };
   }

@@ -70,10 +70,28 @@ export class WritingAssessmentService {
       
       try {
         assessment = await this.callClaudeAPI(userResponse, writingPrompt, rubric);
+        // Ensure processingMetadata exists before setting processingTimeMs
+        if (!assessment.processingMetadata) {
+          assessment.processingMetadata = {
+            modelVersion: 'unknown',
+            processingTimeMs: 0,
+            promptTokens: undefined,
+            responseTokens: undefined
+          };
+        }
         assessment.processingMetadata.processingTimeMs = Date.now() - startTime;
       } catch (apiError) {
         console.warn('Claude API failed, using fallback scoring:', apiError);
         assessment = WritingRubricService.getFallbackScore(userResponse, rubric);
+        // Ensure processingMetadata exists before setting processingTimeMs
+        if (!assessment.processingMetadata) {
+          assessment.processingMetadata = {
+            modelVersion: 'fallback-scoring',
+            processingTimeMs: 0,
+            promptTokens: undefined,
+            responseTokens: undefined
+          };
+        }
         assessment.processingMetadata.processingTimeMs = Date.now() - startTime;
       }
       
@@ -150,7 +168,34 @@ export class WritingAssessmentService {
         
         if (!response.error && response.data) {
           console.log('✅ Supabase Edge Function successful');
-          return response.data as AssessmentResult;
+          // Transform Edge Function response to match AssessmentResult interface
+          const edgeResponse = response.data;
+          const transformedResult: AssessmentResult = {
+            totalScore: edgeResponse.overall_score || 0,
+            maxPossibleScore: rubric.totalMarks,
+            percentageScore: Math.round((edgeResponse.overall_score || 0) / rubric.totalMarks * 100),
+            criterionScores: {},
+            overallFeedback: edgeResponse.overall_feedback || '',
+            strengths: edgeResponse.suggestions?.slice(0, 2) || [],
+            improvements: edgeResponse.suggestions?.slice(2) || [],
+            processingMetadata: edgeResponse.processingMetadata || {
+              modelVersion: 'claude-3-haiku-20240307',
+              processingTimeMs: 0
+            }
+          };
+          
+          // Transform criterion scores
+          if (edgeResponse.scores && edgeResponse.feedback) {
+            for (const criterionName in edgeResponse.scores) {
+              transformedResult.criterionScores[criterionName] = {
+                score: edgeResponse.scores[criterionName] || 0,
+                maxMarks: rubric.criteria.find((c: any) => c.name === criterionName)?.maxMarks || 0,
+                feedback: edgeResponse.feedback[criterionName] || ''
+              };
+            }
+          }
+          
+          return transformedResult;
         }
         
         console.warn('⚠️ Supabase Edge Function failed:', response.error);
@@ -188,6 +233,7 @@ export class WritingAssessmentService {
       
     } catch (proxyError) {
       console.warn('⚠️ Local proxy server error:', proxyError);
+      console.warn('🔄 All API methods failed, will use fallback scoring');
       throw new Error(`All assessment methods failed. Last error: ${proxyError.message}`);
     }
   }
@@ -214,10 +260,10 @@ export class WritingAssessmentService {
         overall_feedback: data.assessment.overallFeedback,
         strengths: data.assessment.strengths,
         improvements: data.assessment.improvements,
-        claude_model_version: data.assessment.processingMetadata.modelVersion,
-        processing_time_ms: data.assessment.processingMetadata.processingTimeMs,
-        prompt_tokens: data.assessment.processingMetadata.promptTokens,
-        response_tokens: data.assessment.processingMetadata.responseTokens
+        claude_model_version: data.assessment.processingMetadata?.modelVersion || 'unknown',
+        processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
+        prompt_tokens: data.assessment.processingMetadata?.promptTokens || null,
+        response_tokens: data.assessment.processingMetadata?.responseTokens || null
       });
       
     if (error) {
@@ -252,7 +298,9 @@ export class WritingAssessmentService {
       improvements: ['Please provide a response to the writing prompt', 'Take time to plan your writing before starting'],
       processingMetadata: {
         modelVersion: 'empty-response',
-        processingTimeMs: 0
+        processingTimeMs: 0,
+        promptTokens: undefined,
+        responseTokens: undefined
       }
     };
   }
