@@ -87,6 +87,15 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   // Check if this is drill mode (only drill mode has showFeedback but not review mode)
   const isDrillMode = showFeedback && !isReviewMode;
   
+  // Debug logging for writing text field issue
+  console.log('🔍 TEXT FIELD DEBUG:', {
+    showFeedback,
+    isReviewMode,
+    isDrillMode,
+    showDrillFeedback,
+    disabled: isReviewMode || (isDrillMode && showDrillFeedback)
+  });
+  
   // Check if all questions in this test are writing questions
   const isWritingSection = questions.length > 0 && questions.every(q => 
     q.format === 'Written Response' || 
