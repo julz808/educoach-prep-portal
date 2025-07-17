@@ -506,7 +506,13 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         </div>
                         <textarea
                           value={textAnswer}
-                          onChange={(e) => handleTextAnswerChange(e.target.value)}
+                          onChange={(e) => {
+                            console.log('📝 TEXTAREA onChange triggered:', e.target.value);
+                            handleTextAnswerChange(e.target.value);
+                          }}
+                          onFocus={() => console.log('🎯 TEXTAREA onFocus triggered')}
+                          onBlur={() => console.log('🎯 TEXTAREA onBlur triggered')}
+                          onClick={() => console.log('🖱️ TEXTAREA onClick triggered')}
                           placeholder="Type your answer here..."
                           disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                           className={cn(
