@@ -287,24 +287,32 @@ export async function fetchDashboardMetrics(
       }
     }
   } else {
-    // Fallback: No questions structure exists, so count tests based on user activity
-    console.log('📊 DASHBOARD: No practice questions found in database, using fallback logic');
+    // Fallback: No questions structure exists, so use default section requirements
+    console.log('📊 DASHBOARD: No practice questions found in database, using fallback logic with default sections');
+    
+    // Default sections that practice tests typically have
+    const defaultSections = ['Reading Comprehension', 'Mathematics', 'Writing', 'General Ability'];
     
     for (const [testId, sessions] of practiceTestGroups) {
       const completedSessions = sessions.filter(s => s.status === 'completed');
-      const totalSessions = sessions.length;
+      const completedSections = completedSessions.map(s => s.section_name);
+      const uniqueCompletedSections = [...new Set(completedSections)];
+      
+      // For practice tests, we expect at least 3-4 main sections to be completed
+      // Use a more conservative approach: require at least 3 different sections to be completed
+      const hasMinimumSections = uniqueCompletedSections.length >= 3;
       
       console.log(`📊 DASHBOARD: Practice test ${testId} (fallback):`, {
-        totalSessions,
+        totalSessions: sessions.length,
         completedSessions: completedSessions.length,
-        sectionsCompleted: completedSessions.map(s => s.section_name)
+        completedSections: uniqueCompletedSections,
+        hasMinimumSections
       });
       
-      // If the user has completed ANY sections for this practice test, count it as complete
-      // This matches the practice tests page behavior where it shows "Completed"
-      if (completedSessions.length > 0) {
+      // Only count as complete if multiple sections are finished (not just one)
+      if (hasMinimumSections) {
         completedPracticeTests++;
-        console.log(`📊 DASHBOARD: Counting practice test ${testId} as completed (fallback)`);
+        console.log(`📊 DASHBOARD: Counting practice test ${testId} as completed (fallback - ${uniqueCompletedSections.length} sections)`);
       }
     }
   }
