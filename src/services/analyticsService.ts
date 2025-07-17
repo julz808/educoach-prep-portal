@@ -784,6 +784,13 @@ export class AnalyticsService {
       console.log(`✍️ Processing writing sub-skill: ${subSkillName}`);
       
       // For writing questions, get scores from writing_assessments table
+      // Verify user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn('User not authenticated for writing assessments query');
+        return { score: 0, maxScore: 0, accuracy: 0 };
+      }
+      
       const { data: writingAssessments, error: writingError } = await supabase
         .from('writing_assessments')
         .select('question_id, total_score, max_possible_score, percentage_score')

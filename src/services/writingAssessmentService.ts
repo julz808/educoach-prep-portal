@@ -242,6 +242,12 @@ export class WritingAssessmentService {
    * Store assessment results in database
    */
   private static async storeAssessment(data: StoreAssessmentData): Promise<void> {
+    // Verify user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated for writing assessment storage');
+    }
+    
     const { error } = await supabase
       .from('writing_assessments')
       .insert({

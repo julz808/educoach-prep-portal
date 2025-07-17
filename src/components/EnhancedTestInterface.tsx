@@ -87,14 +87,6 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   // Check if this is drill mode (only drill mode has showFeedback but not review mode)
   const isDrillMode = showFeedback && !isReviewMode;
   
-  // Debug logging for writing text field issue
-  console.log('🔍 TEXT FIELD DEBUG:', {
-    showFeedback,
-    isReviewMode,
-    isDrillMode,
-    showDrillFeedback,
-    disabled: isReviewMode || (isDrillMode && showDrillFeedback)
-  });
   
   // Check if all questions in this test are writing questions
   const isWritingSection = questions.length > 0 && questions.every(q => 
@@ -506,13 +498,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         </div>
                         <textarea
                           value={textAnswer}
-                          onChange={(e) => {
-                            console.log('📝 TEXTAREA onChange triggered:', e.target.value);
-                            handleTextAnswerChange(e.target.value);
-                          }}
-                          onFocus={() => console.log('🎯 TEXTAREA onFocus triggered')}
-                          onBlur={() => console.log('🎯 TEXTAREA onBlur triggered')}
-                          onClick={() => console.log('🖱️ TEXTAREA onClick triggered')}
+                          onChange={(e) => handleTextAnswerChange(e.target.value)}
                           placeholder="Type your answer here..."
                           disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                           className={cn(
