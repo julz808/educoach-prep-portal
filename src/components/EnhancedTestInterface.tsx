@@ -519,6 +519,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                             "w-full min-h-[250px] p-4 border-2 rounded-xl text-base leading-relaxed",
                             "focus:outline-none focus:ring-2 focus:ring-edu-teal focus:border-edu-teal",
                             "resize-vertical transition-colors duration-200",
+                            "pointer-events-auto z-10 relative",
                             textAnswer.trim().length > 0 
                               ? "border-edu-teal bg-edu-teal/5" 
                               : "border-gray-200 hover:border-edu-teal/40"
@@ -662,7 +663,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         value={textAnswer}
                         onChange={(e) => handleTextAnswerChange(e.target.value)}
                         placeholder="Type your answer here..."
-                        disabled={showFeedback && !isReviewMode}
+                        disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                         className={cn(
                           "w-full min-h-[300px] p-4 border-2 rounded-xl text-base leading-relaxed",
                           "focus:outline-none focus:ring-2 focus:ring-edu-teal focus:border-edu-teal",
