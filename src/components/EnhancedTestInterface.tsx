@@ -499,7 +499,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                           value={textAnswer}
                           onChange={(e) => handleTextAnswerChange(e.target.value)}
                           placeholder="Type your answer here..."
-                          disabled={showFeedback && !isReviewMode}
+                          disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                           className={cn(
                             "w-full min-h-[250px] p-4 border-2 rounded-xl text-base leading-relaxed",
                             "focus:outline-none focus:ring-2 focus:ring-edu-teal focus:border-edu-teal",
