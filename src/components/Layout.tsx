@@ -37,21 +37,21 @@ const navigationItems: NavigationItem[] = [
     id: 'diagnostic',
     label: 'Diagnostic',
     icon: <Activity size={20} />,
-    path: '/diagnostic',
+    path: '/dashboard/diagnostic',
     description: 'Assess your current level'
   },
   {
     id: 'drills',
     label: 'Skill Drills',
     icon: <TargetIcon size={20} />,
-    path: '/drills',
+    path: '/dashboard/drill',
     description: 'Practise specific skills'
   },
   {
     id: 'practice',
     label: 'Practice Tests',
     icon: <FileText size={20} />,
-    path: '/practice',
+    path: '/dashboard/practice-tests',
     description: 'Sit full practice tests'
   },
   {
@@ -215,9 +215,9 @@ const Layout: React.FC = () => {
                           switch (item.id) {
                             case 'diagnostic':
                               return 'bg-purple-500 text-white shadow-lg';
-                            case 'drill':
+                            case 'drills':
                               return 'bg-orange-500 text-white shadow-lg';
-                            case 'practice-tests':
+                            case 'practice':
                               return 'bg-rose-500 text-white shadow-lg';
                             default:
                               return 'bg-edu-teal text-white shadow-lg';
@@ -235,9 +235,9 @@ const Layout: React.FC = () => {
                           switch (item.id) {
                             case 'diagnostic':
                               return 'text-purple-500';
-                            case 'drill':
+                            case 'drills':
                               return 'text-orange-500';
-                            case 'practice-tests':
+                            case 'practice':
                               return 'text-rose-500';
                             default:
                               return 'text-edu-teal';
@@ -434,9 +434,9 @@ const Layout: React.FC = () => {
                               switch (item.id) {
                                 case 'diagnostic':
                                   return 'bg-purple-500 text-white';
-                                case 'drill':
+                                case 'drills':
                                   return 'bg-orange-500 text-white';
-                                case 'practice-tests':
+                                case 'practice':
                                   return 'bg-rose-500 text-white';
                                 default:
                                   return 'bg-edu-teal text-white';
@@ -452,9 +452,9 @@ const Layout: React.FC = () => {
                               switch (item.id) {
                                 case 'diagnostic':
                                   return 'text-purple-500';
-                                case 'drill':
+                                case 'drills':
                                   return 'text-orange-500';
-                                case 'practice-tests':
+                                case 'practice':
                                   return 'text-rose-500';
                                 default:
                                   return 'text-edu-teal';

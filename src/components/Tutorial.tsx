@@ -156,8 +156,8 @@ export function Tutorial() {
           <X className="h-4 w-4" />
         </button>
 
-        <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-        <p className="text-sm text-gray-600 mb-4">{step.content}</p>
+        <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+        <p className="text-base text-gray-600 mb-4">{step.content}</p>
         
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-500">
