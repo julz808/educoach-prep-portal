@@ -103,8 +103,20 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
     try {
       setProductAccess(prev => ({ ...prev, isLoading: true, error: undefined }));
       
+      console.log(`🔍 Access Control Debug:`, {
+        userId: user.id,
+        productId: productId,
+        dbProductType: product.dbProductType
+      });
+      
       // Check if user has access to this product
       const hasAccess = await UserMetadataService.hasProductAccess(user.id, product.dbProductType);
+      
+      console.log(`✅ Access Control Result:`, {
+        productId: productId,
+        hasAccess: hasAccess,
+        message: hasAccess ? 'User has access' : 'User needs to purchase'
+      });
       
       setProductAccess({
         hasAccess,
