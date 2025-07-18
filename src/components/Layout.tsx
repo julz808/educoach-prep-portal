@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { Tutorial } from '@/components/Tutorial';
 
 interface NavigationItem {
   id: string;
@@ -36,21 +37,21 @@ const navigationItems: NavigationItem[] = [
     id: 'diagnostic',
     label: 'Diagnostic',
     icon: <Activity size={20} />,
-    path: '/dashboard/diagnostic',
+    path: '/diagnostic',
     description: 'Assess your current level'
   },
   {
-    id: 'drill',
+    id: 'drills',
     label: 'Skill Drills',
     icon: <TargetIcon size={20} />,
-    path: '/dashboard/drill',
+    path: '/drills',
     description: 'Practise specific skills'
   },
   {
-    id: 'practice-tests',
+    id: 'practice',
     label: 'Practice Tests',
     icon: <FileText size={20} />,
-    path: '/dashboard/practice-tests',
+    path: '/practice',
     description: 'Sit full practice tests'
   },
   {
@@ -202,6 +203,7 @@ const Layout: React.FC = () => {
               {navigationItems.map((item) => (
                 <button
                   key={item.id}
+                  data-nav-id={item.id}
                   onClick={() => handleNavigation(item.path)}
                   className={cn(
                     "w-full flex items-center rounded-xl transition-all duration-200 group",
@@ -423,6 +425,7 @@ const Layout: React.FC = () => {
                   {navigationItems.map((item) => (
                     <button
                       key={item.id}
+                      data-nav-id={item.id}
                       onClick={() => handleNavigation(item.path)}
                       className={cn(
                         "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200",
@@ -526,6 +529,9 @@ const Layout: React.FC = () => {
           </div>
         </div>
       </main>
+      
+      {/* Tutorial Component */}
+      <Tutorial />
     </div>
   );
 };

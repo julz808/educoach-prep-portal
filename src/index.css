@@ -78,3 +78,21 @@
 #root {
   @apply w-full min-h-screen;
 }
+
+/* Tutorial highlight animation */
+.tutorial-highlight {
+  position: relative;
+  animation: tutorial-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tutorial-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(117, 197, 187, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(117, 197, 187, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(117, 197, 187, 0);
+  }
+}

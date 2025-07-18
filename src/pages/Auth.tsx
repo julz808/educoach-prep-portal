@@ -93,47 +93,74 @@ const Auth = () => {
       if (authError) throw authError;
       
       if (authData.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            user_id: authData.user.id,
-            student_first_name: studentFirstName,
-            student_last_name: studentLastName,
-            parent_first_name: parentFirstName,
-            parent_last_name: parentLastName,
-            school_name: schoolName,
-            year_level: parseInt(yearLevel),
-            display_name: `${studentFirstName} ${studentLastName}`,
+        // Wait for auth session to be established and user to be created in database
+        // This ensures the user exists in auth.users table before creating profile
+        let retryCount = 0;
+        const maxRetries = 10;
+        let userExists = false;
+        
+        while (!userExists && retryCount < maxRetries) {
+          try {
+            // Check if session is established
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && session.user.id === authData.user.id) {
+              // Session exists, but we also need to verify the user is in the database
+              // Try a simple auth check to ensure the user record is fully created
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user && user.id === authData.user.id) {
+                userExists = true;
+                break;
+              }
+            }
+            
+            // Wait 1 second before retrying (longer delay for database propagation)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retryCount++;
+          } catch (sessionError) {
+            console.log('Session/user check failed, retrying...', sessionError);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retryCount++;
+          }
+        }
+        
+        if (!userExists) {
+          throw new Error('User creation not completed. Please try signing in instead.');
+        }
+        
+        // Additional safety delay to ensure database replication
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Use the new unified registration function
+        const { data: registrationResult, error: registrationError } = await supabase
+          .rpc('register_new_user', {
+            p_user_id: authData.user.id,
+            p_email: email,
+            p_student_first_name: studentFirstName,
+            p_student_last_name: studentLastName,
+            p_parent_first_name: parentFirstName,
+            p_parent_last_name: parentLastName,
+            p_school_name: schoolName,
+            p_year_level: parseInt(yearLevel)
           });
 
-        if (profileError) throw profileError;
+        if (registrationError) {
+          console.error('Registration function error:', registrationError);
+          throw new Error(`Failed to complete registration: ${registrationError.message}`);
+        }
 
-        // Initialize progress for all products
-        const products = [
-          'VIC Selective Entry (Year 9 Entry)',
-          'NSW Selective Entry (Year 7 Entry)',
-          'Year 5 NAPLAN',
-          'Year 7 NAPLAN',
-          'EduTest Scholarship (Year 7 Entry)',
-          'ACER Scholarship (Year 7 Entry)'
-        ];
+        // Check if the function returned an error
+        if (registrationResult && !registrationResult.success) {
+          console.error('Registration failed:', registrationResult);
+          throw new Error(`Registration failed: ${registrationResult.error || 'Unknown error'}`);
+        }
 
-        const { error: progressError } = await supabase
-          .from('user_progress')
-          .insert(
-            products.map(product => ({
-              user_id: authData.user.id,
-              product_type: product
-            }))
-          );
-
-        if (progressError) throw progressError;
+        console.log('Registration successful:', registrationResult);
       }
       
       toast.success("Account created! Please check your email for verification.");
       navigate("/dashboard");
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast.error(error.message || "Error creating account");
     } finally {
       setIsLoading(false);
