@@ -358,7 +358,7 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-16 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-20 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
