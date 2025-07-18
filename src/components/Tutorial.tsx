@@ -4,35 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 interface TutorialStep {
-  target: string;
+  target: string | null;
   title: string;
   content: string;
-  position: "top" | "bottom" | "left" | "right";
+  position: "top" | "bottom" | "left" | "right" | "center";
 }
 
 const tutorialSteps: TutorialStep[] = [
   {
-    target: '[data-nav-id="dashboard"]',
-    title: "Dashboard",
-    content: "Your learning hub - track progress, view metrics, and see your performance across all subjects at a glance.",
-    position: "right"
+    target: null, // No target for welcome message
+    title: "Welcome to EduCourse! 🎓",
+    content: "We're excited to help you excel in your studies! Let's take a quick tour of the platform's key features to get you started on your learning journey.",
+    position: "center"
   },
   {
     target: '[data-nav-id="diagnostic"]',
     title: "Diagnostic Test",
-    content: "Start here! Take a comprehensive test to identify your strengths and areas for improvement.",
+    content: "Start here! Take a comprehensive test to identify your strengths and areas for improvement. This helps us personalize your learning experience.",
     position: "right"
   },
   {
     target: '[data-nav-id="drills"]',
     title: "Skill Drills",
-    content: "Practice specific skills with targeted exercises. Get instant feedback and improve weak areas identified in your diagnostic.",
+    content: "Practice specific skills with targeted exercises. Get instant feedback and improve weak areas identified in your diagnostic test.",
     position: "right"
   },
   {
     target: '[data-nav-id="practice"]',
     title: "Practice Tests",
-    content: "Full-length practice exams that simulate real test conditions. Perfect for exam preparation!",
+    content: "Full-length practice exams that simulate real test conditions. Perfect for exam preparation and tracking your progress!",
+    position: "right"
+  },
+  {
+    target: '[data-nav-id="insights"]',
+    title: "Performance Insights",
+    content: "Track your progress with detailed analytics. See how you're improving across different skills and subjects over time.",
     position: "right"
   }
 ];
@@ -56,19 +62,26 @@ export function Tutorial() {
 
   useEffect(() => {
     if (showTutorial && tutorialSteps[currentStep]) {
-      console.log("Tutorial - Looking for element:", tutorialSteps[currentStep].target);
-      const element = document.querySelector(tutorialSteps[currentStep].target);
-      console.log("Tutorial - Found element:", element);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        setTargetRect(rect);
-        
-        // Add highlight class
-        element.classList.add("tutorial-highlight");
-        
-        return () => {
-          element.classList.remove("tutorial-highlight");
-        };
+      const step = tutorialSteps[currentStep];
+      console.log("Tutorial - Looking for element:", step.target);
+      
+      if (step.target) {
+        const element = document.querySelector(step.target);
+        console.log("Tutorial - Found element:", element);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          setTargetRect(rect);
+          
+          // Add highlight class
+          element.classList.add("tutorial-highlight");
+          
+          return () => {
+            element.classList.remove("tutorial-highlight");
+          };
+        }
+      } else {
+        // No target (welcome message), clear targetRect
+        setTargetRect(null);
       }
     }
   }, [currentStep, showTutorial]);
@@ -100,14 +113,14 @@ export function Tutorial() {
     zIndex: 9999,
   };
 
-  if (targetRect && step.position === "right") {
-    style.left = targetRect.right + 20;
-    style.top = targetRect.top + (targetRect.height / 2) - 75;
-  } else {
-    // Fallback position if target not found
+  if (step.position === "center" || !targetRect) {
+    // Center position for welcome message or fallback
     style.left = "50%";
     style.top = "50%";
     style.transform = "translate(-50%, -50%)";
+  } else if (targetRect && step.position === "right") {
+    style.left = targetRect.right + 20;
+    style.top = targetRect.top + (targetRect.height / 2) - 75;
   }
 
   return (
