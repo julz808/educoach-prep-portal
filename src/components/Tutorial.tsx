@@ -13,8 +13,8 @@ interface TutorialStep {
 const tutorialSteps: TutorialStep[] = [
   {
     target: null, // No target for welcome message
-    title: "Welcome to EduCourse! 🎓",
-    content: "We're excited to help you excel in your studies! Let's take a quick tour of the platform's key features to get you started on your learning journey.",
+    title: "Welcome to EduCourse!",
+    content: "We're excited to help you ace your next test! Let's take a quick tour of the platform to get you started.",
     position: "center"
   },
   {
@@ -26,7 +26,7 @@ const tutorialSteps: TutorialStep[] = [
   {
     target: '[data-nav-id="drills"]',
     title: "Skill Drills",
-    content: "Practice specific skills with targeted exercises. Get instant feedback and improve weak areas identified in your diagnostic test.",
+    content: "Practice specific skills with targeted exercises. Get instant feedback and improve weak areas identified in your diagnostic and practice tests.",
     position: "right"
   },
   {
@@ -38,7 +38,7 @@ const tutorialSteps: TutorialStep[] = [
   {
     target: '[data-nav-id="insights"]',
     title: "Performance Insights",
-    content: "Track your progress with detailed analytics. See how you're improving across different skills and subjects over time.",
+    content: "Track your progress with detailed analytics. See how you're improving across different test sections and sub-skills.",
     position: "right"
   }
 ];
@@ -146,7 +146,7 @@ export function Tutorial() {
 
       {/* Tutorial card */}
       <Card 
-        className="w-80 p-6 shadow-xl"
+        className="w-96 p-6 shadow-xl"
         style={style}
       >
         <button
