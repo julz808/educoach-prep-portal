@@ -25,6 +25,7 @@ import { ProductProvider } from "./context/ProductContext";
 import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
 import Profile from '@/pages/Profile';
+import PurchaseSuccess from '@/pages/PurchaseSuccess';
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => {
                       <Route path="/edutest-generator" element={<EduTestGenerator />} />
                       <Route path="/auth/callback" element={<AuthCallback />} />
                       <Route path="/auth/reset-password" element={<ResetPassword />} />
+                      <Route path="/purchase-success" element={<PurchaseSuccess />} />
                       <Route element={<ProtectedRoute />}>
                         {/* Test instruction routes (outside of Layout) */}
                         <Route path="/test-instructions/:testType/:subjectId" element={<TestInstructionsPage />} />

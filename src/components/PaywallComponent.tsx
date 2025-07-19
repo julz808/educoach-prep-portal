@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lock, CreditCard, CheckCircle, ArrowRight } from 'lucide-react';
+import { Lock, CreditCard, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TestProduct } from '@/context/ProductContext';
+import { redirectToCheckout } from '@/services/stripeService';
+import { isStripeConfigured } from '@/config/stripeConfig';
+import { toast } from '@/components/ui/sonner';
 
 interface PaywallComponentProps {
   product: TestProduct;
@@ -16,13 +19,30 @@ export const PaywallComponent: React.FC<PaywallComponentProps> = ({
   onPurchase,
   className = "" 
 }) => {
-  const handlePurchase = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePurchase = async () => {
+    // Check if Stripe is configured
+    if (!isStripeConfigured()) {
+      toast.error('Payment system is being set up. Please try again later.');
+      return;
+    }
+
+    // Use custom purchase handler if provided
     if (onPurchase) {
       onPurchase(product.id);
-    } else {
-      // Fallback to showing purchase information
-      console.log('Purchase clicked for product:', product.id);
-      // TODO: Implement Stripe Checkout integration
+      return;
+    }
+
+    // Start checkout process
+    setIsLoading(true);
+    try {
+      await redirectToCheckout(product.id);
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast.error('Failed to start checkout. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,12 +100,22 @@ export const PaywallComponent: React.FC<PaywallComponentProps> = ({
           {/* Purchase Button */}
           <Button 
             onClick={handlePurchase}
-            className="w-full bg-edu-teal hover:bg-edu-teal/90 text-white font-semibold py-3"
+            disabled={isLoading}
+            className="w-full bg-edu-teal hover:bg-edu-teal/90 text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             size="lg"
           >
-            <CreditCard className="w-5 h-5 mr-2" />
-            Purchase Access
-            <ArrowRight className="w-4 h-4 ml-2" />
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <CreditCard className="w-5 h-5 mr-2" />
+                Purchase Access
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
 
           {/* Security Note */}
