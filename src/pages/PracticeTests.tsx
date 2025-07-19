@@ -25,6 +25,8 @@ import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { SessionService, SectionProgress } from '@/services/sessionService';
 import { useAuth } from '@/context/AuthContext';
 import { DeveloperTools } from '@/components/DeveloperTools';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 
 // Map frontend product IDs to database product_type values (same as Dashboard)
 const getDbProductType = (productId: string): string => {
@@ -78,7 +80,7 @@ const PracticeTests: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
 
   // Helper function to calculate total time from curriculum data
   const calculateTotalTime = (testType: string, sections: TestSection[]): number => {
@@ -562,6 +564,17 @@ const PracticeTests: React.FC = () => {
     }
   };
 
+  // Access control - show paywall if user doesn't have access to current product
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return (

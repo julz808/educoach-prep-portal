@@ -3,6 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { TestInstructions } from '@/components/TestInstructions';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { SessionService } from '@/services/sessionService';
 import { 
@@ -30,7 +32,7 @@ const TestInstructionsPage: React.FC = () => {
   }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);
@@ -208,6 +210,18 @@ const TestInstructionsPage: React.FC = () => {
   }
 
   const properDisplayName = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
+
+  // Access control - show paywall if user doesn't have access to current product
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
+      </div>
+    );
+  }
 
   return (
     <TestInstructions

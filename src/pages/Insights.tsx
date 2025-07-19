@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart3, Target, BookOpen, Activity, AlertCircle, TrendingUp, TrendingDown, Clock, Award, CheckCircle, XCircle, Flag, Star, Info, Zap, FileText } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useProduct } from '@/context/ProductContext';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { 
   AnalyticsService, 
   type OverallPerformance, 
@@ -141,7 +143,7 @@ const SpiderChart = ({ data, size = 320, animate = true }: {
 
 const PerformanceDashboard = () => {
   const { user } = useAuth();
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('diagnostic');
   const [selectedPracticeTest, setSelectedPracticeTest] = useState(2);
@@ -459,6 +461,18 @@ const PerformanceDashboard = () => {
             Sign In
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // Access control - show paywall if user doesn't have access to current product
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-white">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
       </div>
     );
   }

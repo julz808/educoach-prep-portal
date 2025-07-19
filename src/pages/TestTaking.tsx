@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { EnhancedTestInterface } from '@/components/EnhancedTestInterface';
 import { 
   fetchDiagnosticModes,
@@ -98,8 +100,20 @@ const TestTaking: React.FC = () => {
   const testModeFromQuery = searchParams.get('testMode'); // Get specific practice test mode
   const actualSessionId = sessionIdFromQuery || sessionId || sectionId;
   const navigate = useNavigate();
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const { user } = useAuth();
+
+  // Check if paywall should be shown
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-edu-light-blue">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
+      </div>
+    );
+  }
   
   // Determine the actual test mode to use for database operations
   const actualTestMode = testModeFromQuery || testType;
