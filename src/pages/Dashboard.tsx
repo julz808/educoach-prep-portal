@@ -16,6 +16,8 @@ import { InteractiveInsightsDashboard } from '@/components/InteractiveInsightsDa
 import { QuestionInterface } from '@/components/QuestionInterface';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { 
   fetchQuestionsFromSupabase, 
   getPlaceholderTestStructure,
@@ -45,7 +47,7 @@ const getDbProductType = (productId: string): string => {
 };
 
 const Dashboard: React.FC = () => {
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct, productAccess } = useProduct();
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -104,6 +106,18 @@ const Dashboard: React.FC = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
           <p className="text-gray-600">Loading dashboard...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Check if paywall should be shown
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-edu-light-blue">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
       </div>
     );
   }

@@ -13,6 +13,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { 
   fetchDiagnosticModes, 
   type TestMode, 
@@ -55,7 +57,7 @@ interface DiagnosticTest {
 const DiagnosticTests: React.FC = () => {
   console.log('🔥 DiagnosticTests component is rendering!');
   
-  const { selectedProduct } = useProduct();
+  const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -626,6 +628,18 @@ const DiagnosticTests: React.FC = () => {
           <p className="text-red-600 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
+      </div>
+    );
+  }
+
+  // Check if paywall should be shown
+  if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
+    return (
+      <div className="min-h-screen bg-edu-light-blue">
+        <PaywallComponent 
+          product={currentProduct} 
+          className="min-h-screen"
+        />
       </div>
     );
   }

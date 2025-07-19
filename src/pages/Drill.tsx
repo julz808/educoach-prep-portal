@@ -16,6 +16,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
+import { PaywallComponent } from '@/components/PaywallComponent';
+import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { 
   fetchDrillModes, 
   type TestMode, 
