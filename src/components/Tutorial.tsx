@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 interface TutorialStep {
   target: string | null;
@@ -43,22 +44,60 @@ const tutorialSteps: TutorialStep[] = [
   }
 ];
 
-export function Tutorial() {
+// Tutorial Context
+interface TutorialContextType {
+  startTutorial: () => void;
+}
+
+const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
+
+export const useTutorial = () => {
+  const context = useContext(TutorialContext);
+  if (!context) {
+    throw new Error('useTutorial must be used within a TutorialProvider');
+  }
+  return context;
+};
+
+function TutorialComponent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-  
-  // Debug: Always show a test element to verify component is rendering
-  console.log("Tutorial component is rendering");
+  const { user } = useAuth();
+
+  // Check if this is the user's first time
+  const checkFirstTimeUser = () => {
+    if (!user) return false;
+    
+    const tutorialShownKey = `tutorial_shown_${user.id}`;
+    const hasSeenTutorial = localStorage.getItem(tutorialShownKey);
+    
+    return !hasSeenTutorial;
+  };
+
+  // Mark tutorial as seen
+  const markTutorialAsSeen = () => {
+    if (user) {
+      const tutorialShownKey = `tutorial_shown_${user.id}`;
+      localStorage.setItem(tutorialShownKey, 'true');
+    }
+  };
+
+  // Start tutorial function (can be called manually)
+  const startTutorial = () => {
+    setCurrentStep(0);
+    setShowTutorial(true);
+  };
 
   useEffect(() => {
-    // Show tutorial every time (for testing)
-    // Small delay to ensure page is loaded and sidebar is rendered
-    setTimeout(() => {
-      console.log("Tutorial - Starting tutorial");
-      setShowTutorial(true);
-    }, 2000);
-  }, []);
+    // Only show tutorial on first visit
+    if (user && checkFirstTimeUser()) {
+      // Small delay to ensure page is loaded and sidebar is rendered
+      setTimeout(() => {
+        setShowTutorial(true);
+      }, 2000);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (showTutorial && tutorialSteps[currentStep]) {
@@ -96,7 +135,8 @@ export function Tutorial() {
 
   const handleClose = () => {
     setShowTutorial(false);
-    // Removed localStorage so it shows every time
+    markTutorialAsSeen(); // Mark as seen when closed
+    setCurrentStep(0);
   };
 
   if (!showTutorial) return null;
@@ -186,3 +226,22 @@ export function Tutorial() {
     </>
   );
 }
+
+// Tutorial Provider Component
+export function TutorialProvider({ children }: { children: React.ReactNode }) {
+  const [tutorialTrigger, setTutorialTrigger] = useState(0);
+
+  const startTutorial = () => {
+    setTutorialTrigger(prev => prev + 1);
+  };
+
+  return (
+    <TutorialContext.Provider value={{ startTutorial }}>
+      {children}
+      <TutorialComponent key={tutorialTrigger} />
+    </TutorialContext.Provider>
+  );
+}
+
+// Export Tutorial for backward compatibility
+export const Tutorial = TutorialProvider;

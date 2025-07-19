@@ -7,13 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Home, BookOpen, BarChart3, Brain, Activity, 
   Menu, X, ChevronRight, Bell, ChevronDown,
-  Target as TargetIcon, Clock, TrendingUp, Award, User, Settings, Search, FileText, LogOut
+  Target as TargetIcon, Clock, TrendingUp, Award, User, Settings, Search, FileText, LogOut, HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Tutorial } from '@/components/Tutorial';
+import { Tutorial, useTutorial } from '@/components/Tutorial';
 
 interface NavigationItem {
   id: string;
@@ -72,6 +72,17 @@ const Layout: React.FC = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Start tutorial function
+  const handleStartTutorial = () => {
+    // Clear the tutorial seen flag for current user to force show
+    if (user) {
+      const tutorialShownKey = `tutorial_shown_${user.id}`;
+      localStorage.removeItem(tutorialShownKey);
+      // Refresh the page to trigger tutorial
+      window.location.reload();
+    }
+  };
 
   // Auto-collapse sidebar on tablet
   useEffect(() => {
@@ -307,6 +318,16 @@ const Layout: React.FC = () => {
                 <ChevronRight size={16} className="text-edu-navy/40" />
               </button>
               <Button
+                onClick={handleStartTutorial}
+                variant="ghost"
+                size="sm"
+                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-2"
+                title="Show Tutorial"
+              >
+                <HelpCircle size={16} />
+                <span>Tutorial</span>
+              </Button>
+              <Button
                 onClick={signOut}
                 variant="outline"
                 size="sm"
@@ -329,6 +350,15 @@ const Layout: React.FC = () => {
                 >
                   <User size={20} className="text-white" />
                 </button>
+                <Button
+                  onClick={handleStartTutorial}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50"
+                  title="Show Tutorial"
+                >
+                  <HelpCircle size={16} />
+                </Button>
                 <Button
                   onClick={signOut}
                   variant="outline"
@@ -501,6 +531,18 @@ const Layout: React.FC = () => {
                   </div>
                   <ChevronRight size={16} className="text-edu-navy/40" />
                 </button>
+                <Button
+                  onClick={() => {
+                    handleStartTutorial();
+                    setSidebarOpen(false);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-2"
+                >
+                  <HelpCircle size={16} />
+                  <span>Tutorial</span>
+                </Button>
                 <Button
                   onClick={signOut}
                   variant="outline"
