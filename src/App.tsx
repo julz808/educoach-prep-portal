@@ -18,6 +18,9 @@ import Auth from "./pages/Auth";
 import CourseDetail from "./pages/CourseDetail";
 import EduTestGenerator from "./pages/EduTestGenerator";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Debug import - remove after troubleshooting
+import './debug-access-control';
 import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
 import { AuthProvider } from "./context/AuthContext";
