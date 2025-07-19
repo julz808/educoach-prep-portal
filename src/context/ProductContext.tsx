@@ -86,8 +86,8 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
   });
 
   const [productAccess, setProductAccess] = useState<ProductAccessInfo>({
-    hasAccess: true, // Default to true for safety - won't break existing functionality
-    isLoading: false,
+    hasAccess: false, // Default to false - require purchase
+    isLoading: true, // Start with loading state
     error: undefined
   });
 
@@ -126,16 +126,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
       
       return hasAccess;
     } catch (error) {
-      console.warn('Access check failed, allowing access for safety:', error);
+      console.warn('Access check failed, denying access for security:', error);
       
-      // SAFETY FALLBACK: If access check fails, allow access to prevent breaking functionality
+      // SECURITY: If access check fails, deny access and show paywall
       setProductAccess({
-        hasAccess: true,
+        hasAccess: false,
         isLoading: false,
-        error: 'Access check failed - defaulting to allowed'
+        error: 'Access check failed - please purchase to continue'
       });
       
-      return true;
+      return false;
     }
   };
 
