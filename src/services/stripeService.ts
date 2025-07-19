@@ -28,7 +28,15 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
 
     // Get product configuration
     const productConfig = getStripeProductConfig(productId);
+    console.log('🔍 Product Config Debug:', {
+      productId,
+      productConfig,
+      priceId: productConfig?.priceId,
+      hasConfig: !!productConfig
+    });
+    
     if (!productConfig || !productConfig.priceId) {
+      console.error('❌ Product config missing:', { productId, productConfig });
       return { error: 'Product configuration not found.' };
     }
 

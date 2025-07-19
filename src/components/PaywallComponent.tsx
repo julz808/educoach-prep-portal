@@ -22,8 +22,20 @@ export const PaywallComponent: React.FC<PaywallComponentProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchase = async () => {
+    // Debug logging
+    console.log('🔍 Purchase Debug:', {
+      isStripeConfigured: isStripeConfigured(),
+      publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+      productId: product.id
+    });
+
     // Check if Stripe is configured
     if (!isStripeConfigured()) {
+      console.error('❌ Stripe not configured:', {
+        publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+        hasKey: !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+        isPlaceholder: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY === 'pk_test_your_publishable_key_here'
+      });
       toast.error('Payment system is being set up. Please try again later.');
       return;
     }
