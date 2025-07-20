@@ -47,10 +47,16 @@ serve(async (req) => {
       apiVersion: '2023-08-16',
     })
 
-    // Initialize Supabase
+    // Initialize Supabase with service role key for admin access
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
     // Get the webhook secret
@@ -123,10 +129,23 @@ serve(async (req) => {
               continue
             }
 
+            // Check if user already has access
+            const { data: existingAccess } = await supabase
+              .from('user_products')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('product_type', dbProductType)
+              .single()
+
+            if (existingAccess) {
+              console.log('✅ User already has access to this product')
+              continue
+            }
+
             // Grant access to the product
             const { data, error } = await supabase
               .from('user_products')
-              .upsert({
+              .insert({
                 user_id: userId,
                 product_type: dbProductType,
                 is_active: true,
@@ -135,8 +154,6 @@ serve(async (req) => {
                 stripe_customer_id: session.customer,
                 amount_paid: session.amount_total,
                 currency: session.currency
-              }, {
-                onConflict: 'user_id,product_type'
               })
 
             if (error) {
