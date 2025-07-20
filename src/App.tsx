@@ -22,6 +22,7 @@ import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProductProvider } from "./context/ProductContext";
+import { TutorialProvider } from "./components/Tutorial";
 import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
 import Profile from '@/pages/Profile';
@@ -39,8 +40,9 @@ const App = () => {
             <UserProvider>
               <TestTypeProvider>
                 <ProductProvider>
-                  <Toaster />
-                  <Sonner />
+                  <TutorialProvider>
+                    <Toaster />
+                    <Sonner />
                   <BrowserRouter>
                     <Routes>
                       <Route path="/" element={<Landing />} />
@@ -73,6 +75,7 @@ const App = () => {
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </BrowserRouter>
+                  </TutorialProvider>
                 </ProductProvider>
               </TestTypeProvider>
             </UserProvider>

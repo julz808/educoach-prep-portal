@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Tutorial, useTutorial } from '@/components/Tutorial';
+import { useTutorial } from '@/components/Tutorial';
 
 interface NavigationItem {
   id: string;
@@ -567,8 +567,6 @@ const Layout: React.FC = () => {
         </div>
       </main>
       
-      {/* Tutorial Component */}
-      <Tutorial />
     </div>
   );
 };
