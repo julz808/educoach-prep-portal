@@ -70,18 +70,13 @@ const Layout: React.FC = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const { selectedProduct, setSelectedProduct, currentProduct, allProducts } = useProduct();
   const { signOut, user } = useAuth();
+  const { startTutorial } = useTutorial();
   const location = useLocation();
   const navigate = useNavigate();
 
   // Start tutorial function
   const handleStartTutorial = () => {
-    // Clear the tutorial seen flag for current user to force show
-    if (user) {
-      const tutorialShownKey = `tutorial_shown_${user.id}`;
-      localStorage.removeItem(tutorialShownKey);
-      // Refresh the page to trigger tutorial
-      window.location.reload();
-    }
+    startTutorial();
   };
 
   // Auto-collapse sidebar on tablet
@@ -300,6 +295,16 @@ const Layout: React.FC = () => {
           {/* User Profile - Desktop */}
           {!sidebarCollapsed && (
             <div className="p-6 border-t border-gray-100">
+              <Button
+                onClick={handleStartTutorial}
+                variant="ghost"
+                size="sm"
+                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-4"
+                title="How it works"
+              >
+                <HelpCircle size={16} />
+                <span>How it works</span>
+              </Button>
               <button
                 onClick={() => navigate('/profile')}
                 className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
@@ -318,16 +323,6 @@ const Layout: React.FC = () => {
                 <ChevronRight size={16} className="text-edu-navy/40" />
               </button>
               <Button
-                onClick={handleStartTutorial}
-                variant="ghost"
-                size="sm"
-                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-2"
-                title="Show Tutorial"
-              >
-                <HelpCircle size={16} />
-                <span>Tutorial</span>
-              </Button>
-              <Button
                 onClick={signOut}
                 variant="outline"
                 size="sm"
@@ -343,6 +338,15 @@ const Layout: React.FC = () => {
           {sidebarCollapsed && (
             <div className="p-4 border-t border-gray-100">
               <div className="space-y-2">
+                <Button
+                  onClick={handleStartTutorial}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50"
+                  title="How it works"
+                >
+                  <HelpCircle size={16} />
+                </Button>
                 <button
                   onClick={() => navigate('/profile')}
                   className="w-12 h-12 bg-edu-teal rounded-full flex items-center justify-center mx-auto hover:bg-edu-teal/90 transition-colors"
@@ -350,15 +354,6 @@ const Layout: React.FC = () => {
                 >
                   <User size={20} className="text-white" />
                 </button>
-                <Button
-                  onClick={handleStartTutorial}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50"
-                  title="Show Tutorial"
-                >
-                  <HelpCircle size={16} />
-                </Button>
                 <Button
                   onClick={signOut}
                   variant="outline"
@@ -514,6 +509,18 @@ const Layout: React.FC = () => {
               
               {/* Mobile User Profile */}
               <div className="p-6 border-t border-gray-100">
+                <Button
+                  onClick={() => {
+                    handleStartTutorial();
+                    setSidebarOpen(false);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-4"
+                >
+                  <HelpCircle size={16} />
+                  <span>How it works</span>
+                </Button>
                 <button
                   onClick={() => handleNavigation('/profile')}
                   className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
@@ -531,18 +538,6 @@ const Layout: React.FC = () => {
                   </div>
                   <ChevronRight size={16} className="text-edu-navy/40" />
                 </button>
-                <Button
-                  onClick={() => {
-                    handleStartTutorial();
-                    setSidebarOpen(false);
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-2"
-                >
-                  <HelpCircle size={16} />
-                  <span>Tutorial</span>
-                </Button>
                 <Button
                   onClick={signOut}
                   variant="outline"

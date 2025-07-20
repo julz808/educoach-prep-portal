@@ -148,9 +148,8 @@ const Auth = () => {
           }
         }
         
-        if (!userExists) {
-          throw new Error('User creation not completed. Please try signing in instead.');
-        }
+        // Remove the strict user existence check since we'll handle verification via email
+        // The user account is created but may not be fully activated until email verification
         
         // Additional safety delay to ensure database replication
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -343,7 +342,7 @@ const Auth = () => {
                   </AlertDescription>
                 </Alert>
                 <div className="space-y-2">
-                  <Label htmlFor="email-register">Email</Label>
+                  <Label htmlFor="email-register">Email (linked to product)</Label>
                   <div className="relative">
                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -388,7 +387,7 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="parentEmail">Parent Email</Label>
+                  <Label htmlFor="parentEmail">Parent Email (can be same as above)</Label>
                   <div className="relative">
                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
