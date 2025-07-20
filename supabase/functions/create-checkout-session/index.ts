@@ -14,6 +14,15 @@ serve(async (req) => {
   }
 
   try {
+    // Debug environment variables
+    console.log('🔍 Environment Debug:', {
+      hasStripeKey: !!Deno.env.get('STRIPE_SECRET_KEY'),
+      stripeKeyPrefix: Deno.env.get('STRIPE_SECRET_KEY')?.substring(0, 8),
+      hasSupabaseUrl: !!Deno.env.get('SUPABASE_URL'),
+      hasSupabaseAnonKey: !!Deno.env.get('SUPABASE_ANON_KEY'),
+      authHeader: req.headers.get('Authorization')?.substring(0, 20) + '...'
+    });
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -33,11 +42,20 @@ serve(async (req) => {
     // Get the authenticated user
     const {
       data: { user },
+      error: authError
     } = await supabaseClient.auth.getUser()
 
+    console.log('🔍 Auth Debug:', {
+      hasUser: !!user,
+      userId: user?.id,
+      userEmail: user?.email,
+      authError: authError?.message
+    });
+
     if (!user) {
+      console.error('❌ User authentication failed:', authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Unauthorized', details: authError?.message }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -70,6 +88,13 @@ serve(async (req) => {
     }
 
     // Create Stripe checkout session
+    console.log('🔍 Creating Stripe session with:', {
+      priceId,
+      productId,
+      userId,
+      userEmail: userEmail?.substring(0, 10) + '...'
+    });
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -118,15 +143,28 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    console.error('Error creating checkout session:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode,
+      stack: error.stack?.substring(0, 500)
+    });
+    
+    // Check if this is a Stripe authentication error
+    const isStripeAuthError = error.type === 'StripeAuthenticationError' || 
+                              error.statusCode === 401 ||
+                              error.message?.includes('Invalid API key');
     
     return new Response(
       JSON.stringify({ 
         error: error.message || 'Internal server error',
-        details: error.type || 'Unknown error type'
+        details: error.type || 'Unknown error type',
+        isStripeAuthError,
+        statusCode: error.statusCode
       }),
       { 
-        status: 500, 
+        status: isStripeAuthError ? 401 : 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     )

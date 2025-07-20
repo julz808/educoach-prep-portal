@@ -47,6 +47,15 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
     }
 
     // Create checkout session via Edge Function
+    console.log('🔍 Invoking create-checkout-session with:', {
+      priceId: productConfig.priceId,
+      productId,
+      userId: user.id,
+      userEmail: user.email?.substring(0, 10) + '...',
+      hasUser: !!user,
+      userSessionValid: !!user.aud
+    });
+
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
       body: {
         priceId: productConfig.priceId,
@@ -58,8 +67,20 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       }
     });
 
+    console.log('🔍 Edge function response:', { 
+      data, 
+      error,
+      hasData: !!data,
+      hasError: !!error,
+      errorDetails: error
+    });
+
     if (error) {
-      console.error('Error creating checkout session:', error);
+      console.error('❌ Error creating checkout session:', {
+        message: error.message,
+        details: error,
+        isAuthError: error.message?.includes('401') || error.message?.includes('Unauthorized')
+      });
       return { error: error.message || 'Failed to create checkout session.' };
     }
 
