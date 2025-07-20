@@ -128,12 +128,25 @@ export async function redirectToCheckout(productId: string): Promise<void> {
     console.log('🚀 Redirecting to Stripe checkout with session:', result.sessionId);
 
     // Redirect to checkout
+    console.log('🔄 Attempting redirect with Stripe instance:', !!stripe);
     const { error } = await stripe.redirectToCheckout({
       sessionId: result.sessionId
     });
 
     if (error) {
-      console.error('❌ Stripe redirect error:', error);
+      console.error('❌ Stripe redirect error:', {
+        type: error.type,
+        message: error.message,
+        code: error.code,
+        decline_code: error.decline_code,
+        param: error.param
+      });
+      
+      // Check for specific error types
+      if (error.type === 'invalid_request_error' && error.message?.includes('No such checkout.session')) {
+        throw new Error('Checkout session not found. This usually means the publishable key doesn\'t match the secret key.');
+      }
+      
       throw error;
     }
   } catch (error: any) {
