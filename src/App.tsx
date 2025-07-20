@@ -28,6 +28,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Profile from '@/pages/Profile';
 import PurchaseSuccess from '@/pages/PurchaseSuccess';
 import StripeTest from '@/pages/StripeTest';
+import AccessDebug from '@/pages/AccessDebug';
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => {
                       <Route path="/auth/reset-password" element={<ResetPassword />} />
                       <Route path="/purchase-success" element={<PurchaseSuccess />} />
                       <Route path="/stripe-test" element={<StripeTest />} />
+                      <Route path="/access-debug" element={<AccessDebug />} />
                       <Route element={<ProtectedRoute />}>
                         {/* Test instruction routes (outside of Layout) */}
                         <Route path="/test-instructions/:testType/:subjectId" element={<TestInstructionsPage />} />
