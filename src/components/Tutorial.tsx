@@ -89,15 +89,7 @@ function TutorialComponent() {
     setShowTutorial(true);
   };
 
-  useEffect(() => {
-    // Only show tutorial on first visit
-    if (user && checkFirstTimeUser()) {
-      // Small delay to ensure page is loaded and sidebar is rendered
-      setTimeout(() => {
-        setShowTutorial(true);
-      }, 2000);
-    }
-  }, [user]);
+  // Removed auto-show on first visit - tutorial only shows when manually triggered
 
   useEffect(() => {
     if (showTutorial && tutorialSteps[currentStep]) {

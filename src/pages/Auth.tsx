@@ -17,6 +17,8 @@ const Auth = () => {
   const { resendVerificationEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
   const [parentFirstName, setParentFirstName] = useState("");
@@ -26,6 +28,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [activeTab, setActiveTab] = useState<string>("login");
 
   // Clean up auth state to avoid issues
   const cleanupAuthState = () => {
@@ -75,6 +78,19 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    // Validate password length
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -139,6 +155,7 @@ const Auth = () => {
             p_student_last_name: studentLastName,
             p_parent_first_name: parentFirstName,
             p_parent_last_name: parentLastName,
+            p_parent_email: parentEmail,
             p_school_name: schoolName,
             p_year_level: parseInt(yearLevel)
           });
@@ -157,8 +174,20 @@ const Auth = () => {
         console.log('Registration successful:', registrationResult);
       }
       
-      toast.success("Account created! Please check your email for verification.");
-      navigate("/dashboard");
+      toast.success("Account created successfully! Please check your email to verify your account before logging in.");
+      // Clear form fields
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setParentEmail("");
+      setStudentFirstName("");
+      setStudentLastName("");
+      setParentFirstName("");
+      setParentLastName("");
+      setSchoolName("");
+      setYearLevel("");
+      // Switch to login tab
+      setActiveTab("login");
     } catch (error: any) {
       console.error('Registration error:', error);
       toast.error(error.message || "Error creating account");
@@ -196,7 +225,7 @@ const Auth = () => {
             Sign in to access your education portal
           </CardDescription>
         </CardHeader>
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
@@ -343,6 +372,21 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="parentEmail">Parent Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="parentEmail"
+                      type="email"
+                      placeholder="parent@email.com"
+                      className="pl-8"
+                      value={parentEmail}
+                      onChange={(e) => setParentEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="parentFirstName">Parent First Name</Label>
                   <div className="relative">
                     <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -421,6 +465,21 @@ const Auth = () => {
                       className="pl-8"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword-register">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword-register"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-8"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
                   </div>
