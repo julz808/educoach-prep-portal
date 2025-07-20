@@ -106,7 +106,7 @@ const StripeTest = () => {
       <Card>
         <CardHeader>
           <CardTitle>Stripe Configuration Test</CardTitle>
-          <CardDescription>Debug Stripe integration issues</CardDescription>
+          <CardDescription>Debug Stripe integration issues - Updated</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
