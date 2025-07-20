@@ -91,7 +91,7 @@ serve(async (req) => {
       });
     }
 
-    // Initialize Supabase with service role (admin access, no auth required)
+    // Initialize Supabase with service role (admin access, bypasses RLS)
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -99,8 +99,31 @@ serve(async (req) => {
       },
       db: {
         schema: 'public'
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'stripe-webhook@1.0.0'
+        }
       }
     });
+
+    // Test database connection and service role permissions
+    console.log('🔍 Testing service role database access...');
+    try {
+      const { data: testQuery, error: testError } = await supabase
+        .from('user_products')
+        .select('count(*)')
+        .limit(1);
+      
+      if (testError) {
+        console.error('❌ Service role database test failed:', testError);
+        console.error('Error details:', JSON.stringify(testError, null, 2));
+      } else {
+        console.log('✅ Service role database access confirmed');
+      }
+    } catch (dbTestError) {
+      console.error('❌ Database connection test failed:', dbTestError);
+    }
 
     // Handle the event
     if (event.type === 'checkout.session.completed') {
