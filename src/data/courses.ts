@@ -109,7 +109,7 @@ export const courses: Course[] = [
 export const faqs = [
   {
     question: "How long do I have access to the course?",
-    answer: "You have 12 months of access from the date of purchase."
+    answer: "You have unlimited access from the date of purchase."
   },
   {
     question: "Are the practice tests similar to the real exams?",

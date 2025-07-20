@@ -59,12 +59,11 @@ export const PaywallComponent: React.FC<PaywallComponentProps> = ({
   };
 
   const features = [
-    "Comprehensive diagnostic tests",
-    "Personalized skill drills",
-    "Full-length practice tests", 
-    "Detailed performance insights",
-    "AI-powered feedback",
-    "12 months access"
+    "Comprehensive diagnostic test",
+    "Personalised skill drills for targeted practice",
+    "5 full-length practice tests", 
+    "Detailed performance insights and analytics",
+    "Unlimited access"
   ];
 
   return (
@@ -93,7 +92,7 @@ export const PaywallComponent: React.FC<PaywallComponentProps> = ({
                 AUD
               </Badge>
             </div>
-            <p className="text-sm text-edu-navy/60">One-time payment • 12 months access</p>
+            <p className="text-sm text-edu-navy/60">One-time payment • Unlimited access</p>
           </div>
 
           {/* Features List */}

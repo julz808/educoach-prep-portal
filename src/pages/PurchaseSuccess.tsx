@@ -94,23 +94,23 @@ const PurchaseSuccess: React.FC = () => {
             <ul className="text-sm text-edu-navy/80 space-y-1">
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Comprehensive diagnostic tests
+                Comprehensive diagnostic test
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Personalized skill drills
+                Personalised skill drills for targeted practice
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Full-length practice tests
+                5 full-length practice tests
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Detailed performance insights
+                Detailed performance insights and analytics
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                12 months access
+                Unlimited access
               </li>
             </ul>
           </div>
