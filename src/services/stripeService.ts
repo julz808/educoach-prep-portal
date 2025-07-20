@@ -100,6 +100,15 @@ export async function redirectToCheckout(productId: string): Promise<void> {
   try {
     // Show loading state
     console.log('Starting checkout for product:', productId);
+    
+    // Debug: Check Stripe configuration
+    const publishableKey = getStripePublishableKey();
+    console.log('🔍 Frontend Stripe Debug:', {
+      hasPublishableKey: !!publishableKey,
+      keyPrefix: publishableKey.substring(0, 8),
+      keyLength: publishableKey.length,
+      isLiveMode: publishableKey.startsWith('pk_live_')
+    });
 
     // Create checkout session
     const result = await createCheckoutSession(productId);
@@ -108,11 +117,15 @@ export async function redirectToCheckout(productId: string): Promise<void> {
       throw new Error(result.error);
     }
 
+    console.log('✅ Checkout session created:', result.sessionId);
+
     // Get Stripe instance
     const stripe = await getStripe();
     if (!stripe) {
       throw new Error('Stripe is not available. Please try again later.');
     }
+
+    console.log('🚀 Redirecting to Stripe checkout with session:', result.sessionId);
 
     // Redirect to checkout
     const { error } = await stripe.redirectToCheckout({
@@ -120,6 +133,7 @@ export async function redirectToCheckout(productId: string): Promise<void> {
     });
 
     if (error) {
+      console.error('❌ Stripe redirect error:', error);
       throw error;
     }
   } catch (error: any) {
