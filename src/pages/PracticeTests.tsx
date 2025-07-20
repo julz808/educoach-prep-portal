@@ -565,13 +565,6 @@ const PracticeTests: React.FC = () => {
   };
 
   // Access control - show paywall if user doesn't have access to current product
-  console.log('🔍 PracticeTests Access Control Check:', {
-    isPaywallUIEnabled: isPaywallUIEnabled(),
-    hasAccessToCurrentProduct,
-    currentProduct,
-    shouldShowPaywall: isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct
-  });
-  
   if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50">

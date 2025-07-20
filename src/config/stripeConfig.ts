@@ -70,11 +70,5 @@ export function isAccessControlEnabled(): boolean {
 }
 
 export function isPaywallUIEnabled(): boolean {
-  const enabled = import.meta.env.VITE_ENABLE_PAYWALL_UI === 'true';
-  console.log('🔍 Paywall UI Check:', {
-    VITE_ENABLE_PAYWALL_UI: import.meta.env.VITE_ENABLE_PAYWALL_UI,
-    enabled: enabled,
-    type: typeof import.meta.env.VITE_ENABLE_PAYWALL_UI
-  });
-  return enabled;
+  return import.meta.env.VITE_ENABLE_PAYWALL_UI === 'true';
 }
