@@ -11,6 +11,7 @@ import { Mail, Lock, User, ArrowRight, School, GraduationCap, AlertCircle } from
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
+import { RegistrationSuccessModal } from "@/components/RegistrationSuccessModal";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -29,6 +30,14 @@ const Auth = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [activeTab, setActiveTab] = useState<string>("login");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
+  // Handle success modal close
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setActiveTab("login");
+  };
 
   // Clean up auth state to avoid issues
   const cleanupAuthState = () => {
@@ -174,7 +183,10 @@ const Auth = () => {
         console.log('Registration successful:', registrationResult);
       }
       
-      toast.success("Account created successfully! Please check your email to verify your account before logging in.");
+      // Store the email for the modal and show success modal
+      setRegisteredEmail(email);
+      setShowSuccessModal(true);
+      
       // Clear form fields
       setEmail("");
       setPassword("");
@@ -186,8 +198,6 @@ const Auth = () => {
       setParentLastName("");
       setSchoolName("");
       setYearLevel("");
-      // Switch to login tab
-      setActiveTab("login");
     } catch (error: any) {
       console.error('Registration error:', error);
       toast.error(error.message || "Error creating account");
@@ -326,6 +336,12 @@ const Auth = () => {
           <TabsContent value="register">
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4 pt-4">
+                <Alert className="bg-blue-50 border-blue-200">
+                  <AlertCircle className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-800">
+                    <strong>Important:</strong> Use the same email address for registration and product purchases to ensure automatic access to your courses.
+                  </AlertDescription>
+                </Alert>
                 <div className="space-y-2">
                   <Label htmlFor="email-register">Email</Label>
                   <div className="relative">
@@ -495,6 +511,13 @@ const Auth = () => {
           </TabsContent>
         </Tabs>
       </Card>
+
+      {/* Registration Success Modal */}
+      <RegistrationSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        email={registeredEmail}
+      />
     </div>
   );
 };
