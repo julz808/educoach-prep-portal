@@ -19,6 +19,7 @@ import { TestSessionService } from '@/services/testSessionService';
 import { DrillSessionService } from '@/services/drillSessionService';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
 import { ScoringService } from '@/services/scoringService';
+import { DeveloperToolsReplicaService } from '@/services/developerToolsReplicaService';
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { calculateTimeAllocation, shouldShowImmediateAnswerFeedback, shouldHaveTimer } from '@/utils/timeAllocation';
@@ -1139,85 +1140,8 @@ const TestTaking: React.FC = () => {
 
         console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
         
-        // ADDITIONALLY: Record individual question attempt for insights (ALL test types)
-        const isPracticeTest = updatedSession.type === 'practice' || updatedSession.type.startsWith('practice_');
-        const isDiagnosticTest = updatedSession.type === 'diagnostic';
-        const isDrillTest = updatedSession.type === 'drill';
-        
-        console.log('🔍 SESSION-TYPE-CHECK: Session type:', updatedSession.type, 'isPractice:', isPracticeTest, 'isDiagnostic:', isDiagnosticTest, 'isDrill:', isDrillTest);
-        
-        if (user && (isPracticeTest || isDiagnosticTest || isDrillTest)) {
-          try {
-            const currentQuestion = updatedSession.questions[updatedSession.currentQuestion];
-            const selectedAnswer = stringAnswers[updatedSession.currentQuestion.toString()];
-            const isCorrect = answerIndex === currentQuestion.correctAnswer;
-            
-            console.log('📊 QUESTION-ATTEMPT: Recording individual question attempt for insights:', {
-              questionId: currentQuestion.id,
-              sessionId: updatedSession.id,
-              selectedAnswer,
-              correctAnswer: currentQuestion.correctAnswer,
-              isCorrect,
-              subSkill: currentQuestion.subSkill,
-              topic: currentQuestion.topic
-            });
-            
-            // Record individual question attempt to question_attempt_history table
-            if (updatedSession.type === 'drill') {
-              // Use DrillSessionService for drill question responses
-              await DrillSessionService.recordQuestionResponse(
-                user.id,
-                currentQuestion.id,
-                updatedSession.id,
-                getDbProductType(selectedProduct),
-                selectedAnswer,
-                isCorrect,
-                30, // time spent seconds
-                updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
-                false // is_skipped
-              );
-            } else {
-              // Use existing RPC for practice tests
-              console.log('🔧 SAVE-ATTEMPT: Calling save_question_attempt with params:', {
-                p_user_id: user.id,
-                p_question_id: currentQuestion.id,
-                p_session_id: updatedSession.id,
-                p_user_answer: selectedAnswer,
-                p_is_correct: isCorrect,
-                p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
-                p_is_skipped: false,
-                p_time_spent_seconds: 30
-              });
-              
-              const { data: attemptData, error: attemptError } = await supabase.rpc('save_question_attempt', {
-                p_user_id: user.id,
-                p_question_id: currentQuestion.id,
-                p_session_id: updatedSession.id,
-                p_user_answer: selectedAnswer,
-                p_is_correct: isCorrect,
-                p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
-                p_is_skipped: false,
-                p_time_spent_seconds: 30
-              });
-              
-              if (attemptError) {
-                console.error('❌ SAVE-ATTEMPT: Error recording attempt:', attemptError);
-                console.error('❌ SAVE-ATTEMPT: Error details:', {
-                  code: attemptError.code,
-                  message: attemptError.message,
-                  details: attemptError.details,
-                  hint: attemptError.hint
-                });
-              } else {
-                console.log('✅ SAVE-ATTEMPT: Question attempt saved successfully:', attemptData);
-              }
-            }
-            
-            console.log('📝 QUESTION-ATTEMPT: Attempt recording completed (check above for success/error)');
-          } catch (questionAttemptError) {
-            console.error('❌ QUESTION-ATTEMPT: Failed to record individual question attempt:', questionAttemptError);
-          }
-        }
+        // NOTE: Individual question attempts will be recorded during session completion
+        // using the DeveloperToolsReplicaService to ensure insights compatibility
       } catch (error) {
         console.error('❌ IMMEDIATE-SAVE FAILED:', error);
         console.error('❌ IMMEDIATE-SAVE FAILED: Error details:', JSON.stringify(error, null, 2));
@@ -1412,8 +1336,23 @@ const TestTaking: React.FC = () => {
           session.answers
         );
       } else {
-        // For regular sessions, use existing logic
-        await SessionService.completeSession(session.id);
+        // For regular sessions (diagnostic/practice), use developer tools replica approach
+        console.log('🎯 DEV-REPLICA: Using developer tools completion approach for insights compatibility');
+        
+        // Create the session structure in the exact format the replica service expects
+        const sessionForReplica = {
+          id: session.id,
+          userId: user.id,
+          productType: session.productType,
+          testMode: session.type, // diagnostic, practice_1, practice_2, etc.
+          sectionName: session.sectionName,
+          questions: session.questions,
+          answers: session.answers,
+          textAnswers: session.textAnswers,
+          flaggedQuestions: session.flaggedQuestions
+        };
+        
+        await DeveloperToolsReplicaService.completeSessionLikeDeveloperTools(sessionForReplica);
       }
       
       // Calculate final score using ScoringService

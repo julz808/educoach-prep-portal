@@ -1,6 +1,5 @@
--- CREATE MISSING save_question_attempt FUNCTION
--- This function is called by TestTaking.tsx but doesn't exist in the database
--- This will fix the live test-taking system so future tests create proper question_attempt_history records
+-- Fix save_question_attempt function to properly handle drill sessions
+-- The original function only checked user_test_sessions but drill sessions are in drill_sessions table
 
 CREATE OR REPLACE FUNCTION save_question_attempt(
     p_user_id UUID,
@@ -16,15 +15,23 @@ RETURNS VOID AS $$
 DECLARE
     session_test_mode TEXT;
 BEGIN
-    -- Get the test mode from the session to determine session_type
+    -- First try to get test mode from user_test_sessions (diagnostic and practice tests)
     SELECT test_mode INTO session_test_mode
     FROM user_test_sessions
     WHERE id = p_session_id;
     
-    -- Normalize session_type (practice_1, practice_2, etc. become 'practice')
+    -- If not found, check if this is a drill session
     IF session_test_mode IS NULL THEN
-        session_test_mode := 'unknown';
-    ELSIF session_test_mode LIKE 'practice_%' THEN
+        -- Check if this session exists in drill_sessions table
+        IF EXISTS (SELECT 1 FROM drill_sessions WHERE id = p_session_id) THEN
+            session_test_mode := 'drill';
+        ELSE
+            session_test_mode := 'unknown';
+        END IF;
+    END IF;
+    
+    -- Normalize session_type (practice_1, practice_2, etc. become 'practice')
+    IF session_test_mode LIKE 'practice_%' THEN
         session_test_mode := 'practice';
     END IF;
     
@@ -60,17 +67,11 @@ BEGIN
         time_spent_seconds = EXCLUDED.time_spent_seconds,
         attempted_at = NOW();
         
-    RAISE LOG 'Recorded question attempt: user_id=%, question_id=%, session_id=%, correct=%', 
-        p_user_id, p_question_id, p_session_id, p_is_correct;
-        
 EXCEPTION WHEN OTHERS THEN
+    -- Log error but don't break the test flow
     RAISE LOG 'Error in save_question_attempt: %', SQLERRM;
-    -- Don't re-raise the error to avoid breaking the test flow
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Grant permissions to authenticated users (same as other functions)
+-- Grant permissions to authenticated users
 GRANT EXECUTE ON FUNCTION save_question_attempt(UUID, UUID, UUID, TEXT, BOOLEAN, BOOLEAN, BOOLEAN, INTEGER) TO authenticated;
-
--- Test the function works
-SELECT 'Function created successfully' as status;
