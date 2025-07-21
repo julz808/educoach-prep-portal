@@ -1344,7 +1344,7 @@ const TestTaking: React.FC = () => {
           id: session.id,
           userId: user.id,
           productType: session.productType,
-          testMode: session.type, // diagnostic, practice_1, practice_2, etc.
+          testMode: actualTestMode, // diagnostic, practice_1, practice_2, etc.
           sectionName: session.sectionName,
           questions: session.questions,
           answers: session.answers,
