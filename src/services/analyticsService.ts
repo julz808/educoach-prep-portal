@@ -1316,16 +1316,42 @@ export class AnalyticsService {
               .eq('user_id', userId)
               .eq('session_id', session.id);
             
-            if (!attemptsError && sessionAttempts) {
+            if (!attemptsError && sessionAttempts && sessionAttempts.length > 0) {
               questionsCorrect = sessionAttempts.filter(attempt => attempt.is_correct).length;
               questionsAttempted = sessionAttempts.length; // Use actual attempts count
               console.log(`📊 Section ${session.section_name} - Real-time calculation: ${questionsCorrect} correct out of ${questionsAttempted} attempted`);
             } else {
-              console.error(`❌ Error getting attempts for session ${session.id}:`, attemptsError);
-              // Fallback to stored values if query fails
-              questionsCorrect = session.correct_answers || 0;
-              questionsAttempted = session.questions_answered || 0;
-              console.log(`📊 Section ${session.section_name} - Using fallback stored values: ${questionsCorrect}/${questionsAttempted}`);
+              console.log(`⚠️ No question attempts found for session ${session.id}, using answers_data calculation...`);
+              
+              // FALLBACK: Calculate from session's answers_data (same method as individual test reviews)
+              const answersData = session.answers_data || {};
+              let correctFromAnswers = 0;
+              let attemptedFromAnswers = 0;
+              
+              // Get question IDs for this session to validate answers
+              if (session.question_order && Array.isArray(session.question_order)) {
+                for (const questionId of session.question_order) {
+                  const userAnswer = answersData[questionId];
+                  if (userAnswer !== undefined && userAnswer !== null) {
+                    attemptedFromAnswers++;
+                    
+                    // Get correct answer from questions table
+                    const { data: questionData } = await supabase
+                      .from('questions')
+                      .select('correct_answer')
+                      .eq('id', questionId)
+                      .single();
+                    
+                    if (questionData && questionData.correct_answer === userAnswer) {
+                      correctFromAnswers++;
+                    }
+                  }
+                }
+              }
+              
+              questionsCorrect = correctFromAnswers;
+              questionsAttempted = attemptedFromAnswers;
+              console.log(`📊 Section ${session.section_name} - Calculated from answers_data: ${questionsCorrect} correct out of ${questionsAttempted} attempted`);
             }
           }
           
