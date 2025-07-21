@@ -1172,7 +1172,18 @@ const TestTaking: React.FC = () => {
               );
             } else {
               // Use existing RPC for practice tests
-              const { error: attemptError } = await supabase.rpc('save_question_attempt', {
+              console.log('🔧 SAVE-ATTEMPT: Calling save_question_attempt with params:', {
+                p_user_id: user.id,
+                p_question_id: currentQuestion.id,
+                p_session_id: updatedSession.id,
+                p_user_answer: selectedAnswer,
+                p_is_correct: isCorrect,
+                p_is_flagged: updatedSession.flaggedQuestions.has(updatedSession.currentQuestion),
+                p_is_skipped: false,
+                p_time_spent_seconds: 30
+              });
+              
+              const { data: attemptData, error: attemptError } = await supabase.rpc('save_question_attempt', {
                 p_user_id: user.id,
                 p_question_id: currentQuestion.id,
                 p_session_id: updatedSession.id,
@@ -1184,11 +1195,19 @@ const TestTaking: React.FC = () => {
               });
               
               if (attemptError) {
-                console.error('📊 QUESTION-ATTEMPT: Error recording attempt:', attemptError);
+                console.error('❌ SAVE-ATTEMPT: Error recording attempt:', attemptError);
+                console.error('❌ SAVE-ATTEMPT: Error details:', {
+                  code: attemptError.code,
+                  message: attemptError.message,
+                  details: attemptError.details,
+                  hint: attemptError.hint
+                });
+              } else {
+                console.log('✅ SAVE-ATTEMPT: Question attempt saved successfully:', attemptData);
               }
             }
             
-            console.log('✅ QUESTION-ATTEMPT: Individual question attempt recorded successfully');
+            console.log('📝 QUESTION-ATTEMPT: Attempt recording completed (check above for success/error)');
           } catch (questionAttemptError) {
             console.error('❌ QUESTION-ATTEMPT: Failed to record individual question attempt:', questionAttemptError);
           }
