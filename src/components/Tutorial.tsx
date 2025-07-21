@@ -59,9 +59,14 @@ export const useTutorial = () => {
   return context;
 };
 
-function TutorialComponent() {
+interface TutorialComponentProps {
+  initialShow?: boolean;
+  onClose?: () => void;
+}
+
+function TutorialComponent({ initialShow = false, onClose }: TutorialComponentProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(initialShow);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const { user } = useAuth();
 
@@ -83,11 +88,12 @@ function TutorialComponent() {
     }
   };
 
-  // Start tutorial function (can be called manually)
-  const startTutorial = () => {
-    setCurrentStep(0);
-    setShowTutorial(true);
-  };
+  // Update tutorial state when props change
+  useEffect(() => {
+    if (initialShow !== undefined) {
+      setShowTutorial(initialShow);
+    }
+  }, [initialShow]);
 
   // Removed auto-show on first visit - tutorial only shows when manually triggered
 
@@ -129,6 +135,9 @@ function TutorialComponent() {
     setShowTutorial(false);
     markTutorialAsSeen(); // Mark as seen when closed
     setCurrentStep(0);
+    if (onClose) {
+      onClose();
+    }
   };
 
   if (!showTutorial) return null;
@@ -221,18 +230,32 @@ function TutorialComponent() {
 
 // Tutorial Provider Component
 export function TutorialProvider({ children }: { children: React.ReactNode }) {
-  const [tutorialTrigger, setTutorialTrigger] = useState(0);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const startTutorial = () => {
-    setTutorialTrigger(prev => prev + 1);
+    console.log("Tutorial - Starting tutorial");
+    setShowTutorial(true);
   };
 
   return (
     <TutorialContext.Provider value={{ startTutorial }}>
       {children}
-      <TutorialComponent key={tutorialTrigger} />
+      {showTutorial && (
+        <TutorialWrapper 
+          showTutorial={showTutorial} 
+          setShowTutorial={setShowTutorial} 
+        />
+      )}
     </TutorialContext.Provider>
   );
+}
+
+// Wrapper component to handle tutorial state
+function TutorialWrapper({ showTutorial, setShowTutorial }: { 
+  showTutorial: boolean; 
+  setShowTutorial: (show: boolean) => void; 
+}) {
+  return <TutorialComponent initialShow={showTutorial} onClose={() => setShowTutorial(false)} />;
 }
 
 // Export Tutorial for backward compatibility
