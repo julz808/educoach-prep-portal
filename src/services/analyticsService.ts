@@ -1306,9 +1306,27 @@ export class AnalyticsService {
               questionOrderLength: session.question_order?.length
             });
             
-            // Use stored values which are already correct
-            questionsCorrect = session.correct_answers || 0;
-            questionsAttempted = session.questions_answered || 0;
+            // CRITICAL FIX: Get real-time correct answers from question_attempt_history table
+            // instead of relying on session.correct_answers which appears to be 0
+            console.log(`📊 Section ${session.section_name} - Getting real-time correct answers from question_attempt_history...`);
+            
+            const { data: sessionAttempts, error: attemptsError } = await supabase
+              .from('question_attempt_history')
+              .select('is_correct, question_id')
+              .eq('user_id', userId)
+              .eq('session_id', session.id);
+            
+            if (!attemptsError && sessionAttempts) {
+              questionsCorrect = sessionAttempts.filter(attempt => attempt.is_correct).length;
+              questionsAttempted = sessionAttempts.length; // Use actual attempts count
+              console.log(`📊 Section ${session.section_name} - Real-time calculation: ${questionsCorrect} correct out of ${questionsAttempted} attempted`);
+            } else {
+              console.error(`❌ Error getting attempts for session ${session.id}:`, attemptsError);
+              // Fallback to stored values if query fails
+              questionsCorrect = session.correct_answers || 0;
+              questionsAttempted = session.questions_answered || 0;
+              console.log(`📊 Section ${session.section_name} - Using fallback stored values: ${questionsCorrect}/${questionsAttempted}`);
+            }
           }
           
           // For total points, get actual max_points from questions in this section
