@@ -1139,8 +1139,14 @@ const TestTaking: React.FC = () => {
 
         console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
         
-        // ADDITIONALLY: Record individual question attempt for insights (practice tests and drills)
-        if (user && (updatedSession.type === 'practice' || updatedSession.type === 'drill')) {
+        // ADDITIONALLY: Record individual question attempt for insights (ALL test types)
+        const isPracticeTest = updatedSession.type === 'practice' || updatedSession.type.startsWith('practice_');
+        const isDiagnosticTest = updatedSession.type === 'diagnostic';
+        const isDrillTest = updatedSession.type === 'drill';
+        
+        console.log('🔍 SESSION-TYPE-CHECK: Session type:', updatedSession.type, 'isPractice:', isPracticeTest, 'isDiagnostic:', isDiagnosticTest, 'isDrill:', isDrillTest);
+        
+        if (user && (isPracticeTest || isDiagnosticTest || isDrillTest)) {
           try {
             const currentQuestion = updatedSession.questions[updatedSession.currentQuestion];
             const selectedAnswer = stringAnswers[updatedSession.currentQuestion.toString()];
