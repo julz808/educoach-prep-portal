@@ -149,6 +149,12 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     // Get total questions available for this test to calculate correct denominators
     const { sectionTotals, subSkillTotals, totalAvailable } = await getTotalQuestionsAvailable(productType, testType, testNumber);
     
+    // CRITICAL FIX: If questions table has no data, fall back to session-based calculations
+    const useSessionBasedCalculation = totalAvailable === 0;
+    if (useSessionBasedCalculation) {
+      console.log('⚠️ Questions table has no data for this test mode, using session-based calculation fallback');
+    }
+    
     // Get question details for all attempted questions
     const questionIds = questionAttempts.map(attempt => attempt.question_id);
     console.log(`🔍 Getting question details for ${questionIds.length} questions`);
@@ -274,9 +280,18 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       sectionBreakdown.map(section => [section.sectionName, section.score])
     );
     
-    // Calculate overall scores using question counts for consistency with display
-    // For overall score, use total available questions as denominator
-    const overallScore = totalAvailable > 0 ? Math.round((totalQuestionsCorrect / totalAvailable) * 100) : 0;
+    // Calculate overall scores - use session-based calculation if questions table is empty
+    let overallScore = 0;
+    if (useSessionBasedCalculation) {
+      // Use session-based calculation: earned points / max points for score
+      overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+      console.log(`📊 Using session-based score: ${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`);
+    } else {
+      // Use questions table: correct questions / total available for score  
+      overallScore = totalAvailable > 0 ? Math.round((totalQuestionsCorrect / totalAvailable) * 100) : 0;
+      console.log(`📊 Using questions table score: ${totalQuestionsCorrect}/${totalAvailable} = ${overallScore}%`);
+    }
+    
     const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
     
     console.log(`📊 Overall calculation details:`, {
@@ -304,8 +319,15 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       `${s.sectionName}: ${s.questionsCorrect}/${s.questionsTotal} = ${s.score}%`
     ));
     
+    // Calculate correct total questions for display
+    const displayTotalQuestions = useSessionBasedCalculation 
+      ? totalQuestionsAttempted  // For session-based, use attempted as total
+      : (totalAvailable || totalQuestionsAttempted); // For questions table, use available or attempted
+    
+    console.log(`📊 Final totals - displayTotal: ${displayTotalQuestions}, attempted: ${totalQuestionsAttempted}, correct: ${totalQuestionsCorrect}, score: ${overallScore}%`);
+
     return {
-      totalQuestions: totalAvailable || totalQuestionsAttempted,
+      totalQuestions: displayTotalQuestions,
       questionsAttempted: totalQuestionsAttempted,
       questionsCorrect: totalQuestionsCorrect,
       totalMaxPoints,
