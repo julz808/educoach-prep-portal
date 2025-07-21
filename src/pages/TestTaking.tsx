@@ -765,14 +765,41 @@ const TestTaking: React.FC = () => {
           existingSession = await loadDrillSession(sessionIdToUse);
         } else {
           // For regular sessions, use TestSessionService  
-          sessionIdToUse = await TestSessionService.createOrResumeSession(
-            user.id,
-            properDisplayName, // Use mapped product type, not raw selectedProduct
-            actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
+          console.log('🚀 SESSION-CREATE: Creating session with params:', {
+            userId: user.id,
+            productType: properDisplayName,
+            testMode: actualTestMode,
             sectionName,
-            questions.length,
-            questions.map(q => q.id)
-          );
+            questionCount: questions.length
+          });
+          
+          try {
+            sessionIdToUse = await TestSessionService.createOrResumeSession(
+              user.id,
+              properDisplayName, // Use mapped product type, not raw selectedProduct
+              actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
+              sectionName,
+              questions.length,
+              questions.map(q => q.id)
+            );
+            
+            console.log('✅ SESSION-CREATE: Session created successfully:', sessionIdToUse);
+            
+            if (!sessionIdToUse) {
+              throw new Error('Session creation returned undefined');
+            }
+          } catch (sessionError) {
+            console.error('❌ SESSION-CREATE: Failed to create session:', sessionError);
+            console.error('❌ SESSION-CREATE: Error details:', {
+              message: sessionError instanceof Error ? sessionError.message : 'Unknown error',
+              stack: sessionError instanceof Error ? sessionError.stack : 'No stack trace',
+              userId: user.id,
+              productType: properDisplayName,
+              testMode: actualTestMode,
+              sectionName
+            });
+            throw new Error(`Failed to create test session: ${sessionError instanceof Error ? sessionError.message : 'Unknown error'}`);
+          }
 
           // Check if this is actually resuming an existing session
           existingSession = await SessionService.loadSession(sessionIdToUse);
