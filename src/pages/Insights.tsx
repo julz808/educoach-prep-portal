@@ -382,7 +382,7 @@ const PerformanceDashboard = () => {
     if (!selectedTest || selectedTest.status !== 'completed') return;
     
     const targetScore = selectedTest.score || 0;
-    const targetAccuracy = selectedTest.score || 0; // Will calculate proper accuracy later
+    const targetAccuracy = selectedTest.overallAccuracy || 0;
     
     // Reset and animate
     setAnimatedPracticeScore(0);

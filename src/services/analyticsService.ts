@@ -343,7 +343,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     
     // Build section breakdown
     const sectionBreakdown = Array.from(sectionStats.values()).map(section => ({
-      sectionName: section.sectionName,
+      sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
       score: section.maxPoints > 0 ? Math.round((section.earnedPoints / section.maxPoints) * 100) : 0,
       accuracy: section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0,
       questionsCorrect: section.questionsCorrect,
@@ -353,7 +353,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => ({
-      sectionName: subSkill.sectionName,
+      sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
       subSkillName: subSkill.subSkillName,
       score: subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0,
       accuracy: subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0,
@@ -547,7 +547,7 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
       const accuracy = estimatedAttempted > 0 ? Math.round((sectionCorrectPoints / estimatedAttempted) * 100) : 0;
       
       return {
-        sectionName: section.sectionName,
+        sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
         score,
         accuracy,
         questionsCorrect: sectionCorrectPoints,
@@ -586,7 +586,7 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
       const accuracy = estimatedAttempted > 0 ? Math.round((subSkillCorrectPoints / estimatedAttempted) * 100) : 0;
       
       return {
-        sectionName: subSkill.sectionName,
+        sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
         subSkillName: subSkill.subSkillName,
         score,
         accuracy,
@@ -1922,6 +1922,17 @@ export class AnalyticsService {
           // Calculate overall scores using earned points for score, questions for accuracy
           const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
           const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
+          
+          console.log(`🔍 PRACTICE TEST ${i} SCORE CALCULATION:`, {
+            totalEarnedPoints,
+            totalMaxPoints,
+            totalQuestionsCorrect,
+            totalQuestionsAttempted,
+            calculatedScore: overallScore,
+            calculatedAccuracy: overallAccuracy,
+            scoreFormula: `${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`,
+            accuracyFormula: `${totalQuestionsCorrect}/${totalQuestionsAttempted} = ${overallAccuracy}%`
+          });
           
           aggregatedTestData = {
             testNumber: i,
