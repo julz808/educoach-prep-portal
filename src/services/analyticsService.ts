@@ -11,6 +11,93 @@ const PRODUCT_ID_TO_TYPE: Record<string, string> = {
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
 };
 
+// Map database section names to curriculumData.ts names to ensure consistency
+function mapSectionNameToCurriculum(sectionName: string, productType: string): string {
+  // Section name mappings for each product based on curriculumData.ts
+  const sectionMappings: Record<string, Record<string, string>> = {
+    'EduTest Scholarship (Year 7 Entry)': {
+      'Reading Reasoning': 'Reading Comprehension',
+      'General Ability - Quantitative': 'Numerical Reasoning',
+      'General Ability - Verbal': 'Verbal Reasoning',
+      'Mathematics Reasoning': 'Mathematics',
+      'Writing': 'Written Expression',
+      // Keep correct names as-is
+      'Reading Comprehension': 'Reading Comprehension',
+      'Numerical Reasoning': 'Numerical Reasoning', 
+      'Verbal Reasoning': 'Verbal Reasoning',
+      'Mathematics': 'Mathematics',
+      'Written Expression': 'Written Expression'
+    },
+    'ACER Scholarship (Year 7 Entry)': {
+      'Mathematics Reasoning': 'Mathematics',
+      'General Ability - Verbal': 'Humanities',
+      'Writing': 'Written Expression',
+      // Keep correct names as-is
+      'Mathematics': 'Mathematics',
+      'Humanities': 'Humanities',
+      'Written Expression': 'Written Expression'
+    },
+    'NSW Selective Entry (Year 7 Entry)': {
+      'Reading Reasoning': 'Reading',
+      'Mathematics Reasoning': 'Mathematical Reasoning',
+      'General Ability - Verbal': 'Thinking Skills',
+      'Writing': 'Writing',
+      // Keep correct names as-is
+      'Reading': 'Reading',
+      'Mathematical Reasoning': 'Mathematical Reasoning',
+      'Thinking Skills': 'Thinking Skills',
+      'Writing': 'Writing'
+    },
+    'VIC Selective Entry (Year 9 Entry)': {
+      'Reading Reasoning': 'Verbal Reasoning',
+      'Mathematics Reasoning': 'Numerical Reasoning',
+      'General Ability - Verbal': 'Verbal Reasoning',
+      'General Ability - Quantitative': 'Numerical Reasoning',
+      'Writing': 'Writing',
+      // Keep correct names as-is
+      'Verbal Reasoning': 'Verbal Reasoning',
+      'Numerical Reasoning': 'Numerical Reasoning',
+      'Writing': 'Writing'
+    },
+    'Year 5 NAPLAN': {
+      'Reading Reasoning': 'Reading',
+      'Mathematics Reasoning': 'Numeracy Calculator',
+      'General Ability - Quantitative': 'Numeracy No Calculator',
+      'Language': 'Language Conventions',
+      'Writing': 'Writing',
+      // Keep correct names as-is
+      'Reading': 'Reading',
+      'Language Conventions': 'Language Conventions',
+      'Numeracy No Calculator': 'Numeracy No Calculator',
+      'Numeracy Calculator': 'Numeracy Calculator',
+      'Writing': 'Writing'
+    },
+    'Year 7 NAPLAN': {
+      'Reading Reasoning': 'Reading',
+      'Mathematics Reasoning': 'Numeracy Calculator',
+      'General Ability - Quantitative': 'Numeracy No Calculator',
+      'Language': 'Language Conventions',
+      'Writing': 'Writing',
+      // Keep correct names as-is
+      'Reading': 'Reading',
+      'Language Conventions': 'Language Conventions',
+      'Numeracy No Calculator': 'Numeracy No Calculator',
+      'Numeracy Calculator': 'Numeracy Calculator',
+      'Writing': 'Writing'
+    }
+  };
+
+  const productMappings = sectionMappings[productType];
+  if (productMappings && productMappings[sectionName]) {
+    console.log(`📝 SECTION-MAP: Mapped "${sectionName}" -> "${productMappings[sectionName]}" for ${productType}`);
+    return productMappings[sectionName];
+  }
+  
+  // Return original name if no mapping found
+  console.log(`📝 SECTION-MAP: No mapping found for "${sectionName}" in ${productType}, using original`);
+  return sectionName;
+}
+
 // Helper function to get total questions available for a practice test
 async function getTotalQuestionsAvailable(productType: string, testType: string, testNumber?: number) {
   try {
@@ -1498,7 +1585,7 @@ export class AnalyticsService {
         });
         
         return {
-          sectionName: session.section_name || 'Unknown Section',
+          sectionName: mapSectionNameToCurriculum(session.section_name || 'Unknown Section', productType),
           score, // Score based on total questions (for Score view)
           questionsCorrect,
           questionsTotal: actualTotalQuestions, // Use actual total, not DB value

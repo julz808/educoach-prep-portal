@@ -146,7 +146,7 @@ const PerformanceDashboard = () => {
   const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('diagnostic');
-  const [selectedPracticeTest, setSelectedPracticeTest] = useState(2);
+  const [selectedPracticeTest, setSelectedPracticeTest] = useState<number | null>(null);
   const [practiceFilter, setPracticeFilter] = useState('all');
   const [drillFilter, setDrillFilter] = useState('all');
   const [sectionView, setSectionView] = useState<'score' | 'accuracy'>('score');
@@ -237,6 +237,23 @@ const PerformanceDashboard = () => {
           practice,
           drills,
         });
+        
+        // Auto-select the latest completed practice test
+        if (practice?.tests && practice.tests.length > 0) {
+          const completedTests = practice.tests.filter(test => test.status === 'completed');
+          if (completedTests.length > 0) {
+            // Find the test with the highest test number that's completed
+            const latestCompleted = completedTests.reduce((latest, current) => 
+              current.testNumber > latest.testNumber ? current : latest
+            );
+            setSelectedPracticeTest(latestCompleted.testNumber);
+            console.log('🎯 Auto-selected latest completed practice test:', latestCompleted.testNumber);
+          } else {
+            // No completed tests, select the first test (Test 1)
+            setSelectedPracticeTest(1);
+            console.log('🎯 No completed tests, defaulting to Test 1');
+          }
+        }
 
         console.log('✅ Performance data loaded successfully');
         console.log('🔍 Practice data received:', practice);
