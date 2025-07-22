@@ -15,9 +15,23 @@ import {
 import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
 import { supabase } from '@/integrations/supabase/client';
 
+// Map frontend product IDs to curriculum product types
+const PRODUCT_ID_TO_TYPE: Record<string, string> = {
+  'year-5-naplan': 'Year 5 NAPLAN',
+  'year-7-naplan': 'Year 7 NAPLAN',
+  'acer-year-7': 'ACER Scholarship (Year 7 Entry)',
+  'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+  'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+  'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+};
+
 // Helper function to get filter tabs based on product type
-const getFilterTabsForProduct = (productType: string) => {
+const getFilterTabsForProduct = (productId: string) => {
+  // Map the product ID to the curriculum product type
+  const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
   const sections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
+  
+  console.log('🔍 Getting filter tabs for:', productId, '->', productType, 'Sections:', sections);
   
   // Create filter tabs from actual sections
   const filterTabs = [{ id: 'all', label: 'All Skills' }];
