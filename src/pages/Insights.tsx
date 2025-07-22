@@ -15,6 +15,45 @@ import {
 import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper function to get filter tabs based on product type
+const getFilterTabsForProduct = (productType: string) => {
+  const sections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
+  
+  // Create filter tabs from actual sections
+  const filterTabs = [{ id: 'all', label: 'All Skills' }];
+  
+  // Add each section as a filter, using a simplified ID
+  sections.forEach(section => {
+    let id = 'other';
+    const lowerSection = section.toLowerCase();
+    
+    if (lowerSection.includes('reading')) {
+      id = 'reading';
+    } else if (lowerSection.includes('verbal')) {
+      id = 'verbal';
+    } else if (lowerSection.includes('mathematics') || lowerSection.includes('mathematical') || lowerSection.includes('numeracy')) {
+      id = 'mathematical';
+    } else if (lowerSection.includes('numerical') || lowerSection.includes('quantitative')) {
+      id = 'quantitative';
+    } else if (lowerSection.includes('writing') || lowerSection.includes('written')) {
+      id = 'writing';
+    } else if (lowerSection.includes('language')) {
+      id = 'language';
+    } else if (lowerSection.includes('thinking')) {
+      id = 'thinking';
+    } else if (lowerSection.includes('humanities')) {
+      id = 'humanities';
+    }
+    
+    // Check if this filter ID already exists
+    if (!filterTabs.find(tab => tab.id === id)) {
+      filterTabs.push({ id, label: section });
+    }
+  });
+  
+  return filterTabs;
+};
+
 interface PerformanceData {
   overall: OverallPerformance | null;
   diagnostic: DiagnosticResults | null;
@@ -884,14 +923,7 @@ const PerformanceDashboard = () => {
                       
                       {/* Filter Tabs */}
                       <div className="flex flex-wrap gap-2">
-                        {[
-                          { id: 'all', label: 'All Skills' },
-                          { id: 'reading', label: 'Reading Reasoning' },
-                          { id: 'mathematical', label: 'Mathematics Reasoning' },
-                          { id: 'verbal', label: 'General Ability - Verbal' },
-                          { id: 'quantitative', label: 'General Ability - Quantitative' },
-                          { id: 'writing', label: 'Writing' }
-                        ].map((filter) => (
+                        {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setPracticeFilter(filter.id)}
@@ -939,6 +971,18 @@ const PerformanceDashboard = () => {
                           // Writing categories
                           else if (lowerSectionName.includes('writing') || lowerSectionName.includes('written expression')) {
                             category = 'writing';
+                          }
+                          // Language categories
+                          else if (lowerSectionName.includes('language')) {
+                            category = 'language';
+                          }
+                          // Thinking categories
+                          else if (lowerSectionName.includes('thinking')) {
+                            category = 'thinking';
+                          }
+                          // Humanities categories
+                          else if (lowerSectionName.includes('humanities')) {
+                            category = 'humanities';
                           }
                           
                           return {
@@ -1425,14 +1469,7 @@ const PerformanceDashboard = () => {
                       
                       {/* Filter Tabs */}
                       <div className="flex flex-wrap gap-2">
-                        {[
-                          { id: 'all', label: 'All Skills' },
-                          { id: 'reading', label: 'Reading Reasoning' },
-                          { id: 'mathematical', label: 'Mathematics Reasoning' },
-                          { id: 'verbal', label: 'General Ability - Verbal' },
-                          { id: 'quantitative', label: 'General Ability - Quantitative' },
-                          { id: 'writing', label: 'Writing' }
-                        ].map((filter) => (
+                        {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setPracticeFilter(filter.id)}
@@ -1477,6 +1514,15 @@ const PerformanceDashboard = () => {
                           if (practiceFilter === 'writing') {
                             return lowerSectionName.includes('writing') || 
                                    lowerSectionName.includes('written expression');
+                          }
+                          if (practiceFilter === 'language') {
+                            return lowerSectionName.includes('language');
+                          }
+                          if (practiceFilter === 'thinking') {
+                            return lowerSectionName.includes('thinking');
+                          }
+                          if (practiceFilter === 'humanities') {
+                            return lowerSectionName.includes('humanities');
                           }
                           
                           return true;
@@ -1613,14 +1659,7 @@ const PerformanceDashboard = () => {
                       
                       {/* Filter Tabs */}
                       <div className="flex flex-wrap gap-2">
-                        {[
-                          { id: 'all', label: 'All Skills' },
-                          { id: 'reading', label: 'Reading Reasoning' },
-                          { id: 'mathematical', label: 'Mathematics Reasoning' },
-                          { id: 'verbal', label: 'General Ability - Verbal' },
-                          { id: 'quantitative', label: 'General Ability - Quantitative' },
-                          { id: 'writing', label: 'Writing' }
-                        ].map((filter) => (
+                        {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setDrillFilter(filter.id)}
@@ -1673,6 +1712,15 @@ const PerformanceDashboard = () => {
                             if (drillFilter === 'writing') {
                               return lowerSectionName.includes('writing') || 
                                      lowerSectionName.includes('written expression');
+                            }
+                            if (drillFilter === 'language') {
+                              return lowerSectionName.includes('language');
+                            }
+                            if (drillFilter === 'thinking') {
+                              return lowerSectionName.includes('thinking');
+                            }
+                            if (drillFilter === 'humanities') {
+                              return lowerSectionName.includes('humanities');
                             }
                             
                             return true;
