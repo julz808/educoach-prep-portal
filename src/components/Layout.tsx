@@ -198,8 +198,8 @@ const Layout: React.FC = () => {
 
           {/* Test Product Selector - Moved to Sidebar */}
           {!sidebarCollapsed && (
-            <div className="flex-shrink-0 p-6 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Test Product</h3>
+            <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100">
+              <h3 className="text-sm font-semibold text-edu-navy/70 mb-2">Test Product</h3>
               <Select value={selectedProduct} onValueChange={handleProductChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select test product" />
@@ -306,43 +306,44 @@ const Layout: React.FC = () => {
 
           {/* User Profile - Desktop */}
           {!sidebarCollapsed && (
-            <div className="flex-shrink-0 p-6 border-t border-gray-100 bg-white">
+            <div className="flex-shrink-0 p-4 border-t border-gray-100 bg-white">
               <Button
                 onClick={handleStartTutorial}
                 variant="ghost"
                 size="sm"
-                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-4"
+                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-3"
                 title="How it works"
               >
                 <HelpCircle size={16} />
                 <span>How it works</span>
               </Button>
-              <button
-                onClick={() => navigate('/profile')}
-                className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
-              >
-                <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
-                  <User size={20} className="text-white" />
-                </div>
-                <div className="flex-1 text-left">
-                  <div className="font-medium text-edu-navy">
-                    {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="flex-1 flex items-center space-x-2 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+                >
+                  <div className="w-9 h-9 bg-edu-teal rounded-full flex items-center justify-center flex-shrink-0">
+                    <User size={18} className="text-white" />
                   </div>
-                  <div className="text-xs text-edu-navy/60">
-                    {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-medium text-edu-navy text-sm truncate">
+                      {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
+                    </div>
+                    <div className="text-xs text-edu-navy/60">
+                      {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
+                    </div>
                   </div>
-                </div>
-                <ChevronRight size={16} className="text-edu-navy/40" />
-              </button>
-              <Button
-                onClick={signOut}
-                variant="outline"
-                size="sm"
-                className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
-              >
-                <LogOut size={16} />
-                <span>Sign Out</span>
-              </Button>
+                </button>
+                <Button
+                  onClick={signOut}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center px-3 py-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
+                  title="Sign Out"
+                >
+                  <LogOut size={16} />
+                </Button>
+              </div>
             </div>
           )}
 
@@ -395,7 +396,7 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-32 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-40 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -437,7 +438,7 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-32 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-36 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
