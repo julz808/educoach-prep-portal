@@ -213,6 +213,8 @@ const PerformanceDashboard = () => {
     practice: null,
     drills: null,
   });
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
+  const [tabLoadingStates, setTabLoadingStates] = useState<Record<string, boolean>>({});
   
   // Animation states
   const [animatedOverallScore, setAnimatedOverallScore] = useState(0);
@@ -226,9 +228,9 @@ const PerformanceDashboard = () => {
   // User profile state
   const [userProfile, setUserProfile] = useState<any>(null);
 
-  // Load real performance data
+  // Load essential data first (user profile and overall performance)
   useEffect(() => {
-    const loadPerformanceData = async () => {
+    const loadEssentialData = async () => {
       if (!user || !selectedProduct) {
         setIsLoading(false);
         return;
@@ -238,88 +240,102 @@ const PerformanceDashboard = () => {
       setDataError(null);
       
       try {
-        console.log('📊 Loading performance data for:', user.id, selectedProduct);
+        console.log('📊 Loading essential data for:', user.id, selectedProduct);
         
-        // Load user profile
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (profile) {
-          setUserProfile(profile);
-        }
-        
-        // Load data with individual error handling for each section
-        const results = await Promise.allSettled([
-          AnalyticsService.getOverallPerformance(user.id, selectedProduct),
-          AnalyticsService.getDiagnosticResults(user.id, selectedProduct),
-          AnalyticsService.getPracticeTestResults(user.id, selectedProduct),
-          AnalyticsService.getDrillResults(user.id, selectedProduct),
+        // Load user profile and overall performance in parallel (fastest queries)
+        const [profileResult, overallResult] = await Promise.allSettled([
+          supabase.from('user_profiles').select('*').eq('user_id', user.id).single(),
+          AnalyticsService.getOverallPerformance(user.id, selectedProduct)
         ]);
-
-        const [overallResult, diagnosticResult, practiceResult, drillsResult] = results;
-
-        // Extract successful results or null for failed ones
+        
+        // Set user profile
+        if (profileResult.status === 'fulfilled' && profileResult.value.data) {
+          setUserProfile(profileResult.value.data);
+        }
+        
+        // Set overall performance
         const overall = overallResult.status === 'fulfilled' ? overallResult.value : null;
-        const diagnostic = diagnosticResult.status === 'fulfilled' ? diagnosticResult.value : null;
-        const practice = practiceResult.status === 'fulfilled' ? practiceResult.value : null;
-        const drills = drillsResult.status === 'fulfilled' ? drillsResult.value : null;
+        setPerformanceData(prev => ({
+          ...prev,
+          overall
+        }));
         
-        // Debug drill data
-        console.log('🔧 Drill result status:', drillsResult.status);
-        if (drillsResult.status === 'rejected') {
-          console.error('🔧 Drill result error:', drillsResult.reason);
-        } else {
-          console.log('🔧 Drill data:', drills);
-          console.log('🔧 Drill subSkillBreakdown:', drills?.subSkillBreakdown);
-        }
-
-        // Log any failures but don't fail the entire load
-        results.forEach((result, index) => {
-          const sections = ['Overall', 'Diagnostic', 'Practice', 'Drills'];
-          if (result.status === 'rejected') {
-            console.warn(`⚠️ Failed to load ${sections[index]} data:`, result.reason);
-          }
-        });
-
-        setPerformanceData({
-          overall,
-          diagnostic,
-          practice,
-          drills,
-        });
+        console.log('✅ Essential data loaded, now loading default tab data');
         
-        // Auto-select the latest completed practice test
-        if (practice?.tests && practice.tests.length > 0) {
-          const completedTests = practice.tests.filter(test => test.status === 'completed');
-          if (completedTests.length > 0) {
-            // Find the test with the highest test number that's completed
-            const latestCompleted = completedTests.reduce((latest, current) => 
-              current.testNumber > latest.testNumber ? current : latest
-            );
-            setSelectedPracticeTest(latestCompleted.testNumber);
-            console.log('🎯 Auto-selected latest completed practice test:', latestCompleted.testNumber);
-          } else {
-            // No completed tests, select the first test (Test 1)
-            setSelectedPracticeTest(1);
-            console.log('🎯 No completed tests, defaulting to Test 1');
-          }
-        }
-
-        console.log('✅ Performance data loaded successfully');
-        console.log('🔍 Practice data received:', practice);
+        // Load default tab data (diagnostic)
+        await loadTabData('diagnostic');
+        
       } catch (error) {
-        console.error('❌ Error loading performance data:', error);
+        console.error('❌ Error loading essential data:', error);
         setDataError('Failed to load performance data. Please try again.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadPerformanceData();
+    loadEssentialData();
   }, [user, selectedProduct]);
+
+  // Function to load data for a specific tab
+  const loadTabData = async (tabName: string) => {
+    if (!user || !selectedProduct || loadedTabs.has(tabName)) {
+      return; // Already loaded or no user/product
+    }
+
+    // Set loading state for this tab
+    setTabLoadingStates(prev => ({ ...prev, [tabName]: true }));
+
+    try {
+      console.log(`🚀 Loading data for ${tabName} tab...`);
+      
+      let data = null;
+      switch (tabName) {
+        case 'diagnostic':
+          data = await AnalyticsService.getDiagnosticResults(user.id, selectedProduct);
+          setPerformanceData(prev => ({ ...prev, diagnostic: data }));
+          break;
+        case 'practice':
+          data = await AnalyticsService.getPracticeTestResults(user.id, selectedProduct);
+          setPerformanceData(prev => ({ ...prev, practice: data }));
+          
+          // Auto-select the latest completed practice test
+          if (data?.tests && data.tests.length > 0) {
+            const completedTests = data.tests.filter(test => test.status === 'completed');
+            if (completedTests.length > 0) {
+              const latestCompleted = completedTests.reduce((latest, current) => 
+                current.testNumber > latest.testNumber ? current : latest
+              );
+              setSelectedPracticeTest(latestCompleted.testNumber);
+              console.log('🎯 Auto-selected latest completed practice test:', latestCompleted.testNumber);
+            } else {
+              setSelectedPracticeTest(1);
+              console.log('🎯 No completed tests, defaulting to Test 1');
+            }
+          }
+          break;
+        case 'drills':
+          data = await AnalyticsService.getDrillResults(user.id, selectedProduct);
+          setPerformanceData(prev => ({ ...prev, drills: data }));
+          break;
+      }
+      
+      // Mark tab as loaded
+      setLoadedTabs(prev => new Set([...prev, tabName]));
+      console.log(`✅ ${tabName} data loaded successfully`);
+      
+    } catch (error) {
+      console.error(`❌ Error loading ${tabName} data:`, error);
+      // Don't show error for individual tab failures
+    } finally {
+      // Clear loading state for this tab
+      setTabLoadingStates(prev => ({ ...prev, [tabName]: false }));
+    }
+  };
+
+  // Load tab data when switching tabs
+  useEffect(() => {
+    loadTabData(activeTab);
+  }, [activeTab, user, selectedProduct]);
   
   // Counting animation for overall score and accuracy
   useEffect(() => {
@@ -592,7 +608,12 @@ const PerformanceDashboard = () => {
           {/* Diagnostic Tab */}
           {activeTab === 'diagnostic' && (
             <div className="space-y-8">
-              {!performanceData.diagnostic ? (
+              {!loadedTabs.has('diagnostic') ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edu-teal"></div>
+                  <span className="ml-3 text-edu-navy/70">Loading diagnostic insights...</span>
+                </div>
+              ) : !performanceData.diagnostic ? (
                 <div className="text-center py-16">
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
                     <Target className="h-12 w-12 text-teal-500" />
@@ -1103,7 +1124,12 @@ const PerformanceDashboard = () => {
           {/* Practice Tests Tab */}
           {activeTab === 'practice' && (
             <div className="space-y-8">
-              {/* Check if user has completed at least one practice test */}
+              {!loadedTabs.has('practice') ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edu-teal"></div>
+                  <span className="ml-3 text-edu-navy/70">Loading practice test insights...</span>
+                </div>
+              ) : /* Check if user has completed at least one practice test */
               {!performanceData.practice?.tests?.some(test => test.status === 'completed') ? (
                 <div className="text-center py-16">
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
@@ -1612,7 +1638,12 @@ const PerformanceDashboard = () => {
           {/* Drills Tab */}
           {activeTab === 'drills' && (
             <div className="space-y-8">
-              {!performanceData.drills?.subSkillBreakdown?.some(section =>
+              {!loadedTabs.has('drills') ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edu-teal"></div>
+                  <span className="ml-3 text-edu-navy/70">Loading drill insights...</span>
+                </div>
+              ) : !performanceData.drills?.subSkillBreakdown?.some(section =>
                 section.subSkills.some(skill => skill.questionsCompleted > 0)
               ) ? (
                 <div className="text-center py-16">

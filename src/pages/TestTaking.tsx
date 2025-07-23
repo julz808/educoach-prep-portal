@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -138,6 +138,7 @@ const TestTaking: React.FC = () => {
   const [writingProcessingStatus, setWritingProcessingStatus] = useState<string>('');
   const [testScore, setTestScore] = useState<any>(null);
   const [calculatingScore, setCalculatingScore] = useState(false);
+  const textAutoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -1014,6 +1015,79 @@ const TestTaking: React.FC = () => {
     return () => clearInterval(interval);
   }, [session?.status, actualTestMode]);
 
+  // Page unload protection - save text answers before leaving
+  useEffect(() => {
+    const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+      if (!session) return;
+      
+      // Check if there are unsaved text answers
+      const hasUnsavedText = Object.values(session.textAnswers).some(text => 
+        text && text.trim().length > 0
+      );
+      
+      if (hasUnsavedText) {
+        console.log('🚨 PAGE-UNLOAD: Saving text answers before page unload');
+        
+        // Clear any pending auto-save timeout
+        if (textAutoSaveTimeoutRef.current) {
+          clearTimeout(textAutoSaveTimeoutRef.current);
+        }
+        
+        try {
+          // Force immediate save
+          await saveProgress(session);
+          console.log('✅ PAGE-UNLOAD: Text answers saved successfully');
+        } catch (error) {
+          console.error('❌ PAGE-UNLOAD: Failed to save text answers:', error);
+          // Show browser warning
+          event.preventDefault();
+          event.returnValue = 'You have unsaved writing. Are you sure you want to leave?';
+          return 'You have unsaved writing. Are you sure you want to leave?';
+        }
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden' && session) {
+        // Page is being hidden (tab switch, minimized, etc.)
+        const hasUnsavedText = Object.values(session.textAnswers).some(text => 
+          text && text.trim().length > 0
+        );
+        
+        if (hasUnsavedText) {
+          console.log('👁️ VISIBILITY: Page hidden, saving text answers');
+          
+          // Clear any pending auto-save timeout
+          if (textAutoSaveTimeoutRef.current) {
+            clearTimeout(textAutoSaveTimeoutRef.current);
+          }
+          
+          try {
+            await saveProgress(session);
+            console.log('✅ VISIBILITY: Text answers saved successfully');
+          } catch (error) {
+            console.error('❌ VISIBILITY: Failed to save text answers:', error);
+          }
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Clear any pending timeout
+      if (textAutoSaveTimeoutRef.current) {
+        clearTimeout(textAutoSaveTimeoutRef.current);
+      }
+    };
+  }, [session]);
+
   const handleAnswer = (answerIndex: number) => {
     console.log('🎯 HANDLEANSWER: Function called with answerIndex:', answerIndex);
     
@@ -1149,7 +1223,7 @@ const TestTaking: React.FC = () => {
     })(); // Immediate execution
   };
 
-  const handleTextAnswer = (text: string) => {
+  const handleTextAnswer = useCallback((text: string) => {
     if (!session) return;
     
     console.log('📝 TEXT: User entered text for question', session.currentQuestion, ':', text.substring(0, 50) + '...');
@@ -1165,13 +1239,34 @@ const TestTaking: React.FC = () => {
       
       console.log('📝 TEXT: Updated text answers state:', newTextAnswers);
       
+      // Clear existing timeout
+      if (textAutoSaveTimeoutRef.current) {
+        clearTimeout(textAutoSaveTimeoutRef.current);
+      }
+      
+      // Set new debounced auto-save (save after 2 seconds of no typing)
+      textAutoSaveTimeoutRef.current = setTimeout(async () => {
+        console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
+        try {
+          const sessionToSave = {
+            ...prev,
+            textAnswers: newTextAnswers,
+            questions: updatedQuestions
+          };
+          await saveProgress(sessionToSave);
+          console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
+        } catch (error) {
+          console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
+        }
+      }, 2000);
+      
       return {
         ...prev,
         textAnswers: newTextAnswers,
         questions: updatedQuestions
       };
     });
-  };
+  }, [session]);
 
   const handleNext = async () => {
     if (!session) return;

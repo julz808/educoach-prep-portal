@@ -161,7 +161,19 @@ const Layout: React.FC = () => {
           {/* Header */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              {!sidebarCollapsed && (
+              {sidebarCollapsed ? (
+                <div 
+                  className="w-12 h-12 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate('/dashboard')}
+                  title="EduCourse"
+                >
+                  <img 
+                    src="/images/educourse-logo.png" 
+                    alt="EduCourse" 
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
+              ) : (
                 <div 
                   className="h-28 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                   onClick={() => navigate('/dashboard')}
@@ -336,20 +348,20 @@ const Layout: React.FC = () => {
 
           {/* Collapsed User Profile - Desktop */}
           {sidebarCollapsed && (
-            <div className="p-4 border-t border-gray-100">
-              <div className="space-y-2">
+            <div className="p-3 border-t border-gray-100">
+              <div className="space-y-3">
                 <Button
                   onClick={handleStartTutorial}
                   variant="ghost"
                   size="sm"
-                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50"
+                  className="w-full p-3 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 rounded-lg"
                   title="How it works"
                 >
-                  <HelpCircle size={16} />
+                  <HelpCircle size={18} />
                 </Button>
                 <button
                   onClick={() => navigate('/profile')}
-                  className="w-12 h-12 bg-edu-teal rounded-full flex items-center justify-center mx-auto hover:bg-edu-teal/90 transition-colors"
+                  className="w-full h-12 bg-edu-teal rounded-lg flex items-center justify-center hover:bg-edu-teal/90 transition-colors"
                   title="Profile"
                 >
                   <User size={20} className="text-white" />
@@ -358,10 +370,10 @@ const Layout: React.FC = () => {
                   onClick={signOut}
                   variant="outline"
                   size="sm"
-                  className="w-full p-2 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
+                  className="w-full p-3 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20 rounded-lg"
                   title="Sign Out"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={18} />
                 </Button>
               </div>
             </div>
@@ -383,14 +395,14 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-20 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-24 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
           
           <div className="flex items-center space-x-2">
             <Select value={selectedProduct} onValueChange={handleProductChange}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-36 sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -404,6 +416,14 @@ const Layout: React.FC = () => {
             <Button variant="ghost" size="sm">
               <Bell size={20} />
             </Button>
+            {/* User profile button for smaller screens */}
+            <button
+              onClick={() => navigate('/profile')}
+              className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center hover:bg-edu-teal/90 transition-colors"
+              title="Profile"
+            >
+              <User size={18} className="text-white" />
+            </button>
           </div>
         </div>
       </header>
