@@ -157,9 +157,9 @@ const Layout: React.FC = () => {
         "hidden lg:block",
         sidebarCollapsed ? "w-20" : "w-80"
       )}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="flex-shrink-0 p-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
               {sidebarCollapsed ? (
                 <div 
@@ -198,7 +198,7 @@ const Layout: React.FC = () => {
 
           {/* Test Product Selector - Moved to Sidebar */}
           {!sidebarCollapsed && (
-            <div className="p-6 border-b border-gray-100">
+            <div className="flex-shrink-0 p-6 border-b border-gray-100">
               <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Test Product</h3>
               <Select value={selectedProduct} onValueChange={handleProductChange}>
                 <SelectTrigger className="w-full">
@@ -216,7 +216,7 @@ const Layout: React.FC = () => {
           )}
 
           {/* Navigation */}
-          <nav className={cn("flex-1", sidebarCollapsed ? "p-2" : "p-6")}>
+          <nav className={cn("flex-1 overflow-y-auto", sidebarCollapsed ? "p-2" : "p-6")}>
             <div className="space-y-2">
               {navigationItems.map((item) => (
                 <button
@@ -306,7 +306,7 @@ const Layout: React.FC = () => {
 
           {/* User Profile - Desktop */}
           {!sidebarCollapsed && (
-            <div className="p-6 border-t border-gray-100">
+            <div className="flex-shrink-0 p-6 border-t border-gray-100 bg-white">
               <Button
                 onClick={handleStartTutorial}
                 variant="ghost"
@@ -348,7 +348,7 @@ const Layout: React.FC = () => {
 
           {/* Collapsed User Profile - Desktop */}
           {sidebarCollapsed && (
-            <div className="p-3 border-t border-gray-100">
+            <div className="flex-shrink-0 p-3 border-t border-gray-100 bg-white">
               <div className="space-y-3">
                 <Button
                   onClick={handleStartTutorial}
