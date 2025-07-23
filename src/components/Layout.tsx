@@ -383,7 +383,7 @@ const Layout: React.FC = () => {
 
       {/* Mobile/Tablet Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -395,7 +395,7 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-24 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-32 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -437,7 +437,7 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-28 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-32 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
