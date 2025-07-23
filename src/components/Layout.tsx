@@ -175,13 +175,13 @@ const Layout: React.FC = () => {
                 </div>
               ) : (
                 <div 
-                  className="h-28 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                  className="h-32 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                   onClick={() => navigate('/dashboard')}
                 >
                   <img 
                     src="/images/educourse-logo.png" 
                     alt="EduCourse" 
-                    className="h-40 w-auto object-contain scale-105 -ml-2"
+                    className="h-48 w-auto object-contain scale-105 -ml-2"
                   />
                 </div>
               )}
@@ -317,33 +317,23 @@ const Layout: React.FC = () => {
                 <HelpCircle size={16} />
                 <span>How it works</span>
               </Button>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="flex-1 flex items-center space-x-2 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
-                >
-                  <div className="w-9 h-9 bg-edu-teal rounded-full flex items-center justify-center flex-shrink-0">
-                    <User size={18} className="text-white" />
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+              >
+                <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center flex-shrink-0">
+                  <User size={20} className="text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-edu-navy">
+                    {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
                   </div>
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="font-medium text-edu-navy text-sm truncate">
-                      {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
-                    </div>
-                    <div className="text-xs text-edu-navy/60">
-                      {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
-                    </div>
+                  <div className="text-xs text-edu-navy/60">
+                    {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
                   </div>
-                </button>
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center px-3 py-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
-                  title="Sign Out"
-                >
-                  <LogOut size={16} />
-                </Button>
-              </div>
+                </div>
+                <ChevronRight size={16} className="text-edu-navy/40" />
+              </button>
             </div>
           )}
 
@@ -367,15 +357,6 @@ const Layout: React.FC = () => {
                 >
                   <User size={20} className="text-white" />
                 </button>
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="w-full p-3 flex items-center justify-center text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20 rounded-lg"
-                  title="Sign Out"
-                >
-                  <LogOut size={18} />
-                </Button>
               </div>
             </div>
           )}
@@ -384,19 +365,20 @@ const Layout: React.FC = () => {
 
       {/* Mobile/Tablet Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
+              className="p-1.5"
             >
-              <Menu size={24} />
+              <Menu size={22} />
             </Button>
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-40 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-10 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -438,7 +420,7 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-36 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-40 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
@@ -544,7 +526,7 @@ const Layout: React.FC = () => {
                 </Button>
                 <button
                   onClick={() => handleNavigation('/profile')}
-                  className="w-full flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+                  className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
                 >
                   <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
                     <User size={20} className="text-white" />
@@ -559,15 +541,6 @@ const Layout: React.FC = () => {
                   </div>
                   <ChevronRight size={16} className="text-edu-navy/40" />
                 </button>
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 border-edu-navy/20"
-                >
-                  <LogOut size={16} />
-                  <span>Sign Out</span>
-                </Button>
               </div>
             </div>
           </aside>

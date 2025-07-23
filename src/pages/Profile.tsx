@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, User, School, GraduationCap, Mail, Phone, MapPin, Calendar, Save, ArrowLeft } from 'lucide-react';
+import { Loader2, User, School, GraduationCap, Mail, Phone, MapPin, Calendar, Save, ArrowLeft, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
@@ -29,7 +29,7 @@ interface UserProfile {
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -170,12 +170,15 @@ const Profile = () => {
             <h1 className="text-3xl font-bold text-edu-navy">Profile Settings</h1>
             <p className="text-muted-foreground mt-2">Manage your account information and preferences</p>
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="text-edu-teal border-edu-teal">
-              <Calendar className="mr-1 h-3 w-3" />
-              Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' }) : 'N/A'}
-            </Badge>
-          </div>
+          <Button
+            onClick={signOut}
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+          >
+            <LogOut size={16} />
+            <span>Sign Out</span>
+          </Button>
         </div>
       </div>
 
