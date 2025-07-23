@@ -1129,8 +1129,7 @@ const PerformanceDashboard = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edu-teal"></div>
                   <span className="ml-3 text-edu-navy/70">Loading practice test insights...</span>
                 </div>
-              ) : /* Check if user has completed at least one practice test */
-              {!performanceData.practice?.tests?.some(test => test.status === 'completed') ? (
+              ) : !performanceData.practice?.tests?.some(test => test.status === 'completed') ? (
                 <div className="text-center py-16">
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-teal-50 rounded-full mb-6">
                     <FileText className="h-12 w-12 text-teal-500" />
