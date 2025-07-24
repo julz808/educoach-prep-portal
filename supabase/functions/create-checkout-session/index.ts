@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'https://esm.sh/stripe@17.0.0'
+import Stripe from 'https://esm.sh/stripe@17.0.0?target=deno'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,7 +23,19 @@ serve(async (req) => {
     });
 
     // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+    if (!stripeSecretKey) {
+      console.error('❌ Missing STRIPE_SECRET_KEY');
+      return new Response(
+        JSON.stringify({ error: 'Missing Stripe configuration' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+    
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2024-11-20',
     })
 
