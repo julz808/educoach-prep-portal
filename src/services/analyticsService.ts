@@ -1346,7 +1346,8 @@ export class AnalyticsService {
         
         try {
           // Check if this is a writing section and needs special handling
-          const isWritingSection = session.section_name?.toLowerCase().includes('writing');
+          const isWritingSection = session.section_name?.toLowerCase().includes('writing') || 
+                                  session.section_name?.toLowerCase().includes('written expression');
           
           if (isWritingSection) {
             console.log(`✍️ Processing writing section: ${session.section_name}`);
@@ -1375,6 +1376,12 @@ export class AnalyticsService {
                 calculatedPercentage: totalPossibleScore > 0 ? Math.round((totalEarnedScore / totalPossibleScore) * 100) : 0,
                 numAssessments: writingAssessments.length
               });
+              
+              // CRITICAL: Ensure we don't accidentally zero out writing scores
+              if (questionsCorrect === 0 && totalEarnedScore > 0) {
+                console.log(`🔧 FIXING: Writing section ${session.section_name} had questionsCorrect=0 but totalEarnedScore=${totalEarnedScore}, fixing...`);
+                questionsCorrect = totalEarnedScore;
+              }
             } else {
               // Fallback to stored session data for writing sections without assessments
               console.log(`⚠️ No writing assessments found for section ${session.section_name}, using question-level scoring`);
@@ -1614,7 +1621,10 @@ export class AnalyticsService {
         const score = actualTotalQuestions > 0 ? Math.round((questionsCorrect / actualTotalQuestions) * 100) : 0;
         const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
         
+        const mappedName = mapSectionNameToCurriculum(session.section_name || 'Unknown Section', productType);
         console.log(`📊 Section ${session.section_name} FINAL RESULT:`, {
+          originalName: session.section_name,
+          mappedName,
           actualTotalQuestions,
           questionsCorrect,
           questionsAttempted,
@@ -1622,8 +1632,14 @@ export class AnalyticsService {
           accuracy: accuracy + '%',
           calculation: `${questionsCorrect}/${actualTotalQuestions} = ${score}%`,
           dbTotalQuestions: session.total_questions,
-          questionOrderLength: session.question_order?.length
+          questionOrderLength: session.question_order?.length,
+          isWritingSection
         });
+        
+        // EXTRA DEBUG: Log if this is a writing section with zero score
+        if (isWritingSection && score === 0) {
+          console.warn(`⚠️ WRITING ZERO SCORE DEBUG: Section "${session.section_name}" -> "${mappedName}" has score=0. This might be incorrect!`);
+        }
         
         return {
           sectionName: mapSectionNameToCurriculum(session.section_name || 'Unknown Section', productType),

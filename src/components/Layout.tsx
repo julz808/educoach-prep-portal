@@ -181,7 +181,7 @@ const Layout: React.FC = () => {
                   <img 
                     src="/images/educourse-logo.png" 
                     alt="EduCourse" 
-                    className="h-16 w-auto object-contain"
+                    className="h-24 w-auto object-contain"
                   />
                 </div>
               )}
