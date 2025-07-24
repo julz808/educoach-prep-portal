@@ -279,6 +279,55 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     let totalMaxPoints = 0;
     let totalEarnedPoints = 0;
     
+    // Check for writing sections in this session and get writing assessments
+    const writingSections = new Set();
+    const writingAssessmentsBySection = new Map();
+    
+    // Find unique writing sections
+    questionAttempts.forEach(attempt => {
+      const question = questionDetailsMap.get(attempt.question_id);
+      if (question) {
+        const sectionName = question.section_name || 'Unknown Section';
+        const isWritingSection = sectionName.toLowerCase().includes('writing') || 
+                                sectionName.toLowerCase().includes('written expression');
+        if (isWritingSection) {
+          writingSections.add(sectionName);
+        }
+      }
+    });
+    
+    // Get writing assessments for writing sections
+    if (writingSections.size > 0) {
+      console.log(`✍️ Found ${writingSections.size} writing sections, fetching writing assessments for session ${sessionId}`);
+      const { data: writingAssessments, error: writingError } = await supabase
+        .from('writing_assessments')
+        .select('total_score, max_possible_score, percentage_score, question_id')
+        .eq('session_id', sessionId);
+      
+      if (!writingError && writingAssessments && writingAssessments.length > 0) {
+        console.log(`✍️ Found ${writingAssessments.length} writing assessments for session ${sessionId}`);
+        
+        // Group assessments by section
+        writingAssessments.forEach(assessment => {
+          // Find which section this assessment belongs to
+          const question = questionDetailsMap.get(assessment.question_id);
+          if (question) {
+            const sectionName = question.section_name;
+            if (!writingAssessmentsBySection.has(sectionName)) {
+              writingAssessmentsBySection.set(sectionName, []);
+            }
+            writingAssessmentsBySection.get(sectionName).push(assessment);
+          }
+        });
+        
+        console.log(`✍️ Writing assessments grouped by section:`, 
+          Array.from(writingAssessmentsBySection.entries()).map(([section, assessments]) => 
+            ({ section, count: assessments.length, totalScore: assessments.reduce((sum, a) => sum + (a.total_score || 0), 0) })
+          )
+        );
+      }
+    }
+
     questionAttempts.forEach(attempt => {
       const question = questionDetailsMap.get(attempt.question_id);
       if (!question) {
@@ -341,24 +390,78 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       }
     });
     
+    // Update totals to account for writing sections with assessments
+    writingAssessmentsBySection.forEach((assessments, sectionName) => {
+      const totalPossibleScore = assessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
+      const totalEarnedScore = assessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
+      
+      console.log(`✍️ Updating totals for writing section ${sectionName}: earned=${totalEarnedScore}, possible=${totalPossibleScore}`);
+      
+      // Find the section's stats to subtract the question-level counts
+      const sectionData = sectionStats.get(sectionName);
+      if (sectionData) {
+        // Subtract the question-level counts and add the assessment-level counts
+        totalQuestionsCorrect -= sectionData.questionsCorrect;
+        totalQuestionsCorrect += totalEarnedScore;
+        
+        totalMaxPoints -= sectionData.maxPoints;
+        totalMaxPoints += totalPossibleScore;
+        
+        totalEarnedPoints -= sectionData.earnedPoints;
+        totalEarnedPoints += totalEarnedScore;
+        
+        console.log(`✍️ Updated totals after writing section adjustment:`, {
+          totalQuestionsCorrect,
+          totalMaxPoints,
+          totalEarnedPoints
+        });
+      }
+    });
+    
     // Build section breakdown
     const sectionBreakdown = Array.from(sectionStats.values()).map(section => {
       const totalQuestions = sectionTotals.get(section.sectionName) || section.questionsAttempted;
       
-      // For practice tests, use simple percentage (questionsCorrect/questionsTotal) instead of weighted scoring
-      // This matches user expectations: 3/60 = 5%, not weighted point values
-      const score = totalQuestions > 0 ? Math.round((section.questionsCorrect / totalQuestions) * 100) : 0;
-      const accuracy = section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0;
+      // Check if this is a writing section with assessments
+      const isWritingSection = section.sectionName.toLowerCase().includes('writing') || 
+                              section.sectionName.toLowerCase().includes('written expression');
+      const writingAssessments = writingAssessmentsBySection.get(section.sectionName);
       
-      console.log(`📊 Section ${section.sectionName} - Score calculation: ${section.questionsCorrect}/${totalQuestions} = ${score}% (was using weighted: ${section.earnedPoints}/${section.maxPoints})`);
+      let score, accuracy, questionsCorrect, actualTotalQuestions, questionsAttempted;
+      
+      if (isWritingSection && writingAssessments && writingAssessments.length > 0) {
+        // For writing sections with assessments, use the actual weighted scores
+        const totalPossibleScore = writingAssessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
+        const totalEarnedScore = writingAssessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
+        
+        // Use actual point values for writing sections
+        actualTotalQuestions = totalPossibleScore;
+        questionsAttempted = totalPossibleScore; // All questions attempted if assessments exist
+        questionsCorrect = totalEarnedScore;
+        
+        score = totalPossibleScore > 0 ? Math.round((totalEarnedScore / totalPossibleScore) * 100) : 0;
+        accuracy = score; // For writing, score and accuracy are the same
+        
+        console.log(`✍️ Writing section ${section.sectionName} - Using assessment scores: ${totalEarnedScore}/${totalPossibleScore} = ${score}% (assessments: ${writingAssessments.length})`);
+      } else {
+        // For non-writing sections, use simple percentage (questionsCorrect/questionsTotal)
+        // This matches user expectations: 3/60 = 5%, not weighted point values
+        score = totalQuestions > 0 ? Math.round((section.questionsCorrect / totalQuestions) * 100) : 0;
+        accuracy = section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0;
+        questionsCorrect = section.questionsCorrect;
+        actualTotalQuestions = totalQuestions;
+        questionsAttempted = section.questionsAttempted;
+        
+        console.log(`📊 Section ${section.sectionName} - Score calculation: ${section.questionsCorrect}/${totalQuestions} = ${score}% (was using weighted: ${section.earnedPoints}/${section.maxPoints})`);
+      }
       
       return {
         sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
         score,
         accuracy,
-        questionsCorrect: section.questionsCorrect,
-        questionsTotal: totalQuestions,
-        questionsAttempted: section.questionsAttempted
+        questionsCorrect,
+        questionsTotal: actualTotalQuestions,
+        questionsAttempted
       };
     });
     

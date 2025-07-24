@@ -69,5 +69,9 @@ async function grantAccess(userEmail: string, productType: string) {
   }
 }
 
-// Usage: Grant access to EduTest for Julian
-grantAccess('juliansunou@gmail.com', 'EduTest Scholarship (Year 7 Entry)');
+// Get user email from command line arguments or use default
+const userEmail = process.argv[2] || 'juliansunou@gmail.com';
+const productType = process.argv[3] || 'ACER Scholarship (Year 7 Entry)';
+
+console.log(`🚀 Granting access for: ${userEmail} to ${productType}`);
+grantAccess(userEmail, productType);
