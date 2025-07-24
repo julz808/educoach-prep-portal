@@ -48,7 +48,7 @@ Deno.serve(async (request) => {
 
     // Initialize Stripe client
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2024-11-20'
+      apiVersion: '2023-10-16'
     })
 
     // Get signature and body
