@@ -19,7 +19,7 @@ serve(async (req) => {
       hasStripeKey: !!Deno.env.get('STRIPE_SECRET_KEY'),
       stripeKeyPrefix: Deno.env.get('STRIPE_SECRET_KEY')?.substring(0, 8),
       hasSupabaseUrl: !!Deno.env.get('SUPABASE_URL'),
-      hasSupabaseAnonKey: !!Deno.env.get('SUPABASE_ANON_KEY'),
+      hasSupabaseServiceKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
       authHeader: req.headers.get('Authorization')?.substring(0, 20) + '...'
     });
 
@@ -28,67 +28,18 @@ serve(async (req) => {
       apiVersion: '2024-11-20',
     })
 
-    // Initialize Supabase client with proper authentication
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const authHeader = req.headers.get('Authorization');
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('❌ Missing Supabase environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
+    // Parse request body first to get userId
+    const body = await req.json()
+    const { priceId, productId, userId, userEmail, successUrl, cancelUrl } = body
 
-    // Use service role key to bypass RLS but still verify the user token
-    const supabaseClient = createClient(
-      supabaseUrl,
-      supabaseServiceKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
-
-    // Get the authenticated user from the JWT token
-    let user = null;
-    let authError = null;
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '');
-      const { data, error } = await supabaseClient.auth.getUser(token);
-      user = data?.user;
-      authError = error;
-    } else {
-      authError = { message: 'No authorization header provided' };
-    }
-
-    console.log('🔍 Auth Debug:', {
-      hasUser: !!user,
-      userId: user?.id,
-      userEmail: user?.email,
-      authError: authError?.message
+    console.log('🔍 Request body:', {
+      hasPriceId: !!priceId,
+      hasProductId: !!productId,
+      hasUserId: !!userId,
+      hasUserEmail: !!userEmail,
+      priceId,
+      productId
     });
-
-    if (!user) {
-      console.error('❌ User authentication failed:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', details: authError?.message }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    // Parse request body
-    const { priceId, productId, userId, userEmail, successUrl, cancelUrl } = await req.json()
 
     if (!priceId || !productId || !userId || !userEmail) {
       return new Response(
@@ -100,16 +51,6 @@ serve(async (req) => {
       )
     }
 
-    // Verify user matches authenticated user
-    if (user.id !== userId) {
-      return new Response(
-        JSON.stringify({ error: 'User ID mismatch' }),
-        { 
-          status: 403, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
 
     // Create Stripe checkout session
     console.log('🔍 Creating Stripe session with:', {
