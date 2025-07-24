@@ -28,22 +28,46 @@ serve(async (req) => {
       apiVersion: '2024-11-20',
     })
 
-    // Initialize Supabase client
+    // Initialize Supabase client with proper authentication
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const authHeader = req.headers.get('Authorization');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('❌ Missing Supabase environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    // Use service role key to bypass RLS but still verify the user token
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      supabaseUrl,
+      supabaseServiceKey,
       {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
     )
 
-    // Get the authenticated user
-    const {
-      data: { user },
-      error: authError
-    } = await supabaseClient.auth.getUser()
+    // Get the authenticated user from the JWT token
+    let user = null;
+    let authError = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data, error } = await supabaseClient.auth.getUser(token);
+      user = data?.user;
+      authError = error;
+    } else {
+      authError = { message: 'No authorization header provided' };
+    }
 
     console.log('🔍 Auth Debug:', {
       hasUser: !!user,
