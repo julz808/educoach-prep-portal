@@ -9,7 +9,7 @@ supabase functions deploy stripe-webhook-nuclear --no-verify-jwt
 
 ### 2. 🔐 Set Environment Variables (EXACT NAMES)
 ```bash
-supabase secrets set STRIPE_SECRET_KEY="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"
+supabase secrets set STRIPE_SECRET_KEY="sk_live_YOUR_ACTUAL_STRIPE_SECRET_KEY"
 supabase secrets set STRIPE_WEBHOOK_SIGNING_SECRET="whsec_YOUR_WEBHOOK_SECRET_FROM_STRIPE_DASHBOARD"
 supabase secrets set SUPABASE_URL="https://mcxxiunseawojmojikvb.supabase.co"
 supabase secrets set SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jeHhpdW5zZWF3b2ptb2ppa3ZiIiwicm9sZUI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODE0MTA4NSwiZXhwIjoyMDYzNzE3MDg1fQ.eRPuBSss8QCkAkbiuXVSruM04LHkdxjOn3rhf9CKAJI"

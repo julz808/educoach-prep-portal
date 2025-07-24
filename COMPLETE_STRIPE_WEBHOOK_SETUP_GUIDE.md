@@ -63,7 +63,7 @@ cp supabase/.env.local.example supabase/.env.local
 Edit `supabase/.env.local` with these values:
 ```bash
 # Stripe Configuration
-STRIPE_SECRET_KEY=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
+STRIPE_SECRET_KEY=sk_live_YOUR_ACTUAL_STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SIGNING_SECRET=whsec_YOUR_WEBHOOK_SECRET_FROM_STRIPE_DASHBOARD
 
 # Supabase Configuration  

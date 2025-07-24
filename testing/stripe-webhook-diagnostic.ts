@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 // Comprehensive Stripe webhook diagnostic
-const stripeSecretKey = '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';
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_live_YOUR_ACTUAL_STRIPE_SECRET_KEY';
 const expectedWebhookUrl = 'https://mcxxiunseawojmojikvb.supabase.co/functions/v1/stripe-webhook-nuclear';
 
 if (!stripeSecretKey) {
