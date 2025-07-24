@@ -1622,6 +1622,10 @@ export class AnalyticsService {
         const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
         
         const mappedName = mapSectionNameToCurriculum(session.section_name || 'Unknown Section', productType);
+        // Check if this is a writing section for logging
+        const isWritingSectionForLog = session.section_name?.toLowerCase().includes('writing') || 
+                                       session.section_name?.toLowerCase().includes('written expression');
+        
         console.log(`📊 Section ${session.section_name} FINAL RESULT:`, {
           originalName: session.section_name,
           mappedName,
@@ -1633,11 +1637,11 @@ export class AnalyticsService {
           calculation: `${questionsCorrect}/${actualTotalQuestions} = ${score}%`,
           dbTotalQuestions: session.total_questions,
           questionOrderLength: session.question_order?.length,
-          isWritingSection
+          isWritingSection: isWritingSectionForLog
         });
         
         // EXTRA DEBUG: Log if this is a writing section with zero score
-        if (isWritingSection && score === 0) {
+        if (isWritingSectionForLog && score === 0) {
           console.warn(`⚠️ WRITING ZERO SCORE DEBUG: Section "${session.section_name}" -> "${mappedName}" has score=0. This might be incorrect!`);
         }
         
