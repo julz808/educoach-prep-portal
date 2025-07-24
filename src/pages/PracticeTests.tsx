@@ -80,6 +80,7 @@ const PracticeTests: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
+  const [averageScore, setAverageScore] = useState<number>(0);
   const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
 
   // Helper function to calculate total time from curriculum data
@@ -111,6 +112,43 @@ const PracticeTests: React.FC = () => {
       return `${roundedHours} hours`;
     } else {
       return `${roundedHours} hours`;
+    }
+  };
+
+  // Calculate average score from actual test sessions (same logic as insights)
+  const calculateAverageScore = async () => {
+    if (!user) {
+      setAverageScore(0);
+      return;
+    }
+
+    try {
+      const dbProductType = getDbProductType(selectedProduct);
+      
+      // Get all completed practice test sessions (same query as insights)
+      const { data: testSessions, error: testError } = await supabase
+        .from('user_test_sessions')
+        .select('final_score')
+        .eq('user_id', user.id)
+        .eq('product_type', dbProductType)
+        .eq('status', 'completed')
+        .like('test_mode', 'practice_%'); // Only practice tests
+
+      if (testError) {
+        console.error('❌ Error fetching practice test sessions for average score:', testError);
+        setAverageScore(0);
+        return;
+      }
+
+      const calculatedAverageScore = testSessions && testSessions.length > 0
+        ? Math.round(testSessions.reduce((sum, test) => sum + (test.final_score || 0), 0) / testSessions.length)
+        : 0;
+
+      console.log('📊 PRACTICE: Calculated average score from test sessions:', calculatedAverageScore, '(from', testSessions.length, 'completed sessions)');
+      setAverageScore(calculatedAverageScore);
+    } catch (error) {
+      console.error('Error calculating average score:', error);
+      setAverageScore(0);
     }
   };
 
@@ -199,6 +237,9 @@ const PracticeTests: React.FC = () => {
             
             setSectionProgress(allProgressData);
             console.log('📊 All practice progress loaded:', allProgressData);
+
+            // Calculate average score from test sessions
+            await calculateAverageScore();
           } catch (error) {
             console.error('Error loading practice progress:', error);
           }
@@ -248,6 +289,9 @@ const PracticeTests: React.FC = () => {
           
           setSectionProgress(allProgressData);
           console.log('🔄 Practice progress refreshed on focus/mount');
+
+          // Recalculate average score
+          await calculateAverageScore();
         } catch (error) {
           console.error('Error refreshing practice progress:', error);
         }
@@ -309,6 +353,9 @@ const PracticeTests: React.FC = () => {
           
           setSectionProgress(allProgressData);
           console.log('🔄 FORCE REFRESH: Fresh practice progress data loaded:', allProgressData);
+
+          // Recalculate average score
+          await calculateAverageScore();
           
           // Clear the refresh parameter from URL
           setSearchParams({});
@@ -433,10 +480,6 @@ const PracticeTests: React.FC = () => {
 
   const completedTests = practiceTests.filter(test => test.status === 'completed').length;
   const inProgressTests = practiceTests.filter(test => test.status === 'in-progress').length;
-  const averageScore = practiceTests
-    .filter(test => test.bestScore)
-    .reduce((acc, test) => acc + (test.bestScore || 0), 0) / 
-    practiceTests.filter(test => test.bestScore).length || 0;
 
   const getStatusColor = (status: string) => {
     switch (status) {

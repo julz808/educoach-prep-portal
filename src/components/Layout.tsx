@@ -159,7 +159,7 @@ const Layout: React.FC = () => {
       )}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-          <div className="flex-shrink-0 p-4 border-b border-gray-100">
+          <div className="flex-shrink-0 px-4 py-2 border-b border-gray-100">
             <div className="flex items-center justify-between">
               {sidebarCollapsed ? (
                 <div 
@@ -175,13 +175,13 @@ const Layout: React.FC = () => {
                 </div>
               ) : (
                 <div 
-                  className="h-32 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                  className="h-20 w-full flex items-center justify-start cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                   onClick={() => navigate('/dashboard')}
                 >
                   <img 
                     src="/images/educourse-logo.png" 
                     alt="EduCourse" 
-                    className="h-48 w-auto object-contain scale-105 -ml-2"
+                    className="h-16 w-auto object-contain"
                   />
                 </div>
               )}
@@ -198,7 +198,7 @@ const Layout: React.FC = () => {
 
           {/* Test Product Selector - Moved to Sidebar */}
           {!sidebarCollapsed && (
-            <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100">
+            <div className="flex-shrink-0 px-6 py-3 border-b border-gray-100">
               <h3 className="text-sm font-semibold text-edu-navy/70 mb-2">Test Product</h3>
               <Select value={selectedProduct} onValueChange={handleProductChange}>
                 <SelectTrigger className="w-full">

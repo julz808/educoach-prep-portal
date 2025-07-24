@@ -342,37 +342,57 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     });
     
     // Build section breakdown
-    const sectionBreakdown = Array.from(sectionStats.values()).map(section => ({
-      sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
-      score: section.maxPoints > 0 ? Math.round((section.earnedPoints / section.maxPoints) * 100) : 0,
-      accuracy: section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0,
-      questionsCorrect: section.questionsCorrect,
-      questionsTotal: sectionTotals.get(section.sectionName) || section.questionsAttempted, // Use actual total from database
-      questionsAttempted: section.questionsAttempted
-    }));
+    const sectionBreakdown = Array.from(sectionStats.values()).map(section => {
+      const totalQuestions = sectionTotals.get(section.sectionName) || section.questionsAttempted;
+      
+      // For practice tests, use simple percentage (questionsCorrect/questionsTotal) instead of weighted scoring
+      // This matches user expectations: 3/60 = 5%, not weighted point values
+      const score = totalQuestions > 0 ? Math.round((section.questionsCorrect / totalQuestions) * 100) : 0;
+      const accuracy = section.questionsAttempted > 0 ? Math.round((section.questionsCorrect / section.questionsAttempted) * 100) : 0;
+      
+      console.log(`📊 Section ${section.sectionName} - Score calculation: ${section.questionsCorrect}/${totalQuestions} = ${score}% (was using weighted: ${section.earnedPoints}/${section.maxPoints})`);
+      
+      return {
+        sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
+        score,
+        accuracy,
+        questionsCorrect: section.questionsCorrect,
+        questionsTotal: totalQuestions,
+        questionsAttempted: section.questionsAttempted
+      };
+    });
     
     // Build sub-skill breakdown
-    const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => ({
-      sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
-      subSkillName: subSkill.subSkillName,
-      score: subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0,
-      accuracy: subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0,
-      questionsCorrect: subSkill.questionsCorrect,
-      questionsTotal: subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted, // Use actual total from database
-      questionsAttempted: subSkill.questionsAttempted
-    }));
+    const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
+      const totalQuestions = subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
+      
+      // Use simple percentage for sub-skills too (consistent with section calculation)
+      const score = totalQuestions > 0 ? Math.round((subSkill.questionsCorrect / totalQuestions) * 100) : 0;
+      const accuracy = subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0;
+      
+      return {
+        sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
+        subSkillName: subSkill.subSkillName,
+        score,
+        accuracy,
+        questionsCorrect: subSkill.questionsCorrect,
+        questionsTotal: totalQuestions,
+        questionsAttempted: subSkill.questionsAttempted
+      };
+    });
     
     // Build section scores map
     const sectionScores = Object.fromEntries(
       sectionBreakdown.map(section => [section.sectionName, section.score])
     );
     
-    // Calculate overall scores - use session-based calculation if questions table is empty
+    // Calculate overall scores - use simple percentage calculation for practice tests
     let overallScore = 0;
     if (useSessionBasedCalculation) {
-      // Use session-based calculation: earned points / max points for score
-      overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-      console.log(`📊 Using session-based score: ${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`);
+      // Use simple percentage: correct questions / total questions for practice tests
+      const displayTotalQuestions = totalAvailable || totalQuestionsAttempted;
+      overallScore = displayTotalQuestions > 0 ? Math.round((totalQuestionsCorrect / displayTotalQuestions) * 100) : 0;
+      console.log(`📊 Using simple percentage for practice test: ${totalQuestionsCorrect}/${displayTotalQuestions} = ${overallScore}% (not weighted: ${totalEarnedPoints}/${totalMaxPoints})`);
     } else {
       // Use questions table: correct questions / total available for score  
       overallScore = totalAvailable > 0 ? Math.round((totalQuestionsCorrect / totalAvailable) * 100) : 0;
@@ -1357,31 +1377,52 @@ export class AnalyticsService {
               });
             } else {
               // Fallback to stored session data for writing sections without assessments
-              console.log(`⚠️ No writing assessments found for section ${session.section_name}, using session data`);
+              console.log(`⚠️ No writing assessments found for section ${session.section_name}, using question-level scoring`);
               
-              // For VIC Selective writing, assume 60 points total (2 tasks × 30 points)
-              // This is a fallback when no assessments are available yet
-              const standardWritingTotal = 60;
-              const storedCorrectAnswers = session.correct_answers || 0;
-              const storedQuestionsAnswered = session.questions_answered || 0;
+              // When no writing assessments exist, use the same calculation as other sections
+              // This ensures consistency with sub-skill breakdowns
               
-              if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
-                // Convert from task count to points (each task worth 30 points for VIC selective)
-                const taskCount = session.question_order.length;
-                actualTotalQuestions = taskCount * 30; // e.g., 2 tasks × 30 points = 60 points
-                questionsAttempted = storedQuestionsAnswered * 30; // answered tasks × 30 points
-                questionsCorrect = storedCorrectAnswers * 30; // correct answers × 30 points (approximate)
+              // Get real-time correct answers from question_attempt_history
+              const { data: sessionAttempts, error: attemptsError } = await supabase
+                .from('question_attempt_history')
+                .select('is_correct, question_id')
+                .eq('user_id', userId)
+                .eq('session_id', sessionId);
+
+              if (!attemptsError && sessionAttempts) {
+                questionsCorrect = sessionAttempts.filter(attempt => attempt.is_correct).length;
+                questionsAttempted = sessionAttempts.length;
+                
+                console.log(`✍️ Writing section ${session.section_name} - Using question attempts: ${questionsCorrect}/${questionsAttempted}`);
               } else {
-                actualTotalQuestions = standardWritingTotal;
-                questionsAttempted = standardWritingTotal;
-                questionsCorrect = Math.round((storedCorrectAnswers / Math.max(storedQuestionsAnswered, 1)) * standardWritingTotal);
+                // Final fallback to session data
+                questionsCorrect = session.correct_answers || 0;
+                questionsAttempted = session.questions_answered || 0;
+                
+                console.log(`✍️ Writing section ${session.section_name} - Using session data: ${questionsCorrect}/${questionsAttempted}`);
               }
               
-              console.log(`✍️ Writing section ${session.section_name} FALLBACK to weighted scoring:`, {
-                originalCorrect: storedCorrectAnswers,
-                originalTotal: session.question_order?.length || session.total_questions,
-                weightedCorrect: questionsCorrect,
-                weightedTotal: actualTotalQuestions
+              // For total questions, use actual question count from question_order or database
+              if (session.question_order && Array.isArray(session.question_order)) {
+                actualTotalQuestions = session.question_order.length;
+              } else {
+                // Query actual questions in database
+                const { data: sectionQuestions, error: sectionQError } = await supabase
+                  .from('questions')
+                  .select('id')
+                  .eq('product_type', productType)
+                  .eq('test_mode', 'diagnostic')
+                  .eq('section_name', session.section_name);
+                  
+                actualTotalQuestions = sectionQuestions?.length || session.total_questions || 0;
+              }
+              
+              console.log(`✍️ Writing section ${session.section_name} CORRECTED to match sub-skills:`, {
+                questionsCorrect,
+                questionsAttempted,
+                actualTotalQuestions,
+                originalSessionCorrect: session.correct_answers,
+                originalSessionTotal: session.total_questions
               });
             }
           } else {

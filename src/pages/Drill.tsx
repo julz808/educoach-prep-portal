@@ -82,6 +82,7 @@ const Drill: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [drillProgress, setDrillProgress] = useState<Record<string, any>>({});
+  const [averageScore, setAverageScore] = useState<number>(0);
   
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
@@ -161,6 +162,50 @@ const Drill: React.FC = () => {
     }
   };
 
+  // Calculate average score from actual drill sessions (same logic as insights)
+  const calculateAverageScore = async () => {
+    if (!user) {
+      setAverageScore(0);
+      return;
+    }
+
+    try {
+      const dbProductType = getDbProductType(selectedProduct);
+      
+      // Get all completed drill sessions (same query as insights)
+      const { data: drillSessions, error: drillError } = await supabase
+        .from('drill_sessions')
+        .select('questions_correct, questions_total')
+        .eq('user_id', user.id)
+        .eq('product_type', dbProductType)
+        .eq('status', 'completed');
+
+      if (drillError) {
+        console.error('❌ Error fetching drill sessions for average score:', drillError);
+        setAverageScore(0);
+        return;
+      }
+
+      // Calculate average score as percentage of correct answers
+      if (drillSessions && drillSessions.length > 0) {
+        const totalCorrect = drillSessions.reduce((sum, session) => sum + (session.questions_correct || 0), 0);
+        const totalQuestions = drillSessions.reduce((sum, session) => sum + (session.questions_total || 0), 0);
+        
+        const calculatedAverageScore = totalQuestions > 0 
+          ? Math.round((totalCorrect / totalQuestions) * 100)
+          : 0;
+
+        console.log('📊 DRILL: Calculated average score from drill sessions:', calculatedAverageScore, '% (', totalCorrect, '/', totalQuestions, 'from', drillSessions.length, 'completed sessions)');
+        setAverageScore(calculatedAverageScore);
+      } else {
+        setAverageScore(0);
+      }
+    } catch (error) {
+      console.error('Error calculating drill average score:', error);
+      setAverageScore(0);
+    }
+  };
+
   useEffect(() => {
     const loadDrillData = async () => {
       setLoading(true);
@@ -171,6 +216,9 @@ const Drill: React.FC = () => {
         
         // Load drill progress from database
         const progressData = await reloadProgressData();
+
+        // Calculate average score from drill sessions
+        await calculateAverageScore();
         
         const modes = await fetchDrillModes(selectedProduct);
         console.log('🔧 DEBUG: Received drill modes:', modes);
@@ -703,9 +751,9 @@ const Drill: React.FC = () => {
         value: totalCompleted.toString() 
       },
       { 
-        icon: <TrendingUp size={16} />,
-        label: "Overall Progress", 
-        value: `${overallProgress}%` 
+        icon: <BarChart3 size={16} />,
+        label: "Average Score", 
+        value: isNaN(averageScore) ? '0%' : `${Math.round(averageScore)}%`
       }
     ],
     ...(totalQuestions === 0 && {
@@ -738,6 +786,7 @@ const Drill: React.FC = () => {
         onDataChanged={async () => {
           console.log('🔄 DRILL: Developer tools data changed, force reloading...');
           await reloadProgressData();
+          await calculateAverageScore();
           // Also reload the drill modes to get fresh data
           window.location.reload();
         }}
