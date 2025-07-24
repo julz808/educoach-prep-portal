@@ -7,18 +7,13 @@ const corsHeaders = {
 }
 
 const STRIPE_PRODUCT_TO_DB_TYPE = {
+  // Live Mode Product IDs
   'prod_Shqo1r4nLXrZ1O': 'Year 5 NAPLAN',
   'prod_ShqppA31VnjzIP': 'Year 7 NAPLAN',
   'prod_ShqpEsp5rkFKmf': 'EduTest Scholarship (Year 7 Entry)',
   'prod_ShqqrSpEygs1Da': 'ACER Scholarship (Year 7 Entry)',
   'prod_ShqqjPuJGAP2FW': 'NSW Selective Entry (Year 7 Entry)',
-  'prod_ShqrKwKE5Ii2rZ': 'VIC Selective Entry (Year 9 Entry)',
-  'prod_ShnPdOiDYbl6r0': 'Year 5 NAPLAN',
-  'prod_ShnRiUgfv0qnuc': 'Year 7 NAPLAN',
-  'prod_ShnVu21eaNIeqa': 'EduTest Scholarship (Year 7 Entry)',
-  'prod_ShnYQIQbQp0qzx': 'ACER Scholarship (Year 7 Entry)',
-  'prod_ShnNTdv0tv1ikx': 'NSW Selective Entry (Year 7 Entry)',
-  'prod_ShnKBAkGwieDH0': 'VIC Selective Entry (Year 9 Entry)'
+  'prod_ShqrKwKE5Ii2rZ': 'VIC Selective Entry (Year 9 Entry)'
 }
 
 Deno.serve(async (request) => {
