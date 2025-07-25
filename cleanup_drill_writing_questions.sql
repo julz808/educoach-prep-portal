@@ -20,7 +20,9 @@ WITH writing_drill_questions AS (
     AND (
       LOWER(q.section_name) LIKE '%writing%' 
       OR LOWER(q.section_name) LIKE '%written expression%'
-      OR q.format = 'Written Response'
+      OR LOWER(q.sub_skill) LIKE '%writing%'
+      OR LOWER(q.sub_skill) LIKE '%narrative%'
+      OR LOWER(q.sub_skill) LIKE '%persuasive%'
     )
 )
 -- Show what will be kept vs deleted
@@ -49,7 +51,9 @@ WHERE test_mode = 'drill'
   AND (
     LOWER(section_name) LIKE '%writing%' 
     OR LOWER(section_name) LIKE '%written expression%'
-    OR format = 'Written Response'
+    OR LOWER(sub_skill) LIKE '%writing%'
+    OR LOWER(sub_skill) LIKE '%narrative%'
+    OR LOWER(sub_skill) LIKE '%persuasive%'
   )
 GROUP BY product_type, sub_skill, difficulty
 HAVING COUNT(*) > 1
@@ -76,7 +80,9 @@ WHERE id IN (
       AND (
         LOWER(q.section_name) LIKE '%writing%' 
         OR LOWER(q.section_name) LIKE '%written expression%'
-        OR q.format = 'Written Response'
+        OR LOWER(q.sub_skill) LIKE '%writing%'
+        OR LOWER(q.sub_skill) LIKE '%narrative%'
+        OR LOWER(q.sub_skill) LIKE '%persuasive%'
       )
   ) ranked_questions
   WHERE rn > 1
@@ -100,7 +106,9 @@ WHERE test_mode = 'drill'
   AND (
     LOWER(section_name) LIKE '%writing%' 
     OR LOWER(section_name) LIKE '%written expression%'
-    OR format = 'Written Response'
+    OR LOWER(sub_skill) LIKE '%writing%'
+    OR LOWER(sub_skill) LIKE '%narrative%'
+    OR LOWER(sub_skill) LIKE '%persuasive%'
   )
 GROUP BY product_type, sub_skill
 ORDER BY product_type, sub_skill;
