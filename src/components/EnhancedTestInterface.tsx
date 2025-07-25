@@ -951,7 +951,16 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600">Answered:</span>
                       <span className="font-semibold text-edu-navy">
-                        {Object.keys(answers).length}/{questions.length}
+                        {questions.filter((_, index) => {
+                          const question = questions[index];
+                          const isWrittenResponseQuestion = question?.format === 'Written Response' || 
+                                                          !question?.options || 
+                                                          question?.options.length === 0;
+                          
+                          return isWrittenResponseQuestion 
+                            ? (textAnswers[index] && textAnswers[index].trim().length > 0)
+                            : answers[index] !== undefined;
+                        }).length}/{questions.length}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -966,7 +975,16 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600">Answered:</span>
                       <span className="font-semibold text-edu-navy">
-                        {Object.keys(answers).length}/{questions.length}
+                        {questions.filter((_, index) => {
+                          const question = questions[index];
+                          const isWrittenResponseQuestion = question?.format === 'Written Response' || 
+                                                          !question?.options || 
+                                                          question?.options.length === 0;
+                          
+                          return isWrittenResponseQuestion 
+                            ? (textAnswers[index] && textAnswers[index].trim().length > 0)
+                            : answers[index] !== undefined;
+                        }).length}/{questions.length}
                       </span>
                     </div>
                     <div className="flex justify-between">
