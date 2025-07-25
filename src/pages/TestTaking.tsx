@@ -1405,8 +1405,14 @@ const TestTaking: React.FC = () => {
       setWritingProcessingStatus('Finalizing your results...');
       if (session.type === 'drill') {
         // For drill sessions, complete using DrillSessionService
-        const questionsAnswered = Object.keys(session.answers).length;
-        const questionsCorrect = Object.values(session.answers).filter((answer, index) => {
+        const questionsAnswered = Object.keys(session.answers).length + 
+          session.textAnswers.filter(answer => answer && answer.trim().length > 0).length;
+        
+        // Count correct answers - need to handle writing questions differently
+        let questionsCorrect = 0;
+        
+        // Count correct multiple choice answers
+        questionsCorrect += Object.values(session.answers).filter((answer, index) => {
           const question = session.questions[parseInt(Object.keys(session.answers)[index])];
           // Handle both number and string answer formats
           let answerIndex: number;
@@ -1417,6 +1423,32 @@ const TestTaking: React.FC = () => {
           }
           return answerIndex === question.correctAnswer;
         }).length;
+        
+        // For writing questions, check if assessments were created
+        const writingQuestions = session.questions.filter(q => 
+          q.format === 'Written Response' || 
+          q.subSkill?.toLowerCase().includes('writing') ||
+          q.subSkill?.toLowerCase().includes('written')
+        );
+        
+        if (writingQuestions.length > 0) {
+          // Get writing assessments from the database
+          const { data: assessments } = await supabase
+            .from('writing_assessments')
+            .select('question_id, total_score, max_possible_score')
+            .eq('session_id', session.id)
+            .in('question_id', writingQuestions.map(q => q.id));
+          
+          if (assessments) {
+            // Add writing scores to correct count (treating 70%+ as "correct" for drill purposes)
+            assessments.forEach(assessment => {
+              const percentage = (assessment.total_score / assessment.max_possible_score) * 100;
+              if (percentage >= 70) {
+                questionsCorrect += 1;
+              }
+            });
+          }
+        }
         
         console.log('🏁 DRILL-COMPLETE: Completing drill session:', {
           sessionId: session.id,
