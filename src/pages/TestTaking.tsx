@@ -1424,31 +1424,10 @@ const TestTaking: React.FC = () => {
           return answerIndex === question.correctAnswer;
         }).length;
         
-        // For writing questions, check if assessments were created
-        const writingQuestions = session.questions.filter(q => 
-          q.format === 'Written Response' || 
-          q.subSkill?.toLowerCase().includes('writing') ||
-          q.subSkill?.toLowerCase().includes('written')
-        );
-        
-        if (writingQuestions.length > 0) {
-          // Get writing assessments from the database
-          const { data: assessments } = await supabase
-            .from('writing_assessments')
-            .select('question_id, total_score, max_possible_score')
-            .eq('session_id', session.id)
-            .in('question_id', writingQuestions.map(q => q.id));
-          
-          if (assessments) {
-            // Add writing scores to correct count (treating 70%+ as "correct" for drill purposes)
-            assessments.forEach(assessment => {
-              const percentage = (assessment.total_score / assessment.max_possible_score) * 100;
-              if (percentage >= 70) {
-                questionsCorrect += 1;
-              }
-            });
-          }
-        }
+        // For writing questions, ALL attempted questions count as "correct" for drill progress
+        // Progress tracking is about completion, not scoring
+        const writingQuestionsAttempted = session.textAnswers.filter(answer => answer && answer.trim().length > 0).length;
+        questionsCorrect += writingQuestionsAttempted;
         
         console.log('🏁 DRILL-COMPLETE: Completing drill session:', {
           sessionId: session.id,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,7 @@ import {
 } from '@/services/supabaseQuestionService';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { SessionService, SectionProgress } from '@/services/sessionService';
+import { AnalyticsService } from '@/services/analyticsService';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { DeveloperTools } from '@/components/DeveloperTools';
@@ -64,6 +65,7 @@ const DiagnosticTests: React.FC = () => {
   
   const [diagnosticModes, setDiagnosticModes] = useState<TestMode[]>([]);
   const [sectionProgress, setSectionProgress] = useState<Record<string, SectionProgress>>({});
+  const [diagnosticAnalytics, setDiagnosticAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
@@ -187,6 +189,16 @@ const DiagnosticTests: React.FC = () => {
             console.log('📊 Progress data values:', Object.values(progressData));
             
             setSectionProgress(progressData);
+            
+            // Also load analytics data for accurate average score calculation
+            try {
+              const analyticsData = await AnalyticsService.getDiagnosticResults(user.id, selectedProduct);
+              setDiagnosticAnalytics(analyticsData);
+              console.log('📊 Diagnostic analytics loaded:', analyticsData);
+            } catch (analyticsError) {
+              console.error('❌ Error loading diagnostic analytics:', analyticsError);
+              // Don't fail if analytics fails - just use the session-based calculation
+            }
           } catch (error) {
             console.error('❌ Error loading diagnostic progress:', error);
           }
@@ -449,7 +461,17 @@ const DiagnosticTests: React.FC = () => {
 
   const completedSections = diagnosticTest ? diagnosticTest.sections.filter(s => s.status === 'completed').length : 0;
   const inProgressSections = diagnosticTest ? diagnosticTest.sections.filter(s => s.status === 'in-progress').length : 0;
-  const averageScore = diagnosticTest && diagnosticTest.bestScore ? diagnosticTest.bestScore : 0;
+  
+  // Use analytics data for average score calculation (same as insights page) when available
+  const averageScore = useMemo(() => {
+    if (diagnosticAnalytics?.sectionBreakdown?.length > 0) {
+      // Use the same calculation as insights page
+      const sectionScores = diagnosticAnalytics.sectionBreakdown.map((s: any) => s.score);
+      return Math.round(sectionScores.reduce((sum: number, score: number) => sum + score, 0) / sectionScores.length);
+    }
+    // Fallback to diagnostic test calculation
+    return diagnosticTest && diagnosticTest.bestScore ? diagnosticTest.bestScore : 0;
+  }, [diagnosticAnalytics, diagnosticTest]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
