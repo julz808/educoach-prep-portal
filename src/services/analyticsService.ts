@@ -1070,6 +1070,7 @@ export class AnalyticsService {
     }
     
     const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
+    const score = totalPoints > 0 ? Math.round((questionsCorrect / totalPoints) * 100) : 0;
 
     subSkillPerformance.push({
       subSkill: subSkillName,
@@ -1078,6 +1079,7 @@ export class AnalyticsService {
       questionsAttempted,
       questionsCorrect,
       accuracy,
+      score,
       sectionName
     });
 
@@ -1363,6 +1365,7 @@ export class AnalyticsService {
         }
         
         const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
+        const score = totalPoints > 0 ? Math.round((questionsCorrect / totalPoints) * 100) : 0;
 
         // Get section name (use first question's section, they should all be the same)
         const sectionName = questions?.[0]?.section_name || subSkill.test_sections?.section_name || 'Unknown';
@@ -1374,6 +1377,7 @@ export class AnalyticsService {
           questionsAttempted,
           questionsCorrect,
           accuracy,
+          score,
           sectionName
         });
 

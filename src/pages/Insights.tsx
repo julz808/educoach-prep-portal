@@ -859,7 +859,7 @@ const PerformanceDashboard = () => {
                             <CheckCircle className="w-5 h-5 text-green-600" />
                             Top 5 Sub-Skills
                           </h3>
-                          <div className="flex bg-slate-100 rounded-lg p-1">
+                          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
                             <button
                               onClick={() => setTopBottomView('score')}
                               className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
@@ -880,12 +880,32 @@ const PerformanceDashboard = () => {
                             >
                               Attempted
                             </button>
+                            <div className="relative group">
+                              <HelpCircle className="w-4 h-4 text-slate-400 cursor-help" />
+                              <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                <div className="space-y-3">
+                                  <div>
+                                    <div className="font-semibold text-teal-400 mb-1">Total View</div>
+                                    <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
+                                    <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                       <div className="p-6">
                         <div className="space-y-4">
-                          {(performanceData.diagnostic?.strengths || []).slice(0, 5).map((item, index) => (
+                          {(() => {
+                            const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
+                            const sortedSkills = topBottomView === 'score' 
+                              ? [...allSubSkills].sort((a, b) => (b.score || 0) - (a.score || 0))
+                              : [...allSubSkills].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0));
+                            return sortedSkills.slice(0, 5).map((item, index) => (
                             <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                               <div className="flex-1">
                                 <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
@@ -893,18 +913,19 @@ const PerformanceDashboard = () => {
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-lg font-semibold text-green-600">
-                                  {Math.round(topBottomView === 'score' ? item.score : item.accuracy)}%
+                                  {Math.round(topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%
                                 </div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
                                     className="h-full rounded-full bg-green-500"
-                                    style={{ width: `${topBottomView === 'score' ? item.score : item.accuracy}%` }}
+                                    style={{ width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%` }}
                                   />
                                 </div>
                               </div>
                             </div>
-                          ))}
-                          {(!performanceData.diagnostic?.strengths || performanceData.diagnostic.strengths.length === 0) && (
+                            ));
+                          })()}
+                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.length === 0) && (
                             <div className="text-center py-8 text-slate-500">
                               <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               Complete more questions to see your top sub-skills
@@ -922,7 +943,7 @@ const PerformanceDashboard = () => {
                             <XCircle className="w-5 h-5 text-red-600" />
                             Bottom 5 Sub-Skills
                           </h3>
-                          <div className="flex bg-slate-100 rounded-lg p-1">
+                          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
                             <button
                               onClick={() => setTopBottomView('score')}
                               className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
@@ -943,12 +964,32 @@ const PerformanceDashboard = () => {
                             >
                               Attempted
                             </button>
+                            <div className="relative group">
+                              <HelpCircle className="w-4 h-4 text-slate-400 cursor-help" />
+                              <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                                <div className="space-y-3">
+                                  <div>
+                                    <div className="font-semibold text-teal-400 mb-1">Total View</div>
+                                    <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
+                                    <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                       <div className="p-6">
                         <div className="space-y-4">
-                          {(performanceData.diagnostic?.weaknesses || []).slice(0, 5).map((item, index) => (
+                          {(() => {
+                            const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
+                            const sortedSkills = topBottomView === 'score' 
+                              ? [...allSubSkills].sort((a, b) => (a.score || 0) - (b.score || 0))
+                              : [...allSubSkills].sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0));
+                            return sortedSkills.slice(0, 5).map((item, index) => (
                             <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                               <div className="flex-1">
                                 <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
@@ -956,20 +997,21 @@ const PerformanceDashboard = () => {
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className={`text-lg font-semibold ${
-                                  (topBottomView === 'score' ? item.score : item.accuracy) >= 60 ? 'text-orange-600' : 'text-red-600'
-                                }`}>{Math.round(topBottomView === 'score' ? item.score : item.accuracy)}%</div>
+                                  (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'text-orange-600' : 'text-red-600'
+                                }`}>{Math.round(topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%</div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
                                     className={`h-full rounded-full ${
-                                      (topBottomView === 'score' ? item.score : item.accuracy) >= 60 ? 'bg-orange-500' : 'bg-red-500'
+                                      (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'bg-orange-500' : 'bg-red-500'
                                     }`}
-                                    style={{ width: `${topBottomView === 'score' ? item.score : item.accuracy}%` }}
+                                    style={{ width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%` }}
                                   />
                                 </div>
                               </div>
                             </div>
-                          ))}
-                          {(!performanceData.diagnostic?.weaknesses || performanceData.diagnostic.weaknesses.length === 0) && (
+                            ));
+                          })()}
+                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.length === 0) && (
                             <div className="text-center py-8 text-slate-500">
                               <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               Complete more questions to see your bottom sub-skills
@@ -1006,6 +1048,21 @@ const PerformanceDashboard = () => {
                           >
                             Attempted
                           </button>
+                          <div className="relative group">
+                            <HelpCircle className="w-4 h-4 text-slate-400 cursor-help" />
+                            <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                              <div className="space-y-3">
+                                <div>
+                                  <div className="font-semibold text-teal-400 mb-1">Total View</div>
+                                  <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
+                                  <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
@@ -1569,6 +1626,21 @@ const PerformanceDashboard = () => {
                           >
                             Attempted
                           </button>
+                          <div className="relative group">
+                            <HelpCircle className="w-4 h-4 text-slate-400 cursor-help" />
+                            <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                              <div className="space-y-3">
+                                <div>
+                                  <div className="font-semibold text-teal-400 mb-1">Total View</div>
+                                  <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
+                                  <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
