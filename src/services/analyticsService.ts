@@ -480,71 +480,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     });
     
     
-    // For practice tests, also ensure we get all sub-skills from sub_skills table like diagnostic does
-    if (testType === 'practice') {
-      const { data: allSubSkills, error: subSkillsError } = await supabase
-        .from('sub_skills')
-        .select(`
-          id,
-          name,
-          product_type,
-          test_sections!inner(section_name)
-        `)
-        .eq('product_type', productType);
-        
-      if (!subSkillsError && allSubSkills) {
-        
-        // Add any missing sub-skills that weren't in the question attempts
-        for (const subSkill of allSubSkills) {
-          const sectionName = subSkill.test_sections.section_name;
-          const isWritingSection = sectionName.toLowerCase().includes('written expression') || 
-                                  sectionName.toLowerCase().includes('writing');
-          
-          if (isWritingSection && !subSkillStats.has(subSkill.name)) {
-            
-            // Get questions for this sub-skill to calculate max points
-            const { data: subSkillQuestions, error: questionsError } = await supabase
-              .from('questions')
-              .select('id, max_points')
-              .eq('sub_skill_id', subSkill.id)
-              .eq('test_mode', testType)
-              .eq('product_type', productType);
-              
-            if (!questionsError && subSkillQuestions) {
-              const maxPoints = subSkillQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-              
-              // Check if there are any writing assessments for these questions
-              const questionIds = subSkillQuestions.map(q => q.id);
-              const { data: assessments, error: assessmentError } = await supabase
-                .from('writing_assessments')
-                .select('total_score, max_possible_score, question_id')
-                .eq('session_id', sessionId)
-                .in('question_id', questionIds);
-                
-              let earnedPoints = 0;
-              let actualMaxPoints = maxPoints;
-              let questionsAttempted = 0;
-              
-              if (!assessmentError && assessments && assessments.length > 0) {
-                earnedPoints = assessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
-                actualMaxPoints = assessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
-                questionsAttempted = assessments.length;
-              }
-              
-              subSkillStats.set(subSkill.name, {
-                subSkillName: subSkill.name,
-                sectionName: sectionName,
-                questionsTotal: 0,
-                questionsAttempted: questionsAttempted,
-                questionsCorrect: 0,
-                maxPoints: actualMaxPoints,
-                earnedPoints: earnedPoints
-              });
-            }
-          }
-        }
-      }
-    }
     
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
@@ -1050,14 +985,15 @@ export class AnalyticsService {
     sectionName: string, 
     productType: string, 
     userId: string, 
-    subSkillPerformance: any[]
+    subSkillPerformance: any[],
+    testMode: string = 'diagnostic'
   ) {
-    // Get all diagnostic questions for this sub-skill
+    // Get all questions for this sub-skill and test mode
     const { data: questions, error: questionsError } = await supabase
       .from('questions')
       .select('id, section_name, max_points')
       .eq('sub_skill', subSkillName)
-      .eq('test_mode', 'diagnostic')
+      .eq('test_mode', testMode)
       .eq('product_type', productType);
 
     if (questionsError) {
@@ -1070,7 +1006,7 @@ export class AnalyticsService {
                               sectionName?.toLowerCase().includes('writing');
     
     // Calculate total max_points for this sub-skill
-    let totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
+    const totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
     
     if (totalPoints === 0) {
       console.log(`⚠️ Sub-skill "${subSkillName}" has no diagnostic questions`);
@@ -1084,11 +1020,12 @@ export class AnalyticsService {
     // Get user responses for these questions
     const questionIds = questions?.map(q => q.id) || [];
     
+    const sessionType = testMode === 'diagnostic' ? 'diagnostic' : 'practice';
     const { data: responses, error: responsesError } = await supabase
       .from('question_attempt_history')
       .select('question_id, is_correct, user_answer')
       .eq('user_id', userId)
-      .eq('session_type', 'diagnostic')
+      .eq('session_type', sessionType)
       .in('question_id', questionIds);
 
     if (responsesError) {
@@ -1370,7 +1307,7 @@ export class AnalyticsService {
         }
 
         // Calculate total max_points for this sub-skill
-        let totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
+        const totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
         
         if (totalPoints === 0) {
           console.log(`⚠️ Sub-skill "${subSkill.name}" has no diagnostic questions`);
@@ -1398,6 +1335,12 @@ export class AnalyticsService {
         
         let questionsAttempted = 0;
         let questionsCorrect = 0;
+        
+        // Check if this is a writing sub-skill (like practice test processing)
+        const isWritingSubSkill = subSkill.name.toLowerCase().includes('writing') || 
+                                  subSkill.name.toLowerCase().includes('narrative') || 
+                                  subSkill.name.toLowerCase().includes('persuasive') ||
+                                  questions?.[0]?.section_name?.toLowerCase().includes('written expression');
         
         if (isWritingSubSkill) {
           console.log(`✍️ Processing writing sub-skill: ${subSkill.name}`);
@@ -2105,6 +2048,27 @@ export class AnalyticsService {
         created: s.created_at
       })));
       
+      // Use DIAGNOSTIC APPROACH for practice tests - get data directly from sub_skills table like diagnostic insights
+      console.log('📊 Using diagnostic approach for practice test processing...');
+      
+      // Get sub-skills from sub_skills table (exactly like diagnostic)
+      const { data: subSkillsData, error: subSkillsError } = await supabase
+        .from('sub_skills')
+        .select(`
+          id,
+          name,
+          product_type,
+          test_sections!inner(section_name)
+        `)
+        .eq('product_type', productType);
+
+      if (subSkillsError) {
+        console.error('❌ Error fetching sub-skills:', subSkillsError);
+        throw subSkillsError;
+      }
+
+      console.log(`📊 Found ${subSkillsData?.length || 0} sub-skills from sub_skills table for ${productType}`);
+      
       // Loop through all possible test numbers (1-5) but only process those that exist in database
       for (let i = 1; i <= 5; i++) {
         // Skip if this practice test doesn't exist in the database
@@ -2113,7 +2077,6 @@ export class AnalyticsService {
           continue;
         }
         
-        // Find ALL sessions for this practice test number (since we now create per-section sessions)
         const testMode = `practice_${i}`;
         const testSessions = specificModeSessions.filter(s => 
           s.test_mode === testMode && s.status === 'completed'
@@ -2124,134 +2087,200 @@ export class AnalyticsService {
         let aggregatedTestData = null;
         
         if (testSessions.length > 0) {
-          console.log(`📊 Aggregating data from ${testSessions.length} sessions for Test ${i}...`);
+          console.log(`📊 Processing Test ${i} using diagnostic approach...`);
           
           // Check if ALL sections of this practice test are completed
           const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
           const completedSectionsForThisTest = testSessions.map(s => s.section_name);
           const missingSectionsForThisTest = expectedSections.filter(section => !completedSectionsForThisTest.includes(section));
           
-          console.log(`📊 Test ${i} - Expected sections:`, expectedSections);
-          console.log(`📊 Test ${i} - Completed sections:`, completedSectionsForThisTest);
-          console.log(`📊 Test ${i} - Missing sections:`, missingSectionsForThisTest);
-          
           if (missingSectionsForThisTest.length > 0) {
             console.log(`ℹ️ Test ${i} insights not available - missing ${missingSectionsForThisTest.length} sections: ${missingSectionsForThisTest.join(', ')}`);
-            // Don't include this test in results - user needs to complete all sections
             continue;
           }
           
-          console.log(`✅ Test ${i} - All sections completed - showing insights`);
+          console.log(`✅ Test ${i} - All sections completed - using diagnostic approach`);
           
-          // Aggregate data from all sections for this practice test
-          const sectionAggregates = new Map(); // For proper section consolidation
-          const subSkillAggregates = new Map(); // For proper sub-skill consolidation
-          const allSectionScores = {};
-          let totalQuestions = 0;
-          let totalQuestionsAttempted = 0;
-          let totalQuestionsCorrect = 0;
-          let totalMaxPoints = 0;
-          let totalEarnedPoints = 0;
+          // Process sub-skills using DIAGNOSTIC APPROACH
+          const subSkillPerformance = [];
+          const sectionTotals = new Map<string, {questionsCorrect: number, questionsTotal: number, questionsAttempted: number}>();
           
-          for (const session of testSessions) {
-            try {
-              const sectionData = await getRealTestData(userId, productType, session.id, 'practice', i);
-              if (sectionData) {
-                // Properly aggregate sections (consolidate duplicates like Written Expression)
-                for (const section of sectionData.sectionBreakdown || []) {
-                  const key = section.sectionName;
-                  if (sectionAggregates.has(key)) {
-                    // Consolidate existing section data
-                    const existing = sectionAggregates.get(key);
-                    existing.questionsCorrect += section.questionsCorrect;
-                    existing.questionsTotal += section.questionsTotal;
-                    existing.questionsAttempted += section.questionsAttempted;
-                    // Recalculate percentages - for written expression, use total points as denominator for both score and accuracy
-                    existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
-                    existing.accuracy = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
-                  } else {
-                    // Add new section - for written expression, ensure accuracy uses total points as denominator
-                    const newSection = { ...section };
-                    if (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing')) {
-                      // For writing sections, accuracy should equal score (both use total points as denominator)
-                      newSection.accuracy = newSection.score;
-                    }
-                    sectionAggregates.set(key, newSection);
-                  }
-                }
-                
-                Object.assign(allSectionScores, sectionData.sectionScores);
-                
-                // Properly aggregate sub-skills (consolidate duplicates)
-                for (const subSkill of sectionData.subSkillBreakdown || []) {
-                  const key = subSkill.subSkillName;
-                  if (subSkillAggregates.has(key)) {
-                    // Consolidate existing sub-skill data
-                    const existing = subSkillAggregates.get(key);
-                    existing.questionsCorrect += subSkill.questionsCorrect;
-                    existing.questionsTotal += subSkill.questionsTotal;
-                    existing.questionsAttempted += subSkill.questionsAttempted;
-                    // Recalculate percentages - for written expression, accuracy should use total points
-                    existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
-                    // Check for writing sections by section name OR sub-skill name
-                    const isWritingSection = existing.sectionName.toLowerCase().includes('written expression') || 
-                                           existing.sectionName.toLowerCase().includes('writing') ||
-                                           existing.subSkillName.toLowerCase().includes('writing') ||
-                                           existing.subSkillName.toLowerCase().includes('narrative');
-                    if (isWritingSection) {
-                      // For writing sub-skills, accuracy should equal score (both use total points as denominator)
-                      existing.accuracy = existing.score;
-                    } else {
-                      existing.accuracy = existing.questionsAttempted > 0 ? Math.round((existing.questionsCorrect / existing.questionsAttempted) * 100) : 0;
-                    }
-                  } else {
-                    // Add new sub-skill - for written expression, ensure accuracy uses total points
-                    const newSubSkill = { ...subSkill };
-                    // Check for writing sections by section name OR sub-skill name
-                    const isWritingSection = subSkill.sectionName.toLowerCase().includes('written expression') || 
-                                           subSkill.sectionName.toLowerCase().includes('writing') ||
-                                           subSkill.subSkillName.toLowerCase().includes('writing') ||
-                                           subSkill.subSkillName.toLowerCase().includes('narrative');
-                    if (isWritingSection) {
-                      // For writing sub-skills, accuracy should equal score (both use total points as denominator)
-                      newSubSkill.accuracy = newSubSkill.score;
-                    }
-                    subSkillAggregates.set(key, newSubSkill);
-                  }
-                }
-                
-                // Only count totalQuestions once (it's the same for all sessions in the practice test)
-                if (totalQuestions === 0) {
-                  totalQuestions = sectionData.totalQuestions || 0;
-                }
-                totalQuestionsAttempted += sectionData.questionsAttempted || 0;
-                totalQuestionsCorrect += sectionData.questionsCorrect || 0;
-                totalMaxPoints += sectionData.totalMaxPoints || 0;
-                totalEarnedPoints += sectionData.totalEarnedPoints || 0;
+          // If no sub-skills found in sub_skills table, get them directly from questions (fallback like diagnostic)
+          if (!subSkillsData || subSkillsData.length === 0) {
+            console.log(`📊 No sub-skills in sub_skills table for ${productType}, checking questions table...`);
+            
+            // Get unique sub-skills directly from practice questions for this test
+            const { data: questionSubSkills, error: questionError } = await supabase
+              .from('questions')
+              .select('sub_skill, section_name')
+              .eq('product_type', productType)
+              .eq('test_mode', testMode)
+              .not('sub_skill', 'is', null);
+
+            if (questionError) {
+              console.error('❌ Error fetching sub-skills from questions:', questionError);
+              throw questionError;
+            }
+
+            // Create unique sub-skills from questions
+            const uniqueSubSkills = new Map<string, string>();
+            questionSubSkills?.forEach(q => {
+              if (q.sub_skill) {
+                uniqueSubSkills.set(q.sub_skill, q.section_name);
               }
-            } catch (error) {
-              console.error(`❌ Error getting data for session ${session.id}:`, error);
+            });
+
+            console.log(`📊 Found ${uniqueSubSkills.size} unique sub-skills from questions table for Test ${i}`);
+
+            // Process each unique sub-skill using diagnostic approach
+            for (const [subSkillName, sectionName] of uniqueSubSkills) {
+              await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance, testMode);
+            }
+          } else {
+            // Process sub-skills from sub_skills table (exactly like diagnostic)
+            for (const subSkill of subSkillsData || []) {
+              // Get all practice questions for this sub-skill in this specific test
+              const { data: questions, error: questionsError } = await supabase
+                .from('questions')
+                .select('id, section_name, max_points')
+                .eq('sub_skill_id', subSkill.id)
+                .eq('test_mode', testMode)
+                .eq('product_type', productType);
+
+              if (questionsError) {
+                console.error(`❌ Error fetching questions for sub-skill ${subSkill.name}:`, questionsError);
+                continue;
+              }
+
+              if (!questions || questions.length === 0) {
+                console.log(`⚠️ Sub-skill "${subSkill.name}" has no questions in Test ${i}`);
+                continue;
+              }
+
+              // Calculate total max_points for this sub-skill (like diagnostic)
+              const totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
+              
+              console.log(`📊 Sub-skill "${subSkill.name}" total points: ${totalPoints} (from ${questions?.length} questions) in Test ${i}`);
+
+              // Get user responses for these questions (like diagnostic)
+              const questionIds = questions?.map(q => q.id) || [];
+              
+              const { data: responses, error: responsesError } = await supabase
+                .from('question_attempt_history')
+                .select('question_id, is_correct, user_answer')
+                .eq('user_id', userId)
+                .eq('session_type', 'practice')
+                .in('question_id', questionIds);
+
+              if (responsesError) {
+                console.error(`❌ Error fetching responses for sub-skill ${subSkill.name}:`, responsesError);
+                continue;
+              }
+              
+              let questionsAttempted = 0;
+              let questionsCorrect = 0;
+              
+              // Check if this is a writing sub-skill (like diagnostic)
+              const isWritingSubSkill = subSkill.name.toLowerCase().includes('writing') || 
+                                       subSkill.name.toLowerCase().includes('narrative') || 
+                                       subSkill.name.toLowerCase().includes('persuasive') ||
+                                       questions?.[0]?.section_name?.toLowerCase().includes('written expression');
+              
+              if (isWritingSubSkill) {
+                console.log(`✍️ Processing writing sub-skill: ${subSkill.name} for Test ${i}`);
+                
+                // For writing questions, get scores from writing_assessments table (exactly like diagnostic)
+                const { data: writingAssessments, error: writingError } = await supabase
+                  .from('writing_assessments')
+                  .select('question_id, total_score, max_possible_score, percentage_score')
+                  .eq('user_id', userId)
+                  .in('question_id', questionIds);
+                
+                if (writingError) {
+                  console.error(`❌ Error fetching writing assessments for ${subSkill.name}:`, writingError);
+                }
+                
+                // Use weighted scoring based on actual points (exactly like diagnostic)
+                if (writingAssessments && writingAssessments.length > 0) {
+                  const totalPossiblePoints = writingAssessments.reduce((sum, w) => sum + (w.max_possible_score || 0), 0);
+                  const totalEarnedPoints = writingAssessments.reduce((sum, w) => sum + (w.total_score || 0), 0);
+                  
+                  questionsAttempted = totalPossiblePoints;  
+                  questionsCorrect = totalEarnedPoints;      
+                  
+                  console.log(`✍️ Writing sub-skill ${subSkill.name} Test ${i} WEIGHTED:`, {
+                    earnedPoints: totalEarnedPoints,
+                    possiblePoints: totalPossiblePoints,
+                    percentage: totalPossiblePoints > 0 ? Math.round((totalEarnedPoints / totalPossiblePoints) * 100) : 0,
+                    numAssessments: writingAssessments.length
+                  });
+                }
+              } else {
+                // Non-writing questions use standard calculation (like diagnostic)
+                questionsAttempted = responses?.length || 0;
+                questionsCorrect = responses?.filter(r => r.is_correct).length || 0;
+              }
+              
+              const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
+              const score = totalPoints > 0 ? Math.round((questionsCorrect / totalPoints) * 100) : 0;
+
+              // Get section name (like diagnostic)
+              const sectionName = questions?.[0]?.section_name || subSkill.test_sections?.section_name || 'Unknown';
+
+              subSkillPerformance.push({
+                subSkill: subSkill.name,
+                subSkillId: subSkill.id,
+                questionsTotal: totalPoints,
+                questionsAttempted,
+                questionsCorrect,
+                accuracy,
+                score,
+                sectionName
+              });
+
+              // Aggregate by section (like diagnostic)
+              if (!sectionTotals.has(sectionName)) {
+                sectionTotals.set(sectionName, {questionsCorrect: 0, questionsTotal: 0, questionsAttempted: 0});
+              }
+              const sectionData = sectionTotals.get(sectionName)!;
+              sectionData.questionsCorrect += questionsCorrect;
+              sectionData.questionsTotal += totalPoints;
+              sectionData.questionsAttempted += questionsAttempted;
             }
           }
           
-          // Convert aggregated sections and sub-skills back to arrays
-          const allSectionBreakdowns = Array.from(sectionAggregates.values());
-          const allSubSkillBreakdowns = Array.from(subSkillAggregates.values());
+          // Build section breakdown from aggregated data (like diagnostic)
+          const sectionBreakdown = Array.from(sectionTotals.entries()).map(([sectionName, data]) => ({
+            sectionName,
+            questionsCorrect: data.questionsCorrect,
+            questionsTotal: data.questionsTotal,
+            questionsAttempted: data.questionsAttempted,
+            score: data.questionsTotal > 0 ? Math.round((data.questionsCorrect / data.questionsTotal) * 100) : 0,
+            accuracy: data.questionsAttempted > 0 ? Math.round((data.questionsCorrect / data.questionsAttempted) * 100) : 0
+          }));
           
-          // Calculate overall scores using earned points for score, max points for accuracy (to include written expression)
-          const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-          // For accuracy: use max points (same as score) to properly account for written expression
-          const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+          // Calculate totals (like diagnostic)
+          const totalQuestionsCorrect = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsCorrect, 0);
+          const totalQuestions = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsTotal, 0);
+          const totalQuestionsAttempted = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsAttempted, 0);
           
-          console.log(`🔍 PRACTICE TEST ${i} SCORE CALCULATION:`, {
-            totalEarnedPoints,
-            totalMaxPoints,
+          const overallScore = totalQuestions > 0 ? Math.round((totalQuestionsCorrect / totalQuestions) * 100) : 0;
+          const overallAccuracy = totalQuestions > 0 ? Math.round((totalQuestionsCorrect / totalQuestions) * 100) : 0; // Use totalQuestions like diagnostic for writing sections
+          
+          // Build section scores object
+          const sectionScores = {};
+          sectionBreakdown.forEach(section => {
+            sectionScores[section.sectionName] = section.score;
+          });
+          
+          console.log(`🔍 PRACTICE TEST ${i} DIAGNOSTIC APPROACH CALCULATION:`, {
             totalQuestionsCorrect,
+            totalQuestions,
             totalQuestionsAttempted,
             calculatedScore: overallScore,
             calculatedAccuracy: overallAccuracy,
-            scoreFormula: `${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`,
-            accuracyFormula: `${totalQuestionsCorrect}/${totalQuestionsAttempted} = ${overallAccuracy}%`
+            scoreFormula: `${totalQuestionsCorrect}/${totalQuestions} = ${overallScore}%`,
+            accuracyFormula: `${totalQuestionsCorrect}/${totalQuestions} = ${overallAccuracy}%`
           });
           
           aggregatedTestData = {
@@ -2259,23 +2288,18 @@ export class AnalyticsService {
             score: overallScore,
             status: 'completed',
             completedAt: testSessions[testSessions.length - 1]?.completed_at,
-            sectionScores: allSectionScores,
-            sectionBreakdown: allSectionBreakdowns,
-            subSkillBreakdown: allSubSkillBreakdowns,
+            sectionScores: sectionScores,
+            sectionBreakdown: sectionBreakdown,
+            subSkillBreakdown: subSkillPerformance,
             totalQuestions: totalQuestions,
             questionsAttempted: totalQuestionsAttempted,
             questionsCorrect: totalQuestionsCorrect,
             overallAccuracy: overallAccuracy,
-            totalMaxPoints: totalMaxPoints,
-            totalEarnedPoints: totalEarnedPoints
+            totalMaxPoints: totalQuestions, // Use totalQuestions as totalMaxPoints for consistency
+            totalEarnedPoints: totalQuestionsCorrect
           };
           
-          console.log(`📊 Aggregated Test ${i} data:`, {
-            totalSessions: testSessions.length,
-            totalQuestions,
-            overallScore,
-            sectionCount: allSectionBreakdowns.length
-          });
+          console.log(`📊 Test ${i} processed using diagnostic approach - sections: ${sectionBreakdown.length}, sub-skills: ${subSkillPerformance.length}`);
         } else {
           // No completed sessions found for this test
           aggregatedTestData = {
