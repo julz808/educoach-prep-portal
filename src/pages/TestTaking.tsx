@@ -139,6 +139,8 @@ const TestTaking: React.FC = () => {
   const [testScore, setTestScore] = useState<any>(null);
   const [calculatingScore, setCalculatingScore] = useState(false);
   const textAutoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const periodicSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTextChangeTimeRef = useRef<number>(0);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -1081,9 +1083,12 @@ const TestTaking: React.FC = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       
-      // Clear any pending timeout
+      // Clear any pending timeout and periodic interval
       if (textAutoSaveTimeoutRef.current) {
         clearTimeout(textAutoSaveTimeoutRef.current);
+      }
+      if (periodicSaveIntervalRef.current) {
+        clearInterval(periodicSaveIntervalRef.current);
       }
     };
   }, [session]);
@@ -1230,6 +1235,9 @@ const TestTaking: React.FC = () => {
     
     console.log('📝 TEXT: User entered text for question', session.currentQuestion, ':', text.substring(0, 50) + '...');
     
+    // Update last change time for periodic saving
+    lastTextChangeTimeRef.current = Date.now();
+    
     setSession(prev => {
       if (!prev) return prev;
       const newTextAnswers = { ...prev.textAnswers };
@@ -1246,7 +1254,7 @@ const TestTaking: React.FC = () => {
         clearTimeout(textAutoSaveTimeoutRef.current);
       }
       
-      // Set new debounced auto-save (save after 2 seconds of no typing)
+      // Set new debounced auto-save (save after 1 second of no typing - reduced from 2 seconds)
       textAutoSaveTimeoutRef.current = setTimeout(async () => {
         console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
         try {
@@ -1260,7 +1268,29 @@ const TestTaking: React.FC = () => {
         } catch (error) {
           console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
         }
-      }, 2000);
+      }, 1000); // Reduced from 2000ms to 1000ms for faster auto-save
+      
+      // Start periodic saving if not already running
+      if (!periodicSaveIntervalRef.current) {
+        periodicSaveIntervalRef.current = setInterval(async () => {
+          // Only save if there were recent changes (within last 6 seconds)
+          const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
+          if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
+            console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
+            try {
+              const sessionToSave = {
+                ...prev,
+                textAnswers: newTextAnswers,
+                questions: updatedQuestions
+              };
+              await saveProgress(sessionToSave);
+              console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
+            } catch (error) {
+              console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
+            }
+          }
+        }, 5000); // Every 5 seconds
+      }
       
       return {
         ...prev,
@@ -1269,6 +1299,26 @@ const TestTaking: React.FC = () => {
       };
     });
   }, [session]);
+  
+  // Handle textarea blur event for immediate save
+  const handleTextBlur = useCallback(async () => {
+    if (!session) return;
+    
+    console.log('💾 TEXT-BLUR-SAVE: Textarea lost focus, saving immediately');
+    
+    // Clear any pending auto-save timeout since we're saving now
+    if (textAutoSaveTimeoutRef.current) {
+      clearTimeout(textAutoSaveTimeoutRef.current);
+      textAutoSaveTimeoutRef.current = null;
+    }
+    
+    try {
+      await saveProgress(session);
+      console.log('✅ TEXT-BLUR-SAVE: Text saved on blur successfully');
+    } catch (error) {
+      console.error('❌ TEXT-BLUR-SAVE: Failed to save text on blur:', error);
+    }
+  }, [session, saveProgress]);
 
   const handleNext = async () => {
     if (!session) return;
@@ -1727,6 +1777,7 @@ const TestTaking: React.FC = () => {
         currentQuestionIndex={session.currentQuestion}
         onAnswer={handleAnswer}
         onTextAnswer={handleTextAnswer}
+        onTextBlur={handleTextBlur}
         onNext={handleNext}
         onPrevious={handlePrevious}
         onJumpToQuestion={handleJumpToQuestion}
@@ -1756,6 +1807,7 @@ const TestTaking: React.FC = () => {
         timeRemaining={shouldHaveTimer(actualTestMode) ? timeRemaining : undefined}
         onAnswer={handleAnswer}
         onTextAnswer={handleTextAnswer}
+        onTextBlur={handleTextBlur}
         onNext={handleNext}
         onPrevious={handlePrevious}
         onJumpToQuestion={handleJumpToQuestion}

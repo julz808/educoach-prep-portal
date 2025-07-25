@@ -30,6 +30,7 @@ interface EnhancedTestInterfaceProps {
   timeRemaining?: number;
   onAnswer: (answerIndex: number) => void;
   onTextAnswer?: (text: string) => void; // For written responses
+  onTextBlur?: () => void; // For immediate save on text blur
   onNext: () => void;
   onPrevious: () => void;
   onJumpToQuestion: (questionIndex: number) => void;
@@ -54,6 +55,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   timeRemaining,
   onAnswer,
   onTextAnswer,
+  onTextBlur,
   onNext,
   onPrevious,
   onJumpToQuestion,
@@ -499,6 +501,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                         <textarea
                           value={textAnswer}
                           onChange={(e) => handleTextAnswerChange(e.target.value)}
+                          onBlur={onTextBlur}
                           placeholder="Type your answer here..."
                           disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                           className={cn(
@@ -648,6 +651,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                       <textarea
                         value={textAnswer}
                         onChange={(e) => handleTextAnswerChange(e.target.value)}
+                        onBlur={onTextBlur}
                         placeholder="Type your answer here..."
                         disabled={isReviewMode || (isDrillMode && showDrillFeedback)}
                         className={cn(
