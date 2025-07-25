@@ -986,7 +986,8 @@ export class AnalyticsService {
     productType: string, 
     userId: string, 
     subSkillPerformance: any[],
-    testMode: string = 'diagnostic'
+    testMode: string = 'diagnostic',
+    sectionTotals?: Map<string, {questionsCorrect: number, questionsTotal: number, questionsAttempted: number}>
   ) {
     // Get all questions for this sub-skill and test mode
     const { data: questions, error: questionsError } = await supabase
@@ -1106,6 +1107,17 @@ export class AnalyticsService {
       score,
       sectionName
     });
+
+    // Update section totals if provided (for practice tests)
+    if (sectionTotals) {
+      if (!sectionTotals.has(sectionName)) {
+        sectionTotals.set(sectionName, {questionsCorrect: 0, questionsTotal: 0, questionsAttempted: 0});
+      }
+      const sectionData = sectionTotals.get(sectionName)!;
+      sectionData.questionsCorrect += questionsCorrect;
+      sectionData.questionsTotal += totalPoints;
+      sectionData.questionsAttempted += questionsAttempted;
+    }
 
     console.log(`📊 Sub-skill "${subSkillName}": ${questionsCorrect}/${questionsAttempted}/${totalPoints} (${accuracy}%) in ${sectionName}`);
   }
@@ -2134,7 +2146,7 @@ export class AnalyticsService {
 
             // Process each unique sub-skill using diagnostic approach
             for (const [subSkillName, sectionName] of uniqueSubSkills) {
-              await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance, testMode);
+              await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance, testMode, sectionTotals);
             }
           } else {
             // Process sub-skills from sub_skills table (exactly like diagnostic)
@@ -2258,6 +2270,9 @@ export class AnalyticsService {
             score: data.questionsTotal > 0 ? Math.round((data.questionsCorrect / data.questionsTotal) * 100) : 0,
             accuracy: data.questionsAttempted > 0 ? Math.round((data.questionsCorrect / data.questionsAttempted) * 100) : 0
           }));
+          
+          console.log(`📊 Test ${i} Section breakdown:`, sectionBreakdown);
+          console.log(`📊 Test ${i} Section totals map:`, Array.from(sectionTotals.entries()));
           
           // Calculate totals (like diagnostic)
           const totalQuestionsCorrect = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsCorrect, 0);
