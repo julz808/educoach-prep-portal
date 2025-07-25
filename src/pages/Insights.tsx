@@ -1580,7 +1580,19 @@ const PerformanceDashboard = () => {
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-slate-900 text-sm">{subSkill.subSkillName}</h4>
+                                  <div className="relative group">
+                                    <h4 className="font-medium text-slate-900 text-sm cursor-help flex items-center gap-1">
+                                      {subSkill.subSkillName}
+                                      <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </h4>
+                                    {UNIFIED_SUB_SKILLS[subSkill.subSkillName] && (
+                                      <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
+                                        <div className="font-semibold text-teal-400 mb-2">{subSkill.subSkillName}</div>
+                                        <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[subSkill.subSkillName]?.description || 'No description available'}</div>
+                                        <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                                      </div>
+                                    )}
+                                  </div>
                                   <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
@@ -1780,7 +1792,19 @@ const PerformanceDashboard = () => {
                               <div className="flex items-center gap-6">
                                 {/* Left Section: Sub-skill Info */}
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-slate-900 text-sm">{subSkill.subSkillName}</h4>
+                                  <div className="relative group">
+                                    <h4 className="font-medium text-slate-900 text-sm cursor-help flex items-center gap-1">
+                                      {subSkill.subSkillName}
+                                      <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </h4>
+                                    {UNIFIED_SUB_SKILLS[subSkill.subSkillName] && (
+                                      <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
+                                        <div className="font-semibold text-teal-400 mb-2">{subSkill.subSkillName}</div>
+                                        <div className="text-xs leading-relaxed">{UNIFIED_SUB_SKILLS[subSkill.subSkillName]?.description || 'No description available'}</div>
+                                        <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
+                                      </div>
+                                    )}
+                                  </div>
                                   <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
                                 </div>
 
