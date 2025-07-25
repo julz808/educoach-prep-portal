@@ -248,38 +248,28 @@ export class WritingAssessmentService {
       throw new Error('User not authenticated for writing assessment storage');
     }
     
-    // First try to delete any existing assessment for this question/session
-    await supabase
-      .from('writing_assessments')
-      .delete()
-      .eq('user_id', data.userId)
-      .eq('session_id', data.sessionId)
-      .eq('question_id', data.questionId);
-
-    // Then insert the new assessment
-    const { error } = await supabase
-      .from('writing_assessments')
-      .insert({
-        user_id: data.userId,
-        session_id: data.sessionId,
-        question_id: data.questionId,
-        product_type: data.productType,
-        writing_genre: data.genre,
-        rubric_used: data.rubric,
-        user_response: data.userResponse,
-        word_count: WritingRubricService.getWordCount(data.userResponse),
-        total_score: data.assessment.totalScore,
-        max_possible_score: data.assessment.maxPossibleScore,
-        percentage_score: data.assessment.percentageScore,
-        criterion_scores: data.assessment.criterionScores,
-        overall_feedback: data.assessment.overallFeedback,
-        strengths: data.assessment.strengths,
-        improvements: data.assessment.improvements,
-        claude_model_version: data.assessment.processingMetadata?.modelVersion || 'unknown',
-        processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
-        prompt_tokens: data.assessment.processingMetadata?.promptTokens || null,
-        response_tokens: data.assessment.processingMetadata?.responseTokens || null
-      });
+    // Use RPC function to handle the upsert properly
+    const { error } = await supabase.rpc('upsert_writing_assessment', {
+      p_user_id: data.userId,
+      p_session_id: data.sessionId,
+      p_question_id: data.questionId,
+      p_product_type: data.productType,
+      p_writing_genre: data.genre,
+      p_rubric_used: data.rubric,
+      p_user_response: data.userResponse,
+      p_word_count: WritingRubricService.getWordCount(data.userResponse),
+      p_total_score: data.assessment.totalScore,
+      p_max_possible_score: data.assessment.maxPossibleScore,
+      p_percentage_score: data.assessment.percentageScore,
+      p_criterion_scores: data.assessment.criterionScores,
+      p_overall_feedback: data.assessment.overallFeedback,
+      p_strengths: data.assessment.strengths,
+      p_improvements: data.assessment.improvements,
+      p_claude_model_version: data.assessment.processingMetadata?.modelVersion || 'unknown',
+      p_processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
+      p_prompt_tokens: data.assessment.processingMetadata?.promptTokens,
+      p_response_tokens: data.assessment.processingMetadata?.responseTokens
+    });
       
     if (error) {
       console.error('Error storing writing assessment:', error);
