@@ -36,6 +36,7 @@ interface Question {
   topic: string;
   subSkill: string;
   format?: 'Multiple Choice' | 'Written Response';
+  response_type?: string;
   maxPoints: number;
 }
 
@@ -76,6 +77,7 @@ export class ScoringService {
       let earnedPoints = 0;
       let isCorrect = false;
       const isWriting = question.format === 'Written Response' || 
+                       question.response_type === 'extended_response' ||
                        question.subSkill?.toLowerCase().includes('writing') ||
                        question.topic?.toLowerCase().includes('writing');
 

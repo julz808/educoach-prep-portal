@@ -701,7 +701,22 @@ const Drill: React.FC = () => {
                       <div className="h-8 flex items-center justify-center mb-4">
                         {data.bestScore && data.completed > 0 && (
                           <Badge variant="outline" className={cn(config.badgeClass)}>
-                            Score: {data.correctAnswers || 0}/{data.total} ({data.bestScore}%)
+                            {(() => {
+                              // Check if this is a writing sub-skill
+                              const isWritingSkill = subSkill.name.toLowerCase().includes('writing') || 
+                                                   subSkill.name.toLowerCase().includes('written');
+                              
+                              if (isWritingSkill) {
+                                // For writing, show points earned out of max possible points
+                                // Writing questions typically have 30 max points each
+                                const maxPossiblePoints = data.total * 30; // Assuming 30 points per writing question
+                                const earnedPoints = Math.round((data.bestScore / 100) * maxPossiblePoints);
+                                return `Score: ${earnedPoints}/${maxPossiblePoints} (${data.bestScore}%)`;
+                              } else {
+                                // For non-writing questions, show correct answers out of total questions
+                                return `Score: ${data.correctAnswers || 0}/${data.total} (${data.bestScore}%)`;
+                              }
+                            })()}
                           </Badge>
                         )}
                       </div>

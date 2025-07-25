@@ -1489,6 +1489,7 @@ const TestTaking: React.FC = () => {
     
     const writingQuestions = session.questions.filter((question, index) => {
       const isWritingQuestion = question.format === 'Written Response' || 
+                               question.response_type === 'extended_response' ||
                                question.subSkill?.toLowerCase().includes('writing') ||
                                question.subSkill?.toLowerCase().includes('written') ||
                                question.topic?.toLowerCase().includes('writing') ||

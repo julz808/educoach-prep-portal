@@ -41,7 +41,6 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
       'Reading Reasoning': 'Reading',
       'Mathematics Reasoning': 'Mathematical Reasoning',
       'General Ability - Verbal': 'Thinking Skills',
-      'Writing': 'Writing',
       // Keep correct names as-is
       'Reading': 'Reading',
       'Mathematical Reasoning': 'Mathematical Reasoning',
@@ -53,7 +52,6 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
       'Mathematics Reasoning': 'Numerical Reasoning',
       'General Ability - Verbal': 'Verbal Reasoning',
       'General Ability - Quantitative': 'Numerical Reasoning',
-      'Writing': 'Writing',
       // Keep correct names as-is
       'Verbal Reasoning': 'Verbal Reasoning',
       'Numerical Reasoning': 'Numerical Reasoning',
@@ -64,7 +62,6 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
       'Mathematics Reasoning': 'Numeracy Calculator',
       'General Ability - Quantitative': 'Numeracy No Calculator',
       'Language': 'Language Conventions',
-      'Writing': 'Writing',
       // Keep correct names as-is
       'Reading': 'Reading',
       'Language Conventions': 'Language Conventions',
@@ -77,7 +74,6 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
       'Mathematics Reasoning': 'Numeracy Calculator',
       'General Ability - Quantitative': 'Numeracy No Calculator',
       'Language': 'Language Conventions',
-      'Writing': 'Writing',
       // Keep correct names as-is
       'Reading': 'Reading',
       'Language Conventions': 'Language Conventions',
