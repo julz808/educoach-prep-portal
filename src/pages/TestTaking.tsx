@@ -458,7 +458,25 @@ const TestTaking: React.FC = () => {
         throw new Error(`No ${difficulty || ''} drill questions found for this section`);
       }
 
-      // Convert questions to our format - drills are always multiple choice
+      // Convert questions to our format and determine if this is a writing drill
+      const isWritingDrill = sectionName.toLowerCase().includes('writing') || 
+                             sectionName.toLowerCase().includes('written') || 
+                             sectionName.toLowerCase().includes('expression');
+      
+      // Determine maxPoints based on product type for writing drills
+      const getMaxPointsForWriting = (productType: string): number => {
+        const dbProductType = getDbProductType(selectedProduct);
+        switch (dbProductType) {
+          case 'VIC Selective Entry (Year 9 Entry)': return 30;
+          case 'NSW Selective Entry (Year 7 Entry)': return 50;
+          case 'Year 5 NAPLAN':
+          case 'Year 7 NAPLAN': return 48;
+          case 'EduTest Scholarship (Year 7 Entry)': return 15;
+          case 'ACER Scholarship (Year 7 Entry)': return 20;
+          default: return 30;
+        }
+      };
+      
       const convertedQuestions = filteredQuestions.map((q, index) => ({
         id: q.id || `question-${index}`,
         text: q.text || '',
@@ -469,8 +487,8 @@ const TestTaking: React.FC = () => {
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
         passageContent: q.passageContent || '',
-        format: 'Multiple Choice' as const,
-        maxPoints: 1 // Drills are always 1 point per question
+        format: isWritingDrill ? 'Written Response' as const : 'Multiple Choice' as const,
+        maxPoints: isWritingDrill ? getMaxPointsForWriting(selectedProduct) : 1
       }));
       
       console.log('🔧 DRILL: Converted questions:', convertedQuestions.length, 'questions with proper fallbacks');

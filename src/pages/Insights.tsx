@@ -1997,7 +1997,7 @@ const PerformanceDashboard = () => {
                                   <div className="text-center">
                                     <div className="text-xs text-slate-500 mb-2">Easy</div>
                                     <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty1Correct || 0}/{subSkill.difficulty1Questions || 0}
+                                      {subSkill.difficulty1Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty1MaxPoints || 0) : (subSkill.difficulty1Questions || 0)}
                                     </div>
                                   </div>
 
@@ -2005,7 +2005,7 @@ const PerformanceDashboard = () => {
                                   <div className="text-center">
                                     <div className="text-xs text-slate-500 mb-2">Medium</div>
                                     <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty2Correct || 0}/{subSkill.difficulty2Questions || 0}
+                                      {subSkill.difficulty2Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty2MaxPoints || 0) : (subSkill.difficulty2Questions || 0)}
                                     </div>
                                   </div>
 
@@ -2013,7 +2013,7 @@ const PerformanceDashboard = () => {
                                   <div className="text-center">
                                     <div className="text-xs text-slate-500 mb-2">Hard</div>
                                     <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty3Correct || 0}/{subSkill.difficulty3Questions || 0}
+                                      {subSkill.difficulty3Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty3MaxPoints || 0) : (subSkill.difficulty3Questions || 0)}
                                     </div>
                                   </div>
                                 </div>
