@@ -349,7 +349,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         if (questionAssessment) {
           earnedPoints = questionAssessment.total_score || 0;
           maxPoints = questionAssessment.max_possible_score || maxPoints;
-          console.log(`✍️ Using writing assessment for ${subSkillName}: ${earnedPoints}/${maxPoints} points`);
         }
       }
       
@@ -481,6 +480,72 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     });
     
     
+    // For practice tests, also ensure we get all sub-skills from sub_skills table like diagnostic does
+    if (testType === 'practice') {
+      const { data: allSubSkills, error: subSkillsError } = await supabase
+        .from('sub_skills')
+        .select(`
+          id,
+          name,
+          product_type,
+          test_sections!inner(section_name)
+        `)
+        .eq('product_type', productType);
+        
+      if (!subSkillsError && allSubSkills) {
+        
+        // Add any missing sub-skills that weren't in the question attempts
+        for (const subSkill of allSubSkills) {
+          const sectionName = subSkill.test_sections.section_name;
+          const isWritingSection = sectionName.toLowerCase().includes('written expression') || 
+                                  sectionName.toLowerCase().includes('writing');
+          
+          if (isWritingSection && !subSkillStats.has(subSkill.name)) {
+            
+            // Get questions for this sub-skill to calculate max points
+            const { data: subSkillQuestions, error: questionsError } = await supabase
+              .from('questions')
+              .select('id, max_points')
+              .eq('sub_skill_id', subSkill.id)
+              .eq('test_mode', testType)
+              .eq('product_type', productType);
+              
+            if (!questionsError && subSkillQuestions) {
+              const maxPoints = subSkillQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+              
+              // Check if there are any writing assessments for these questions
+              const questionIds = subSkillQuestions.map(q => q.id);
+              const { data: assessments, error: assessmentError } = await supabase
+                .from('writing_assessments')
+                .select('total_score, max_possible_score, question_id')
+                .eq('session_id', sessionId)
+                .in('question_id', questionIds);
+                
+              let earnedPoints = 0;
+              let actualMaxPoints = maxPoints;
+              let questionsAttempted = 0;
+              
+              if (!assessmentError && assessments && assessments.length > 0) {
+                earnedPoints = assessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
+                actualMaxPoints = assessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
+                questionsAttempted = assessments.length;
+              }
+              
+              subSkillStats.set(subSkill.name, {
+                subSkillName: subSkill.name,
+                sectionName: sectionName,
+                questionsTotal: 0,
+                questionsAttempted: questionsAttempted,
+                questionsCorrect: 0,
+                maxPoints: actualMaxPoints,
+                earnedPoints: earnedPoints
+              });
+            }
+          }
+        }
+      }
+    }
+    
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
       // For practice tests, use max points as the total (like diagnostic) to properly handle written expression
@@ -532,6 +597,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       overallScore,
       overallAccuracy
     });
+    
     
     
     console.log(`🎯 ${testType.toUpperCase()} RESULTS:`, {
