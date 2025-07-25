@@ -396,14 +396,35 @@ const TestTaking: React.FC = () => {
       const drillModes = await fetchDrillModes(selectedProduct);
       console.log('🔧 DRILL: Available drill modes:', drillModes.map(dm => dm.name));
       
-      // Find the section containing questions by subjectId
+      // Find the section containing questions by subjectId or sectionName
       let foundSection = null;
       for (const mode of drillModes) {
-        foundSection = mode.sections.find(section => 
-          section.id === subjectId || 
-          section.name.toLowerCase().includes(subjectId.toLowerCase()) ||
-          subjectId.toLowerCase().includes(section.name.toLowerCase())
-        );
+        foundSection = mode.sections.find(section => {
+          // First try exact matches
+          if (section.id === subjectId || section.name === sectionName) {
+            return true;
+          }
+          
+          // Then try case-insensitive matches
+          const sectionNameLower = section.name.toLowerCase();
+          const subjectIdLower = subjectId.toLowerCase();
+          const sectionNameFromParams = sectionName.toLowerCase();
+          
+          // Remove special characters and normalize for comparison
+          const normalizeString = (str: string) => str.replace(/[-_\s]+/g, ' ').trim();
+          
+          const normalizedSectionName = normalizeString(sectionNameLower);
+          const normalizedSubjectId = normalizeString(subjectIdLower);
+          const normalizedSectionNameFromParams = normalizeString(sectionNameFromParams);
+          
+          return normalizedSectionName === normalizedSubjectId ||
+                 normalizedSectionName === normalizedSectionNameFromParams ||
+                 normalizedSectionName.includes(normalizedSubjectId) ||
+                 normalizedSubjectId.includes(normalizedSectionName) ||
+                 normalizedSectionName.includes(normalizedSectionNameFromParams) ||
+                 normalizedSectionNameFromParams.includes(normalizedSectionName);
+        });
+        
         if (foundSection && foundSection.questions.length > 0) {
           console.log('✅ DRILL: Found section:', foundSection.name, 'in mode:', mode.name, 'with', foundSection.questions.length, 'questions');
           break;
@@ -1266,65 +1287,68 @@ const TestTaking: React.FC = () => {
     // Update last change time for periodic saving
     lastTextChangeTimeRef.current = Date.now();
     
-    // Create updated session state
-    const updatedTextAnswers = { ...session.textAnswers };
-    updatedTextAnswers[session.currentQuestion] = text;
-    
-    const updatedQuestions = [...session.questions];
-    updatedQuestions[session.currentQuestion].userTextAnswer = text;
-    
-    const updatedSession = {
-      ...session,
-      textAnswers: updatedTextAnswers,
-      questions: updatedQuestions
-    };
-    
-    // Update React state
-    setSession(updatedSession);
-    
-    console.log('📝 TEXT: Updated text answers state:', updatedTextAnswers);
-    
-    // Clear existing timeout
-    if (textAutoSaveTimeoutRef.current) {
-      clearTimeout(textAutoSaveTimeoutRef.current);
-    }
-    
-    // Set new debounced auto-save (save after 1 second of no typing)
-    textAutoSaveTimeoutRef.current = setTimeout(async () => {
-      console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
-      try {
-        await saveProgress(updatedSession);
-        console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
-      } catch (error) {
-        console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
+    setSession(prev => {
+      if (!prev) return prev;
+      
+      const newTextAnswers = { ...prev.textAnswers };
+      newTextAnswers[prev.currentQuestion] = text;
+      
+      // Update the question's userTextAnswer
+      const updatedQuestions = [...prev.questions];
+      updatedQuestions[prev.currentQuestion].userTextAnswer = text;
+      
+      console.log('📝 TEXT: Updated text answers state:', newTextAnswers);
+      
+      const updatedSession = {
+        ...prev,
+        textAnswers: newTextAnswers,
+        questions: updatedQuestions
+      };
+      
+      // Clear existing timeout
+      if (textAutoSaveTimeoutRef.current) {
+        clearTimeout(textAutoSaveTimeoutRef.current);
       }
-    }, 1000);
-    
-    // Start periodic saving if not already running
-    if (!periodicSaveIntervalRef.current) {
-      periodicSaveIntervalRef.current = setInterval(async () => {
-        // Only save if there were recent changes (within last 6 seconds)
-        const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
-        if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
-          console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
-          try {
-            // Get current session state for periodic save
-            setSession(currentSession => {
-              if (currentSession) {
-                saveProgress(currentSession).then(() => {
-                  console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
-                }).catch(error => {
-                  console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
-                });
-              }
-              return currentSession; // No state change
-            });
-          } catch (error) {
-            console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
-          }
+      
+      // Set new debounced auto-save (save after 1 second of no typing)
+      textAutoSaveTimeoutRef.current = setTimeout(async () => {
+        console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
+        try {
+          await saveProgress(updatedSession);
+          console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
+        } catch (error) {
+          console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
         }
-      }, 5000); // Every 5 seconds
-    }
+      }, 1000);
+      
+      // Start periodic saving if not already running
+      if (!periodicSaveIntervalRef.current) {
+        periodicSaveIntervalRef.current = setInterval(async () => {
+          // Only save if there were recent changes (within last 6 seconds)
+          const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
+          if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
+            console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
+            try {
+              // Get current session state for periodic save
+              setSession(currentSession => {
+                if (currentSession) {
+                  saveProgress(currentSession).then(() => {
+                    console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
+                  }).catch(error => {
+                    console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
+                  });
+                }
+                return currentSession; // No state change
+              });
+            } catch (error) {
+              console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
+            }
+          }
+        }, 5000); // Every 5 seconds
+      }
+      
+      return updatedSession;
+    });
   }, [session, saveProgress]);
   
   // Handle textarea blur event for immediate save
