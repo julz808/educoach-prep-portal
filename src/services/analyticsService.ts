@@ -1099,6 +1099,7 @@ export class AnalyticsService {
 
     subSkillPerformance.push({
       subSkill: subSkillName,
+      subSkillName: subSkillName,  // Add subSkillName for frontend compatibility
       subSkillId: null, // No ID when coming from questions table
       questionsTotal: totalPoints,
       questionsAttempted,
@@ -1414,6 +1415,7 @@ export class AnalyticsService {
 
         subSkillPerformance.push({
           subSkill: subSkill.name,
+          subSkillName: subSkill.name,  // Add subSkillName for frontend compatibility
           subSkillId: subSkill.id,
           questionsTotal: totalPoints,
           questionsAttempted,
@@ -2241,6 +2243,7 @@ export class AnalyticsService {
 
               subSkillPerformance.push({
                 subSkill: subSkill.name,
+                subSkillName: subSkill.name,  // Add subSkillName for frontend compatibility
                 subSkillId: subSkill.id,
                 questionsTotal: totalPoints,
                 questionsAttempted,
