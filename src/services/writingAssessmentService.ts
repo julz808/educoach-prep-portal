@@ -248,8 +248,8 @@ export class WritingAssessmentService {
       throw new Error('User not authenticated for writing assessment storage');
     }
     
-    // Use RPC function to handle the upsert properly (v2 to avoid overload conflicts)
-    const { error } = await supabase.rpc('upsert_writing_assessment_v2', {
+    // Use RPC function to handle the upsert properly
+    const { error } = await supabase.rpc('upsert_writing_assessment', {
       p_user_id: data.userId,
       p_session_id: data.sessionId,
       p_question_id: data.questionId,
