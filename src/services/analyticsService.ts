@@ -337,8 +337,21 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       
       const subSkillName = question.sub_skill || 'Unknown Sub-skill';
       const sectionName = question.section_name || 'Unknown Section';
-      const maxPoints = question.max_points || 1;
-      const earnedPoints = attempt.is_correct ? maxPoints : 0;
+      let maxPoints = question.max_points || 1;
+      let earnedPoints = attempt.is_correct ? maxPoints : 0;
+      
+      // For writing questions, use actual assessment scores
+      const isWritingQuestion = sectionName.toLowerCase().includes('writing') || 
+                               sectionName.toLowerCase().includes('written expression');
+      if (isWritingQuestion && writingAssessmentsBySection.has(sectionName)) {
+        const sectionAssessments = writingAssessmentsBySection.get(sectionName);
+        const questionAssessment = sectionAssessments.find(a => a.question_id === attempt.question_id);
+        if (questionAssessment) {
+          earnedPoints = questionAssessment.total_score || 0;
+          maxPoints = questionAssessment.max_possible_score || maxPoints;
+          console.log(`✍️ Using writing assessment for ${subSkillName}: ${earnedPoints}/${maxPoints} points`);
+        }
+      }
       
       
       // Track overall totals
@@ -467,43 +480,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       };
     });
     
-    // For EduTest Written Expression, ensure we have both sub-skills
-    if (productType.includes('EduTest') && testType === 'practice') {
-      const writingSection = Array.from(sectionStats.values()).find(s => 
-        s.sectionName.toLowerCase().includes('written expression') || 
-        s.sectionName.toLowerCase().includes('writing')
-      );
-      
-      if (writingSection) {
-        // Ensure both Narrative Writing and Persuasive Writing exist
-        const narrativeExists = subSkillStats.has('Narrative Writing');
-        const persuasiveExists = subSkillStats.has('Persuasive Writing');
-        
-        if (!narrativeExists) {
-          subSkillStats.set('Narrative Writing', {
-            subSkillName: 'Narrative Writing',
-            sectionName: writingSection.sectionName,
-            questionsTotal: 0,
-            questionsAttempted: 0,
-            questionsCorrect: 0,
-            maxPoints: 15,
-            earnedPoints: 0
-          });
-        }
-        
-        if (!persuasiveExists) {
-          subSkillStats.set('Persuasive Writing', {
-            subSkillName: 'Persuasive Writing',
-            sectionName: writingSection.sectionName,
-            questionsTotal: 0,
-            questionsAttempted: 0,
-            questionsCorrect: 0,
-            maxPoints: 15,
-            earnedPoints: 0
-          });
-        }
-      }
-    }
     
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
@@ -556,6 +532,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       overallScore,
       overallAccuracy
     });
+    
     
     console.log(`🎯 ${testType.toUpperCase()} RESULTS:`, {
       sessionId,
