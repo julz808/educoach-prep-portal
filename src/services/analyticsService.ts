@@ -502,20 +502,12 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       sectionBreakdown.map(section => [section.sectionName, section.score])
     );
     
-    // Calculate overall scores - use simple percentage calculation for practice tests
-    let overallScore = 0;
-    if (useSessionBasedCalculation) {
-      // Use simple percentage: correct questions / total questions for practice tests
-      const displayTotalQuestions = totalAvailable || totalQuestionsAttempted;
-      overallScore = displayTotalQuestions > 0 ? Math.round((totalQuestionsCorrect / displayTotalQuestions) * 100) : 0;
-      console.log(`📊 Using simple percentage for practice test: ${totalQuestionsCorrect}/${displayTotalQuestions} = ${overallScore}% (not weighted: ${totalEarnedPoints}/${totalMaxPoints})`);
-    } else {
-      // Use questions table: correct questions / total available for score  
-      overallScore = totalAvailable > 0 ? Math.round((totalQuestionsCorrect / totalAvailable) * 100) : 0;
-      console.log(`📊 Using questions table score: ${totalQuestionsCorrect}/${totalAvailable} = ${overallScore}%`);
-    }
+    // Calculate overall score using max points (to properly account for written expression)
+    const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+    console.log(`📊 Overall score calculation: ${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`);
     
-    const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
+    // For accuracy: use earned points / max points to properly account for written expression
+    const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
     
     console.log(`📊 Overall calculation details:`, {
       totalMaxPoints,
@@ -2166,8 +2158,8 @@ export class AnalyticsService {
           
           // Calculate overall scores using earned points for score, max points for accuracy (to include written expression)
           const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-          // For accuracy: use questions attempted (like diagnostic) not max points
-          const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
+          // For accuracy: use max points (same as score) to properly account for written expression
+          const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
           
           console.log(`🔍 PRACTICE TEST ${i} SCORE CALCULATION:`, {
             totalEarnedPoints,
