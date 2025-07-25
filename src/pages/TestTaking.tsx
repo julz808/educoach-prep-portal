@@ -502,7 +502,7 @@ const TestTaking: React.FC = () => {
         sectionName: skillName, // Use the readable skill name instead of UUID
         currentQuestionIndex: drillSessionData.questionsAnswered || 0,
         answers: drillSessionData.answersData || {},
-        textAnswers: {},
+        textAnswers: drillSessionData.textAnswersData || {},
         flaggedQuestions: [],
         timeRemainingSeconds: 1800, // Default 30 minutes for drills
         totalQuestions: drillSessionData.questionsTotal || 0,
@@ -1180,7 +1180,7 @@ const TestTaking: React.FC = () => {
         // Use different save logic for drill vs regular sessions
         if (updatedSession.type === 'drill') {
           // For drill sessions, update drill-specific progress
-          const questionsAnswered = Object.keys(stringAnswers).length;
+          const questionsAnswered = Object.keys(stringAnswers).length + Object.keys(stringTextAnswers).length;
           const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
             const question = updatedSession.questions[parseInt(Object.keys(stringAnswers)[index])];
             const answerIndex = answer.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
@@ -1191,14 +1191,16 @@ const TestTaking: React.FC = () => {
             sessionId: updatedSession.id,
             questionsAnswered,
             questionsCorrect,
-            answers: stringAnswers
+            answers: stringAnswers,
+            textAnswers: stringTextAnswers
           });
           
           await DrillSessionService.updateProgress(
             updatedSession.id,
             questionsAnswered,
             questionsCorrect,
-            stringAnswers
+            stringAnswers,
+            stringTextAnswers
           );
         } else {
           // For regular sessions, use existing logic
@@ -1432,14 +1434,24 @@ const TestTaking: React.FC = () => {
         console.log('🏁 DRILL-COMPLETE: Completing drill session:', {
           sessionId: session.id,
           questionsAnswered,
-          questionsCorrect
+          questionsCorrect,
+          textAnswersCount: Object.keys(session.textAnswers).length
+        });
+        
+        // Convert textAnswers to string format for database storage
+        const stringTextAnswers: Record<string, string> = {};
+        Object.entries(session.textAnswers).forEach(([index, answer]) => {
+          if (answer && answer.trim().length > 0) {
+            stringTextAnswers[index] = answer;
+          }
         });
         
         await DrillSessionService.completeSession(
           session.id,
           questionsAnswered,
           questionsCorrect,
-          session.answers
+          session.answers,
+          stringTextAnswers
         );
       } else {
         // For regular sessions (diagnostic/practice), use developer tools replica approach

@@ -12,6 +12,7 @@ export interface DrillSessionData {
   questionsCorrect: number;
   questionIds: string[];
   answersData: Record<string, string>;
+  textAnswersData?: Record<string, string>; // Added for writing responses
   startedAt: string;
   completedAt?: string;
 }
@@ -105,6 +106,7 @@ export class DrillSessionService {
         questionsCorrect: sessionData.questions_correct,
         questionIds: sessionData.question_ids || [],
         answersData: sessionData.answers_data || {},
+        textAnswersData: sessionData.text_answers_data || {},
         startedAt: sessionData.started_at,
         completedAt: sessionData.completed_at
       };
@@ -121,21 +123,24 @@ export class DrillSessionService {
     sessionId: string,
     questionsAnswered: number,
     questionsCorrect: number,
-    answersData: Record<string, string>
+    answersData: Record<string, string>,
+    textAnswersData?: Record<string, string>
   ): Promise<void> {
     try {
       console.log('💾 DRILL: Updating progress:', {
         sessionId,
         questionsAnswered,
         questionsCorrect,
-        answersCount: Object.keys(answersData).length
+        answersCount: Object.keys(answersData).length,
+        textAnswersCount: Object.keys(textAnswersData || {}).length
       });
 
       const { error } = await supabase.rpc('update_drill_session_progress', {
         p_session_id: sessionId,
         p_questions_answered: questionsAnswered,
         p_questions_correct: questionsCorrect,
-        p_answers_data: answersData
+        p_answers_data: answersData,
+        p_text_answers_data: textAnswersData || {}
       });
 
       if (error) {
@@ -157,21 +162,24 @@ export class DrillSessionService {
     sessionId: string,
     questionsAnswered: number,
     questionsCorrect: number,
-    answersData: Record<string, string>
+    answersData: Record<string, string>,
+    textAnswersData?: Record<string, string>
   ): Promise<void> {
     try {
       console.log('🏁 DRILL: Completing session:', {
         sessionId,
         questionsAnswered,
         questionsCorrect,
-        accuracy: questionsAnswered > 0 ? Math.round((questionsCorrect / questionsAnswered) * 100) : 0
+        accuracy: questionsAnswered > 0 ? Math.round((questionsCorrect / questionsAnswered) * 100) : 0,
+        textAnswersCount: Object.keys(textAnswersData || {}).length
       });
 
       const { error } = await supabase.rpc('complete_drill_session', {
         p_session_id: sessionId,
         p_questions_answered: questionsAnswered,
         p_questions_correct: questionsCorrect,
-        p_answers_data: answersData
+        p_answers_data: answersData,
+        p_text_answers_data: textAnswersData || {}
       });
 
       if (error) {
