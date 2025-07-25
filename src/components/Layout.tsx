@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Home, BookOpen, BarChart3, Brain, Activity, 
-  Menu, X, ChevronRight, Bell, ChevronDown,
+  Menu, X, ChevronRight, ChevronDown,
   Target as TargetIcon, Clock, TrendingUp, Award, User, Settings, Search, FileText, LogOut, HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -378,7 +378,7 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-20 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-28 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -396,9 +396,6 @@ const Layout: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="sm">
-              <Bell size={20} />
-            </Button>
             {/* User profile button for smaller screens */}
             <button
               onClick={() => navigate('/profile')}

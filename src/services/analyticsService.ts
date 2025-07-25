@@ -465,15 +465,18 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       };
     });
     
-    // Build sub-skill breakdown
-    const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
+    // Build sub-skill breakdown - include ALL available sub-skills, even if not attempted
+    const subSkillBreakdown = [];
+    
+    // First, add all attempted sub-skills
+    for (const subSkill of subSkillStats.values()) {
       const totalQuestions = subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
       
       // Use simple percentage for sub-skills too (consistent with section calculation)
       const score = totalQuestions > 0 ? Math.round((subSkill.questionsCorrect / totalQuestions) * 100) : 0;
       const accuracy = subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0;
       
-      return {
+      subSkillBreakdown.push({
         sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
         subSkillName: subSkill.subSkillName,
         score,
@@ -481,8 +484,28 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         questionsCorrect: subSkill.questionsCorrect,
         questionsTotal: totalQuestions,
         questionsAttempted: subSkill.questionsAttempted
-      };
-    });
+      });
+    }
+    
+    // Then, add any missing sub-skills from subSkillTotals that weren't attempted
+    for (const [subSkillName, subSkillData] of subSkillTotals.entries()) {
+      // Skip if we already have this sub-skill from attempted questions
+      if (subSkillStats.has(subSkillName)) {
+        continue;
+      }
+      
+      console.log(`📋 Adding unattempted sub-skill: ${subSkillName} (${subSkillData.total} questions available)`);
+      
+      subSkillBreakdown.push({
+        sectionName: mapSectionNameToCurriculum(subSkillData.section, productType),
+        subSkillName: subSkillName,
+        score: 0, // 0% score for unattempted
+        accuracy: 0, // 0% accuracy for unattempted  
+        questionsCorrect: 0,
+        questionsTotal: subSkillData.total,
+        questionsAttempted: 0
+      });
+    }
     
     // Build section scores map
     const sectionScores = Object.fromEntries(

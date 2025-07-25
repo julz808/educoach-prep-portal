@@ -1481,7 +1481,7 @@ const PerformanceDashboard = () => {
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
+                        <h3 className="text-lg font-semibold text-slate-900">Detailed Sub-Skills Performance</h3>
                         <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
                           <button
                             onClick={() => setSubSkillView('score')}
@@ -1710,7 +1710,7 @@ const PerformanceDashboard = () => {
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200">
                       <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Sub-Skills Performance</h3>
+                        <h3 className="text-lg font-semibold text-slate-900">Detailed Sub-Skills Performance</h3>
                       </div>
                       
                       {/* Filter Tabs */}
