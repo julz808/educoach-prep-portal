@@ -250,7 +250,7 @@ export class WritingAssessmentService {
     
     const { error } = await supabase
       .from('writing_assessments')
-      .insert({
+      .upsert({
         user_id: data.userId,
         session_id: data.sessionId,
         question_id: data.questionId,
@@ -270,6 +270,8 @@ export class WritingAssessmentService {
         processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
         prompt_tokens: data.assessment.processingMetadata?.promptTokens || null,
         response_tokens: data.assessment.processingMetadata?.responseTokens || null
+      }, {
+        onConflict: 'user_id,session_id,question_id'
       });
       
     if (error) {

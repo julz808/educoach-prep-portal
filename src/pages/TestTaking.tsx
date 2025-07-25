@@ -1408,7 +1408,7 @@ const TestTaking: React.FC = () => {
       if (session.type === 'drill') {
         // For drill sessions, complete using DrillSessionService
         const questionsAnswered = Object.keys(session.answers).length + 
-          session.textAnswers.filter(answer => answer && answer.trim().length > 0).length;
+          Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
         
         // Count correct answers - need to handle writing questions differently
         let questionsCorrect = 0;
@@ -1428,7 +1428,7 @@ const TestTaking: React.FC = () => {
         
         // For writing questions, ALL attempted questions count as "correct" for drill progress
         // Progress tracking is about completion, not scoring
-        const writingQuestionsAttempted = session.textAnswers.filter(answer => answer && answer.trim().length > 0).length;
+        const writingQuestionsAttempted = Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
         questionsCorrect += writingQuestionsAttempted;
         
         console.log('🏁 DRILL-COMPLETE: Completing drill session:', {
