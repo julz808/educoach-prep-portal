@@ -829,12 +829,14 @@ const PerformanceDashboard = () => {
                                   </div>
                                   <div 
                                     key={`${section.sectionName}-fraction-${sectionView}`}
-                                    className="text-xs text-slate-600 fadeIn"
+                                    className="text-sm text-slate-600 fadeIn"
                                     style={{ animationDelay: `${index * 150 + 600}ms` }}
                                   >
                                     {sectionView === 'score' 
                                       ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                      : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
+                                      : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
+                                        ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                        : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
                                     }
                                   </div>
                                 </div>
@@ -1096,7 +1098,9 @@ const PerformanceDashboard = () => {
                                   >
                                     {subSkillView === 'score' 
                                       ? <span>{skill.score}/{skill.total}</span>
-                                      : <span>{skill.score}/{skill.answered}</span>
+                                      : (skill.section.toLowerCase().includes('written expression') || skill.section.toLowerCase().includes('writing'))
+                                        ? <span>{skill.score}/{skill.total}</span>
+                                        : <span>{skill.score}/{skill.answered}</span>
                                     }
                                   </div>
                                 </div>
@@ -1463,12 +1467,14 @@ const PerformanceDashboard = () => {
                                     </div>
                                     <div 
                                       key={`${section.sectionName}-fraction-${sectionView}`}
-                                      className="text-xs text-slate-600 fadeIn"
+                                      className="text-sm text-slate-600 fadeIn"
                                       style={{ animationDelay: `${index * 150 + 600}ms` }}
                                     >
                                       {sectionView === 'score' 
                                         ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                        : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
+                                        : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
+                                          ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                          : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
                                       }
                                     </div>
                                   </div>
@@ -1640,7 +1646,9 @@ const PerformanceDashboard = () => {
                                   >
                                     {subSkillView === 'score' 
                                       ? <span>{subSkill.questionsCorrect}/{subSkill.questionsTotal}</span>
-                                      : <span>{subSkill.questionsCorrect}/{subSkill.questionsAttempted}</span>
+                                      : (subSkill.sectionName.toLowerCase().includes('written expression') || subSkill.sectionName.toLowerCase().includes('writing'))
+                                        ? <span>{subSkill.questionsCorrect}/{subSkill.questionsTotal}</span>
+                                        : <span>{subSkill.questionsCorrect}/{subSkill.questionsAttempted}</span>
                                     }
                                   </div>
                                 </div>
