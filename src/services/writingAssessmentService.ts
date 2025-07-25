@@ -263,8 +263,8 @@ export class WritingAssessmentService {
       p_percentage_score: data.assessment.percentageScore,
       p_criterion_scores: data.assessment.criterionScores,
       p_overall_feedback: data.assessment.overallFeedback,
-      p_strengths: data.assessment.strengths,
-      p_improvements: data.assessment.improvements,
+      p_strengths: data.assessment.strengths || [], // Pass as array directly for JSONB
+      p_improvements: data.assessment.improvements || [], // Pass as array directly for JSONB
       p_claude_model_version: data.assessment.processingMetadata?.modelVersion || 'unknown',
       p_processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
       p_prompt_tokens: data.assessment.processingMetadata?.promptTokens,

@@ -708,10 +708,12 @@ const Drill: React.FC = () => {
                               
                               if (isWritingSkill) {
                                 // For writing, show points earned out of max possible points
-                                // Writing questions typically have 30 max points each
-                                const maxPossiblePoints = data.total * 30; // Assuming 30 points per writing question
-                                const earnedPoints = Math.round((data.bestScore / 100) * maxPossiblePoints);
-                                return `Score: ${earnedPoints}/${maxPossiblePoints} (${data.bestScore}%)`;
+                                // Calculate actual max points from the questions
+                                const totalMaxPoints = subSkill.questions
+                                  .filter((_, index) => index < data.total) // Only count the questions that were attempted
+                                  .reduce((sum, question) => sum + (question.maxPoints || 30), 0);
+                                const earnedPoints = Math.round((data.bestScore / 100) * totalMaxPoints);
+                                return `Score: ${earnedPoints}/${totalMaxPoints} (${data.bestScore}%)`;
                               } else {
                                 // For non-writing questions, show correct answers out of total questions
                                 return `Score: ${data.correctAnswers || 0}/${data.total} (${data.bestScore}%)`;
