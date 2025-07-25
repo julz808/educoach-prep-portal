@@ -1266,67 +1266,66 @@ const TestTaking: React.FC = () => {
     // Update last change time for periodic saving
     lastTextChangeTimeRef.current = Date.now();
     
-    setSession(prev => {
-      if (!prev) return prev;
-      const newTextAnswers = { ...prev.textAnswers };
-      newTextAnswers[prev.currentQuestion] = text;
-      
-      // Update the question's userTextAnswer
-      const updatedQuestions = [...prev.questions];
-      updatedQuestions[prev.currentQuestion].userTextAnswer = text;
-      
-      console.log('📝 TEXT: Updated text answers state:', newTextAnswers);
-      
-      // Clear existing timeout
-      if (textAutoSaveTimeoutRef.current) {
-        clearTimeout(textAutoSaveTimeoutRef.current);
+    // Create updated session state
+    const updatedTextAnswers = { ...session.textAnswers };
+    updatedTextAnswers[session.currentQuestion] = text;
+    
+    const updatedQuestions = [...session.questions];
+    updatedQuestions[session.currentQuestion].userTextAnswer = text;
+    
+    const updatedSession = {
+      ...session,
+      textAnswers: updatedTextAnswers,
+      questions: updatedQuestions
+    };
+    
+    // Update React state
+    setSession(updatedSession);
+    
+    console.log('📝 TEXT: Updated text answers state:', updatedTextAnswers);
+    
+    // Clear existing timeout
+    if (textAutoSaveTimeoutRef.current) {
+      clearTimeout(textAutoSaveTimeoutRef.current);
+    }
+    
+    // Set new debounced auto-save (save after 1 second of no typing)
+    textAutoSaveTimeoutRef.current = setTimeout(async () => {
+      console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
+      try {
+        await saveProgress(updatedSession);
+        console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
+      } catch (error) {
+        console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
       }
-      
-      // Set new debounced auto-save (save after 1 second of no typing - reduced from 2 seconds)
-      textAutoSaveTimeoutRef.current = setTimeout(async () => {
-        console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
-        try {
-          const sessionToSave = {
-            ...prev,
-            textAnswers: newTextAnswers,
-            questions: updatedQuestions
-          };
-          await saveProgress(sessionToSave);
-          console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
-        } catch (error) {
-          console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
-        }
-      }, 1000); // Reduced from 2000ms to 1000ms for faster auto-save
-      
-      // Start periodic saving if not already running
-      if (!periodicSaveIntervalRef.current) {
-        periodicSaveIntervalRef.current = setInterval(async () => {
-          // Only save if there were recent changes (within last 6 seconds)
-          const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
-          if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
-            console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
-            try {
-              const sessionToSave = {
-                ...prev,
-                textAnswers: newTextAnswers,
-                questions: updatedQuestions
-              };
-              await saveProgress(sessionToSave);
-              console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
-            } catch (error) {
-              console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
-            }
+    }, 1000);
+    
+    // Start periodic saving if not already running
+    if (!periodicSaveIntervalRef.current) {
+      periodicSaveIntervalRef.current = setInterval(async () => {
+        // Only save if there were recent changes (within last 6 seconds)
+        const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
+        if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
+          console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
+          try {
+            // Get current session state for periodic save
+            setSession(currentSession => {
+              if (currentSession) {
+                saveProgress(currentSession).then(() => {
+                  console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
+                }).catch(error => {
+                  console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
+                });
+              }
+              return currentSession; // No state change
+            });
+          } catch (error) {
+            console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
           }
-        }, 5000); // Every 5 seconds
-      }
-      
-      return {
-        ...prev,
-        textAnswers: newTextAnswers,
-        questions: updatedQuestions
-      };
-    });
-  }, [session]);
+        }
+      }, 5000); // Every 5 seconds
+    }
+  }, [session, saveProgress]);
   
   // Handle textarea blur event for immediate save
   const handleTextBlur = useCallback(async () => {
