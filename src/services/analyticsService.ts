@@ -340,6 +340,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       const maxPoints = question.max_points || 1;
       const earnedPoints = attempt.is_correct ? maxPoints : 0;
       
+      
       // Track overall totals
       totalQuestionsAttempted++;
       totalMaxPoints += maxPoints;
@@ -469,6 +470,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
       // For practice tests, use max points as the total (like diagnostic) to properly handle written expression
       const totalQuestions = subSkill.maxPoints || subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
+      
       
       // Calculate score using max points (earned points / max points)
       const score = subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0;
@@ -2164,7 +2166,8 @@ export class AnalyticsService {
           
           // Calculate overall scores using earned points for score, max points for accuracy (to include written expression)
           const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-          const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+          // For accuracy: use questions attempted (like diagnostic) not max points
+          const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
           
           console.log(`🔍 PRACTICE TEST ${i} SCORE CALCULATION:`, {
             totalEarnedPoints,
