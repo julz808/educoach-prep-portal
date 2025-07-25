@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, Target, BookOpen, Activity, AlertCircle, TrendingUp, TrendingDown, Clock, Award, CheckCircle, XCircle, Flag, Star, Info, Zap, FileText } from 'lucide-react';
+import { BarChart3, Target, BookOpen, Activity, AlertCircle, TrendingUp, TrendingDown, Clock, Award, CheckCircle, XCircle, Flag, Star, Info, Zap, FileText, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useProduct } from '@/context/ProductContext';
 import { PaywallComponent } from '@/components/PaywallComponent';
