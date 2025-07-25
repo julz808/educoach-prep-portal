@@ -483,7 +483,7 @@ const Drill: React.FC = () => {
           // TestTaking.tsx will handle session management just like diagnostic/practice tests
           console.log(`🎯 DRILL-WRITING: Writing drill detected - routing to TestTaking.tsx`);
           const subjectId = selectedSubSkill.name; // Use full section name as subjectId
-          const navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?difficulty=${difficulty}`;
+          const navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
           console.log(`🎯 DRILL-WRITING: Navigating to: ${navigationUrl}`);
           navigate(navigationUrl);
           return;

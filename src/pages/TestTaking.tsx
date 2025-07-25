@@ -757,8 +757,16 @@ const TestTaking: React.FC = () => {
         let sessionIdToUse: string;
         let existingSession: any = null;
 
-        if (testType === 'drill') {
-          // For drill sessions, use DrillSessionService
+        // Check if this is a writing drill - writing drills should use SessionService like diagnostic/practice
+        const isWritingDrill = testType === 'drill' && (
+          sectionName.toLowerCase().includes('writing') ||
+          sectionName.toLowerCase().includes('written') ||
+          sectionName.toLowerCase().includes('expression') ||
+          questions.some(q => q.format === 'extended_response' || q.format === 'short_answer')
+        );
+        
+        if (testType === 'drill' && !isWritingDrill) {
+          // For NON-WRITING drill sessions, use DrillSessionService
           // Find the first question with a valid subSkillId (UUID), or create one from the sub_skill text
           const subSkillText = questions[0]?.subSkill || sectionName;
           const firstQuestionWithUUID = questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
@@ -789,7 +797,8 @@ const TestTaking: React.FC = () => {
           // Check if this is actually resuming an existing drill session
           existingSession = await loadDrillSession(sessionIdToUse);
         } else {
-          // For regular sessions, use TestSessionService  
+          // For regular sessions (diagnostic/practice) AND writing drills, use TestSessionService
+          console.log('🚀 SESSION-CREATE: Using SessionService for:', testType === 'drill' ? 'WRITING DRILL' : testType.toUpperCase());
           console.log('🚀 SESSION-CREATE: Creating session with params:', {
             userId: user.id,
             productType: properDisplayName,
@@ -989,8 +998,16 @@ const TestTaking: React.FC = () => {
       const flaggedQuestions = Array.from(sessionToUse.flaggedQuestions).map(q => q.toString());
 
       // Use different save logic for drill vs regular sessions
-      if (sessionToUse.type === 'drill') {
-        // For drill sessions, use DrillSessionService
+      // EXCEPTION: Writing drills use SessionService like diagnostic/practice tests
+      const isWritingDrill = sessionToUse.type === 'drill' && (
+        sessionToUse.sectionName.toLowerCase().includes('writing') ||
+        sessionToUse.sectionName.toLowerCase().includes('written') ||
+        sessionToUse.sectionName.toLowerCase().includes('expression') ||
+        sessionToUse.questions.some(q => q.format === 'extended_response' || q.format === 'short_answer')
+      );
+      
+      if (sessionToUse.type === 'drill' && !isWritingDrill) {
+        // For NON-WRITING drill sessions, use DrillSessionService
         const questionsAnswered = Object.keys(stringAnswers).length + Object.keys(stringTextAnswers).length;
         const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
           const question = sessionToUse.questions[parseInt(Object.keys(stringAnswers)[index])];
@@ -1014,7 +1031,7 @@ const TestTaking: React.FC = () => {
           stringTextAnswers
         );
       } else {
-        // For regular sessions (diagnostic/practice), use SessionService
+        // For regular sessions (diagnostic/practice) AND writing drills, use SessionService
         console.log('💾 SAVE: About to save with SessionService.saveProgress:');
         console.log('💾 SAVE: - Session ID:', sessionToUse.id);
         console.log('💾 SAVE: - Current Question:', sessionToUse.currentQuestion);
@@ -1232,8 +1249,16 @@ const TestTaking: React.FC = () => {
         });
 
         // Use different save logic for drill vs regular sessions
-        if (updatedSession.type === 'drill') {
-          // For drill sessions, update drill-specific progress
+        // EXCEPTION: Writing drills use SessionService like diagnostic/practice tests
+        const isWritingDrill = updatedSession.type === 'drill' && (
+          updatedSession.sectionName.toLowerCase().includes('writing') ||
+          updatedSession.sectionName.toLowerCase().includes('written') ||
+          updatedSession.sectionName.toLowerCase().includes('expression') ||
+          updatedSession.questions.some(q => q.format === 'extended_response' || q.format === 'short_answer')
+        );
+        
+        if (updatedSession.type === 'drill' && !isWritingDrill) {
+          // For NON-WRITING drill sessions, update drill-specific progress
           const questionsAnswered = Object.keys(stringAnswers).length + Object.keys(stringTextAnswers).length;
           const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
             const question = updatedSession.questions[parseInt(Object.keys(stringAnswers)[index])];
@@ -1257,7 +1282,7 @@ const TestTaking: React.FC = () => {
             stringTextAnswers
           );
         } else {
-          // For regular sessions, use existing logic
+          // For regular sessions AND writing drills, use existing logic
           await SessionService.saveProgress(
             updatedSession.id,
             updatedSession.currentQuestion,
@@ -1505,9 +1530,18 @@ const TestTaking: React.FC = () => {
       await processWritingAssessments();
       
       // Mark as completed - use different logic for drill vs regular sessions
+      // EXCEPTION: Writing drills use SessionService like diagnostic/practice tests
       setWritingProcessingStatus('Finalizing your results...');
-      if (session.type === 'drill') {
-        // For drill sessions, complete using DrillSessionService
+      
+      const isWritingDrill = session.type === 'drill' && (
+        session.sectionName.toLowerCase().includes('writing') ||
+        session.sectionName.toLowerCase().includes('written') ||
+        session.sectionName.toLowerCase().includes('expression') ||
+        session.questions.some(q => q.format === 'extended_response' || q.format === 'short_answer')
+      );
+      
+      if (session.type === 'drill' && !isWritingDrill) {
+        // For NON-WRITING drill sessions, complete using DrillSessionService
         const questionsAnswered = Object.keys(session.answers).length + 
           Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
         
@@ -1564,7 +1598,7 @@ const TestTaking: React.FC = () => {
           stringTextAnswers
         );
       } else {
-        // For regular sessions (diagnostic/practice), use developer tools replica approach
+        // For regular sessions (diagnostic/practice) AND writing drills, use developer tools replica approach
         console.log('🎯 DEV-REPLICA: Using developer tools completion approach for insights compatibility');
         
         // Create the session structure in the exact format the replica service expects
