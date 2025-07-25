@@ -196,13 +196,13 @@ const Layout: React.FC = () => {
             </div>
           </div>
 
-          {/* Test Product Selector - Moved to Sidebar */}
+          {/* Learning Product Selector - Moved to Sidebar */
           {!sidebarCollapsed && (
             <div className="flex-shrink-0 px-6 py-3 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-edu-navy/70 mb-2">Test Product</h3>
+              <h3 className="text-sm font-semibold text-edu-navy/70 mb-2">Learning Product</h3>
               <Select value={selectedProduct} onValueChange={handleProductChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select test product" />
+                  <SelectValue placeholder="Select learning product" />
                 </SelectTrigger>
                 <SelectContent>
                   {allProducts.map((product) => (
@@ -430,7 +430,7 @@ const Layout: React.FC = () => {
               
               {/* Mobile Test Selector */}
               <div className="p-6 border-b border-gray-100">
-                <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Test Product</h3>
+                <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Learning Product</h3>
                 <Select value={selectedProduct} onValueChange={handleProductChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue />

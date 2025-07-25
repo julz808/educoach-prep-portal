@@ -467,18 +467,29 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
-      const totalQuestions = subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
+      // For practice tests, use max points as the total (like diagnostic) to properly handle written expression
+      const totalQuestions = subSkill.maxPoints || subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
       
-      // Use simple percentage for sub-skills too (consistent with section calculation)
-      const score = totalQuestions > 0 ? Math.round((subSkill.questionsCorrect / totalQuestions) * 100) : 0;
-      const accuracy = subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0;
+      // Calculate score using max points (earned points / max points)
+      const score = subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0;
+      
+      // For accuracy: use max points for written expression, attempted for others
+      const sectionName = mapSectionNameToCurriculum(subSkill.sectionName, productType);
+      const isWritingSection = sectionName.toLowerCase().includes('written expression') || 
+                              sectionName.toLowerCase().includes('writing') ||
+                              subSkill.subSkillName.toLowerCase().includes('writing') ||
+                              subSkill.subSkillName.toLowerCase().includes('narrative');
+      
+      const accuracy = isWritingSection 
+        ? score // For writing, accuracy equals score (both use max points)
+        : (subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0);
       
       return {
-        sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
+        sectionName,
         subSkillName: subSkill.subSkillName,
         score,
         accuracy,
-        questionsCorrect: subSkill.questionsCorrect,
+        questionsCorrect: subSkill.earnedPoints || subSkill.questionsCorrect, // Use earned points for written expression
         questionsTotal: totalQuestions,
         questionsAttempted: subSkill.questionsAttempted
       };
