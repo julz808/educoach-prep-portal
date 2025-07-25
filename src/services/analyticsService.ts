@@ -465,18 +465,15 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       };
     });
     
-    // Build sub-skill breakdown - include ALL available sub-skills, even if not attempted
-    const subSkillBreakdown = [];
-    
-    // First, add all attempted sub-skills
-    for (const subSkill of subSkillStats.values()) {
+    // Build sub-skill breakdown
+    const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
       const totalQuestions = subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
       
       // Use simple percentage for sub-skills too (consistent with section calculation)
       const score = totalQuestions > 0 ? Math.round((subSkill.questionsCorrect / totalQuestions) * 100) : 0;
       const accuracy = subSkill.questionsAttempted > 0 ? Math.round((subSkill.questionsCorrect / subSkill.questionsAttempted) * 100) : 0;
       
-      subSkillBreakdown.push({
+      return {
         sectionName: mapSectionNameToCurriculum(subSkill.sectionName, productType),
         subSkillName: subSkill.subSkillName,
         score,
@@ -484,28 +481,8 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         questionsCorrect: subSkill.questionsCorrect,
         questionsTotal: totalQuestions,
         questionsAttempted: subSkill.questionsAttempted
-      });
-    }
-    
-    // Then, add any missing sub-skills from subSkillTotals that weren't attempted
-    for (const [subSkillName, subSkillData] of subSkillTotals.entries()) {
-      // Skip if we already have this sub-skill from attempted questions
-      if (subSkillStats.has(subSkillName)) {
-        continue;
-      }
-      
-      console.log(`📋 Adding unattempted sub-skill: ${subSkillName} (${subSkillData.total} questions available)`);
-      
-      subSkillBreakdown.push({
-        sectionName: mapSectionNameToCurriculum(subSkillData.section, productType),
-        subSkillName: subSkillName,
-        score: 0, // 0% score for unattempted
-        accuracy: 0, // 0% accuracy for unattempted  
-        questionsCorrect: 0,
-        questionsTotal: subSkillData.total,
-        questionsAttempted: 0
-      });
-    }
+      };
+    });
     
     // Build section scores map
     const sectionScores = Object.fromEntries(
@@ -2077,7 +2054,7 @@ export class AnalyticsService {
           
           // Aggregate data from all sections for this practice test
           const allSectionBreakdowns = [];
-          const allSubSkillBreakdowns = [];
+          const subSkillAggregates = new Map(); // For proper sub-skill consolidation
           const allSectionScores = {};
           let totalQuestions = 0;
           let totalQuestionsAttempted = 0;
@@ -2090,8 +2067,26 @@ export class AnalyticsService {
               const sectionData = await getRealTestData(userId, productType, session.id, 'practice', i);
               if (sectionData) {
                 allSectionBreakdowns.push(...sectionData.sectionBreakdown);
-                allSubSkillBreakdowns.push(...sectionData.subSkillBreakdown);
                 Object.assign(allSectionScores, sectionData.sectionScores);
+                
+                // Properly aggregate sub-skills (consolidate duplicates)
+                for (const subSkill of sectionData.subSkillBreakdown || []) {
+                  const key = subSkill.subSkillName;
+                  if (subSkillAggregates.has(key)) {
+                    // Consolidate existing sub-skill data
+                    const existing = subSkillAggregates.get(key);
+                    existing.questionsCorrect += subSkill.questionsCorrect;
+                    existing.questionsTotal += subSkill.questionsTotal;
+                    existing.questionsAttempted += subSkill.questionsAttempted;
+                    // Recalculate percentages
+                    existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
+                    existing.accuracy = existing.questionsAttempted > 0 ? Math.round((existing.questionsCorrect / existing.questionsAttempted) * 100) : 0;
+                  } else {
+                    // Add new sub-skill
+                    subSkillAggregates.set(key, { ...subSkill });
+                  }
+                }
+                
                 // Only count totalQuestions once (it's the same for all sessions in the practice test)
                 if (totalQuestions === 0) {
                   totalQuestions = sectionData.totalQuestions || 0;
@@ -2105,6 +2100,9 @@ export class AnalyticsService {
               console.error(`❌ Error getting data for session ${session.id}:`, error);
             }
           }
+          
+          // Convert aggregated sub-skills back to array
+          const allSubSkillBreakdowns = Array.from(subSkillAggregates.values());
           
           // Calculate overall scores using earned points for score, questions for accuracy
           const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;

@@ -1581,10 +1581,10 @@ const PerformanceDashboard = () => {
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                   <div className="relative group">
-                                    <h4 className="font-medium text-slate-900 text-sm cursor-help flex items-center gap-1">
+                                    <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
                                       {subSkill.subSkillName}
                                       <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </h4>
+                                    </h5>
                                     {UNIFIED_SUB_SKILLS[subSkill.subSkillName] && (
                                       <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
                                         <div className="font-semibold text-teal-400 mb-2">{subSkill.subSkillName}</div>
@@ -1593,17 +1593,17 @@ const PerformanceDashboard = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
+                                  <p className="text-sm text-slate-500">{subSkill.sectionName}</p>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
-                                  <div className={`text-base font-semibold ${
+                                  <div className={`text-lg font-semibold ${
                                     subSkillView === 'score'
                                       ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
                                       : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
                                   }`}>
                                     {subSkillView === 'score' ? displayScore : displayAccuracy}%
                                   </div>
-                                  <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                  <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
                                     <div 
                                       key={`${subSkill.subSkillName}-${subSkillView}`}
                                       className={`h-full rounded-full growToRight ${
@@ -1613,11 +1613,15 @@ const PerformanceDashboard = () => {
                                       }`}
                                       style={{ 
                                         width: `${subSkillView === 'score' ? displayScore : displayAccuracy}%`,
-                                        animationDelay: `${index * 100}ms`
+                                        animationDelay: `${index * 120}ms`
                                       }}
                                     />
                                   </div>
-                                  <div className="text-xs text-slate-500">
+                                  <div 
+                                    key={`${subSkill.subSkillName}-fraction-${subSkillView}`}
+                                    className="text-sm text-slate-600 fadeIn"
+                                    style={{ animationDelay: `${index * 120 + 600}ms` }}
+                                  >
                                     {subSkillView === 'score' 
                                       ? <span>{subSkill.questionsCorrect}/{subSkill.questionsTotal}</span>
                                       : <span>{subSkill.questionsCorrect}/{subSkill.questionsAttempted}</span>
@@ -1793,10 +1797,10 @@ const PerformanceDashboard = () => {
                                 {/* Left Section: Sub-skill Info */}
                                 <div className="flex-1 min-w-0">
                                   <div className="relative group">
-                                    <h4 className="font-medium text-slate-900 text-sm cursor-help flex items-center gap-1">
+                                    <h5 className="font-medium text-slate-900 cursor-help flex items-center gap-1">
                                       {subSkill.subSkillName}
                                       <Info size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </h4>
+                                    </h5>
                                     {UNIFIED_SUB_SKILLS[subSkill.subSkillName] && (
                                       <div className="absolute left-0 top-full mt-2 w-80 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg">
                                         <div className="font-semibold text-teal-400 mb-2">{subSkill.subSkillName}</div>
@@ -1805,12 +1809,12 @@ const PerformanceDashboard = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <p className="text-xs text-slate-500 mt-1">{subSkill.sectionName}</p>
+                                  <p className="text-sm text-slate-500">{subSkill.sectionName}</p>
                                 </div>
 
                                 {/* Overall Stats */}
                                 <div className="flex items-center gap-3 flex-shrink-0">
-                                  <div className={`text-base font-semibold ${
+                                  <div className={`text-lg font-semibold ${
                                     subSkill.accuracy >= 80 ? 'text-green-600' : 
                                     subSkill.accuracy >= 60 ? 'text-orange-600' : 
                                     'text-red-600'
@@ -1818,7 +1822,7 @@ const PerformanceDashboard = () => {
                                     {subSkill.accuracy}%
                                   </div>
                                   
-                                  <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                  <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
                                     <div 
                                       key={`${subSkill.subSkillName}-accuracy`}
                                       className={`h-full rounded-full growToRight ${
@@ -1828,12 +1832,12 @@ const PerformanceDashboard = () => {
                                       }`}
                                       style={{ 
                                         width: `${subSkill.accuracy}%`,
-                                        animationDelay: `${index * 100}ms`
+                                        animationDelay: `${index * 120}ms`
                                       }}
                                     />
                                   </div>
                                   
-                                  <div className="text-xs text-slate-500 whitespace-nowrap">
+                                  <div className="text-sm text-slate-600 whitespace-nowrap fadeIn" style={{ animationDelay: `${index * 120 + 600}ms` }}>
                                     {subSkill.questionsCompleted} questions
                                   </div>
                                 </div>
