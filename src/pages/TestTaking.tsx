@@ -967,22 +967,50 @@ const TestTaking: React.FC = () => {
 
       const flaggedQuestions = Array.from(sessionToUse.flaggedQuestions).map(q => q.toString());
 
-      console.log('💾 SAVE: About to save with SessionService.saveProgress:');
-      console.log('💾 SAVE: - Session ID:', sessionToUse.id);
-      console.log('💾 SAVE: - Current Question:', sessionToUse.currentQuestion);
-      console.log('💾 SAVE: - String Answers:', stringAnswers);
-      console.log('💾 SAVE: - String Text Answers:', stringTextAnswers);
-      console.log('💾 SAVE: - Flagged Questions:', flaggedQuestions);
-      console.log('💾 SAVE: - Time Remaining:', timeRemaining);
+      // Use different save logic for drill vs regular sessions
+      if (sessionToUse.type === 'drill') {
+        // For drill sessions, use DrillSessionService
+        const questionsAnswered = Object.keys(stringAnswers).length + Object.keys(stringTextAnswers).length;
+        const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
+          const question = sessionToUse.questions[parseInt(Object.keys(stringAnswers)[index])];
+          if (!question || !answer) return false;
+          const answerIndex = answer.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
+          return answerIndex === question.correctAnswer;
+        }).length;
+        
+        console.log('💾 DRILL-SAVE: Updating drill session progress:');
+        console.log('💾 DRILL-SAVE: - Session ID:', sessionToUse.id);
+        console.log('💾 DRILL-SAVE: - Questions Answered:', questionsAnswered);
+        console.log('💾 DRILL-SAVE: - Questions Correct:', questionsCorrect);
+        console.log('💾 DRILL-SAVE: - Answers:', stringAnswers);
+        console.log('💾 DRILL-SAVE: - Text Answers:', stringTextAnswers);
 
-      await SessionService.saveProgress(
-        sessionToUse.id,
-        sessionToUse.currentQuestion,
-        stringAnswers,
-        flaggedQuestions,
-        timeRemaining,
-        stringTextAnswers
-      );
+        await DrillSessionService.updateProgress(
+          sessionToUse.id,
+          questionsAnswered,
+          questionsCorrect,
+          stringAnswers,
+          stringTextAnswers
+        );
+      } else {
+        // For regular sessions (diagnostic/practice), use SessionService
+        console.log('💾 SAVE: About to save with SessionService.saveProgress:');
+        console.log('💾 SAVE: - Session ID:', sessionToUse.id);
+        console.log('💾 SAVE: - Current Question:', sessionToUse.currentQuestion);
+        console.log('💾 SAVE: - String Answers:', stringAnswers);
+        console.log('💾 SAVE: - String Text Answers:', stringTextAnswers);
+        console.log('💾 SAVE: - Flagged Questions:', flaggedQuestions);
+        console.log('💾 SAVE: - Time Remaining:', timeRemaining);
+
+        await SessionService.saveProgress(
+          sessionToUse.id,
+          sessionToUse.currentQuestion,
+          stringAnswers,
+          flaggedQuestions,
+          timeRemaining,
+          stringTextAnswers
+        );
+      }
 
       console.log('✅ SAVE COMPLETE: Progress saved successfully');
     } catch (error) {
