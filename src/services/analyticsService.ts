@@ -2053,7 +2053,7 @@ export class AnalyticsService {
           console.log(`✅ Test ${i} - All sections completed - showing insights`);
           
           // Aggregate data from all sections for this practice test
-          const allSectionBreakdowns = [];
+          const sectionAggregates = new Map(); // For proper section consolidation
           const subSkillAggregates = new Map(); // For proper sub-skill consolidation
           const allSectionScores = {};
           let totalQuestions = 0;
@@ -2066,7 +2066,29 @@ export class AnalyticsService {
             try {
               const sectionData = await getRealTestData(userId, productType, session.id, 'practice', i);
               if (sectionData) {
-                allSectionBreakdowns.push(...sectionData.sectionBreakdown);
+                // Properly aggregate sections (consolidate duplicates like Written Expression)
+                for (const section of sectionData.sectionBreakdown || []) {
+                  const key = section.sectionName;
+                  if (sectionAggregates.has(key)) {
+                    // Consolidate existing section data
+                    const existing = sectionAggregates.get(key);
+                    existing.questionsCorrect += section.questionsCorrect;
+                    existing.questionsTotal += section.questionsTotal;
+                    existing.questionsAttempted += section.questionsAttempted;
+                    // Recalculate percentages - for written expression, use total points as denominator for both score and accuracy
+                    existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
+                    existing.accuracy = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
+                  } else {
+                    // Add new section - for written expression, ensure accuracy uses total points as denominator
+                    const newSection = { ...section };
+                    if (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing')) {
+                      // For writing sections, accuracy should equal score (both use total points as denominator)
+                      newSection.accuracy = newSection.score;
+                    }
+                    sectionAggregates.set(key, newSection);
+                  }
+                }
+                
                 Object.assign(allSectionScores, sectionData.sectionScores);
                 
                 // Properly aggregate sub-skills (consolidate duplicates)
@@ -2078,12 +2100,22 @@ export class AnalyticsService {
                     existing.questionsCorrect += subSkill.questionsCorrect;
                     existing.questionsTotal += subSkill.questionsTotal;
                     existing.questionsAttempted += subSkill.questionsAttempted;
-                    // Recalculate percentages
+                    // Recalculate percentages - for written expression, accuracy should use total points
                     existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
-                    existing.accuracy = existing.questionsAttempted > 0 ? Math.round((existing.questionsCorrect / existing.questionsAttempted) * 100) : 0;
+                    if (existing.sectionName.toLowerCase().includes('written expression') || existing.sectionName.toLowerCase().includes('writing')) {
+                      // For writing sub-skills, accuracy should equal score (both use total points as denominator)
+                      existing.accuracy = existing.score;
+                    } else {
+                      existing.accuracy = existing.questionsAttempted > 0 ? Math.round((existing.questionsCorrect / existing.questionsAttempted) * 100) : 0;
+                    }
                   } else {
-                    // Add new sub-skill
-                    subSkillAggregates.set(key, { ...subSkill });
+                    // Add new sub-skill - for written expression, ensure accuracy uses total points
+                    const newSubSkill = { ...subSkill };
+                    if (subSkill.sectionName.toLowerCase().includes('written expression') || subSkill.sectionName.toLowerCase().includes('writing')) {
+                      // For writing sub-skills, accuracy should equal score (both use total points as denominator)
+                      newSubSkill.accuracy = newSubSkill.score;
+                    }
+                    subSkillAggregates.set(key, newSubSkill);
                   }
                 }
                 
@@ -2101,7 +2133,8 @@ export class AnalyticsService {
             }
           }
           
-          // Convert aggregated sub-skills back to array
+          // Convert aggregated sections and sub-skills back to arrays
+          const allSectionBreakdowns = Array.from(sectionAggregates.values());
           const allSubSkillBreakdowns = Array.from(subSkillAggregates.values());
           
           // Calculate overall scores using earned points for score, questions for accuracy

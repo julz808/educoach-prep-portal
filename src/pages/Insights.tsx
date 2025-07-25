@@ -1033,7 +1033,16 @@ const PerformanceDashboard = () => {
                         });
                         
                         return mappedSkills
-                          .filter(item => practiceFilter === 'all' || item.category === practiceFilter)
+                          .filter(item => {
+                            // Filter by score/accuracy tab: 
+                            // Score tab: show ALL sub-skills (including unattempted)
+                            // Accuracy tab: show ONLY attempted sub-skills
+                            if (subSkillView === 'accuracy' && item.answered === 0) {
+                              return false;
+                            }
+                            
+                            return practiceFilter === 'all' || item.category === practiceFilter;
+                          })
                           .sort((a, b) => {
                             const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
                             const bValue = subSkillView === 'score' ? b.performancePercent : b.accuracyPercent;
@@ -1428,7 +1437,7 @@ const PerformanceDashboard = () => {
                               <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
-                                    <h4 className="font-medium text-slate-900 text-sm">{section.sectionName}</h4>
+                                    <h4 className="font-medium text-slate-900 text-base">{section.sectionName}</h4>
                                   </div>
                                   <div className="flex flex-col items-end gap-2">
                                     <div className={`text-base font-semibold ${
@@ -1528,6 +1537,13 @@ const PerformanceDashboard = () => {
                     <div className="divide-y divide-slate-100">
                       {(selectedTest.subSkillBreakdown || [])
                         .filter(subSkill => {
+                          // Filter by score/accuracy tab: 
+                          // Score tab: show ALL sub-skills (including unattempted)
+                          // Accuracy tab: show ONLY attempted sub-skills
+                          if (subSkillView === 'accuracy' && subSkill.questionsAttempted === 0) {
+                            return false;
+                          }
+                          
                           if (practiceFilter === 'all') return true;
                           
                           const lowerSectionName = subSkill.sectionName.toLowerCase();
