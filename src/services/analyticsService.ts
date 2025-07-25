@@ -2106,7 +2106,12 @@ export class AnalyticsService {
                     existing.questionsAttempted += subSkill.questionsAttempted;
                     // Recalculate percentages - for written expression, accuracy should use total points
                     existing.score = existing.questionsTotal > 0 ? Math.round((existing.questionsCorrect / existing.questionsTotal) * 100) : 0;
-                    if (existing.sectionName.toLowerCase().includes('written expression') || existing.sectionName.toLowerCase().includes('writing')) {
+                    // Check for writing sections by section name OR sub-skill name
+                    const isWritingSection = existing.sectionName.toLowerCase().includes('written expression') || 
+                                           existing.sectionName.toLowerCase().includes('writing') ||
+                                           existing.subSkillName.toLowerCase().includes('writing') ||
+                                           existing.subSkillName.toLowerCase().includes('narrative');
+                    if (isWritingSection) {
                       // For writing sub-skills, accuracy should equal score (both use total points as denominator)
                       existing.accuracy = existing.score;
                     } else {
@@ -2115,7 +2120,12 @@ export class AnalyticsService {
                   } else {
                     // Add new sub-skill - for written expression, ensure accuracy uses total points
                     const newSubSkill = { ...subSkill };
-                    if (subSkill.sectionName.toLowerCase().includes('written expression') || subSkill.sectionName.toLowerCase().includes('writing')) {
+                    // Check for writing sections by section name OR sub-skill name
+                    const isWritingSection = subSkill.sectionName.toLowerCase().includes('written expression') || 
+                                           subSkill.sectionName.toLowerCase().includes('writing') ||
+                                           subSkill.subSkillName.toLowerCase().includes('writing') ||
+                                           subSkill.subSkillName.toLowerCase().includes('narrative');
+                    if (isWritingSection) {
                       // For writing sub-skills, accuracy should equal score (both use total points as denominator)
                       newSubSkill.accuracy = newSubSkill.score;
                     }
@@ -2141,9 +2151,9 @@ export class AnalyticsService {
           const allSectionBreakdowns = Array.from(sectionAggregates.values());
           const allSubSkillBreakdowns = Array.from(subSkillAggregates.values());
           
-          // Calculate overall scores using earned points for score, questions for accuracy
+          // Calculate overall scores using earned points for score, max points for accuracy (to include written expression)
           const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-          const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsAttempted) * 100) : 0;
+          const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
           
           console.log(`🔍 PRACTICE TEST ${i} SCORE CALCULATION:`, {
             totalEarnedPoints,

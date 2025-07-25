@@ -284,7 +284,7 @@ const Layout: React.FC = () => {
                         {item.id === 'diagnostic' && shouldShowStartHerePill() && (
                           <Badge 
                             variant="secondary" 
-                            className="text-xs bg-green-100 text-green-700 border-green-200 font-medium"
+                            className="text-xs bg-green-100 text-green-700 border-green-200 font-medium hover:bg-green-100 hover:text-green-700 hover:border-green-200"
                           >
                             Start here
                           </Badge>
@@ -365,7 +365,7 @@ const Layout: React.FC = () => {
 
       {/* Mobile/Tablet Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-1">
+        <div className="flex items-center justify-between px-4">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -497,7 +497,7 @@ const Layout: React.FC = () => {
                       {item.id === 'diagnostic' && shouldShowStartHerePill() && (
                         <Badge 
                           variant="secondary" 
-                          className="ml-auto text-xs bg-green-100 text-green-700 border-green-200 font-medium"
+                          className="ml-auto text-xs bg-green-100 text-green-700 border-green-200 font-medium hover:bg-green-100 hover:text-green-700 hover:border-green-200"
                         >
                           Start here
                         </Badge>
