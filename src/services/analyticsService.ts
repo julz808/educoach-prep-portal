@@ -362,6 +362,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         });
       }
       
+      
       const subSkillData = subSkillStats.get(subSkillName);
       subSkillData.questionsAttempted++;
       subSkillData.maxPoints += maxPoints;
@@ -465,6 +466,44 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         questionsAttempted
       };
     });
+    
+    // For EduTest Written Expression, ensure we have both sub-skills
+    if (productType.includes('EduTest') && testType === 'practice') {
+      const writingSection = Array.from(sectionStats.values()).find(s => 
+        s.sectionName.toLowerCase().includes('written expression') || 
+        s.sectionName.toLowerCase().includes('writing')
+      );
+      
+      if (writingSection) {
+        // Ensure both Narrative Writing and Persuasive Writing exist
+        const narrativeExists = subSkillStats.has('Narrative Writing');
+        const persuasiveExists = subSkillStats.has('Persuasive Writing');
+        
+        if (!narrativeExists) {
+          subSkillStats.set('Narrative Writing', {
+            subSkillName: 'Narrative Writing',
+            sectionName: writingSection.sectionName,
+            questionsTotal: 0,
+            questionsAttempted: 0,
+            questionsCorrect: 0,
+            maxPoints: 15,
+            earnedPoints: 0
+          });
+        }
+        
+        if (!persuasiveExists) {
+          subSkillStats.set('Persuasive Writing', {
+            subSkillName: 'Persuasive Writing',
+            sectionName: writingSection.sectionName,
+            questionsTotal: 0,
+            questionsAttempted: 0,
+            questionsCorrect: 0,
+            maxPoints: 15,
+            earnedPoints: 0
+          });
+        }
+      }
+    }
     
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
@@ -2183,7 +2222,9 @@ export class AnalyticsService {
             totalQuestions: totalQuestions,
             questionsAttempted: totalQuestionsAttempted,
             questionsCorrect: totalQuestionsCorrect,
-            overallAccuracy: overallAccuracy
+            overallAccuracy: overallAccuracy,
+            totalMaxPoints: totalMaxPoints,
+            totalEarnedPoints: totalEarnedPoints
           };
           
           console.log(`📊 Aggregated Test ${i} data:`, {

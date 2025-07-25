@@ -1358,13 +1358,12 @@ const PerformanceDashboard = () => {
                 }
                 
                 // Use ONLY real data from the database
+                // For practice tests, use the backend-calculated values that account for max points
                 const totalQuestions = selectedTest.totalQuestions || 0;
                 const questionsAttempted = selectedTest.questionsAttempted || 0;
                 const questionsCorrect = selectedTest.questionsCorrect || 0;
                 const overallScore = selectedTest.score || 0;
-                const overallAccuracy = questionsAttempted > 0 
-                  ? Math.round((questionsCorrect / questionsAttempted) * 100) 
-                  : 0;
+                const overallAccuracy = selectedTest.overallAccuracy || 0;
                 
                 console.log('🔍 Selected test details:', {
                   testNumber: selectedTest.testNumber,
@@ -1464,8 +1463,8 @@ const PerformanceDashboard = () => {
                           </div>
                           <div className="flex items-center justify-center gap-4">
                             <div className="text-3xl font-bold text-slate-900">
-                              {questionsCorrect}
-                              <span className="text-slate-600">/{questionsAttempted}</span>
+                              {selectedTest.totalEarnedPoints || questionsCorrect}
+                              <span className="text-slate-600">/{selectedTest.totalMaxPoints || totalQuestions}</span>
                             </div>
                             <div className="h-10 w-px bg-slate-200"></div>
                             <div className={`text-3xl font-bold ${
@@ -1664,54 +1663,7 @@ const PerformanceDashboard = () => {
                     
                     {/* Sub-Skills List for Practice Tests */}
                     <div className="divide-y divide-slate-100">
-                      {(function() {
-                        const subSkills = selectedTest.subSkillBreakdown || [];
-                        const expandedSubSkills = [];
-                        
-                        // Check if we need to split Written Expression sub-skills
-                        subSkills.forEach(subSkill => {
-                          const isWritingSection = subSkill.sectionName.toLowerCase().includes('written expression') || 
-                                                 subSkill.sectionName.toLowerCase().includes('writing');
-                          
-                          // For EduTest Scholarship Written Expression - should have 2 sub-skills of 15 points each
-                          if (isWritingSection && subSkill.questionsTotal === 30 && 
-                              selectedProduct.includes('EduTest')) {
-                            // This is likely a combined written expression that needs splitting
-                            // Check if we already have both sub-skills or just one
-                            const hasNarrative = subSkills.some(s => s.subSkillName === 'Narrative Writing');
-                            const hasPersuasive = subSkills.some(s => s.subSkillName === 'Persuasive Writing');
-                            
-                            if (hasNarrative && !hasPersuasive) {
-                              // We only have Narrative, need to split it
-                              expandedSubSkills.push({
-                                ...subSkill,
-                                subSkillName: 'Narrative Writing',
-                                questionsTotal: 15,
-                                questionsCorrect: 0, // Assume narrative had 0
-                                questionsAttempted: 0,
-                                score: 0,
-                                accuracy: 0
-                              });
-                              expandedSubSkills.push({
-                                ...subSkill,
-                                subSkillName: 'Persuasive Writing',
-                                questionsTotal: 15,
-                                questionsCorrect: subSkill.questionsCorrect, // All correct go to persuasive
-                                questionsAttempted: subSkill.questionsAttempted,
-                                score: Math.round((subSkill.questionsCorrect / 15) * 100),
-                                accuracy: Math.round((subSkill.questionsCorrect / 15) * 100)
-                              });
-                            } else {
-                              // Keep as is if we have both or neither
-                              expandedSubSkills.push(subSkill);
-                            }
-                          } else {
-                            expandedSubSkills.push(subSkill);
-                          }
-                        });
-                        
-                        return expandedSubSkills;
-                      })()
+                      {(selectedTest.subSkillBreakdown || [])
                         .filter(subSkill => {
                           // Filter by score/accuracy tab: 
                           // Score tab: show ALL sub-skills (including unattempted)
