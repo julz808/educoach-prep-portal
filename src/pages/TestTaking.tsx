@@ -1488,6 +1488,15 @@ const TestTaking: React.FC = () => {
           textAnswersCount: Object.keys(session.textAnswers).length
         });
         
+        // Convert answers to string format for database storage  
+        const stringAnswers: Record<string, string> = {};
+        Object.entries(session.answers).forEach(([qIndex, answerIndex]) => {
+          const question = session.questions[parseInt(qIndex)];
+          if (question && question.options && question.options[answerIndex]) {
+            stringAnswers[qIndex] = question.options[answerIndex];
+          }
+        });
+        
         // Convert textAnswers to string format for database storage
         const stringTextAnswers: Record<string, string> = {};
         Object.entries(session.textAnswers).forEach(([index, answer]) => {
@@ -1500,7 +1509,7 @@ const TestTaking: React.FC = () => {
           session.id,
           questionsAnswered,
           questionsCorrect,
-          session.answers,
+          stringAnswers, // Use converted string answers
           stringTextAnswers
         );
       } else {

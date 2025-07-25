@@ -168,34 +168,28 @@ export class WritingAssessmentService {
         
         if (!response.error && response.data) {
           console.log('✅ Supabase Edge Function successful');
-          // Transform Edge Function response to match AssessmentResult interface
-          const edgeResponse = response.data;
-          const transformedResult: AssessmentResult = {
-            totalScore: edgeResponse.overall_score || 0,
-            maxPossibleScore: rubric.totalMarks,
-            percentageScore: Math.round((edgeResponse.overall_score || 0) / rubric.totalMarks * 100),
-            criterionScores: {},
-            overallFeedback: edgeResponse.overall_feedback || '',
-            strengths: edgeResponse.suggestions?.slice(0, 2) || [],
-            improvements: edgeResponse.suggestions?.slice(2) || [],
-            processingMetadata: edgeResponse.processingMetadata || {
-              modelVersion: 'claude-3-haiku-20240307',
-              processingTimeMs: 0
-            }
-          };
+          console.log('📋 Edge Function Response:', response.data);
           
-          // Transform criterion scores
-          if (edgeResponse.scores && edgeResponse.feedback) {
-            for (const criterionName in edgeResponse.scores) {
-              transformedResult.criterionScores[criterionName] = {
-                score: edgeResponse.scores[criterionName] || 0,
-                maxMarks: rubric.criteria.find((c: any) => c.name === criterionName)?.maxMarks || 0,
-                feedback: edgeResponse.feedback[criterionName] || ''
-              };
-            }
+          // Edge Function returns the correct format directly - no transformation needed
+          const assessment = response.data;
+          
+          // Ensure processingMetadata exists
+          if (!assessment.processingMetadata) {
+            assessment.processingMetadata = {
+              modelVersion: 'claude-3-5-sonnet-20241022',
+              processingTimeMs: 0,
+              promptTokens: undefined,
+              responseTokens: undefined
+            };
           }
           
-          return transformedResult;
+          console.log('✅ Assessment processed:', {
+            totalScore: assessment.totalScore,
+            maxScore: assessment.maxPossibleScore,
+            percentage: assessment.percentageScore
+          });
+          
+          return assessment as AssessmentResult;
         }
         
         console.warn('⚠️ Supabase Edge Function failed:', response.error);
