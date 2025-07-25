@@ -196,7 +196,7 @@ const Layout: React.FC = () => {
             </div>
           </div>
 
-          {/* Learning Product Selector - Moved to Sidebar */}
+          {/* Learning Product Selector - Moved to Sidebar */
           {!sidebarCollapsed && (
             <div className="flex-shrink-0 px-6 py-3 border-b border-gray-100">
               <h3 className="text-sm font-semibold text-edu-navy/70 mb-2">Learning Product</h3>
@@ -365,7 +365,7 @@ const Layout: React.FC = () => {
 
       {/* Mobile/Tablet Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-1">
+        <div className="flex items-center justify-between px-4">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -428,7 +428,7 @@ const Layout: React.FC = () => {
                 </Button>
               </div>
               
-              {/* Mobile Learning Product Selector */}
+              {/* Mobile Test Selector */}
               <div className="p-6 border-b border-gray-100">
                 <h3 className="text-sm font-semibold text-edu-navy/70 mb-3">Learning Product</h3>
                 <Select value={selectedProduct} onValueChange={handleProductChange}>
