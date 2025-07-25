@@ -204,6 +204,7 @@ const PerformanceDashboard = () => {
   const [drillFilter, setDrillFilter] = useState('all');
   const [sectionView, setSectionView] = useState<'score' | 'accuracy'>('score');
   const [subSkillView, setSubSkillView] = useState<'score' | 'accuracy'>('score');
+  const [topBottomView, setTopBottomView] = useState<'score' | 'accuracy'>('score');
   const [drillView, setDrillView] = useState<'accuracy' | 'level'>('accuracy');
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
@@ -740,7 +741,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Score
+                            Total
                           </button>
                           <button
                             onClick={() => setSectionView('accuracy')}
@@ -750,7 +751,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Accuracy
+                            Attempted
                           </button>
                         </div>
                         <div className="relative group">
@@ -758,11 +759,11 @@ const PerformanceDashboard = () => {
                           <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                             <div className="space-y-3">
                               <div>
-                                <div className="font-semibold text-teal-400 mb-1">Score View</div>
+                                <div className="font-semibold text-teal-400 mb-1">Total View</div>
                                 <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
                               </div>
                               <div>
-                                <div className="font-semibold text-orange-400 mb-1">Accuracy View</div>
+                                <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
                                 <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
                               </div>
                             </div>
@@ -853,10 +854,34 @@ const PerformanceDashboard = () => {
                     {/* Top 5 Strengths */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <div className="px-6 py-4 border-b border-slate-200">
-                        <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                          Top 5 Sub-Skills
-                        </h3>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            Top 5 Sub-Skills
+                          </h3>
+                          <div className="flex bg-slate-100 rounded-lg p-1">
+                            <button
+                              onClick={() => setTopBottomView('score')}
+                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                                topBottomView === 'score' 
+                                  ? 'bg-white text-slate-900 shadow-sm' 
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Total
+                            </button>
+                            <button
+                              onClick={() => setTopBottomView('accuracy')}
+                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                                topBottomView === 'accuracy' 
+                                  ? 'bg-white text-slate-900 shadow-sm' 
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Attempted
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       <div className="p-6">
                         <div className="space-y-4">
@@ -867,11 +892,13 @@ const PerformanceDashboard = () => {
                                 <p className="text-sm text-slate-600">{item.sectionName}</p>
                               </div>
                               <div className="flex items-center gap-3">
-                                <div className="text-lg font-semibold text-green-600">{Math.round(item.accuracy)}%</div>
+                                <div className="text-lg font-semibold text-green-600">
+                                  {Math.round(topBottomView === 'score' ? item.score : item.accuracy)}%
+                                </div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
                                     className="h-full rounded-full bg-green-500"
-                                    style={{ width: `${item.accuracy}%` }}
+                                    style={{ width: `${topBottomView === 'score' ? item.score : item.accuracy}%` }}
                                   />
                                 </div>
                               </div>
@@ -890,10 +917,34 @@ const PerformanceDashboard = () => {
                     {/* Top 5 Areas for Improvement */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <div className="px-6 py-4 border-b border-slate-200">
-                        <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                          <XCircle className="w-5 h-5 text-red-600" />
-                          Bottom 5 Sub-Skills
-                        </h3>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                            <XCircle className="w-5 h-5 text-red-600" />
+                            Bottom 5 Sub-Skills
+                          </h3>
+                          <div className="flex bg-slate-100 rounded-lg p-1">
+                            <button
+                              onClick={() => setTopBottomView('score')}
+                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                                topBottomView === 'score' 
+                                  ? 'bg-white text-slate-900 shadow-sm' 
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Total
+                            </button>
+                            <button
+                              onClick={() => setTopBottomView('accuracy')}
+                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                                topBottomView === 'accuracy' 
+                                  ? 'bg-white text-slate-900 shadow-sm' 
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Attempted
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       <div className="p-6">
                         <div className="space-y-4">
@@ -905,14 +956,14 @@ const PerformanceDashboard = () => {
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className={`text-lg font-semibold ${
-                                  item.accuracy >= 60 ? 'text-orange-600' : 'text-red-600'
-                                }`}>{Math.round(item.accuracy)}%</div>
+                                  (topBottomView === 'score' ? item.score : item.accuracy) >= 60 ? 'text-orange-600' : 'text-red-600'
+                                }`}>{Math.round(topBottomView === 'score' ? item.score : item.accuracy)}%</div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
                                     className={`h-full rounded-full ${
-                                      item.accuracy >= 60 ? 'bg-orange-500' : 'bg-red-500'
+                                      (topBottomView === 'score' ? item.score : item.accuracy) >= 60 ? 'bg-orange-500' : 'bg-red-500'
                                     }`}
-                                    style={{ width: `${item.accuracy}%` }}
+                                    style={{ width: `${topBottomView === 'score' ? item.score : item.accuracy}%` }}
                                   />
                                 </div>
                               </div>
@@ -943,7 +994,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Score
+                            Total
                           </button>
                           <button
                             onClick={() => setSubSkillView('accuracy')}
@@ -953,7 +1004,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Accuracy
+                            Attempted
                           </button>
                         </div>
                       </div>
@@ -1384,7 +1435,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Score
+                            Total
                           </button>
                           <button
                             onClick={() => setSectionView('accuracy')}
@@ -1394,7 +1445,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Accuracy
+                            Attempted
                           </button>
                         </div>
                         <div className="relative group">
@@ -1402,11 +1453,11 @@ const PerformanceDashboard = () => {
                           <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                             <div className="space-y-3">
                               <div>
-                                <div className="font-semibold text-teal-400 mb-1">Score View</div>
+                                <div className="font-semibold text-teal-400 mb-1">Total View</div>
                                 <div className="text-xs">Shows correct answers out of total questions (e.g., 16/20 = 80%)</div>
                               </div>
                               <div>
-                                <div className="font-semibold text-orange-400 mb-1">Accuracy View</div>
+                                <div className="font-semibold text-orange-400 mb-1">Attempted View</div>
                                 <div className="text-xs">Shows correct answers out of questions attempted (e.g., 16/18 = 89%)</div>
                               </div>
                             </div>
@@ -1506,7 +1557,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Score
+                            Total
                           </button>
                           <button
                             onClick={() => setSubSkillView('accuracy')}
@@ -1516,7 +1567,7 @@ const PerformanceDashboard = () => {
                                 : 'text-slate-600 hover:text-slate-900'
                             }`}
                           >
-                            Accuracy
+                            Attempted
                           </button>
                         </div>
                       </div>
