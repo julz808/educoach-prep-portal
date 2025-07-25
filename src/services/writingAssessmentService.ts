@@ -248,9 +248,18 @@ export class WritingAssessmentService {
       throw new Error('User not authenticated for writing assessment storage');
     }
     
+    // First try to delete any existing assessment for this question/session
+    await supabase
+      .from('writing_assessments')
+      .delete()
+      .eq('user_id', data.userId)
+      .eq('session_id', data.sessionId)
+      .eq('question_id', data.questionId);
+
+    // Then insert the new assessment
     const { error } = await supabase
       .from('writing_assessments')
-      .upsert({
+      .insert({
         user_id: data.userId,
         session_id: data.sessionId,
         question_id: data.questionId,
@@ -270,8 +279,6 @@ export class WritingAssessmentService {
         processing_time_ms: data.assessment.processingMetadata?.processingTimeMs || 0,
         prompt_tokens: data.assessment.processingMetadata?.promptTokens || null,
         response_tokens: data.assessment.processingMetadata?.responseTokens || null
-      }, {
-        onConflict: 'user_id,session_id,question_id'
       });
       
     if (error) {
