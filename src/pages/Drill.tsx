@@ -473,7 +473,23 @@ const Drill: React.FC = () => {
     
     if (availableQuestions.length > 0) {
       try {
-        // Get the actual sub-skill ID from the questions
+        // Check if this is a writing/written expression drill FIRST
+        const isWritingDrill = selectedSubSkill.name.toLowerCase().includes('writing') || 
+                              selectedSubSkill.name.toLowerCase().includes('written') ||
+                              selectedSubSkill.name.toLowerCase().includes('expression');
+        
+        if (isWritingDrill) {
+          // For writing drills, route directly to TestTaking.tsx without session pre-creation
+          // TestTaking.tsx will handle session management just like diagnostic/practice tests
+          console.log(`🎯 DRILL-WRITING: Writing drill detected - routing to TestTaking.tsx`);
+          const subjectId = selectedSubSkill.name; // Use full section name as subjectId
+          const navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?difficulty=${difficulty}`;
+          console.log(`🎯 DRILL-WRITING: Navigating to: ${navigationUrl}`);
+          navigate(navigationUrl);
+          return;
+        }
+        
+        // For NON-WRITING drills, continue with existing DrillSessionService logic
         const subSkillText = selectedSubSkill.questions[0]?.subSkill || selectedSubSkill.name;
         const firstQuestionWithUUID = selectedSubSkill.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
         
@@ -498,71 +514,35 @@ const Drill: React.FC = () => {
           dbProductType
         );
         
-        // Check if this is a writing/written expression drill
-        const isWritingDrill = selectedSubSkill.name.toLowerCase().includes('writing') || 
-                              selectedSubSkill.name.toLowerCase().includes('written') ||
-                              selectedSubSkill.name.toLowerCase().includes('expression');
+        // For non-writing drills, keep the current Drill.tsx experience
+        console.log(`🎯 DRILL-STANDARD: Using standard drill experience for non-writing section`);
+        let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
         
-        let navigationUrl: string;
-        
-        if (isWritingDrill) {
-          // For writing drills, use the same TestTaking.tsx experience as diagnostic/practice tests
-          console.log(`🎯 DRILL-WRITING: Routing writing drill to TestTaking.tsx experience`);
-          navigationUrl = `/test/drill/${selectedSubSkill.name.toLowerCase().replace(/\s+/g, '-')}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
+        if (existingSession) {
+          console.log(`🎯 DRILL: Found existing session:`, existingSession);
           
-          if (existingSession) {
-            navigationUrl += `&sessionId=${existingSession.sessionId}`;
-            if (existingSession.status === 'completed' || 
-                (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
-              navigationUrl += '&review=true';
-              console.log(`🎯 DRILL-WRITING: Session is completed, adding review mode`);
-            } else {
-              console.log(`🎯 DRILL-WRITING: Session in progress (${existingSession.questionsAnswered}/${existingSession.questionsTotal}), will resume`);
-            }
+          // Add session ID for resume/review
+          navigationUrl += `&sessionId=${existingSession.sessionId}`;
+          
+          // Add review mode for completed sessions
+          if (existingSession.status === 'completed' || 
+              (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
+            navigationUrl += '&review=true';
+            console.log(`🎯 DRILL: Session is completed, adding review mode`);
           } else {
-            console.log(`🎯 DRILL-WRITING: No existing session found, will create new one`);
+            console.log(`🎯 DRILL: Session in progress (${existingSession.questionsAnswered}/${existingSession.questionsTotal}), will resume`);
           }
         } else {
-          // For non-writing drills, keep the current Drill.tsx experience
-          console.log(`🎯 DRILL-STANDARD: Using standard drill experience for non-writing section`);
-          navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
-          
-          if (existingSession) {
-            console.log(`🎯 DRILL: Found existing session:`, existingSession);
-            
-            // Add session ID for resume/review
-            navigationUrl += `&sessionId=${existingSession.sessionId}`;
-            
-            // Add review mode for completed sessions
-            if (existingSession.status === 'completed' || 
-                (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
-              navigationUrl += '&review=true';
-              console.log(`🎯 DRILL: Session is completed, adding review mode`);
-            } else {
-              console.log(`🎯 DRILL: Session in progress (${existingSession.questionsAnswered}/${existingSession.questionsTotal}), will resume`);
-            }
-          } else {
-            console.log(`🎯 DRILL: No existing session found, will create new one`);
-          }
+          console.log(`🎯 DRILL: No existing session found, will create new one`);
         }
         
         console.log(`🎯 DRILL: Navigating to: ${navigationUrl}`);
         navigate(navigationUrl);
       } catch (error) {
         console.error('🎯 DRILL: Error checking/creating drill session:', error);
-        // Fallback to navigation method based on drill type
-        const isWritingDrill = selectedSubSkill.name.toLowerCase().includes('writing') || 
-                              selectedSubSkill.name.toLowerCase().includes('written') ||
-                              selectedSubSkill.name.toLowerCase().includes('expression');
-        
-        let navigationUrl: string;
-        if (isWritingDrill) {
-          // For writing drills, use TestTaking.tsx experience
-          navigationUrl = `/test/drill/${selectedSubSkill.name.toLowerCase().replace(/\s+/g, '-')}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
-        } else {
-          // For non-writing drills, use old navigation method
-          navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
-        }
+        // Fallback to navigation method for non-writing drills only
+        // (Writing drills already handled above and returned early)
+        const navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
         navigate(navigationUrl);
       }
     } else {
