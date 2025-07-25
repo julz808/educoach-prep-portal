@@ -1615,6 +1615,80 @@ const TestTaking: React.FC = () => {
         };
         
         await DeveloperToolsReplicaService.completeSessionLikeDeveloperTools(sessionForReplica);
+        
+        // SPECIAL CASE: If this is a writing drill, also create a drill_sessions entry
+        // This ensures writing drills show up in drill progress and analytics
+        if (isWritingDrill) {
+          console.log('🎯 WRITING-DRILL: Creating drill_sessions bridge entry for drill progress tracking');
+          
+          // Calculate drill-specific metrics
+          const questionsAnswered = Object.keys(session.answers).length + 
+            Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
+          
+          // For writing drills, score calculation should use max points
+          const totalMaxPoints = session.questions.reduce((sum, q) => sum + (q.maxPoints || 1), 0);
+          const totalEarnedPoints = await ScoringService.calculateTestScore(
+            session.questions,
+            session.answers,
+            session.textAnswers,
+            session.id
+          );
+          
+          // Get the difficulty level from URL params
+          const difficulty = parseInt(searchParams.get('difficulty') === 'easy' ? '1' : 
+                                   searchParams.get('difficulty') === 'medium' ? '2' : '3');
+          
+          // Get or create UUID for sub-skill
+          const subSkillText = session.questions[0]?.subSkill || session.sectionName;
+          const firstQuestionWithUUID = session.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
+          const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
+          
+          // Convert answers to string format for drill_sessions
+          const stringAnswers: Record<string, string> = {};
+          Object.entries(session.answers).forEach(([qIndex, answerIndex]) => {
+            const question = session.questions[parseInt(qIndex)];
+            if (question && question.options && question.options[answerIndex]) {
+              stringAnswers[qIndex] = question.options[answerIndex];
+            }
+          });
+          
+          const stringTextAnswers: Record<string, string> = {};
+          Object.entries(session.textAnswers).forEach(([index, answer]) => {
+            if (answer && answer.trim().length > 0) {
+              stringTextAnswers[index] = answer;
+            }
+          });
+          
+          // For writing drills, treat all attempted questions as "correct" for progress tracking
+          // The actual scoring is handled separately via writing assessments
+          const questionsCorrect = questionsAnswered;
+          
+          try {
+            // Create drill session entry
+            const drillSessionId = await DrillSessionService.createOrResumeSession(
+              user.id,
+              actualSubSkillId,
+              session.productType,
+              difficulty,
+              session.questions.map(q => q.id),
+              session.questions.length
+            );
+            
+            // Complete the drill session
+            await DrillSessionService.completeSession(
+              drillSessionId,
+              questionsAnswered,
+              questionsCorrect,
+              stringAnswers,
+              stringTextAnswers
+            );
+            
+            console.log('✅ WRITING-DRILL: Bridge drill_sessions entry created successfully');
+          } catch (drillError) {
+            console.error('❌ WRITING-DRILL: Failed to create drill_sessions bridge entry:', drillError);
+            // Don't throw - this is supplementary, the main session is already complete
+          }
+        }
       }
       
       // Calculate final score using ScoringService

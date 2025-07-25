@@ -2655,13 +2655,86 @@ export class AnalyticsService {
 
       // Group by section and sub-skill
       const sectionMap = new Map<string, Map<string, {
-        sessions: Array<typeof sessionsWithSubSkillInfo[0]>;
+        sessions: Array<any>;
         totalQuestions: number;
         totalCorrect: number;
-        difficultyStats: Record<number, { questions: number; correct: number }>;
+        totalMaxPoints: number;
+        totalEarnedPoints: number;
+        isWritingDrill: boolean;
+        difficultyStats: Record<number, { questions: number; correct: number; maxPoints: number; earnedPoints: number }>;
       }>>();
 
-      sessionsWithSubSkillInfo.forEach(session => {
+      // Process each session and handle writing drills specially
+      const processedSessions = await Promise.all(
+        sessionsWithSubSkillInfo.map(async (session) => {
+          const sectionName = session.sectionName;
+          const subSkillName = session.subSkillName;
+          const difficulty = session.difficulty || 1;
+          
+          // Check if this is a writing drill by checking if it has writing assessments
+          const isWritingDrill = subSkillName.toLowerCase().includes('writing') ||
+                                subSkillName.toLowerCase().includes('written') ||
+                                subSkillName.toLowerCase().includes('expression');
+          
+          let totalQuestions = session.questions_answered || 0;
+          let totalCorrect = session.questions_correct || 0;
+          let totalMaxPoints = totalQuestions; // Default assumption for non-writing
+          let totalEarnedPoints = totalCorrect;
+          
+          if (isWritingDrill && session.text_answers_data) {
+            console.log(`🎯 DRILL-ANALYTICS: Processing writing drill session ${session.id} for ${subSkillName}`);
+            
+            // For writing drills, get the actual scoring from writing assessments
+            try {
+              // Get question IDs from this session
+              const questionIds = session.question_ids || [];
+              
+              if (questionIds.length > 0) {
+                // Get questions to find max points
+                const { data: questions, error: questionsError } = await supabase
+                  .from('questions')
+                  .select('id, max_points')
+                  .in('id', questionIds);
+                
+                if (!questionsError && questions) {
+                  totalMaxPoints = questions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+                  
+                  // Get writing assessments for this session
+                  const { data: assessments, error: assessmentsError } = await supabase
+                    .from('writing_assessments')
+                    .select('total_score, max_possible_score')
+                    .in('question_id', questionIds);
+                  
+                  if (!assessmentsError && assessments && assessments.length > 0) {
+                    totalEarnedPoints = assessments.reduce((sum, a) => sum + (a.total_score || 0), 0);
+                    // Use max points from assessments if available
+                    const assessmentMaxPoints = assessments.reduce((sum, a) => sum + (a.max_possible_score || 0), 0);
+                    if (assessmentMaxPoints > 0) {
+                      totalMaxPoints = assessmentMaxPoints;
+                    }
+                    
+                    console.log(`🎯 DRILL-ANALYTICS: Writing drill ${session.id}: ${totalEarnedPoints}/${totalMaxPoints} points`);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error(`❌ Error getting writing assessment data for drill session ${session.id}:`, error);
+            }
+          }
+          
+          return {
+            ...session,
+            isWritingDrill,
+            totalQuestions,
+            totalCorrect,
+            totalMaxPoints,
+            totalEarnedPoints
+          };
+        })
+      );
+      
+      // Now group by section and sub-skill using processed data
+      processedSessions.forEach(session => {
         const sectionName = session.sectionName;
         const subSkillName = session.subSkillName;
         const difficulty = session.difficulty || 1;
@@ -2676,33 +2749,64 @@ export class AnalyticsService {
             sessions: [],
             totalQuestions: 0,
             totalCorrect: 0,
-            difficultyStats: { 1: { questions: 0, correct: 0 }, 2: { questions: 0, correct: 0 }, 3: { questions: 0, correct: 0 } },
+            totalMaxPoints: 0,
+            totalEarnedPoints: 0,
+            isWritingDrill: session.isWritingDrill,
+            difficultyStats: { 
+              1: { questions: 0, correct: 0, maxPoints: 0, earnedPoints: 0 }, 
+              2: { questions: 0, correct: 0, maxPoints: 0, earnedPoints: 0 }, 
+              3: { questions: 0, correct: 0, maxPoints: 0, earnedPoints: 0 } 
+            },
           });
         }
 
         const subSkillData = subSkillMap.get(subSkillName)!;
         subSkillData.sessions.push(session);
-        subSkillData.totalQuestions += session.questions_answered || 0;
-        subSkillData.totalCorrect += session.questions_correct || 0;
-        subSkillData.difficultyStats[difficulty].questions += session.questions_answered || 0;
-        subSkillData.difficultyStats[difficulty].correct += session.questions_correct || 0;
+        subSkillData.totalQuestions += session.totalQuestions;
+        subSkillData.totalCorrect += session.totalCorrect;
+        subSkillData.totalMaxPoints += session.totalMaxPoints;
+        subSkillData.totalEarnedPoints += session.totalEarnedPoints;
+        
+        // Update difficulty stats
+        subSkillData.difficultyStats[difficulty].questions += session.totalQuestions;
+        subSkillData.difficultyStats[difficulty].correct += session.totalCorrect;
+        subSkillData.difficultyStats[difficulty].maxPoints += session.totalMaxPoints;
+        subSkillData.difficultyStats[difficulty].earnedPoints += session.totalEarnedPoints;
       });
 
       // Transform to expected format
       const subSkillBreakdown = Array.from(sectionMap.entries()).map(([sectionName, subSkillMap]) => ({
         sectionName,
         subSkills: Array.from(subSkillMap.entries()).map(([subSkillName, data]) => {
-          const accuracy = data.totalQuestions > 0 ? Math.round((data.totalCorrect / data.totalQuestions) * 100) : 0;
+          // For writing drills, use earned points / max points for accuracy
+          // For regular drills, use correct / questions
+          const accuracy = data.isWritingDrill 
+            ? (data.totalMaxPoints > 0 ? Math.round((data.totalEarnedPoints / data.totalMaxPoints) * 100) : 0)
+            : (data.totalQuestions > 0 ? Math.round((data.totalCorrect / data.totalQuestions) * 100) : 0);
           
-          const difficulty1Accuracy = data.difficultyStats[1].questions > 0 
-            ? Math.round((data.difficultyStats[1].correct / data.difficultyStats[1].questions) * 100) 
-            : 0;
-          const difficulty2Accuracy = data.difficultyStats[2].questions > 0 
-            ? Math.round((data.difficultyStats[2].correct / data.difficultyStats[2].questions) * 100) 
-            : 0;
-          const difficulty3Accuracy = data.difficultyStats[3].questions > 0 
-            ? Math.round((data.difficultyStats[3].correct / data.difficultyStats[3].questions) * 100) 
-            : 0;
+          const difficulty1Accuracy = data.isWritingDrill
+            ? (data.difficultyStats[1].maxPoints > 0 
+                ? Math.round((data.difficultyStats[1].earnedPoints / data.difficultyStats[1].maxPoints) * 100) 
+                : 0)
+            : (data.difficultyStats[1].questions > 0 
+                ? Math.round((data.difficultyStats[1].correct / data.difficultyStats[1].questions) * 100) 
+                : 0);
+                
+          const difficulty2Accuracy = data.isWritingDrill
+            ? (data.difficultyStats[2].maxPoints > 0 
+                ? Math.round((data.difficultyStats[2].earnedPoints / data.difficultyStats[2].maxPoints) * 100) 
+                : 0)
+            : (data.difficultyStats[2].questions > 0 
+                ? Math.round((data.difficultyStats[2].correct / data.difficultyStats[2].questions) * 100) 
+                : 0);
+                
+          const difficulty3Accuracy = data.isWritingDrill
+            ? (data.difficultyStats[3].maxPoints > 0 
+                ? Math.round((data.difficultyStats[3].earnedPoints / data.difficultyStats[3].maxPoints) * 100) 
+                : 0)
+            : (data.difficultyStats[3].questions > 0 
+                ? Math.round((data.difficultyStats[3].correct / data.difficultyStats[3].questions) * 100) 
+                : 0);
 
           // Recommend next difficulty level
           let recommendedLevel: 1 | 2 | 3 = 1;
@@ -2720,26 +2824,33 @@ export class AnalyticsService {
             difficulty2Accuracy,
             difficulty3Accuracy,
             difficulty1Questions: data.difficultyStats[1].questions,
-            difficulty1Correct: data.difficultyStats[1].correct,
+            difficulty1Correct: data.isWritingDrill ? data.difficultyStats[1].earnedPoints : data.difficultyStats[1].correct,
             difficulty2Questions: data.difficultyStats[2].questions,
-            difficulty2Correct: data.difficultyStats[2].correct,
+            difficulty2Correct: data.isWritingDrill ? data.difficultyStats[2].earnedPoints : data.difficultyStats[2].correct,
             difficulty3Questions: data.difficultyStats[3].questions,
-            difficulty3Correct: data.difficultyStats[3].correct,
+            difficulty3Correct: data.isWritingDrill ? data.difficultyStats[3].earnedPoints : data.difficultyStats[3].correct,
+            // Add max points fields for writing drills
+            difficulty1MaxPoints: data.isWritingDrill ? data.difficultyStats[1].maxPoints : undefined,
+            difficulty2MaxPoints: data.isWritingDrill ? data.difficultyStats[2].maxPoints : undefined,
+            difficulty3MaxPoints: data.isWritingDrill ? data.difficultyStats[3].maxPoints : undefined,
+            totalMaxPoints: data.isWritingDrill ? data.totalMaxPoints : undefined,
+            totalEarnedPoints: data.isWritingDrill ? data.totalEarnedPoints : undefined,
+            isWritingDrill: data.isWritingDrill,
             recommendedLevel,
           };
         }),
       }));
 
       // Recent activity (last 10 drill sessions)
-      const recentActivity = sessionsWithSubSkillInfo
+      const recentActivity = processedSessions
         .sort((a, b) => new Date(b.completed_at || b.started_at).getTime() - new Date(a.completed_at || a.started_at).getTime())
         .slice(0, 10)
         .map(session => ({
           subSkillName: session.subSkillName,
           difficulty: session.difficulty || 1,
-          accuracy: session.questions_answered > 0 
-            ? Math.round((session.questions_correct / session.questions_answered) * 100) 
-            : 0,
+          accuracy: session.isWritingDrill
+            ? (session.totalMaxPoints > 0 ? Math.round((session.totalEarnedPoints / session.totalMaxPoints) * 100) : 0)
+            : (session.totalQuestions > 0 ? Math.round((session.totalCorrect / session.totalQuestions) * 100) : 0),
           completedAt: session.completed_at || session.started_at,
         }));
 
