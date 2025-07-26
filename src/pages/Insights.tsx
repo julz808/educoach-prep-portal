@@ -1840,12 +1840,20 @@ const PerformanceDashboard = () => {
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
+                            console.log('🔍 ACCURACY-CALC: All sub-skills:', allSubSkills.map(s => ({
+                              name: s.subSkillName,
+                              isGroupedWriting: (s as any).isGroupedWriting,
+                              essays: (s as any).essays
+                            })));
+                            
                             allSubSkills.forEach(subSkill => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
+                                console.log(`🔍 ACCURACY-CALC: Processing writing skill ${subSkill.subSkillName}:`, essays);
                                 Object.values(essays).forEach((essay: any) => {
                                   if (essay.attempted) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding essay: ${essay.correct}/${essay.maxPoints}`);
                                     totalNumerator += essay.correct || 0;
                                     totalDenominator += essay.maxPoints || 0;
                                   }
@@ -1853,20 +1861,24 @@ const PerformanceDashboard = () => {
                               } else {
                                 // For non-writing skills, count each difficulty level
                                 if (subSkill.difficulty1Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
                                   totalNumerator += subSkill.difficulty1Correct || 0;
                                   totalDenominator += subSkill.difficulty1Questions || 0;
                                 }
                                 if (subSkill.difficulty2Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
                                   totalNumerator += subSkill.difficulty2Correct || 0;
                                   totalDenominator += subSkill.difficulty2Questions || 0;
                                 }
                                 if (subSkill.difficulty3Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
                                   totalNumerator += subSkill.difficulty3Correct || 0;
                                   totalDenominator += subSkill.difficulty3Questions || 0;
                                 }
                               }
                             });
                             
+                            console.log(`🔍 ACCURACY-CALC: Final totals: ${totalNumerator}/${totalDenominator}`);
                             const accuracy = totalDenominator > 0 ? Math.round((totalNumerator / totalDenominator) * 100) : 0;
                             return accuracy >= 80 ? 'text-green-600' : accuracy >= 60 ? 'text-orange-600' : 'text-red-600';
                           })()
@@ -1930,12 +1942,23 @@ const PerformanceDashboard = () => {
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
+                            console.log('🔍 TOTAL-CALC: All sub-skills:', allSubSkills.map(s => ({
+                              name: s.subSkillName,
+                              isGroupedWriting: (s as any).isGroupedWriting,
+                              essays: (s as any).essays,
+                              d1Q: s.difficulty1Questions,
+                              d2Q: s.difficulty2Questions,
+                              d3Q: s.difficulty3Questions
+                            })));
+                            
                             allSubSkills.forEach(subSkill => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
+                                console.log(`🔍 TOTAL-CALC: Processing writing skill ${subSkill.subSkillName}:`, essays);
                                 Object.values(essays).forEach((essay: any) => {
                                   if (essay.attempted) {
+                                    console.log(`🔍 TOTAL-CALC: Adding essay: ${essay.correct}/${essay.maxPoints}`);
                                     totalNumerator += essay.correct || 0;
                                     totalDenominator += essay.maxPoints || 0;
                                   }
@@ -1943,20 +1966,24 @@ const PerformanceDashboard = () => {
                               } else {
                                 // For non-writing skills, count each difficulty level
                                 if (subSkill.difficulty1Questions > 0) {
+                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
                                   totalNumerator += subSkill.difficulty1Correct || 0;
                                   totalDenominator += subSkill.difficulty1Questions || 0;
                                 }
                                 if (subSkill.difficulty2Questions > 0) {
+                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
                                   totalNumerator += subSkill.difficulty2Correct || 0;
                                   totalDenominator += subSkill.difficulty2Questions || 0;
                                 }
                                 if (subSkill.difficulty3Questions > 0) {
+                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
                                   totalNumerator += subSkill.difficulty3Correct || 0;
                                   totalDenominator += subSkill.difficulty3Questions || 0;
                                 }
                               }
                             });
                             
+                            console.log(`🔍 TOTAL-CALC: Final totals: ${totalNumerator}/${totalDenominator}`);
                             return `${totalNumerator}/${totalDenominator}`;
                           })()}
                         </div>
