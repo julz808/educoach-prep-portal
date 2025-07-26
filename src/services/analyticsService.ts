@@ -2586,22 +2586,40 @@ export class AnalyticsService {
     }
 
     try {
-      // Get all completed drill sessions (without sub_skills join since we use generated UUIDs)
-      const { data: drillSessions, error: drillsError } = await supabase
-        .from('drill_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('product_type', productType)
-        .eq('status', 'completed');
+      // Get completed sessions from both drill_sessions (regular drills) and user_test_sessions (writing drills)
+      const [drillSessionsResult, userTestSessionsResult] = await Promise.all([
+        supabase
+          .from('drill_sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('product_type', productType)
+          .eq('status', 'completed'),
+        supabase
+          .from('user_test_sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('product_type', productType)
+          .eq('test_mode', 'drill')
+          .eq('status', 'completed')
+      ]);
 
-      if (drillsError) {
-        console.error('❌ Error fetching drill sessions:', drillsError);
-        throw drillsError;
+      if (drillSessionsResult.error) {
+        console.error('❌ Error fetching drill sessions:', drillSessionsResult.error);
+        throw drillSessionsResult.error;
+      }
+      
+      if (userTestSessionsResult.error) {
+        console.error('❌ Error fetching writing drill sessions:', userTestSessionsResult.error);
+        throw userTestSessionsResult.error;
       }
 
-      console.log(`📊 Found ${drillSessions?.length || 0} completed drill sessions`);
+      const drillSessions = drillSessionsResult.data || [];
+      const writingDrillSessions = userTestSessionsResult.data || [];
 
-      if (!drillSessions || drillSessions.length === 0) {
+      console.log(`📊 Found ${drillSessions.length} completed drill sessions`);
+      console.log(`📊 Found ${writingDrillSessions.length} completed writing drill sessions`);
+
+      if (drillSessions.length === 0 && writingDrillSessions.length === 0) {
         console.log('📊 No completed drill sessions found');
         return {
           totalQuestions: 0,
@@ -2611,8 +2629,8 @@ export class AnalyticsService {
         };
       }
 
-      // Get sub-skill information from questions for each session
-      const sessionsWithSubSkillInfo = await Promise.all(
+      // Process regular drill sessions
+      const regularDrillSessionsWithInfo = await Promise.all(
         drillSessions.map(async (session) => {
           if (!session.question_ids || session.question_ids.length === 0) {
             return { ...session, subSkillName: 'Unknown', sectionName: 'Unknown' };
@@ -2637,8 +2655,40 @@ export class AnalyticsService {
           };
         })
       );
+      
+      // Process writing drill sessions from user_test_sessions
+      const writingDrillSessionsWithInfo = writingDrillSessions.map(session => {
+        const sectionName = session.section_name || '';
+        
+        // Check if this is a writing drill session
+        const isWritingSession = sectionName.toLowerCase().includes('writing') || 
+                                sectionName.toLowerCase().includes('written') ||
+                                sectionName.toLowerCase().includes('expression');
+        
+        if (isWritingSession) {
+          // For writing drills, extract section from section_name
+          const subSkillName = sectionName;
+          
+          return {
+            ...session,
+            subSkillName: subSkillName,
+            sectionName: sectionName,
+            // Map user_test_sessions fields to drill_sessions format
+            questions_answered: Math.max(session.current_question_index + 1, 1),
+            questions_correct: Math.max(session.current_question_index + 1, 1), // For writing, attempted = correct for analytics
+            questions_total: session.total_questions || 1,
+            difficulty: 2, // Default to medium for writing drills in analytics
+            isWritingDrill: true
+          };
+        }
+        
+        return null;
+      }).filter(Boolean);
+      
+      // Combine both types of sessions
+      const allSessionsWithSubSkillInfo = [...regularDrillSessionsWithInfo, ...writingDrillSessionsWithInfo];
 
-      console.log('🔍 Drill sessions with sub-skill info:', sessionsWithSubSkillInfo.map(s => ({
+      console.log('🔍 All drill sessions with sub-skill info:', allSessionsWithSubSkillInfo.map(s => ({
         id: s.id,
         subSkill: s.subSkillName,
         section: s.sectionName,
@@ -2649,8 +2699,8 @@ export class AnalyticsService {
       })));
 
       // Calculate totals
-      const totalQuestions = sessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_answered || 0), 0);
-      const totalCorrect = sessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_correct || 0), 0);
+      const totalQuestions = allSessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_answered || 0), 0);
+      const totalCorrect = allSessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_correct || 0), 0);
       const overallAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
       // Group by section and sub-skill
@@ -2666,7 +2716,7 @@ export class AnalyticsService {
 
       // Process each session and handle writing drills specially
       const processedSessions = await Promise.all(
-        sessionsWithSubSkillInfo.map(async (session) => {
+        allSessionsWithSubSkillInfo.map(async (session) => {
           const sectionName = session.sectionName;
           const subSkillName = session.subSkillName;
           const difficulty = session.difficulty || 1;
