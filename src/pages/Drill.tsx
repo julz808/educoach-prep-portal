@@ -784,6 +784,12 @@ const Drill: React.FC = () => {
     return progress.easy.isCompleted && progress.medium.isCompleted && progress.hard.isCompleted;
   };
 
+  // Check if a sub-skill has any progress (has started any difficulty)
+  const hasAnyProgress = (progress: SubSkillProgress) => {
+    return progress.easy.completed > 0 || progress.medium.completed > 0 || progress.hard.completed > 0 ||
+           progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId;
+  };
+
   const getTotalCompleted = () => {
     return skillAreas.reduce((sum, area) => sum + area.completedQuestions, 0);
   };
@@ -917,7 +923,7 @@ const Drill: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold mb-2">{displayLabel}</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        {data.completed === 0 ? 'Not attempted' : 
+                        {data.completed === 0 && !data.sessionId ? 'Not attempted' : 
                          data.isCompleted ? `Score: ${data.correctAnswers}/${data.total}` : 
                          `In progress: ${data.completed}/${data.total}`}
                       </p>
@@ -980,7 +986,7 @@ const Drill: React.FC = () => {
                       disabled={data.total === 0}
                     >
                       <Play size={16} className="mr-2" />
-                      {data.completed === 0 && !data.isCompleted ? 'Start Practice' : 
+                      {data.completed === 0 && !data.sessionId && !data.isCompleted ? 'Start Practice' : 
                        data.isCompleted ? 'View Results' : 'Continue Practice'}
                     </Button>
                   </CardContent>
@@ -1113,9 +1119,15 @@ const Drill: React.FC = () => {
                           In Progress
                         </Badge>
                       )}
-                      {skillArea.completedQuestions === 0 && (
+                      {skillArea.completedQuestions === 0 && !skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
                         <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full">
                           Not Started
+                        </Badge>
+                      )}
+                      {skillArea.completedQuestions === 0 && skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
+                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
+                          <Timer size={12} className="mr-1" />
+                          In Progress
                         </Badge>
                       )}
                       {skillArea.totalQuestions > 0 && (
@@ -1200,7 +1212,7 @@ const Drill: React.FC = () => {
                                           Complete
                                         </Badge>
                                       )}
-                                      {subSkill.completedQuestions > 0 && !subSkill.isComplete && (
+                                      {!subSkill.isComplete && hasAnyProgress(subSkill.progress) && (
                                         <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                                           In Progress
                                         </Badge>
@@ -1216,7 +1228,7 @@ const Drill: React.FC = () => {
                                           size="sm"
                                           className={cn(
                                             "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
-                                            subSkill.completedQuestions === 0 && !subSkill.isComplete
+                                            !hasAnyProgress(subSkill.progress) && !subSkill.isComplete
                                               ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
                                               : subSkill.isComplete
                                               ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
@@ -1228,8 +1240,8 @@ const Drill: React.FC = () => {
                                           }}
                                         >
                                           <Play size={14} className="mr-1" />
-                                          {subSkill.completedQuestions === 0 && !subSkill.isComplete ? 'Start Practice' : 
-                                           subSkill.isComplete ? 'View Results' : 'Resume Practice'}
+                                          {!hasAnyProgress(subSkill.progress) && !subSkill.isComplete ? 'Start Practice' : 
+                                           subSkill.isComplete ? 'View Results' : 'Continue Practice'}
                                         </Button>
                                       )}
                                     </div>
