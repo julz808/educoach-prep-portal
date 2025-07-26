@@ -113,7 +113,12 @@ const Drill: React.FC = () => {
           .eq('product_type', dbProductType),
         supabase
           .from('user_test_sessions')
-          .select('*')
+          .select(`
+            *,
+            writing_assessments(
+              overall_score
+            )
+          `)
           .eq('user_id', user.id)
           .eq('product_type', dbProductType)
           .eq('test_mode', 'drill')
@@ -198,9 +203,13 @@ const Drill: React.FC = () => {
           if (session.status === 'completed') {
             // Completed sessions: user finished the writing drill
             questionsAnswered = Math.max(session.current_question_index + 1, totalQuestions);
-            // For completed sessions, we should get the actual score from writing_assessments
-            // For now, use a default high score since the essay was completed and assessed
-            completionScore = 85; // Default good score for completed writing assessments
+            // Get the actual score from writing_assessments for this session
+            const writingAssessments = session.writing_assessments;
+            if (writingAssessments && writingAssessments.length > 0) {
+              completionScore = writingAssessments[0].overall_score || 0;
+            } else {
+              completionScore = 0; // No assessment found, show 0%
+            }
           } else if (session.status === 'active') {
             // Active sessions: user started but didn't finish
             // Check if user has written any text responses
