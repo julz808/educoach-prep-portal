@@ -584,6 +584,16 @@ const TestTaking: React.FC = () => {
         const questions = await loadQuestions();
         
         // If we have a sessionId, try to resume
+        console.log('🔍 CONDITIONAL-DEBUG: Checking actualSessionId for resume...', {
+          actualSessionId,
+          type: typeof actualSessionId,
+          truthy: !!actualSessionId,
+          length: actualSessionId?.length,
+          isEmpty: actualSessionId === '',
+          isUndefined: actualSessionId === undefined,
+          isNull: actualSessionId === null
+        });
+        
         if (actualSessionId) {
           console.log('🔄 Attempting to resume session:', actualSessionId, 'for testType:', testType);
           console.log('🔄 Is drill session?', testType === 'drill');
@@ -822,6 +832,12 @@ const TestTaking: React.FC = () => {
           }
         } else {
           console.log('🔄 RESUME: No sessionId provided, creating new session');
+          console.log('🔍 ELSE-DEBUG: actualSessionId in else block:', {
+            actualSessionId,
+            type: typeof actualSessionId,
+            truthy: !!actualSessionId,
+            comparison: actualSessionId === undefined || actualSessionId === null || actualSessionId === ''
+          });
         }
 
         // Create new session (or get existing active session)
