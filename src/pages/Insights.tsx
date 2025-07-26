@@ -1832,114 +1832,51 @@ const PerformanceDashboard = () => {
                         <div className="text-base font-medium text-slate-600 mb-2">Overall Accuracy</div>
                         <div className={`text-3xl font-bold ${
                           (() => {
-                            // Calculate actual accuracy from the displayed sub-skills
+                            // Calculate actual accuracy from the displayed sub-skills (same logic as Total Score)
                             let totalNumerator = 0;
                             let totalDenominator = 0;
                             
-                            // Get all sub-skills from all sections and apply the same grouping logic as the display
+                            // Get all sub-skills from all sections
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
-                            // Apply the same grouping logic for writing skills as used in display
-                            const groupedSubSkills = new Map();
-                            
                             allSubSkills.forEach(subSkill => {
-                              const sectionName = subSkill.sectionName || '';
-                              const isWritingSkill = sectionName.toLowerCase().includes('writing') || 
-                                                   sectionName.toLowerCase().includes('written expression');
+                              // For skills with maxPoints (writing assessments), use maxPoints instead of questions
+                              const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
                               
-                              if (isWritingSkill) {
-                                // Extract base name without "- Essay X" part
-                                const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
-                                const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
-                                const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
-                                
-                                if (!groupedSubSkills.has(baseName)) {
-                                  groupedSubSkills.set(baseName, {
-                                    ...subSkill,
-                                    subSkillName: baseName,
-                                    isGroupedWriting: true,
-                                    essays: {}
-                                  });
+                              if (hasMaxPoints) {
+                                console.log(`🔍 ACCURACY-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
+                                if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
                                 }
-                                
-                                const grouped = groupedSubSkills.get(baseName);
-                                
-                                // Determine which difficulty this essay corresponds to
-                                let correct, maxPoints;
-                                if (essayNumber === 1) {
-                                  correct = subSkill.difficulty1Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
-                                } else if (essayNumber === 2) {
-                                  correct = subSkill.difficulty2Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
-                                } else if (essayNumber === 3) {
-                                  correct = subSkill.difficulty3Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                                if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
                                 }
-                                
-                                grouped.essays[essayNumber] = {
-                                  correct,
-                                  maxPoints,
-                                  attempted: maxPoints > 0
-                                };
+                                if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
+                                }
                               } else {
-                                // Non-writing skills: keep as-is
-                                groupedSubSkills.set(subSkill.subSkillName, subSkill);
-                              }
-                            });
-                            
-                            // Now calculate totals from grouped data
-                            Array.from(groupedSubSkills.values()).forEach(subSkill => {
-                              if ((subSkill as any).isGroupedWriting) {
-                                // For writing skills, sum up all attempted essays
-                                const essays = (subSkill as any).essays || {};
-                                console.log(`🔍 ACCURACY-CALC: Processing writing skill ${subSkill.subSkillName}:`, essays);
-                                Object.values(essays).forEach((essay: any) => {
-                                  if (essay.attempted) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding essay: ${essay.correct}/${essay.maxPoints}`);
-                                    totalNumerator += essay.correct || 0;
-                                    totalDenominator += essay.maxPoints || 0;
-                                  }
-                                });
-                              } else {
-                                // For skills with maxPoints (writing assessments), use maxPoints instead of questions
-                                const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
-                                
-                                if (hasMaxPoints) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
-                                  if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
-                                    totalNumerator += subSkill.difficulty1Correct || 0;
-                                    totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
-                                  }
-                                  if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
-                                    totalNumerator += subSkill.difficulty2Correct || 0;
-                                    totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
-                                  }
-                                  if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
-                                    totalNumerator += subSkill.difficulty3Correct || 0;
-                                    totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
-                                  }
-                                } else {
-                                  // For regular skills, count each difficulty level with questions
-                                  if (subSkill.difficulty1Questions > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
-                                    totalNumerator += subSkill.difficulty1Correct || 0;
-                                    totalDenominator += subSkill.difficulty1Questions || 0;
-                                  }
-                                  if (subSkill.difficulty2Questions > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
-                                    totalNumerator += subSkill.difficulty2Correct || 0;
-                                    totalDenominator += subSkill.difficulty2Questions || 0;
-                                  }
-                                  if (subSkill.difficulty3Questions > 0) {
-                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
-                                    totalNumerator += subSkill.difficulty3Correct || 0;
-                                    totalDenominator += subSkill.difficulty3Questions || 0;
-                                  }
+                                // For regular skills, count each difficulty level with questions
+                                if (subSkill.difficulty1Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += subSkill.difficulty1Questions || 0;
+                                }
+                                if (subSkill.difficulty2Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += subSkill.difficulty2Questions || 0;
+                                }
+                                if (subSkill.difficulty3Questions > 0) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += subSkill.difficulty3Questions || 0;
                                 }
                               }
                             });
@@ -1950,76 +1887,33 @@ const PerformanceDashboard = () => {
                           })()
                         }`}>
                           {(() => {
-                            // Calculate actual accuracy percentage from the displayed sub-skills
+                            // Calculate actual accuracy percentage from the displayed sub-skills (same logic as Total Score)
                             let totalNumerator = 0;
                             let totalDenominator = 0;
                             
-                            // Get all sub-skills from all sections and apply the same grouping logic as the display
+                            // Get all sub-skills from all sections
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
-                            // Apply the same grouping logic for writing skills as used in display
-                            const groupedSubSkills = new Map();
-                            
                             allSubSkills.forEach(subSkill => {
-                              const sectionName = subSkill.sectionName || '';
-                              const isWritingSkill = sectionName.toLowerCase().includes('writing') || 
-                                                   sectionName.toLowerCase().includes('written expression');
+                              // For skills with maxPoints (writing assessments), use maxPoints instead of questions
+                              const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
                               
-                              if (isWritingSkill) {
-                                // Extract base name without "- Essay X" part
-                                const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
-                                const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
-                                const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
-                                
-                                if (!groupedSubSkills.has(baseName)) {
-                                  groupedSubSkills.set(baseName, {
-                                    ...subSkill,
-                                    subSkillName: baseName,
-                                    isGroupedWriting: true,
-                                    essays: {}
-                                  });
+                              if (hasMaxPoints) {
+                                if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
                                 }
-                                
-                                const grouped = groupedSubSkills.get(baseName);
-                                
-                                // Determine which difficulty this essay corresponds to
-                                let correct, maxPoints;
-                                if (essayNumber === 1) {
-                                  correct = subSkill.difficulty1Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
-                                } else if (essayNumber === 2) {
-                                  correct = subSkill.difficulty2Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
-                                } else if (essayNumber === 3) {
-                                  correct = subSkill.difficulty3Correct || 0;
-                                  maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                                if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
                                 }
-                                
-                                grouped.essays[essayNumber] = {
-                                  correct,
-                                  maxPoints,
-                                  attempted: maxPoints > 0
-                                };
+                                if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
+                                }
                               } else {
-                                // Non-writing skills: keep as-is
-                                groupedSubSkills.set(subSkill.subSkillName, subSkill);
-                              }
-                            });
-                            
-                            // Now calculate totals from grouped data
-                            Array.from(groupedSubSkills.values()).forEach(subSkill => {
-                              if ((subSkill as any).isGroupedWriting) {
-                                // For writing skills, sum up all attempted essays
-                                const essays = (subSkill as any).essays || {};
-                                Object.values(essays).forEach((essay: any) => {
-                                  if (essay.attempted) {
-                                    totalNumerator += essay.correct || 0;
-                                    totalDenominator += essay.maxPoints || 0;
-                                  }
-                                });
-                              } else {
-                                // For non-writing skills, count each difficulty level
+                                // For regular skills, count each difficulty level with questions
                                 if (subSkill.difficulty1Questions > 0) {
                                   totalNumerator += subSkill.difficulty1Correct || 0;
                                   totalDenominator += subSkill.difficulty1Questions || 0;
