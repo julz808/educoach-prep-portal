@@ -1955,10 +1955,31 @@ const PerformanceDashboard = () => {
                             }
                             
                             const grouped = groupedSubSkills.get(baseName);
+                            
+                            // For writing drills, the scores are in different difficulty levels based on essay number
+                            let correct = 0;
+                            let maxPoints = 15;
+                            let accuracy = 0;
+                            
+                            if (essayNumber === 1) {
+                              correct = subSkill.difficulty1Correct || 0;
+                              maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
+                              accuracy = subSkill.difficulty1Accuracy || 0;
+                            } else if (essayNumber === 2) {
+                              correct = subSkill.difficulty2Correct || 0;
+                              maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
+                              accuracy = subSkill.difficulty2Accuracy || 0;
+                            } else if (essayNumber === 3) {
+                              correct = subSkill.difficulty3Correct || 0;
+                              maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                              accuracy = subSkill.difficulty3Accuracy || 0;
+                            }
+                            
                             grouped.essays[essayNumber] = {
-                              correct: subSkill.difficulty1Correct || 0,
-                              maxPoints: (subSkill as any).difficulty1MaxPoints || 15,
-                              accuracy: subSkill.difficulty1Accuracy || 0
+                              correct,
+                              maxPoints,
+                              accuracy,
+                              attempted: correct > 0 || accuracy > 0
                             };
                             
                             // Update overall accuracy as average of attempted essays
@@ -2014,7 +2035,9 @@ const PerformanceDashboard = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <p className="text-sm text-slate-500">{subSkill.sectionName}</p>
+                                  {!(subSkill as any).isGroupedWriting && (
+                                    <p className="text-sm text-slate-500">{subSkill.sectionName}</p>
+                                  )}
                                 </div>
 
                                 {/* Overall Stats */}
@@ -2058,27 +2081,27 @@ const PerformanceDashboard = () => {
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Essay 1</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {(subSkill as any).essays[1] ? 
+                                          {(subSkill as any).essays[1]?.attempted ? 
                                             `${(subSkill as any).essays[1].correct}/${(subSkill as any).essays[1].maxPoints}` : 
-                                            '0/0'
+                                            '—'
                                           }
                                         </div>
                                       </div>
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Essay 2</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {(subSkill as any).essays[2] ? 
+                                          {(subSkill as any).essays[2]?.attempted ? 
                                             `${(subSkill as any).essays[2].correct}/${(subSkill as any).essays[2].maxPoints}` : 
-                                            '0/0'
+                                            '—'
                                           }
                                         </div>
                                       </div>
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Essay 3</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {(subSkill as any).essays[3] ? 
+                                          {(subSkill as any).essays[3]?.attempted ? 
                                             `${(subSkill as any).essays[3].correct}/${(subSkill as any).essays[3].maxPoints}` : 
-                                            '0/0'
+                                            '—'
                                           }
                                         </div>
                                       </div>

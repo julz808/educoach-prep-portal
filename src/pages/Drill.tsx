@@ -980,7 +980,7 @@ const Drill: React.FC = () => {
                       disabled={data.total === 0}
                     >
                       <Play size={16} className="mr-2" />
-                      {data.completed === 0 ? 'Start Practice' : 
+                      {data.completed === 0 && !data.isCompleted ? 'Start Practice' : 
                        data.isCompleted ? 'View Results' : 'Continue Practice'}
                     </Button>
                   </CardContent>
@@ -1216,7 +1216,7 @@ const Drill: React.FC = () => {
                                           size="sm"
                                           className={cn(
                                             "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
-                                            subSkill.completedQuestions === 0 
+                                            subSkill.completedQuestions === 0 && !subSkill.isComplete
                                               ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
                                               : subSkill.isComplete
                                               ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
@@ -1228,7 +1228,7 @@ const Drill: React.FC = () => {
                                           }}
                                         >
                                           <Play size={14} className="mr-1" />
-                                          {subSkill.completedQuestions === 0 ? 'Start Practice' : 
+                                          {subSkill.completedQuestions === 0 && !subSkill.isComplete ? 'Start Practice' : 
                                            subSkill.isComplete ? 'View Results' : 'Resume Practice'}
                                         </Button>
                                       )}
