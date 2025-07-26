@@ -138,6 +138,15 @@ const Drill: React.FC = () => {
       console.log('🔧 DRILL: Loaded drill sessions:', drillSessions.length);
       console.log('🔧 DRILL: Loaded writing drill sessions (user_test_sessions):', userTestSessions.length);
       
+      // Debug: Show ALL user test sessions to see what's actually in the database
+      console.log('🔧 DRILL-DEBUG: ALL user test sessions:', userTestSessions.map(s => ({
+        id: s.id,
+        section_name: s.section_name,
+        test_mode: s.test_mode,
+        status: s.status,
+        product_type: s.product_type
+      })));
+      
       // Debug: Show actual writing drill sessions found
       const writingSessions = userTestSessions.filter(session => {
         const sectionName = session.section_name || '';

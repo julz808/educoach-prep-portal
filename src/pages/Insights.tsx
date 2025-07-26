@@ -1976,7 +1976,7 @@ const PerformanceDashboard = () => {
                             }
                             
                             // Debug: Log essay scores for writing drills
-                            if (isWritingSubSkill) {
+                            if (isWritingSkill) {
                               console.log(`🔍 INSIGHT-ESSAY: ${baseName} Essay ${essayNumber}:`, {
                                 correct,
                                 maxPoints,
