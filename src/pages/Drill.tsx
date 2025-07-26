@@ -967,13 +967,13 @@ const Drill: React.FC = () => {
                           <Badge variant="outline" className={cn(config.badgeClass)}>
                             {(() => {
                               // Check if this is a writing sub-skill
-                              const isWritingSkill = subSkill.name.toLowerCase().includes('writing') || 
-                                                   subSkill.name.toLowerCase().includes('written');
+                              const isWritingSkill = selectedSubSkill.name.toLowerCase().includes('writing') || 
+                                                   selectedSubSkill.name.toLowerCase().includes('written');
                               
                               if (isWritingSkill) {
                                 // For writing, show points earned out of max possible points
                                 // Calculate actual max points from the questions
-                                const totalMaxPoints = subSkill.questions
+                                const totalMaxPoints = selectedSubSkill.questions
                                   .filter((_, index) => index < data.total) // Only count the questions that were attempted
                                   .reduce((sum, question) => sum + (question.maxPoints || 30), 0);
                                 const earnedPoints = Math.round((data.bestScore / 100) * totalMaxPoints);
