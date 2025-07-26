@@ -405,10 +405,15 @@ const TestTaking: React.FC = () => {
       
       // Find the section containing questions by subjectId or sectionName
       let foundSection = null;
+      console.log('🔧 DRILL: Looking for section with subjectId:', subjectId, 'or sectionName:', sectionName);
+      
       for (const mode of drillModes) {
         foundSection = mode.sections.find(section => {
+          console.log('🔧 DRILL: Checking section:', section.name, 'id:', section.id);
+          
           // First try exact matches
           if (section.id === subjectId || section.name === sectionName) {
+            console.log('🔧 DRILL: Exact match found!');
             return true;
           }
           
@@ -424,12 +429,24 @@ const TestTaking: React.FC = () => {
           const normalizedSubjectId = normalizeString(subjectIdLower);
           const normalizedSectionNameFromParams = normalizeString(sectionNameFromParams);
           
-          return normalizedSectionName === normalizedSubjectId ||
+          console.log('🔧 DRILL: Normalized comparison:', {
+            normalizedSectionName,
+            normalizedSubjectId,
+            normalizedSectionNameFromParams
+          });
+          
+          const isMatch = normalizedSectionName === normalizedSubjectId ||
                  normalizedSectionName === normalizedSectionNameFromParams ||
                  normalizedSectionName.includes(normalizedSubjectId) ||
                  normalizedSubjectId.includes(normalizedSectionName) ||
                  normalizedSectionName.includes(normalizedSectionNameFromParams) ||
                  normalizedSectionNameFromParams.includes(normalizedSectionName);
+                 
+          if (isMatch) {
+            console.log('🔧 DRILL: Match found via normalization!');
+          }
+          
+          return isMatch;
         });
         
         if (foundSection && foundSection.questions.length > 0) {

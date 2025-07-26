@@ -700,8 +700,9 @@ const Drill: React.FC = () => {
             progressData: selectedSubSkill.progress[difficultyKey]
           });
           
-          const subjectId = selectedSubSkill.name; // Use full section name as subjectId
-          let navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
+          // Use a stable identifier for writing drills - convert to lowercase and replace spaces with hyphens
+          const subjectId = selectedSubSkill.name.toLowerCase().replace(/\s+/g, '-');
+          let navigationUrl = `/test/drill/${subjectId}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
           
           // If there's an existing session, include it in the URL to resume instead of creating new
           if (existingSessionId) {
