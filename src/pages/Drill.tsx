@@ -200,21 +200,34 @@ const Drill: React.FC = () => {
           
           console.log(`🔧 WRITING-DRILL: Setting progress for "${actualSubSkillId}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
           
-          // Find the first empty difficulty slot to assign this session to
-          // This handles the case where we can't determine exact difficulty from the session
-          const difficulties = ['easy', 'medium', 'hard'] as const;
-          let assignedDifficulty = null;
+          // Try to determine difficulty from session metadata
+          // For writing drills, we need to be smarter about difficulty assignment
+          // Default to medium but try to be more precise if possible
+          let assignedDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
           
-          for (const diff of difficulties) {
-            if (!progressMap[actualSubSkillId][diff].isCompleted) {
-              assignedDifficulty = diff;
-              break;
-            }
+          // If there are multiple sessions for this sub-skill, assign them to different difficulties
+          // This is a heuristic since we can't directly determine difficulty from user_test_sessions
+          const existingDifficulties = ['easy', 'medium', 'hard'].filter(diff => 
+            progressMap[actualSubSkillId][diff].isCompleted
+          );
+          
+          if (existingDifficulties.length === 0) {
+            assignedDifficulty = 'easy';
+          } else if (existingDifficulties.length === 1) {
+            assignedDifficulty = 'medium';
+          } else {
+            assignedDifficulty = 'hard';
           }
           
-          // If all difficulties are filled, assign to medium as default
-          if (!assignedDifficulty) {
-            assignedDifficulty = 'medium';
+          // Override if the session is already assigned to a specific difficulty
+          if (progressMap[actualSubSkillId][assignedDifficulty].sessionId) {
+            // If this difficulty is already taken, find the next available
+            const availableDifficulties = (['easy', 'medium', 'hard'] as const).filter(diff => 
+              !progressMap[actualSubSkillId][diff].sessionId
+            );
+            if (availableDifficulties.length > 0) {
+              assignedDifficulty = availableDifficulties[0];
+            }
           }
           
           progressMap[actualSubSkillId][assignedDifficulty] = {
@@ -471,6 +484,21 @@ const Drill: React.FC = () => {
 
     loadDrillData();
   }, [selectedProduct, user]);
+  
+  // Refresh progress data when component becomes visible (user returns from drill)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        console.log('🔄 DRILL: Page became visible, refreshing progress data...');
+        reloadProgressData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user]);
 
   // Add periodic refresh to catch developer tools changes
   useEffect(() => {
@@ -572,8 +600,26 @@ const Drill: React.FC = () => {
           // For writing drills, route directly to TestTaking.tsx without session pre-creation
           // TestTaking.tsx will handle session management just like diagnostic/practice tests
           console.log(`🎯 DRILL-WRITING: Writing drill detected - routing to TestTaking.tsx`);
+          
+          // Check if there's an existing session for this difficulty level
+          const difficultyKey = difficulty as 'easy' | 'medium' | 'hard';
+          const existingSessionId = selectedSubSkill.progress[difficultyKey]?.sessionId;
+          
+          console.log(`🎯 DRILL-WRITING: Checking for existing session:`, {
+            difficulty: difficultyKey,
+            existingSessionId,
+            progressData: selectedSubSkill.progress[difficultyKey]
+          });
+          
           const subjectId = selectedSubSkill.name; // Use full section name as subjectId
-          const navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
+          let navigationUrl = `/test/drill/${encodeURIComponent(subjectId)}?sectionName=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}`;
+          
+          // If there's an existing session, include it in the URL to resume instead of creating new
+          if (existingSessionId) {
+            navigationUrl += `&sessionId=${existingSessionId}`;
+            console.log(`🎯 DRILL-WRITING: Including existing sessionId in URL:`, existingSessionId);
+          }
+          
           console.log(`🎯 DRILL-WRITING: Navigating to: ${navigationUrl}`);
           navigate(navigationUrl);
           return;
