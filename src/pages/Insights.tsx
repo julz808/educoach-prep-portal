@@ -1942,7 +1942,7 @@ const PerformanceDashboard = () => {
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
-                            console.log('🔍 TOTAL-CALC: All sub-skills:', allSubSkills.map(s => ({
+                            console.log('🔍 TOTAL-CALC: All sub-skills for debugging:', allSubSkills.map(s => ({
                               name: s.subSkillName,
                               isGroupedWriting: (s as any).isGroupedWriting,
                               essays: (s as any).essays,
