@@ -2019,18 +2019,25 @@ const PerformanceDashboard = () => {
 
                         return finalSubSkills.map((subSkill, index) => {
                           // Debug: Log each sub-skill data to see what properties it has
-                          console.log(`🔍 INSIGHT-DRILL: Sub-skill "${subSkill.subSkillName}" data:`, {
-                            isWritingDrill: (subSkill as any).isWritingDrill,
-                            difficulty1Correct: subSkill.difficulty1Correct,
-                            difficulty1MaxPoints: (subSkill as any).difficulty1MaxPoints,
-                            difficulty1Questions: subSkill.difficulty1Questions,
-                            difficulty2Correct: subSkill.difficulty2Correct,
-                            difficulty2MaxPoints: (subSkill as any).difficulty2MaxPoints,
-                            difficulty2Questions: subSkill.difficulty2Questions,
-                            difficulty3Correct: subSkill.difficulty3Correct,
-                            difficulty3MaxPoints: (subSkill as any).difficulty3MaxPoints,
-                            difficulty3Questions: subSkill.difficulty3Questions
-                          });
+                          if ((subSkill as any).isWritingDrill) {
+                            console.log(`🔍 INSIGHT-DRILL: Writing sub-skill "${subSkill.subSkillName}" data:`, {
+                              isWritingDrill: (subSkill as any).isWritingDrill,
+                              accuracy: subSkill.accuracy,
+                              questionsCompleted: subSkill.questionsCompleted,
+                              difficulty1Correct: subSkill.difficulty1Correct,
+                              difficulty1MaxPoints: (subSkill as any).difficulty1MaxPoints,
+                              difficulty1Questions: subSkill.difficulty1Questions,
+                              difficulty1Accuracy: subSkill.difficulty1Accuracy,
+                              difficulty2Correct: subSkill.difficulty2Correct,
+                              difficulty2MaxPoints: (subSkill as any).difficulty2MaxPoints,
+                              difficulty2Questions: subSkill.difficulty2Questions,
+                              difficulty2Accuracy: subSkill.difficulty2Accuracy,
+                              difficulty3Correct: subSkill.difficulty3Correct,
+                              difficulty3MaxPoints: (subSkill as any).difficulty3MaxPoints,
+                              difficulty3Questions: subSkill.difficulty3Questions,
+                              difficulty3Accuracy: subSkill.difficulty3Accuracy
+                            });
+                          }
                           
                           return (
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
