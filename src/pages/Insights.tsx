@@ -1994,15 +1994,22 @@ const PerformanceDashboard = () => {
                               correct,
                               maxPoints,
                               accuracy,
-                              attempted: correct > 0 || accuracy > 0
+                              // For writing drills, if maxPoints > 0, it means the essay was attempted (even if score is 0)
+                              attempted: maxPoints > 0
                             };
                             
-                            // Update overall accuracy as average of attempted essays
-                            const attemptedEssays = Object.values(grouped.essays).filter((essay: any) => essay.correct > 0);
+                            // Update overall accuracy as average of ALL attempted essays (including 0-point ones)
+                            const attemptedEssays = Object.values(grouped.essays).filter((essay: any) => essay.attempted);
                             if (attemptedEssays.length > 0) {
-                              grouped.accuracy = Math.round(
-                                attemptedEssays.reduce((sum: number, essay: any) => sum + essay.accuracy, 0) / attemptedEssays.length
-                              );
+                              // Calculate accuracy as simple average: (correct1/max1 + correct2/max2 + correct3/max3) / numAttempted * 100
+                              const totalPercentage = attemptedEssays.reduce((sum: number, essay: any) => {
+                                const essayPercentage = essay.maxPoints > 0 ? (essay.correct / essay.maxPoints) * 100 : 0;
+                                return sum + essayPercentage;
+                              }, 0);
+                              grouped.accuracy = Math.round(totalPercentage / attemptedEssays.length);
+                              
+                              // Update questionsCompleted to reflect actual number of essays attempted
+                              grouped.questionsCompleted = attemptedEssays.length;
                             }
                           } else {
                             // Non-writing skills: keep as-is
@@ -2134,19 +2141,28 @@ const PerformanceDashboard = () => {
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Easy</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {subSkill.difficulty1Correct || 0}/{subSkill.difficulty1Questions || 0}
+                                          {(subSkill.difficulty1Questions > 0) ? 
+                                            `${subSkill.difficulty1Correct || 0}/${subSkill.difficulty1Questions}` : 
+                                            '—'
+                                          }
                                         </div>
                                       </div>
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Medium</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {subSkill.difficulty2Correct || 0}/{subSkill.difficulty2Questions || 0}
+                                          {(subSkill.difficulty2Questions > 0) ? 
+                                            `${subSkill.difficulty2Correct || 0}/${subSkill.difficulty2Questions}` : 
+                                            '—'
+                                          }
                                         </div>
                                       </div>
                                       <div className="text-center">
                                         <div className="text-xs text-slate-500 mb-2">Hard</div>
                                         <div className="text-sm font-medium text-slate-700">
-                                          {subSkill.difficulty3Correct || 0}/{subSkill.difficulty3Questions || 0}
+                                          {(subSkill.difficulty3Questions > 0) ? 
+                                            `${subSkill.difficulty3Correct || 0}/${subSkill.difficulty3Questions}` : 
+                                            '—'
+                                          }
                                         </div>
                                       </div>
                                     </>

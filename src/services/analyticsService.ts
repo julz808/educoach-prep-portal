@@ -2674,9 +2674,10 @@ export class AnalyticsService {
             subSkillName: subSkillName,
             sectionName: sectionName,
             // Map user_test_sessions fields to drill_sessions format
-            questions_answered: Math.max(session.current_question_index + 1, 1),
-            questions_correct: Math.max(session.current_question_index + 1, 1), // For writing, attempted = correct for analytics
-            questions_total: session.total_questions || 1,
+            // For writing drills, use actual points from writing assessments instead of question counts
+            questions_answered: totalMaxPoints, // Total possible points for this essay
+            questions_correct: totalEarnedPoints, // Actual points earned
+            questions_total: totalMaxPoints, // Total possible points
             difficulty: (() => {
               // Parse essay number from section name to determine difficulty
               // Format: "Narrative Writing - Essay 1" -> Essay 1 = difficulty 1, Essay 2 = difficulty 2, Essay 3 = difficulty 3
