@@ -96,10 +96,17 @@ const TestTaking: React.FC = () => {
   // This happens when the URL is /test/practice/subjectId/sessionId (3 params)
   // instead of /test/practice/subjectId/sectionId/sessionId (4 params)
   // Also check for sessionId in query parameters (for drill sessions)
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const sessionIdFromQuery = searchParams.get('sessionId');
   const testModeFromQuery = searchParams.get('testMode'); // Get specific practice test mode
-  const actualSessionId = sessionIdFromQuery || sessionId || sectionId;
+  
+  // Also check current URL directly in case searchParams is stale
+  const urlSessionId = new URLSearchParams(window.location.search).get('sessionId');
+  const actualSessionId = urlSessionId || sessionIdFromQuery || sessionId || sectionId;
+  
+  console.log('🔍 SESSION-ID-DEBUG: searchParams sessionId:', sessionIdFromQuery);
+  console.log('🔍 SESSION-ID-DEBUG: URL sessionId:', urlSessionId);
+  console.log('🔍 SESSION-ID-DEBUG: Final actualSessionId:', actualSessionId);
   const navigate = useNavigate();
   const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const { user } = useAuth();
@@ -580,6 +587,7 @@ const TestTaking: React.FC = () => {
         if (actualSessionId) {
           console.log('🔄 Attempting to resume session:', actualSessionId, 'for testType:', testType);
           console.log('🔄 Is drill session?', testType === 'drill');
+          console.log('🔄 CRITICAL: actualSessionId value and type:', actualSessionId, typeof actualSessionId);
           
           // Check if this is a writing drill - writing drills use TestSessionService like diagnostic/practice
           const isWritingDrillForResume = testType === 'drill' && (
@@ -596,12 +604,12 @@ const TestTaking: React.FC = () => {
             await SessionService.loadSession(actualSessionId);
             
           console.log('🔄 Session loaded result:', savedSession);
-          
           console.log('🔄 RESUME: Session loaded?', !!savedSession);
           console.log('🔄 RESUME: Session answers:', savedSession?.answers);
           console.log('🔄 RESUME: Session status:', savedSession?.status);
           
           if (savedSession) {
+            console.log('🔄 RESUME: Found existing session, proceeding with resume...');
             console.log('🔄 RESUME: Loading saved session data:', {
               sessionId: savedSession.id,
               currentQuestionIndex: savedSession.currentQuestionIndex,
@@ -751,11 +759,11 @@ const TestTaking: React.FC = () => {
             setTimeRemaining(savedSession.timeRemainingSeconds);
             
             // Ensure URL has session ID for future resumes
-            const currentUrl = new URL(window.location.href);
-            if (!currentUrl.searchParams.get('sessionId')) {
-              currentUrl.searchParams.set('sessionId', actualSessionId);
-              window.history.replaceState({}, '', currentUrl.toString());
-              console.log('🔗 URL-UPDATE: Added sessionId to initial resume URL:', currentUrl.toString());
+            if (!searchParams.get('sessionId')) {
+              const newSearchParams = new URLSearchParams(searchParams);
+              newSearchParams.set('sessionId', actualSessionId);
+              setSearchParams(newSearchParams, { replace: true });
+              console.log('🔗 URL-UPDATE: Added sessionId to initial resume URL via setSearchParams:', actualSessionId);
             }
             
             console.log('✅ RESUME: Session resumed successfully with:', {
@@ -771,7 +779,11 @@ const TestTaking: React.FC = () => {
               topic: q.topic 
             })));
             return;
+          } else {
+            console.log('🔄 RESUME: No existing session found for ID:', actualSessionId, 'proceeding to create new session');
           }
+        } else {
+          console.log('🔄 RESUME: No sessionId provided, creating new session');
         }
 
         // Create new session (or get existing active session)
@@ -933,11 +945,11 @@ const TestTaking: React.FC = () => {
           setTimeRemaining(existingSession.timeRemainingSeconds);
           
           // Ensure URL has session ID for future resumes
-          const currentUrl = new URL(window.location.href);
-          if (!currentUrl.searchParams.get('sessionId')) {
-            currentUrl.searchParams.set('sessionId', sessionIdToUse);
-            window.history.replaceState({}, '', currentUrl.toString());
-            console.log('🔗 URL-UPDATE: Added sessionId to resumed session URL:', currentUrl.toString());
+          if (!searchParams.get('sessionId')) {
+            const newSearchParams = new URLSearchParams(searchParams);
+            newSearchParams.set('sessionId', sessionIdToUse);
+            setSearchParams(newSearchParams, { replace: true });
+            console.log('🔗 URL-UPDATE: Added sessionId to resumed session URL via setSearchParams:', sessionIdToUse);
           }
           
           console.log('✅ RESUME: Session resumed from createSession with:', {
@@ -972,10 +984,10 @@ const TestTaking: React.FC = () => {
         console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
         
         // Update URL with session ID so it can be resumed
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('sessionId', sessionIdToUse);
-        window.history.replaceState({}, '', currentUrl.toString());
-        console.log('🔗 URL-UPDATE: Added sessionId to URL:', currentUrl.toString());
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.set('sessionId', sessionIdToUse);
+        setSearchParams(newSearchParams, { replace: true });
+        console.log('🔗 URL-UPDATE: Added sessionId to URL via setSearchParams:', sessionIdToUse);
         console.log('🔍 DEBUG: New session questions maxPoints:', newSession.questions.map(q => ({ 
           id: q.id, 
           maxPoints: q.maxPoints, 
