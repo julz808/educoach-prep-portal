@@ -2677,7 +2677,18 @@ export class AnalyticsService {
             questions_answered: Math.max(session.current_question_index + 1, 1),
             questions_correct: Math.max(session.current_question_index + 1, 1), // For writing, attempted = correct for analytics
             questions_total: session.total_questions || 1,
-            difficulty: 2, // Default to medium for writing drills in analytics
+            difficulty: (() => {
+              // Parse essay number from section name to determine difficulty
+              // Format: "Narrative Writing - Essay 1" -> Essay 1 = difficulty 1, Essay 2 = difficulty 2, Essay 3 = difficulty 3
+              const essayMatch = session.section_name?.match(/Essay\s*(\d+)/i);
+              if (essayMatch) {
+                const essayNumber = parseInt(essayMatch[1]);
+                console.log(`🎯 ANALYTICS: Mapping "${session.section_name}" Essay ${essayNumber} -> difficulty ${essayNumber}`);
+                return essayNumber; // Essay 1 -> difficulty 1, Essay 2 -> difficulty 2, Essay 3 -> difficulty 3
+              }
+              console.log(`🎯 ANALYTICS: No essay number found in "${session.section_name}", defaulting to difficulty 2`);
+              return 2; // Default to medium if no essay number found
+            })(),
             isWritingDrill: true
           };
         }
