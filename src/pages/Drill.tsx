@@ -116,12 +116,13 @@ const Drill: React.FC = () => {
           .select(`
             *,
             writing_assessments(
-              overall_score
+              total_score,
+              max_possible_score,
+              percentage_score
             )
           `)
           .eq('user_id', user.id)
           .eq('product_type', dbProductType)
-          .eq('test_mode', 'drill')
       ]);
 
       if (drillSessionsResult.error) {
@@ -168,14 +169,16 @@ const Drill: React.FC = () => {
       // IMPORTANT: Process writing drill sessions FIRST to ensure they take priority
       // Writing drills in user_test_sessions should always override any drill_sessions entries
       userTestSessions?.forEach(session => {
-        console.log(`🔧 WRITING-DRILL: Processing user_test_session: "${session.section_name}", status: ${session.status}`);
+        console.log(`🔧 WRITING-DRILL: Processing user_test_session: "${session.section_name}", test_mode: ${session.test_mode}, status: ${session.status}`);
         
         const sectionName = session.section_name || '';
         
-        // Check if this is a writing drill session
-        const isWritingSession = sectionName.toLowerCase().includes('writing') || 
-                                sectionName.toLowerCase().includes('written') ||
-                                sectionName.toLowerCase().includes('expression');
+        // Check if this is a writing drill session - look for both test_mode='drill' AND writing-related section names
+        const isWritingSession = (session.test_mode === 'drill') && (
+          sectionName.toLowerCase().includes('writing') || 
+          sectionName.toLowerCase().includes('written') ||
+          sectionName.toLowerCase().includes('expression')
+        );
         
         if (isWritingSession) {
           // Extract the base section name and difficulty from section_name
@@ -215,7 +218,10 @@ const Drill: React.FC = () => {
             // Get the actual score from writing_assessments for this session
             const writingAssessments = session.writing_assessments;
             if (writingAssessments && writingAssessments.length > 0) {
-              completionScore = writingAssessments[0].overall_score || 0;
+              // Calculate percentage from total_score and max_possible_score
+              const totalScore = writingAssessments[0].total_score || 0;
+              const maxScore = writingAssessments[0].max_possible_score || 1;
+              completionScore = Math.round((totalScore / maxScore) * 100);
             } else {
               completionScore = 0; // No assessment found, show 0%
             }
