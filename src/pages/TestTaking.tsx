@@ -923,14 +923,27 @@ const TestTaking: React.FC = () => {
             if (isWritingDrill) {
               console.log('🔍 WRITING-DRILL-CHECK: Checking for existing writing drill sessions before creating new one...');
               
-              // Query user_test_sessions for existing sessions with same sub-skill
+              // Get difficulty from URL parameters
+              const urlDifficulty = searchParams.get('difficulty');
+              const difficultyLevel = urlDifficulty === 'easy' ? 1 : urlDifficulty === 'medium' ? 2 : 3;
+              
+              // For writing drills, include difficulty in the section name to make each essay unique
+              const sectionWithDifficulty = `${sectionName} - Essay ${difficultyLevel}`;
+              
+              console.log('🔍 WRITING-DRILL-CHECK: Looking for sessions with:', {
+                sectionName: sectionWithDifficulty,
+                difficulty: difficultyLevel,
+                originalSection: sectionName
+              });
+              
+              // Query user_test_sessions for existing sessions with same sub-skill AND difficulty
               const { data: existingSessions, error: queryError } = await supabase
                 .from('user_test_sessions')
                 .select('id, status, section_name, created_at')
                 .eq('user_id', user.id)
                 .eq('product_type', properDisplayName)
                 .eq('test_mode', actualTestMode)
-                .eq('section_name', sectionName)
+                .eq('section_name', sectionWithDifficulty)
                 .order('created_at', { ascending: false });
               
               if (queryError) {
@@ -959,7 +972,7 @@ const TestTaking: React.FC = () => {
                   user.id,
                   properDisplayName,
                   actualTestMode as 'diagnostic' | 'practice' | 'drill',
-                  sectionName,
+                  sectionWithDifficulty, // Use section name with difficulty for writing drills
                   questions.length,
                   questions.map(q => q.id)
                 );

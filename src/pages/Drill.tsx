@@ -164,9 +164,22 @@ const Drill: React.FC = () => {
                                 sectionName.toLowerCase().includes('expression');
         
         if (isWritingSession) {
-          // Use centralized UUID generation for consistency
-          const actualSubSkillId = getWritingDrillUUID(sectionName);
-          console.log(`🔧 WRITING-DRILL: Generated sub_skill_id "${actualSubSkillId}" for section "${sectionName}"`);
+          // Extract the base section name and difficulty from section_name
+          // Format: "Narrative Writing - Essay 1" -> base: "Narrative Writing", difficulty: 1
+          let baseSectionName = sectionName;
+          let assignedDifficulty: 'easy' | 'medium' | 'hard' = 'medium'; // default
+          
+          const essayMatch = sectionName.match(/^(.+?)\s*-\s*Essay\s*(\d)$/i);
+          if (essayMatch) {
+            baseSectionName = essayMatch[1].trim();
+            const essayNumber = parseInt(essayMatch[2]);
+            assignedDifficulty = essayNumber === 1 ? 'easy' : essayNumber === 2 ? 'medium' : 'hard';
+            console.log(`🔧 WRITING-DRILL: Parsed section "${sectionName}" -> base: "${baseSectionName}", essay: ${essayNumber}, difficulty: ${assignedDifficulty}`);
+          }
+          
+          // Use centralized UUID generation for consistency - use base section name
+          const actualSubSkillId = getWritingDrillUUID(baseSectionName);
+          console.log(`🔧 WRITING-DRILL: Generated sub_skill_id "${actualSubSkillId}" for base section "${baseSectionName}"`);
           
           if (!progressMap[actualSubSkillId]) {
             progressMap[actualSubSkillId] = {
@@ -212,42 +225,6 @@ const Drill: React.FC = () => {
           }
           
           console.log(`🔧 WRITING-DRILL: Setting progress for "${actualSubSkillId}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
-          
-          // FIXED: Determine difficulty from session metadata instead of dynamic assignment
-          // Try to get difficulty from session metadata first
-          let assignedDifficulty: 'easy' | 'medium' | 'hard' = 'medium'; // default fallback
-          
-          // Check if session has difficulty stored in metadata
-          const sessionMetadata = session.test_data || session.session_data || {};
-          if (sessionMetadata.difficulty) {
-            // Map numeric difficulty back to string
-            const difficultyMap = { 1: 'easy', 2: 'medium', 3: 'hard' };
-            assignedDifficulty = difficultyMap[sessionMetadata.difficulty] || 'medium';
-            console.log(`🔧 WRITING-DRILL: Found difficulty in metadata: ${assignedDifficulty}`);
-          } else {
-            // Fallback: Use a consistent assignment based on session ID/timestamp
-            // This ensures the same session always gets the same difficulty
-            const sessionHash = session.id.split('').reduce((a, b) => {
-              a = ((a << 5) - a) + b.charCodeAt(0);
-              return a & a;
-            }, 0);
-            const difficultyIndex = Math.abs(sessionHash) % 3;
-            assignedDifficulty = ['easy', 'medium', 'hard'][difficultyIndex] as 'easy' | 'medium' | 'hard';
-            console.log(`🔧 WRITING-DRILL: Using hash-based difficulty assignment: ${assignedDifficulty} (hash: ${sessionHash})`);
-          }
-          
-          // Only assign if this difficulty slot is not already taken by another session
-          if (progressMap[actualSubSkillId][assignedDifficulty].sessionId && 
-              progressMap[actualSubSkillId][assignedDifficulty].sessionId !== session.id) {
-            // If this difficulty is already taken by a different session, find the next available
-            const availableDifficulties = (['easy', 'medium', 'hard'] as const).filter(diff => 
-              !progressMap[actualSubSkillId][diff].sessionId || progressMap[actualSubSkillId][diff].sessionId === session.id
-            );
-            if (availableDifficulties.length > 0) {
-              assignedDifficulty = availableDifficulties[0];
-              console.log(`🔧 WRITING-DRILL: Reassigned to available difficulty: ${assignedDifficulty}`);
-            }
-          }
           
           progressMap[actualSubSkillId][assignedDifficulty] = {
             completed: questionsAnswered,
