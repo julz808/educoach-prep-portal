@@ -612,6 +612,7 @@ const TestTaking: React.FC = () => {
             console.log('🔄 RESUME: Found existing session, proceeding with resume...');
             console.log('🔄 RESUME: Loading saved session data:', {
               sessionId: savedSession.id,
+              status: savedSession.status,
               currentQuestionIndex: savedSession.currentQuestionIndex,
               savedAnswers: Object.keys(savedSession.answers).length,
               savedTextAnswers: Object.keys(savedSession.textAnswers || {}).length,
@@ -619,6 +620,30 @@ const TestTaking: React.FC = () => {
               rawAnswers: savedSession.answers,
               rawTextAnswers: savedSession.textAnswers
             });
+
+            // Check if this is a completed session - if so, go to review mode
+            console.log('🔄 RESUME: Checking session status for review mode...', {
+              sessionId: savedSession.sessionId,
+              status: savedSession.status,
+              testMode: savedSession.testMode,
+              sectionName: savedSession.sectionName,
+              isWritingDrill: (savedSession.testMode === 'drill' && (
+                savedSession.sectionName.toLowerCase().includes('writing') ||
+                savedSession.sectionName.toLowerCase().includes('written') ||
+                savedSession.sectionName.toLowerCase().includes('expression')
+              ))
+            });
+            
+            if (savedSession.status === 'completed') {
+              console.log('🔄 RESUME: Session is completed, should go to review mode');
+              console.log('🔄 RESUME: Setting review=true in URL...');
+              // Set review mode in URL
+              const currentUrl = new URL(window.location.href);
+              currentUrl.searchParams.set('review', 'true');
+              setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
+            } else {
+              console.log('🔄 RESUME: Session is not completed, status:', savedSession.status);
+            }
 
             // Convert saved session to our format
             const answers: Record<number, number> = {};

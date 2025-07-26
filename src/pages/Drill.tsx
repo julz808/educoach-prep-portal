@@ -182,9 +182,6 @@ const Drill: React.FC = () => {
             };
           }
           
-          // Try to extract difficulty from session metadata or use a reasonable approach
-          // Since we can't easily determine difficulty from user_test_sessions,
-          // we'll need to check which difficulties already have progress and fill the gaps
           const questionsAnswered = Math.max(session.current_question_index + 1, 1);
           const totalQuestions = session.total_questions || 1;
           
@@ -200,33 +197,39 @@ const Drill: React.FC = () => {
           
           console.log(`🔧 WRITING-DRILL: Setting progress for "${actualSubSkillId}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
           
-          // Try to determine difficulty from session metadata
-          // For writing drills, we need to be smarter about difficulty assignment
-          // Default to medium but try to be more precise if possible
-          let assignedDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
+          // FIXED: Determine difficulty from session metadata instead of dynamic assignment
+          // Try to get difficulty from session metadata first
+          let assignedDifficulty: 'easy' | 'medium' | 'hard' = 'medium'; // default fallback
           
-          // If there are multiple sessions for this sub-skill, assign them to different difficulties
-          // This is a heuristic since we can't directly determine difficulty from user_test_sessions
-          const existingDifficulties = ['easy', 'medium', 'hard'].filter(diff => 
-            progressMap[actualSubSkillId][diff].isCompleted
-          );
-          
-          if (existingDifficulties.length === 0) {
-            assignedDifficulty = 'easy';
-          } else if (existingDifficulties.length === 1) {
-            assignedDifficulty = 'medium';
+          // Check if session has difficulty stored in metadata
+          const sessionMetadata = session.test_data || session.session_data || {};
+          if (sessionMetadata.difficulty) {
+            // Map numeric difficulty back to string
+            const difficultyMap = { 1: 'easy', 2: 'medium', 3: 'hard' };
+            assignedDifficulty = difficultyMap[sessionMetadata.difficulty] || 'medium';
+            console.log(`🔧 WRITING-DRILL: Found difficulty in metadata: ${assignedDifficulty}`);
           } else {
-            assignedDifficulty = 'hard';
+            // Fallback: Use a consistent assignment based on session ID/timestamp
+            // This ensures the same session always gets the same difficulty
+            const sessionHash = session.id.split('').reduce((a, b) => {
+              a = ((a << 5) - a) + b.charCodeAt(0);
+              return a & a;
+            }, 0);
+            const difficultyIndex = Math.abs(sessionHash) % 3;
+            assignedDifficulty = ['easy', 'medium', 'hard'][difficultyIndex] as 'easy' | 'medium' | 'hard';
+            console.log(`🔧 WRITING-DRILL: Using hash-based difficulty assignment: ${assignedDifficulty} (hash: ${sessionHash})`);
           }
           
-          // Override if the session is already assigned to a specific difficulty
-          if (progressMap[actualSubSkillId][assignedDifficulty].sessionId) {
-            // If this difficulty is already taken, find the next available
+          // Only assign if this difficulty slot is not already taken by another session
+          if (progressMap[actualSubSkillId][assignedDifficulty].sessionId && 
+              progressMap[actualSubSkillId][assignedDifficulty].sessionId !== session.id) {
+            // If this difficulty is already taken by a different session, find the next available
             const availableDifficulties = (['easy', 'medium', 'hard'] as const).filter(diff => 
-              !progressMap[actualSubSkillId][diff].sessionId
+              !progressMap[actualSubSkillId][diff].sessionId || progressMap[actualSubSkillId][diff].sessionId === session.id
             );
             if (availableDifficulties.length > 0) {
               assignedDifficulty = availableDifficulties[0];
+              console.log(`🔧 WRITING-DRILL: Reassigned to available difficulty: ${assignedDifficulty}`);
             }
           }
           
@@ -239,7 +242,15 @@ const Drill: React.FC = () => {
             isCompleted: session.status === 'completed'
           };
           
-          console.log(`🔧 WRITING-DRILL: Assigned session to ${assignedDifficulty} difficulty for "${actualSubSkillId}"`);
+          console.log(`🔧 WRITING-DRILL: Assigned session ${session.id} to ${assignedDifficulty} difficulty for "${actualSubSkillId}"`);
+          console.log(`🔧 WRITING-DRILL: Session details:`, {
+            sessionId: session.id,
+            status: session.status,
+            isCompleted: session.status === 'completed',
+            completionScore,
+            questionsAnswered,
+            totalQuestions
+          });
         }
       });
 

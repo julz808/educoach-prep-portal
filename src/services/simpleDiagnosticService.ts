@@ -253,6 +253,7 @@ export class SimpleDiagnosticService {
         startedAt: session.created_at,
         sessionData: {
           answers: session.answers_data || {},
+          textAnswers: session.text_answers_data || {},
           flaggedQuestions: session.flagged_questions || [],
           timeRemainingSeconds: 3600, // Default time - could be stored in session
           lastUpdated: session.updated_at
