@@ -786,9 +786,21 @@ const Drill: React.FC = () => {
 
   // Check if a sub-skill has any progress (has started any difficulty)
   const hasAnyProgress = (progress: SubSkillProgress) => {
-    return progress.easy.completed > 0 || progress.medium.completed > 0 || progress.hard.completed > 0 ||
+    const hasProgress = progress.easy.completed > 0 || progress.medium.completed > 0 || progress.hard.completed > 0 ||
            progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId ||
            progress.easy.isCompleted || progress.medium.isCompleted || progress.hard.isCompleted;
+    
+    // Debug logging for writing drills
+    if (progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId) {
+      console.log('🔍 DRILL-PROGRESS: hasAnyProgress check:', {
+        hasProgress,
+        easy: { completed: progress.easy.completed, sessionId: progress.easy.sessionId, isCompleted: progress.easy.isCompleted },
+        medium: { completed: progress.medium.completed, sessionId: progress.medium.sessionId, isCompleted: progress.medium.isCompleted },
+        hard: { completed: progress.hard.completed, sessionId: progress.hard.sessionId, isCompleted: progress.hard.isCompleted }
+      });
+    }
+    
+    return hasProgress;
   };
 
   const getTotalCompleted = () => {

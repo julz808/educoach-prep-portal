@@ -1975,6 +1975,21 @@ const PerformanceDashboard = () => {
                               accuracy = subSkill.difficulty3Accuracy || 0;
                             }
                             
+                            // Debug: Log essay scores for writing drills
+                            if (isWritingSubSkill) {
+                              console.log(`🔍 INSIGHT-ESSAY: ${baseName} Essay ${essayNumber}:`, {
+                                correct,
+                                maxPoints,
+                                accuracy,
+                                difficulty1Correct: subSkill.difficulty1Correct,
+                                difficulty2Correct: subSkill.difficulty2Correct,
+                                difficulty3Correct: subSkill.difficulty3Correct,
+                                difficulty1MaxPoints: (subSkill as any).difficulty1MaxPoints,
+                                difficulty2MaxPoints: (subSkill as any).difficulty2MaxPoints,
+                                difficulty3MaxPoints: (subSkill as any).difficulty3MaxPoints
+                              });
+                            }
+                            
                             grouped.essays[essayNumber] = {
                               correct,
                               maxPoints,
