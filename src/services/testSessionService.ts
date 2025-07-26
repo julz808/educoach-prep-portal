@@ -185,6 +185,7 @@ export class TestSessionService {
           timeRemainingSeconds: primarySection?.time_remaining_seconds ?? 3600,
           flaggedQuestions: primarySection?.flagged_questions || [],
           answers: primarySection?.answers || {},
+          textAnswers: sessionData.session_data?.textAnswers || {},
           lastUpdated: primarySection?.last_updated || sessionData.started_at
         },
         questionOrder: sessionData.question_order || [],

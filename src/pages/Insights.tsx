@@ -1993,25 +1993,31 @@ const PerformanceDashboard = () => {
 
                                 {/* Right Section: Difficulty Breakdown */}
                                 <div className="grid grid-cols-3 gap-8 flex-shrink-0">
-                                  {/* Easy (Level 1) */}
+                                  {/* Easy (Level 1) - Essay 1 for writing drills */}
                                   <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">Easy</div>
+                                    <div className="text-xs text-slate-500 mb-2">
+                                      {(subSkill as any).isWritingDrill ? 'Essay 1' : 'Easy'}
+                                    </div>
                                     <div className="text-sm font-medium text-slate-700">
                                       {subSkill.difficulty1Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty1MaxPoints || 0) : (subSkill.difficulty1Questions || 0)}
                                     </div>
                                   </div>
 
-                                  {/* Medium (Level 2) */}
+                                  {/* Medium (Level 2) - Essay 2 for writing drills */}
                                   <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">Medium</div>
+                                    <div className="text-xs text-slate-500 mb-2">
+                                      {(subSkill as any).isWritingDrill ? 'Essay 2' : 'Medium'}
+                                    </div>
                                     <div className="text-sm font-medium text-slate-700">
                                       {subSkill.difficulty2Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty2MaxPoints || 0) : (subSkill.difficulty2Questions || 0)}
                                     </div>
                                   </div>
 
-                                  {/* Hard (Level 3) */}
+                                  {/* Hard (Level 3) - Essay 3 for writing drills */}
                                   <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">Hard</div>
+                                    <div className="text-xs text-slate-500 mb-2">
+                                      {(subSkill as any).isWritingDrill ? 'Essay 3' : 'Hard'}
+                                    </div>
                                     <div className="text-sm font-medium text-slate-700">
                                       {subSkill.difficulty3Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty3MaxPoints || 0) : (subSkill.difficulty3Questions || 0)}
                                     </div>

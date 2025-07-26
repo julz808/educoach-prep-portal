@@ -141,7 +141,6 @@ const TestTaking: React.FC = () => {
   const textAutoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const periodicSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTextChangeTimeRef = useRef<number>(0);
-  const drillSessionIdRef = useRef<string | null>(null);
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
@@ -855,39 +854,6 @@ const TestTaking: React.FC = () => {
 
           // Check if this is actually resuming an existing session
           existingSession = await SessionService.loadSession(sessionIdToUse);
-          
-          // BRIDGE: For writing drills, also create drill_sessions entry immediately for progress tracking
-          if (isWritingDrill) {
-            console.log('🌉 WRITING-DRILL-BRIDGE: Creating drill_sessions entry immediately for progress tracking');
-            
-            try {
-              // Get sub-skill info for drill session
-              const subSkillText = questions[0]?.subSkill || sectionName;
-              const firstQuestionWithUUID = questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
-              const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
-              
-              const difficulty = parseInt(searchParams.get('difficulty') === 'easy' ? '1' : 
-                                       searchParams.get('difficulty') === 'medium' ? '2' : '3');
-              
-              // Create the drill session entry immediately
-              const drillSessionId = await DrillSessionService.createOrResumeSession(
-                user.id,
-                actualSubSkillId,
-                properDisplayName,
-                difficulty,
-                questions.map(q => q.id),
-                questions.length
-              );
-              
-              console.log('✅ WRITING-DRILL-BRIDGE: Created immediate drill_sessions entry:', drillSessionId);
-              
-              // Store the drill session ID for later updates
-              drillSessionIdRef.current = drillSessionId;
-            } catch (bridgeError) {
-              console.error('❌ WRITING-DRILL-BRIDGE: Failed to create immediate drill_sessions entry:', bridgeError);
-              // Don't throw - this is supplementary, the main session is already created
-            }
-          }
         }
         
         if (existingSession && existingSession.currentQuestionIndex > 0) {
@@ -1099,29 +1065,6 @@ const TestTaking: React.FC = () => {
           timeRemaining,
           stringTextAnswers
         );
-        
-        // BRIDGE: Also update drill_sessions for writing drills
-        if (isWritingDrill && drillSessionIdRef.current) {
-          console.log('🌉 WRITING-DRILL-BRIDGE: Updating drill_sessions progress');
-          
-          try {
-            const questionsAnswered = Object.keys(stringTextAnswers).filter(k => stringTextAnswers[k].trim().length > 0).length;
-            const questionsCorrect = questionsAnswered; // For writing, we'll update this after assessment
-            
-            await DrillSessionService.updateProgress(
-              drillSessionIdRef.current,
-              questionsAnswered,
-              questionsCorrect,
-              stringAnswers,
-              stringTextAnswers
-            );
-            
-            console.log('✅ WRITING-DRILL-BRIDGE: Drill session progress updated');
-          } catch (bridgeError) {
-            console.error('❌ WRITING-DRILL-BRIDGE: Failed to update drill session:', bridgeError);
-            // Don't throw - this is supplementary
-          }
-        }
       }
 
       console.log('✅ SAVE COMPLETE: Progress saved successfully');
@@ -1365,29 +1308,6 @@ const TestTaking: React.FC = () => {
             timeRemaining,
             stringTextAnswers
           );
-          
-          // BRIDGE: Also update drill_sessions for writing drills
-          if (isWritingDrill && drillSessionIdRef.current) {
-            console.log('🌉 WRITING-DRILL-BRIDGE: Updating drill_sessions progress (immediate save)');
-            
-            try {
-              const questionsAnswered = Object.keys(stringTextAnswers).filter(k => stringTextAnswers[k].trim().length > 0).length;
-              const questionsCorrect = questionsAnswered; // For writing, we'll update this after assessment
-              
-              await DrillSessionService.updateProgress(
-                drillSessionIdRef.current,
-                questionsAnswered,
-                questionsCorrect,
-                stringAnswers,
-                stringTextAnswers
-              );
-              
-              console.log('✅ WRITING-DRILL-BRIDGE: Drill session progress updated (immediate save)');
-            } catch (bridgeError) {
-              console.error('❌ WRITING-DRILL-BRIDGE: Failed to update drill session:', bridgeError);
-              // Don't throw - this is supplementary
-            }
-          }
         }
 
         console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
@@ -1751,20 +1671,15 @@ const TestTaking: React.FC = () => {
             // The actual scoring is handled separately via writing assessments
             const questionsCorrect = questionsAnswered;
             
-            // Use existing drill session ID if available, otherwise create new one
-            let drillSessionId = drillSessionIdRef.current;
-            
-            if (!drillSessionId) {
-              // Fallback: create drill session entry if not already created
-              drillSessionId = await DrillSessionService.createOrResumeSession(
-                user.id,
-                actualSubSkillId,
-                session.productType,
-                difficulty,
-                session.questions.map(q => q.id),
-                session.questions.length
-              );
-            }
+            // Create drill session entry for progress tracking at completion
+            const drillSessionId = await DrillSessionService.createOrResumeSession(
+              user.id,
+              actualSubSkillId,
+              session.productType,
+              difficulty,
+              session.questions.map(q => q.id),
+              session.questions.length
+            );
             
             await DrillSessionService.completeSession(
               drillSessionId,

@@ -679,12 +679,22 @@ const Drill: React.FC = () => {
             ].map(({ level, data }) => {
               const config = getDifficultyConfig(level);
               
+              // Check if this is a writing drill to use Essay labels
+              const isWritingDrill = selectedSubSkill.name.toLowerCase().includes('writing') || 
+                                   selectedSubSkill.name.toLowerCase().includes('written') ||
+                                   selectedSubSkill.name.toLowerCase().includes('expression');
+              
+              // Map difficulty levels to Essay labels for writing drills
+              const displayLabel = isWritingDrill ? 
+                (level === 'easy' ? 'Essay 1' : level === 'medium' ? 'Essay 2' : 'Essay 3') :
+                level;
+              
               return (
                 <Card key={level} className={cn("transition-all duration-200 hover:shadow-lg cursor-pointer", config.bgClass)}
                       onClick={() => startDrill(level)}>
                   <CardContent className="p-8 text-center h-full flex flex-col">
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold capitalize mb-2">{level}</h3>
+                      <h3 className="text-2xl font-bold mb-2">{displayLabel}</h3>
                       <p className="text-sm text-gray-600 mb-4">
                         {data.completed === 0 ? 'Not attempted' : 
                          data.isCompleted ? `Score: ${data.correctAnswers}/${data.total}` : 
