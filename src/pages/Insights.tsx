@@ -1930,13 +1930,58 @@ const PerformanceDashboard = () => {
                             }
                             
                             return true;
-                          })
+                          });
+
+                        // Group writing sub-skills by base name (consolidate essays)
+                        const groupedSubSkills = new Map();
+                        
+                        allSubSkills.forEach(subSkill => {
+                          const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
+                                               subSkill.sectionName.toLowerCase().includes('written expression');
+                          
+                          if (isWritingSkill) {
+                            // Extract base name without "- Essay X" part
+                            const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
+                            const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
+                            const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
+                            
+                            if (!groupedSubSkills.has(baseName)) {
+                              groupedSubSkills.set(baseName, {
+                                ...subSkill,
+                                subSkillName: baseName,
+                                isGroupedWriting: true,
+                                essays: {}
+                              });
+                            }
+                            
+                            const grouped = groupedSubSkills.get(baseName);
+                            grouped.essays[essayNumber] = {
+                              correct: subSkill.difficulty1Correct || 0,
+                              maxPoints: (subSkill as any).difficulty1MaxPoints || 15,
+                              accuracy: subSkill.difficulty1Accuracy || 0
+                            };
+                            
+                            // Update overall accuracy as average of attempted essays
+                            const attemptedEssays = Object.values(grouped.essays).filter((essay: any) => essay.correct > 0);
+                            if (attemptedEssays.length > 0) {
+                              grouped.accuracy = Math.round(
+                                attemptedEssays.reduce((sum: number, essay: any) => sum + essay.accuracy, 0) / attemptedEssays.length
+                              );
+                            }
+                          } else {
+                            // Non-writing skills: keep as-is
+                            groupedSubSkills.set(subSkill.subSkillName, subSkill);
+                          }
+                        });
+
+                        // Convert back to array and sort
+                        const finalSubSkills = Array.from(groupedSubSkills.values())
                           .sort((a, b) => {
                             // Sort by accuracy (best to worst) for drill results
                             return (b.accuracy || 0) - (a.accuracy || 0); // Highest to lowest (best first)
                           });
 
-                        return allSubSkills.map((subSkill, index) => {
+                        return finalSubSkills.map((subSkill, index) => {
                           // Debug: Log each sub-skill data to see what properties it has
                           console.log(`🔍 INSIGHT-DRILL: Sub-skill "${subSkill.subSkillName}" data:`, {
                             isWritingDrill: (subSkill as any).isWritingDrill,
@@ -2007,35 +2052,60 @@ const PerformanceDashboard = () => {
 
                                 {/* Right Section: Difficulty Breakdown */}
                                 <div className="grid grid-cols-3 gap-8 flex-shrink-0">
-                                  {/* Easy (Level 1) - Essay 1 for writing drills */}
-                                  <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">
-                                      {(subSkill as any).isWritingDrill ? 'Essay 1' : 'Easy'}
-                                    </div>
-                                    <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty1Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty1MaxPoints || 0) : (subSkill.difficulty1Questions || 0)}
-                                    </div>
-                                  </div>
-
-                                  {/* Medium (Level 2) - Essay 2 for writing drills */}
-                                  <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">
-                                      {(subSkill as any).isWritingDrill ? 'Essay 2' : 'Medium'}
-                                    </div>
-                                    <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty2Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty2MaxPoints || 0) : (subSkill.difficulty2Questions || 0)}
-                                    </div>
-                                  </div>
-
-                                  {/* Hard (Level 3) - Essay 3 for writing drills */}
-                                  <div className="text-center">
-                                    <div className="text-xs text-slate-500 mb-2">
-                                      {(subSkill as any).isWritingDrill ? 'Essay 3' : 'Hard'}
-                                    </div>
-                                    <div className="text-sm font-medium text-slate-700">
-                                      {subSkill.difficulty3Correct || 0}/{(subSkill as any).isWritingDrill ? ((subSkill as any).difficulty3MaxPoints || 0) : (subSkill.difficulty3Questions || 0)}
-                                    </div>
-                                  </div>
+                                  {(subSkill as any).isGroupedWriting ? (
+                                    // For grouped writing skills, show Essay 1, 2, 3 from consolidated data
+                                    <>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Essay 1</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {(subSkill as any).essays[1] ? 
+                                            `${(subSkill as any).essays[1].correct}/${(subSkill as any).essays[1].maxPoints}` : 
+                                            '0/0'
+                                          }
+                                        </div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Essay 2</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {(subSkill as any).essays[2] ? 
+                                            `${(subSkill as any).essays[2].correct}/${(subSkill as any).essays[2].maxPoints}` : 
+                                            '0/0'
+                                          }
+                                        </div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Essay 3</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {(subSkill as any).essays[3] ? 
+                                            `${(subSkill as any).essays[3].correct}/${(subSkill as any).essays[3].maxPoints}` : 
+                                            '0/0'
+                                          }
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    // For regular skills, show Easy/Medium/Hard
+                                    <>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Easy</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {subSkill.difficulty1Correct || 0}/{subSkill.difficulty1Questions || 0}
+                                        </div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Medium</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {subSkill.difficulty2Correct || 0}/{subSkill.difficulty2Questions || 0}
+                                        </div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-xs text-slate-500 mb-2">Hard</div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          {subSkill.difficulty3Correct || 0}/{subSkill.difficulty3Questions || 0}
+                                        </div>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
