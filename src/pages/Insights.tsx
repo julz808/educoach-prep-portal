@@ -1831,10 +1831,86 @@ const PerformanceDashboard = () => {
                       <div className="text-center">
                         <div className="text-base font-medium text-slate-600 mb-2">Overall Accuracy</div>
                         <div className={`text-3xl font-bold ${
-                          (performanceData.drills?.overallAccuracy || 0) >= 80 ? 'text-green-600' : 
-                          (performanceData.drills?.overallAccuracy || 0) >= 60 ? 'text-orange-600' : 
-                          'text-red-600'
-                        }`}>{performanceData.drills?.overallAccuracy || 0}%</div>
+                          (() => {
+                            // Calculate actual accuracy from the displayed sub-skills
+                            let totalNumerator = 0;
+                            let totalDenominator = 0;
+                            
+                            // Get all sub-skills from all sections
+                            const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
+                              .flatMap(section => section.subSkills);
+                            
+                            allSubSkills.forEach(subSkill => {
+                              if ((subSkill as any).isGroupedWriting) {
+                                // For writing skills, sum up all attempted essays
+                                const essays = (subSkill as any).essays || {};
+                                Object.values(essays).forEach((essay: any) => {
+                                  if (essay.attempted) {
+                                    totalNumerator += essay.correct || 0;
+                                    totalDenominator += essay.maxPoints || 0;
+                                  }
+                                });
+                              } else {
+                                // For non-writing skills, count each difficulty level
+                                if (subSkill.difficulty1Questions > 0) {
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += subSkill.difficulty1Questions || 0;
+                                }
+                                if (subSkill.difficulty2Questions > 0) {
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += subSkill.difficulty2Questions || 0;
+                                }
+                                if (subSkill.difficulty3Questions > 0) {
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += subSkill.difficulty3Questions || 0;
+                                }
+                              }
+                            });
+                            
+                            const accuracy = totalDenominator > 0 ? Math.round((totalNumerator / totalDenominator) * 100) : 0;
+                            return accuracy >= 80 ? 'text-green-600' : accuracy >= 60 ? 'text-orange-600' : 'text-red-600';
+                          })()
+                        }`}>
+                          {(() => {
+                            // Calculate actual accuracy percentage from the displayed sub-skills
+                            let totalNumerator = 0;
+                            let totalDenominator = 0;
+                            
+                            // Get all sub-skills from all sections
+                            const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
+                              .flatMap(section => section.subSkills);
+                            
+                            allSubSkills.forEach(subSkill => {
+                              if ((subSkill as any).isGroupedWriting) {
+                                // For writing skills, sum up all attempted essays
+                                const essays = (subSkill as any).essays || {};
+                                Object.values(essays).forEach((essay: any) => {
+                                  if (essay.attempted) {
+                                    totalNumerator += essay.correct || 0;
+                                    totalDenominator += essay.maxPoints || 0;
+                                  }
+                                });
+                              } else {
+                                // For non-writing skills, count each difficulty level
+                                if (subSkill.difficulty1Questions > 0) {
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += subSkill.difficulty1Questions || 0;
+                                }
+                                if (subSkill.difficulty2Questions > 0) {
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += subSkill.difficulty2Questions || 0;
+                                }
+                                if (subSkill.difficulty3Questions > 0) {
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += subSkill.difficulty3Questions || 0;
+                                }
+                              }
+                            });
+                            
+                            const accuracy = totalDenominator > 0 ? Math.round((totalNumerator / totalDenominator) * 100) : 0;
+                            return `${accuracy}%`;
+                          })()}
+                        </div>
                       </div>
                     </div>
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
@@ -1846,10 +1922,42 @@ const PerformanceDashboard = () => {
                           'text-red-600'
                         }`}>
                           {(() => {
-                            const totalQuestions = performanceData.drills?.totalQuestions || 0;
-                            const accuracy = performanceData.drills?.overallAccuracy || 0;
-                            const correctAnswers = Math.round((accuracy / 100) * totalQuestions);
-                            return `${correctAnswers}/${totalQuestions}`;
+                            // Calculate actual totals from the displayed sub-skills
+                            let totalNumerator = 0;
+                            let totalDenominator = 0;
+                            
+                            // Get all sub-skills from all sections
+                            const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
+                              .flatMap(section => section.subSkills);
+                            
+                            allSubSkills.forEach(subSkill => {
+                              if ((subSkill as any).isGroupedWriting) {
+                                // For writing skills, sum up all attempted essays
+                                const essays = (subSkill as any).essays || {};
+                                Object.values(essays).forEach((essay: any) => {
+                                  if (essay.attempted) {
+                                    totalNumerator += essay.correct || 0;
+                                    totalDenominator += essay.maxPoints || 0;
+                                  }
+                                });
+                              } else {
+                                // For non-writing skills, count each difficulty level
+                                if (subSkill.difficulty1Questions > 0) {
+                                  totalNumerator += subSkill.difficulty1Correct || 0;
+                                  totalDenominator += subSkill.difficulty1Questions || 0;
+                                }
+                                if (subSkill.difficulty2Questions > 0) {
+                                  totalNumerator += subSkill.difficulty2Correct || 0;
+                                  totalDenominator += subSkill.difficulty2Questions || 0;
+                                }
+                                if (subSkill.difficulty3Questions > 0) {
+                                  totalNumerator += subSkill.difficulty3Correct || 0;
+                                  totalDenominator += subSkill.difficulty3Questions || 0;
+                                }
+                              }
+                            });
+                            
+                            return `${totalNumerator}/${totalDenominator}`;
                           })()}
                         </div>
                       </div>
@@ -2064,9 +2172,9 @@ const PerformanceDashboard = () => {
                                       </div>
                                     )}
                                   </div>
-                                  {!(subSkill as any).isGroupedWriting && (
-                                    <p className="text-sm text-slate-500">{subSkill.sectionName}</p>
-                                  )}
+                                  <p className="text-sm text-slate-500">
+                                    {(subSkill as any).isGroupedWriting ? 'Written Expression' : subSkill.sectionName}
+                                  </p>
                                 </div>
 
                                 {/* Overall Stats */}
