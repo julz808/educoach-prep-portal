@@ -630,8 +630,8 @@ const PerformanceDashboard = () => {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  {/* Summary Cards */}
-                  <div className="grid grid-cols-3 gap-6">
+                  {/* Summary Cards - Responsive grid for tablets */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {/* Overall Score */}
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                       <div className="text-center">
@@ -850,7 +850,7 @@ const PerformanceDashboard = () => {
                   </div>
 
                   {/* Sub-Skill Overview */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     {/* Top 5 Strengths */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <div className="px-6 py-4 border-b border-slate-200">
@@ -1066,13 +1066,13 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                       
-                      {/* Filter Tabs */}
-                      <div className="flex flex-wrap gap-2">
+                      {/* Filter Tabs - Better responsive wrapping */}
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setPracticeFilter(filter.id)}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                               practiceFilter === filter.id
                                 ? 'bg-slate-900 text-white'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1379,8 +1379,8 @@ const PerformanceDashboard = () => {
                 
                 return (
                   <div className="space-y-8">
-                    {/* Overall Performance Cards */}
-                    <div className="grid grid-cols-3 gap-6">
+                    {/* Overall Performance Cards - Responsive grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                       {/* Overall Score */}
                       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
                         <div className="text-center">
@@ -1643,13 +1643,13 @@ const PerformanceDashboard = () => {
                         </div>
                       </div>
                       
-                      {/* Filter Tabs */}
-                      <div className="flex flex-wrap gap-2">
+                      {/* Filter Tabs - Better responsive wrapping */}
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setPracticeFilter(filter.id)}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                               practiceFilter === filter.id
                                 ? 'bg-slate-900 text-white'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1820,7 +1820,7 @@ const PerformanceDashboard = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Overall Drill Stats */}
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                       <div className="text-center">
                         <div className="text-base font-medium text-slate-600 mb-2">Total Questions Drilled</div>
@@ -2071,13 +2071,13 @@ const PerformanceDashboard = () => {
                         <h3 className="text-lg font-semibold text-slate-900">Detailed Sub-Skills Performance</h3>
                       </div>
                       
-                      {/* Filter Tabs */}
-                      <div className="flex flex-wrap gap-2">
+                      {/* Filter Tabs - Better responsive wrapping */}
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
                             onClick={() => setDrillFilter(filter.id)}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                               drillFilter === filter.id
                                 ? 'bg-slate-900 text-white'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

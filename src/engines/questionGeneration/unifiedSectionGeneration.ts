@@ -288,9 +288,9 @@ function createDifficultyBreakdown(
     }
   }
   
-  // Drills: 10 questions per difficulty (or 2 for writing)
+  // Drills: 10 questions per difficulty (or 1 for writing)
   if (distribution.drill > 0) {
-    const questionsPerDifficulty = isWritingSection(sectionName) ? 2 : 10;
+    const questionsPerDifficulty = isWritingSection(sectionName) ? 1 : 10;
     
     breakdown.push(
       { difficulty: 1, count: questionsPerDifficulty, testModes: ['drill'] },

@@ -126,8 +126,8 @@ export function getTestSectionConfig(testType: string, sectionName: string): Tes
     },
     
     drillTestConfig: {
-      questionsPerSubSkill: isWritingSection ? 6 : 30,
-      questionsPerDifficulty: isWritingSection ? 2 : 10,
+      questionsPerSubSkill: isWritingSection ? 3 : 30,
+      questionsPerDifficulty: isWritingSection ? 1 : 10,
       passageType: isReadingSection ? 'mini' : 'none'
     }
   };

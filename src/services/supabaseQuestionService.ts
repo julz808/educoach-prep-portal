@@ -377,11 +377,21 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
     
     // Fetch all drill questions for this test type
-    // We need to fetch questions by section to ensure we get all of them
-    // because Reading Comprehension questions were created later and fall outside the default 1000 limit
+    // First, get all unique sections that actually exist for this test type
+    const { data: sectionData, error: sectionError } = await supabase
+      .from('questions')
+      .select('section_name')
+      .eq('test_type', dbTestType)
+      .eq('test_mode', 'drill');
     
-    // First, get all sections for this test type
-    const sections = ['Mathematics', 'Verbal Reasoning', 'Numerical Reasoning', 'Reading Comprehension', 'Written Expression'];
+    if (sectionError) {
+      console.error('🔧 DEBUG: Error fetching sections:', sectionError);
+      return [];
+    }
+    
+    const sections = [...new Set(sectionData?.map(q => q.section_name) || [])];
+    console.log('🔧 DEBUG: Found sections for', dbTestType, ':', sections);
+    
     let allDrillQuestions: Question[] = [];
     
     // Fetch questions for each section separately to ensure we get all of them

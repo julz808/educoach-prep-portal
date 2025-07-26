@@ -46,7 +46,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
 }) => {
   return (
     <div className={cn(
-      "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
+      "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6",
       className
     )}>
       {metrics.map((metric, index) => (
@@ -57,10 +57,10 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
                 {React.cloneElement(metric.icon as React.ReactElement, { size: 20 })}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className={cn("text-xl font-bold", metric.color.text)}>
+                <h3 className={cn("text-lg md:text-xl font-bold", metric.color.text)}>
                   {metric.value}
                 </h3>
-                <p className={cn("text-xs", metric.color.text + '/70')}>
+                <p className={cn("text-xs md:text-sm", metric.color.text + '/70')}>
                   {metric.title}
                 </p>
               </div>

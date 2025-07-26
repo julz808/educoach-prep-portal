@@ -301,8 +301,8 @@ async function analyzeTestModeGapsWithQuota(
   if (config.requiresPassages) {
     if (testMode === 'drill') {
       // DRILLS: 1:1 ratio with mini-passages, distributed across difficulties
-      // 30 questions per sub-skill: 10 easy, 10 medium, 10 hard
-      const questionsPerDifficulty = 10;
+      // Questions per difficulty level varies by section type (1 for writing, 10 for others)
+      const questionsPerDifficulty = config.drillTestConfig.questionsPerDifficulty;
       
       for (let difficulty = 1; difficulty <= 3; difficulty++) {
         for (let i = 0; i < questionsPerDifficulty; i++) {
@@ -341,16 +341,26 @@ async function analyzeTestModeGapsWithQuota(
   
   // Generate question gaps distributed across sub-skills
   if (testMode === 'drill') {
-    // For drills: Generate 30 questions per sub-skill (10 easy, 10 medium, 10 hard)
+    // For drills: Check existing questions by sub-skill and difficulty before creating gaps
     for (const subSkill of subSkills) {
       for (let difficulty = 1; difficulty <= 3; difficulty++) {
-        questionGaps.push({
-          testMode,
-          subSkill,
-          difficulty: difficulty as 1 | 2 | 3,
-          questionsNeeded: 10, // 10 questions per difficulty level
-          needsPassage: config.requiresPassages
-        });
+        // Check how many questions already exist for this sub-skill + difficulty
+        const existingCount = existingQuestions.filter(q => 
+          q.sub_skill === subSkill && q.difficulty === difficulty
+        ).length;
+        
+        const targetCount = config.drillTestConfig.questionsPerDifficulty;
+        const neededCount = Math.max(0, targetCount - existingCount);
+        
+        if (neededCount > 0) {
+          questionGaps.push({
+            testMode,
+            subSkill,
+            difficulty: difficulty as 1 | 2 | 3,
+            questionsNeeded: neededCount,
+            needsPassage: config.requiresPassages
+          });
+        }
       }
     }
   } else {

@@ -151,10 +151,10 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-edu-light-blue via-white to-edu-light-blue/50">
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Show only on XL screens (1280px+) */}
       <aside className={cn(
         "fixed left-0 top-0 z-40 h-screen bg-white border-r border-gray-200 transition-all duration-300 shadow-lg",
-        "hidden lg:block",
+        "hidden xl:block",
         sidebarCollapsed ? "w-20" : "w-80"
       )}>
         <div className="flex flex-col h-full overflow-hidden">
@@ -363,9 +363,9 @@ const Layout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Mobile/Tablet Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-3 py-0">
+      {/* Mobile/Tablet Header - Show on all screens below XL (1280px) */}
+      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between px-3 py-1">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -378,14 +378,14 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-40 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-10 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
           
           <div className="flex items-center space-x-2">
             <Select value={selectedProduct} onValueChange={handleProductChange}>
-              <SelectTrigger className="w-36 sm:w-40">
+              <SelectTrigger className="w-32 sm:w-36 md:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -408,9 +408,9 @@ const Layout: React.FC = () => {
         </div>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay - Show on all screens below XL */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)}>
+        <div className="xl:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)}>
           <aside className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b">
@@ -544,11 +544,11 @@ const Layout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content - Removed Page Header */}
+      {/* Main Content - Adjust for XL breakpoint */}
       <main className={cn(
         "transition-all duration-300",
-        "lg:ml-80 lg:pl-0 pt-12 lg:pt-0",
-        sidebarCollapsed && "lg:ml-20"
+        "xl:ml-80 xl:pl-0 pt-14 xl:pt-0",
+        sidebarCollapsed && "xl:ml-20"
       )}>
         <div className="min-h-screen">
           {/* Page Content - No more page header */}
