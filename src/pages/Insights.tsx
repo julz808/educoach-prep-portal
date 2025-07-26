@@ -1836,17 +1836,60 @@ const PerformanceDashboard = () => {
                             let totalNumerator = 0;
                             let totalDenominator = 0;
                             
-                            // Get all sub-skills from all sections
+                            // Get all sub-skills from all sections and apply the same grouping logic as the display
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
-                            console.log('🔍 ACCURACY-CALC: All sub-skills:', allSubSkills.map(s => ({
-                              name: s.subSkillName,
-                              isGroupedWriting: (s as any).isGroupedWriting,
-                              essays: (s as any).essays
-                            })));
+                            // Apply the same grouping logic for writing skills as used in display
+                            const groupedSubSkills = new Map();
                             
                             allSubSkills.forEach(subSkill => {
+                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
+                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              
+                              if (isWritingSkill) {
+                                // Extract base name without "- Essay X" part
+                                const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
+                                const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
+                                const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
+                                
+                                if (!groupedSubSkills.has(baseName)) {
+                                  groupedSubSkills.set(baseName, {
+                                    ...subSkill,
+                                    subSkillName: baseName,
+                                    isGroupedWriting: true,
+                                    essays: {}
+                                  });
+                                }
+                                
+                                const grouped = groupedSubSkills.get(baseName);
+                                
+                                // Determine which difficulty this essay corresponds to
+                                let correct, maxPoints;
+                                if (essayNumber === 1) {
+                                  correct = subSkill.difficulty1Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
+                                } else if (essayNumber === 2) {
+                                  correct = subSkill.difficulty2Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
+                                } else if (essayNumber === 3) {
+                                  correct = subSkill.difficulty3Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                                }
+                                
+                                grouped.essays[essayNumber] = {
+                                  correct,
+                                  maxPoints,
+                                  attempted: maxPoints > 0
+                                };
+                              } else {
+                                // Non-writing skills: keep as-is
+                                groupedSubSkills.set(subSkill.subSkillName, subSkill);
+                              }
+                            });
+                            
+                            // Now calculate totals from grouped data
+                            Array.from(groupedSubSkills.values()).forEach(subSkill => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
@@ -1888,11 +1931,60 @@ const PerformanceDashboard = () => {
                             let totalNumerator = 0;
                             let totalDenominator = 0;
                             
-                            // Get all sub-skills from all sections
+                            // Get all sub-skills from all sections and apply the same grouping logic as the display
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
+                            // Apply the same grouping logic for writing skills as used in display
+                            const groupedSubSkills = new Map();
+                            
                             allSubSkills.forEach(subSkill => {
+                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
+                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              
+                              if (isWritingSkill) {
+                                // Extract base name without "- Essay X" part
+                                const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
+                                const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
+                                const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
+                                
+                                if (!groupedSubSkills.has(baseName)) {
+                                  groupedSubSkills.set(baseName, {
+                                    ...subSkill,
+                                    subSkillName: baseName,
+                                    isGroupedWriting: true,
+                                    essays: {}
+                                  });
+                                }
+                                
+                                const grouped = groupedSubSkills.get(baseName);
+                                
+                                // Determine which difficulty this essay corresponds to
+                                let correct, maxPoints;
+                                if (essayNumber === 1) {
+                                  correct = subSkill.difficulty1Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
+                                } else if (essayNumber === 2) {
+                                  correct = subSkill.difficulty2Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
+                                } else if (essayNumber === 3) {
+                                  correct = subSkill.difficulty3Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                                }
+                                
+                                grouped.essays[essayNumber] = {
+                                  correct,
+                                  maxPoints,
+                                  attempted: maxPoints > 0
+                                };
+                              } else {
+                                // Non-writing skills: keep as-is
+                                groupedSubSkills.set(subSkill.subSkillName, subSkill);
+                              }
+                            });
+                            
+                            // Now calculate totals from grouped data
+                            Array.from(groupedSubSkills.values()).forEach(subSkill => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
@@ -1938,20 +2030,60 @@ const PerformanceDashboard = () => {
                             let totalNumerator = 0;
                             let totalDenominator = 0;
                             
-                            // Get all sub-skills from all sections
+                            // Get all sub-skills from all sections and apply the same grouping logic as the display
                             const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
                               .flatMap(section => section.subSkills);
                             
-                            console.log('🔍 TOTAL-CALC: All sub-skills for debugging:', allSubSkills.map(s => ({
-                              name: s.subSkillName,
-                              isGroupedWriting: (s as any).isGroupedWriting,
-                              essays: (s as any).essays,
-                              d1Q: s.difficulty1Questions,
-                              d2Q: s.difficulty2Questions,
-                              d3Q: s.difficulty3Questions
-                            })));
+                            // Apply the same grouping logic for writing skills as used in display
+                            const groupedSubSkills = new Map();
                             
                             allSubSkills.forEach(subSkill => {
+                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
+                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              
+                              if (isWritingSkill) {
+                                // Extract base name without "- Essay X" part
+                                const baseName = subSkill.subSkillName.replace(/ - Essay \d+$/, '');
+                                const essayMatch = subSkill.subSkillName.match(/ - Essay (\d+)$/);
+                                const essayNumber = essayMatch ? parseInt(essayMatch[1]) : 1;
+                                
+                                if (!groupedSubSkills.has(baseName)) {
+                                  groupedSubSkills.set(baseName, {
+                                    ...subSkill,
+                                    subSkillName: baseName,
+                                    isGroupedWriting: true,
+                                    essays: {}
+                                  });
+                                }
+                                
+                                const grouped = groupedSubSkills.get(baseName);
+                                
+                                // Determine which difficulty this essay corresponds to
+                                let correct, maxPoints;
+                                if (essayNumber === 1) {
+                                  correct = subSkill.difficulty1Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty1MaxPoints || 15;
+                                } else if (essayNumber === 2) {
+                                  correct = subSkill.difficulty2Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty2MaxPoints || 15;
+                                } else if (essayNumber === 3) {
+                                  correct = subSkill.difficulty3Correct || 0;
+                                  maxPoints = (subSkill as any).difficulty3MaxPoints || 15;
+                                }
+                                
+                                grouped.essays[essayNumber] = {
+                                  correct,
+                                  maxPoints,
+                                  attempted: maxPoints > 0
+                                };
+                              } else {
+                                // Non-writing skills: keep as-is
+                                groupedSubSkills.set(subSkill.subSkillName, subSkill);
+                              }
+                            });
+                            
+                            // Now calculate totals from grouped data
+                            Array.from(groupedSubSkills.values()).forEach(subSkill => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
