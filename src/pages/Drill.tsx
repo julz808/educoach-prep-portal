@@ -541,6 +541,14 @@ const Drill: React.FC = () => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && user) {
         console.log('🔄 DRILL: Page became visible, refreshing progress data...');
+        
+        // Check if there's a refresh flag from completed writing drill
+        const refreshFlag = localStorage.getItem('drill_progress_refresh_needed');
+        if (refreshFlag === 'true') {
+          console.log('🔄 DRILL-REFRESH: Found refresh flag, forcing progress reload...');
+          localStorage.removeItem('drill_progress_refresh_needed');
+        }
+        
         reloadProgressData();
       }
     };

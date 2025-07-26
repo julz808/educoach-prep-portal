@@ -884,15 +884,54 @@ const TestTaking: React.FC = () => {
         } else {
           // For regular sessions (diagnostic/practice) AND writing drills, use TestSessionService
           console.log('🚀 SESSION-CREATE: Using TestSessionService for:', isWritingDrill ? 'WRITING DRILL' : testType.toUpperCase());
-          console.log('🚀 SESSION-CREATE: Creating session with params:', {
-            userId: user.id,
-            productType: properDisplayName,
-            testMode: actualTestMode,
-            sectionName,
-            questionCount: questions.length
-          });
           
-          try {
+          // WRITING DRILL FIX: For writing drills, check for existing sessions by sub-skill/difficulty first
+          if (isWritingDrill) {
+            console.log('🔍 WRITING-DRILL-CHECK: Checking for existing writing drill sessions before creating new one...');
+            
+            // Query user_test_sessions for existing sessions with same sub-skill
+            const { data: existingSessions, error: queryError } = await supabase
+              .from('user_test_sessions')
+              .select('id, status, section_name, created_at')
+              .eq('user_id', user.id)
+              .eq('product_type', properDisplayName)
+              .eq('test_mode', actualTestMode)
+              .eq('section_name', sectionName)
+              .order('created_at', { ascending: false });
+            
+            if (queryError) {
+              console.error('🔍 WRITING-DRILL-CHECK: Error querying existing sessions:', queryError);
+            } else if (existingSessions && existingSessions.length > 0) {
+              const mostRecentSession = existingSessions[0];
+              console.log('🔍 WRITING-DRILL-CHECK: Found existing sessions:', existingSessions.map(s => ({
+                id: s.id,
+                status: s.status,
+                created_at: s.created_at
+              })));
+              console.log('🔍 WRITING-DRILL-CHECK: Using most recent session:', mostRecentSession.id, 'status:', mostRecentSession.status);
+              
+              sessionIdToUse = mostRecentSession.id;
+              
+              // If the session is completed, we should go to review mode
+              if (mostRecentSession.status === 'completed') {
+                console.log('🔍 WRITING-DRILL-CHECK: Most recent session is completed, should go to review mode');
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('review', 'true');
+                setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
+              }
+            } else {
+              console.log('🔍 WRITING-DRILL-CHECK: No existing sessions found, will create new one');
+              sessionIdToUse = await TestSessionService.createOrResumeSession(
+                user.id,
+                properDisplayName,
+                actualTestMode as 'diagnostic' | 'practice' | 'drill',
+                sectionName,
+                questions.length,
+                questions.map(q => q.id)
+              );
+            }
+          } else {
+            // Regular diagnostic/practice sessions
             sessionIdToUse = await TestSessionService.createOrResumeSession(
               user.id,
               properDisplayName, // Use mapped product type, not raw selectedProduct
@@ -901,8 +940,9 @@ const TestTaking: React.FC = () => {
               questions.length,
               questions.map(q => q.id)
             );
-            
-            console.log('✅ SESSION-CREATE: Session created successfully:', sessionIdToUse);
+          }
+          
+          console.log('✅ SESSION-CREATE: Session ID determined:', sessionIdToUse);
             
             if (!sessionIdToUse) {
               throw new Error('Session creation returned undefined');
@@ -1760,6 +1800,11 @@ const TestTaking: React.FC = () => {
             console.log('🌉 WRITING-DRILL-BRIDGE: Skipping drill_sessions bridge - using user_test_sessions only');
             console.log('🌉 WRITING-DRILL-BRIDGE: Main session completed in user_test_sessions:', session.id);
             console.log('✅ WRITING-DRILL-BRIDGE: Bridge skipped - progress will be tracked via user_test_sessions only');
+            
+            // PROGRESS REFRESH: Trigger drill progress refresh by setting a flag in localStorage
+            // This will be picked up by the drill page visibility change handler
+            localStorage.setItem('drill_progress_refresh_needed', 'true');
+            console.log('🔄 WRITING-DRILL-REFRESH: Set drill progress refresh flag for drill page');
           } catch (bridgeError) {
             console.error('❌ WRITING-DRILL-BRIDGE: Error in bridge logic:', bridgeError);
             // Don't throw - this was just supplementary logic
