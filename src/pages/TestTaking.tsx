@@ -902,64 +902,65 @@ const TestTaking: React.FC = () => {
           console.log('🚀 SESSION-CREATE: Using TestSessionService for:', isWritingDrill ? 'WRITING DRILL' : testType.toUpperCase());
           
           // WRITING DRILL FIX: For writing drills, check for existing sessions by sub-skill/difficulty first
-          if (isWritingDrill) {
-            console.log('🔍 WRITING-DRILL-CHECK: Checking for existing writing drill sessions before creating new one...');
-            
-            // Query user_test_sessions for existing sessions with same sub-skill
-            const { data: existingSessions, error: queryError } = await supabase
-              .from('user_test_sessions')
-              .select('id, status, section_name, created_at')
-              .eq('user_id', user.id)
-              .eq('product_type', properDisplayName)
-              .eq('test_mode', actualTestMode)
-              .eq('section_name', sectionName)
-              .order('created_at', { ascending: false });
-            
-            if (queryError) {
-              console.error('🔍 WRITING-DRILL-CHECK: Error querying existing sessions:', queryError);
-            } else if (existingSessions && existingSessions.length > 0) {
-              const mostRecentSession = existingSessions[0];
-              console.log('🔍 WRITING-DRILL-CHECK: Found existing sessions:', existingSessions.map(s => ({
-                id: s.id,
-                status: s.status,
-                created_at: s.created_at
-              })));
-              console.log('🔍 WRITING-DRILL-CHECK: Using most recent session:', mostRecentSession.id, 'status:', mostRecentSession.status);
+          try {
+            if (isWritingDrill) {
+              console.log('🔍 WRITING-DRILL-CHECK: Checking for existing writing drill sessions before creating new one...');
               
-              sessionIdToUse = mostRecentSession.id;
+              // Query user_test_sessions for existing sessions with same sub-skill
+              const { data: existingSessions, error: queryError } = await supabase
+                .from('user_test_sessions')
+                .select('id, status, section_name, created_at')
+                .eq('user_id', user.id)
+                .eq('product_type', properDisplayName)
+                .eq('test_mode', actualTestMode)
+                .eq('section_name', sectionName)
+                .order('created_at', { ascending: false });
               
-              // If the session is completed, we should go to review mode
-              if (mostRecentSession.status === 'completed') {
-                console.log('🔍 WRITING-DRILL-CHECK: Most recent session is completed, should go to review mode');
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('review', 'true');
-                setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
+              if (queryError) {
+                console.error('🔍 WRITING-DRILL-CHECK: Error querying existing sessions:', queryError);
+              } else if (existingSessions && existingSessions.length > 0) {
+                const mostRecentSession = existingSessions[0];
+                console.log('🔍 WRITING-DRILL-CHECK: Found existing sessions:', existingSessions.map(s => ({
+                  id: s.id,
+                  status: s.status,
+                  created_at: s.created_at
+                })));
+                console.log('🔍 WRITING-DRILL-CHECK: Using most recent session:', mostRecentSession.id, 'status:', mostRecentSession.status);
+                
+                sessionIdToUse = mostRecentSession.id;
+                
+                // If the session is completed, we should go to review mode
+                if (mostRecentSession.status === 'completed') {
+                  console.log('🔍 WRITING-DRILL-CHECK: Most recent session is completed, should go to review mode');
+                  const currentUrl = new URL(window.location.href);
+                  currentUrl.searchParams.set('review', 'true');
+                  setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
+                }
+              } else {
+                console.log('🔍 WRITING-DRILL-CHECK: No existing sessions found, will create new one');
+                sessionIdToUse = await TestSessionService.createOrResumeSession(
+                  user.id,
+                  properDisplayName,
+                  actualTestMode as 'diagnostic' | 'practice' | 'drill',
+                  sectionName,
+                  questions.length,
+                  questions.map(q => q.id)
+                );
               }
             } else {
-              console.log('🔍 WRITING-DRILL-CHECK: No existing sessions found, will create new one');
+              // Regular diagnostic/practice sessions
               sessionIdToUse = await TestSessionService.createOrResumeSession(
                 user.id,
-                properDisplayName,
-                actualTestMode as 'diagnostic' | 'practice' | 'drill',
+                properDisplayName, // Use mapped product type, not raw selectedProduct
+                actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
                 sectionName,
                 questions.length,
                 questions.map(q => q.id)
               );
             }
-          } else {
-            // Regular diagnostic/practice sessions
-            sessionIdToUse = await TestSessionService.createOrResumeSession(
-              user.id,
-              properDisplayName, // Use mapped product type, not raw selectedProduct
-              actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
-              sectionName,
-              questions.length,
-              questions.map(q => q.id)
-            );
-          }
-          
-          console.log('✅ SESSION-CREATE: Session ID determined:', sessionIdToUse);
             
+            console.log('✅ SESSION-CREATE: Session ID determined:', sessionIdToUse);
+              
             if (!sessionIdToUse) {
               throw new Error('Session creation returned undefined');
             }
