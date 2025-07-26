@@ -435,15 +435,28 @@ const TestTaking: React.FC = () => {
             normalizedSectionNameFromParams
           });
           
-          const isMatch = normalizedSectionName === normalizedSubjectId ||
-                 normalizedSectionName === normalizedSectionNameFromParams ||
-                 normalizedSectionName.includes(normalizedSubjectId) ||
-                 normalizedSubjectId.includes(normalizedSectionName) ||
-                 normalizedSectionName.includes(normalizedSectionNameFromParams) ||
-                 normalizedSectionNameFromParams.includes(normalizedSectionName);
+          // Use exact matching first, then very specific partial matching to avoid false positives
+          const isExactMatch = normalizedSectionName === normalizedSubjectId ||
+                              normalizedSectionName === normalizedSectionNameFromParams;
+          
+          // Only do partial matching if no exact match and the strings are similar enough
+          const isPartialMatch = !isExactMatch && (
+            (normalizedSubjectId.length > 10 && normalizedSectionName.includes(normalizedSubjectId)) ||
+            (normalizedSectionNameFromParams.length > 10 && normalizedSectionName.includes(normalizedSectionNameFromParams)) ||
+            (normalizedSectionName.length > 10 && normalizedSubjectId.includes(normalizedSectionName)) ||
+            (normalizedSectionName.length > 10 && normalizedSectionNameFromParams.includes(normalizedSectionName))
+          );
+          
+          const isMatch = isExactMatch || isPartialMatch;
                  
           if (isMatch) {
-            console.log('🔧 DRILL: Match found via normalization!');
+            console.log('🔧 DRILL: Match found!', {
+              matchType: isExactMatch ? 'exact' : 'partial',
+              sectionName: section.name,
+              sectionId: section.id,
+              subjectId: subjectId,
+              sectionNameParam: sectionName
+            });
           }
           
           return isMatch;
