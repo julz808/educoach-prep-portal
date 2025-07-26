@@ -787,7 +787,8 @@ const Drill: React.FC = () => {
   // Check if a sub-skill has any progress (has started any difficulty)
   const hasAnyProgress = (progress: SubSkillProgress) => {
     return progress.easy.completed > 0 || progress.medium.completed > 0 || progress.hard.completed > 0 ||
-           progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId;
+           progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId ||
+           progress.easy.isCompleted || progress.medium.isCompleted || progress.hard.isCompleted;
   };
 
   const getTotalCompleted = () => {
@@ -923,7 +924,7 @@ const Drill: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold mb-2">{displayLabel}</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        {data.completed === 0 && !data.sessionId ? 'Not attempted' : 
+                        {data.completed === 0 && !data.sessionId && !data.isCompleted ? 'Not attempted' : 
                          data.isCompleted ? `Score: ${data.correctAnswers}/${data.total}` : 
                          `In progress: ${data.completed}/${data.total}`}
                       </p>
@@ -987,7 +988,7 @@ const Drill: React.FC = () => {
                     >
                       <Play size={16} className="mr-2" />
                       {data.completed === 0 && !data.sessionId && !data.isCompleted ? 'Start Practice' : 
-                       data.isCompleted ? 'View Results' : 'Continue Practice'}
+                       data.isCompleted ? 'Review Response' : 'Continue Practice'}
                     </Button>
                   </CardContent>
                 </Card>
