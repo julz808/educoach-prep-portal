@@ -599,11 +599,24 @@ const TestTaking: React.FC = () => {
           console.log('🔄 Is writing drill for resume?', isWritingDrillForResume);
           
           // Load session based on test type and drill type
+          console.log('🔄 LOAD-DEBUG: About to load session...', {
+            testType,
+            isWritingDrillForResume,
+            actualSessionId,
+            loadMethod: (testType === 'drill' && !isWritingDrillForResume) ? 'loadDrillSession' : 'SessionService.loadSession'
+          });
+          
           const savedSession = (testType === 'drill' && !isWritingDrillForResume) ? 
             await loadDrillSession(actualSessionId) : 
             await SessionService.loadSession(actualSessionId);
             
           console.log('🔄 Session loaded result:', savedSession);
+          console.log('🔄 LOAD-DEBUG: Session load completed:', {
+            found: !!savedSession,
+            sessionId: savedSession?.id,
+            status: savedSession?.status,
+            actualSessionIdUsed: actualSessionId
+          });
           console.log('🔄 RESUME: Session loaded?', !!savedSession);
           console.log('🔄 RESUME: Session answers:', savedSession?.answers);
           console.log('🔄 RESUME: Session status:', savedSession?.status);
@@ -1741,28 +1754,15 @@ const TestTaking: React.FC = () => {
             // The actual scoring is handled separately via writing assessments
             const questionsCorrect = questionsAnswered;
             
-            // Create drill session entry for progress tracking at completion
-            const drillSessionId = await DrillSessionService.createOrResumeSession(
-              user.id,
-              actualSubSkillId,
-              session.productType,
-              difficulty,
-              session.questions.map(q => q.id),
-              session.questions.length
-            );
-            
-            await DrillSessionService.completeSession(
-              drillSessionId,
-              questionsAnswered,
-              questionsCorrect,
-              stringAnswers,
-              stringTextAnswers
-            );
-            
-            console.log('✅ WRITING-DRILL-BRIDGE: Created drill_sessions entry for progress tracking');
+            // BRIDGE FIX: Instead of creating a new drill session, we'll skip the bridge
+            // The writing drill should complete in user_test_sessions only
+            // The drill progress loading already handles user_test_sessions properly
+            console.log('🌉 WRITING-DRILL-BRIDGE: Skipping drill_sessions bridge - using user_test_sessions only');
+            console.log('🌉 WRITING-DRILL-BRIDGE: Main session completed in user_test_sessions:', session.id);
+            console.log('✅ WRITING-DRILL-BRIDGE: Bridge skipped - progress will be tracked via user_test_sessions only');
           } catch (bridgeError) {
-            console.error('❌ WRITING-DRILL-BRIDGE: Failed to create drill_sessions entry:', bridgeError);
-            // Don't throw - this is supplementary, the main session is already complete
+            console.error('❌ WRITING-DRILL-BRIDGE: Error in bridge logic:', bridgeError);
+            // Don't throw - this was just supplementary logic
           }
         }
       }

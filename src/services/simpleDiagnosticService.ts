@@ -224,7 +224,7 @@ export class SimpleDiagnosticService {
    */
   static async getSessionForResume(sessionId: string): Promise<any> {
     try {
-      console.log('🔄 Getting session for resume:', sessionId);
+      console.log('🔄 RESUME-DEBUG: Getting session for resume:', sessionId);
 
       const { data: session, error } = await supabase
         .from('user_test_sessions')
@@ -233,7 +233,19 @@ export class SimpleDiagnosticService {
         .single();
 
       if (error) {
-        console.error('Error getting session:', error);
+        console.error('❌ RESUME-DEBUG: Error getting session:', error);
+        console.error('❌ RESUME-DEBUG: Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          sessionId
+        });
+        return null;
+      }
+
+      if (!session) {
+        console.error('❌ RESUME-DEBUG: No session found for ID:', sessionId);
         return null;
       }
 

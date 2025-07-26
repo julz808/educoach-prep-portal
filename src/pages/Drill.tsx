@@ -97,6 +97,7 @@ const Drill: React.FC = () => {
       console.log('🔧 DRILL: Loading progress for product:', dbProductType);
       
       // Load progress from both drill_sessions (for regular drills) and user_test_sessions (for writing drills)
+      console.log('🔧 DRILL-PROGRESS: Loading progress for user:', user.id, 'product:', dbProductType);
       const [drillSessionsResult, userTestSessionsResult] = await Promise.all([
         supabase
           .from('drill_sessions')
@@ -124,40 +125,27 @@ const Drill: React.FC = () => {
       
       console.log('🔧 DRILL: Loaded drill sessions:', drillSessions.length);
       console.log('🔧 DRILL: Loaded writing drill sessions (user_test_sessions):', userTestSessions.length);
+      
+      // Debug: Show actual writing drill sessions found
+      const writingSessions = userTestSessions.filter(session => {
+        const sectionName = session.section_name || '';
+        return sectionName.toLowerCase().includes('writing') || 
+               sectionName.toLowerCase().includes('written') ||
+               sectionName.toLowerCase().includes('expression');
+      });
+      console.log('🔧 DRILL-PROGRESS: Found writing drill sessions:', writingSessions.map(s => ({
+        id: s.id,
+        section: s.section_name,
+        status: s.status,
+        currentQuestionIndex: s.current_question_index,
+        hasTextAnswers: !!(s.text_answers_data && Object.keys(s.text_answers_data).length > 0)
+      })));
 
       // Organize sessions by sub_skill_id and difficulty
       const progressMap: Record<string, any> = {};
       
-      // Process regular drill sessions from drill_sessions table
-      drillSessions?.forEach(session => {
-        console.log(`🔧 DRILL: Processing drill_session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
-        
-        const key = `${session.sub_skill_id}-${session.difficulty}`;
-        if (!progressMap[session.sub_skill_id]) {
-          progressMap[session.sub_skill_id] = {
-            easy: { completed: 0, total: 0, bestScore: undefined },
-            medium: { completed: 0, total: 0, bestScore: undefined },
-            hard: { completed: 0, total: 0, bestScore: undefined }
-          };
-        }
-
-        const difficultyKey = session.difficulty === 1 ? 'easy' : session.difficulty === 2 ? 'medium' : 'hard';
-        // Calculate score as percentage of total questions, not just attempted ones
-        const totalScore = session.questions_total > 0 ? Math.round((session.questions_correct / session.questions_total) * 100) : 0;
-        
-        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, totalScore=${totalScore}%`);
-        
-        progressMap[session.sub_skill_id][difficultyKey] = {
-          completed: session.questions_answered || 0,
-          total: session.questions_total || 0,
-          bestScore: session.status === 'completed' ? totalScore : undefined,
-          correctAnswers: session.questions_correct || 0,
-          sessionId: session.id, // Store session ID for navigation
-          isCompleted: session.status === 'completed' // Track completion status
-        };
-      });
-      
-      // Process writing drill sessions from user_test_sessions table
+      // IMPORTANT: Process writing drill sessions FIRST to ensure they take priority
+      // Writing drills in user_test_sessions should always override any drill_sessions entries
       userTestSessions?.forEach(session => {
         console.log(`🔧 WRITING-DRILL: Processing user_test_session: "${session.section_name}", status: ${session.status}`);
         
@@ -182,17 +170,39 @@ const Drill: React.FC = () => {
             };
           }
           
-          const questionsAnswered = Math.max(session.current_question_index + 1, 1);
           const totalQuestions = session.total_questions || 1;
           
-          // For writing assessments, get actual score from writing_assessments table if available
+          // For writing drills, calculate progress based on session status
+          let questionsAnswered = 0;
           let completionScore = 0;
+          
           if (session.status === 'completed') {
+            // Completed sessions: user finished the writing drill
+            questionsAnswered = Math.max(session.current_question_index + 1, totalQuestions);
             // For completed sessions, we should get the actual score from writing_assessments
             // For now, use a default high score since the essay was completed and assessed
             completionScore = 85; // Default good score for completed writing assessments
-          } else if (questionsAnswered > 0) {
-            completionScore = Math.round((questionsAnswered / totalQuestions) * 100);
+          } else if (session.status === 'active') {
+            // Active sessions: user started but didn't finish
+            // Check if user has written any text responses
+            const hasTextResponses = session.text_answers_data && 
+              Object.values(session.text_answers_data).some(answer => 
+                answer && typeof answer === 'string' && answer.trim().length > 0
+              );
+            
+            if (hasTextResponses || session.current_question_index > 0) {
+              // User has made progress - show as in progress
+              questionsAnswered = Math.max(session.current_question_index, 1); // At least 1 to show progress
+              completionScore = 0; // No score until completed
+            } else {
+              // Active session but no progress yet
+              questionsAnswered = 0;
+              completionScore = 0;
+            }
+          } else {
+            // New or paused sessions: not started
+            questionsAnswered = 0;
+            completionScore = 0;
           }
           
           console.log(`🔧 WRITING-DRILL: Setting progress for "${actualSubSkillId}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
@@ -252,6 +262,36 @@ const Drill: React.FC = () => {
             totalQuestions
           });
         }
+      });
+      
+      // Process regular drill sessions from drill_sessions table
+      // IMPORTANT: Skip any drill_sessions that conflict with writing drill sessions already processed
+      drillSessions?.forEach(session => {
+        console.log(`🔧 DRILL: Processing drill_session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
+        
+        const key = `${session.sub_skill_id}-${session.difficulty}`;
+        if (!progressMap[session.sub_skill_id]) {
+          progressMap[session.sub_skill_id] = {
+            easy: { completed: 0, total: 0, bestScore: undefined },
+            medium: { completed: 0, total: 0, bestScore: undefined },
+            hard: { completed: 0, total: 0, bestScore: undefined }
+          };
+        }
+
+        const difficultyKey = session.difficulty === 1 ? 'easy' : session.difficulty === 2 ? 'medium' : 'hard';
+        // Calculate score as percentage of total questions, not just attempted ones
+        const totalScore = session.questions_total > 0 ? Math.round((session.questions_correct / session.questions_total) * 100) : 0;
+        
+        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, totalScore=${totalScore}%`);
+        
+        progressMap[session.sub_skill_id][difficultyKey] = {
+          completed: session.questions_answered || 0,
+          total: session.questions_total || 0,
+          bestScore: session.status === 'completed' ? totalScore : undefined,
+          correctAnswers: session.questions_correct || 0,
+          sessionId: session.id, // Store session ID for navigation
+          isCompleted: session.status === 'completed' // Track completion status
+        };
       });
 
       console.log('🔧 DRILL: Processed progress map:', progressMap);
