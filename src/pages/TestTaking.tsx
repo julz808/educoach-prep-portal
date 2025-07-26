@@ -749,6 +749,15 @@ const TestTaking: React.FC = () => {
 
             setSession(resumedSession);
             setTimeRemaining(savedSession.timeRemainingSeconds);
+            
+            // Ensure URL has session ID for future resumes
+            const currentUrl = new URL(window.location.href);
+            if (!currentUrl.searchParams.get('sessionId')) {
+              currentUrl.searchParams.set('sessionId', actualSessionId);
+              window.history.replaceState({}, '', currentUrl.toString());
+              console.log('🔗 URL-UPDATE: Added sessionId to initial resume URL:', currentUrl.toString());
+            }
+            
             console.log('✅ RESUME: Session resumed successfully with:', {
               currentQuestion: resumedSession.currentQuestion,
               answersRestored: Object.keys(resumedSession.answers).length,
@@ -922,6 +931,15 @@ const TestTaking: React.FC = () => {
 
           setSession(resumedSession);
           setTimeRemaining(existingSession.timeRemainingSeconds);
+          
+          // Ensure URL has session ID for future resumes
+          const currentUrl = new URL(window.location.href);
+          if (!currentUrl.searchParams.get('sessionId')) {
+            currentUrl.searchParams.set('sessionId', sessionIdToUse);
+            window.history.replaceState({}, '', currentUrl.toString());
+            console.log('🔗 URL-UPDATE: Added sessionId to resumed session URL:', currentUrl.toString());
+          }
+          
           console.log('✅ RESUME: Session resumed from createSession with:', {
             currentQuestion: resumedSession.currentQuestion,
             answersRestored: Object.keys(resumedSession.answers).length,
@@ -952,6 +970,12 @@ const TestTaking: React.FC = () => {
         setSession(newSession);
         setTimeRemaining(timeLimitSeconds || 0);
         console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
+        
+        // Update URL with session ID so it can be resumed
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('sessionId', sessionIdToUse);
+        window.history.replaceState({}, '', currentUrl.toString());
+        console.log('🔗 URL-UPDATE: Added sessionId to URL:', currentUrl.toString());
         console.log('🔍 DEBUG: New session questions maxPoints:', newSession.questions.map(q => ({ 
           id: q.id, 
           maxPoints: q.maxPoints, 
