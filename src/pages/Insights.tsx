@@ -1844,8 +1844,9 @@ const PerformanceDashboard = () => {
                             const groupedSubSkills = new Map();
                             
                             allSubSkills.forEach(subSkill => {
-                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
-                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              const sectionName = subSkill.sectionName || '';
+                              const isWritingSkill = sectionName.toLowerCase().includes('writing') || 
+                                                   sectionName.toLowerCase().includes('written expression');
                               
                               if (isWritingSkill) {
                                 // Extract base name without "- Essay X" part
@@ -1939,8 +1940,9 @@ const PerformanceDashboard = () => {
                             const groupedSubSkills = new Map();
                             
                             allSubSkills.forEach(subSkill => {
-                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
-                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              const sectionName = subSkill.sectionName || '';
+                              const isWritingSkill = sectionName.toLowerCase().includes('writing') || 
+                                                   sectionName.toLowerCase().includes('written expression');
                               
                               if (isWritingSkill) {
                                 // Extract base name without "- Essay X" part
@@ -2038,8 +2040,9 @@ const PerformanceDashboard = () => {
                             const groupedSubSkills = new Map();
                             
                             allSubSkills.forEach(subSkill => {
-                              const isWritingSkill = subSkill.sectionName.toLowerCase().includes('writing') || 
-                                                   subSkill.sectionName.toLowerCase().includes('written expression');
+                              const sectionName = subSkill.sectionName || '';
+                              const isWritingSkill = sectionName.toLowerCase().includes('writing') || 
+                                                   sectionName.toLowerCase().includes('written expression');
                               
                               if (isWritingSkill) {
                                 // Extract base name without "- Essay X" part
