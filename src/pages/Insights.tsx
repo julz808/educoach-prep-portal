@@ -1903,21 +1903,43 @@ const PerformanceDashboard = () => {
                                   }
                                 });
                               } else {
-                                // For non-writing skills, count each difficulty level
-                                if (subSkill.difficulty1Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
-                                  totalNumerator += subSkill.difficulty1Correct || 0;
-                                  totalDenominator += subSkill.difficulty1Questions || 0;
-                                }
-                                if (subSkill.difficulty2Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
-                                  totalNumerator += subSkill.difficulty2Correct || 0;
-                                  totalDenominator += subSkill.difficulty2Questions || 0;
-                                }
-                                if (subSkill.difficulty3Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
-                                  totalNumerator += subSkill.difficulty3Correct || 0;
-                                  totalDenominator += subSkill.difficulty3Questions || 0;
+                                // For skills with maxPoints (writing assessments), use maxPoints instead of questions
+                                const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
+                                
+                                if (hasMaxPoints) {
+                                  console.log(`🔍 ACCURACY-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
+                                  if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty1Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
+                                  }
+                                  if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty2Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
+                                  }
+                                  if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty3Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
+                                  }
+                                } else {
+                                  // For regular skills, count each difficulty level with questions
+                                  if (subSkill.difficulty1Questions > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
+                                    totalNumerator += subSkill.difficulty1Correct || 0;
+                                    totalDenominator += subSkill.difficulty1Questions || 0;
+                                  }
+                                  if (subSkill.difficulty2Questions > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
+                                    totalNumerator += subSkill.difficulty2Correct || 0;
+                                    totalDenominator += subSkill.difficulty2Questions || 0;
+                                  }
+                                  if (subSkill.difficulty3Questions > 0) {
+                                    console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
+                                    totalNumerator += subSkill.difficulty3Correct || 0;
+                                    totalDenominator += subSkill.difficulty3Questions || 0;
+                                  }
                                 }
                               }
                             });
@@ -2099,21 +2121,43 @@ const PerformanceDashboard = () => {
                                   }
                                 });
                               } else {
-                                // For non-writing skills, count each difficulty level
-                                if (subSkill.difficulty1Questions > 0) {
-                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
-                                  totalNumerator += subSkill.difficulty1Correct || 0;
-                                  totalDenominator += subSkill.difficulty1Questions || 0;
-                                }
-                                if (subSkill.difficulty2Questions > 0) {
-                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
-                                  totalNumerator += subSkill.difficulty2Correct || 0;
-                                  totalDenominator += subSkill.difficulty2Questions || 0;
-                                }
-                                if (subSkill.difficulty3Questions > 0) {
-                                  console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
-                                  totalNumerator += subSkill.difficulty3Correct || 0;
-                                  totalDenominator += subSkill.difficulty3Questions || 0;
+                                // For skills with maxPoints (writing assessments), use maxPoints instead of questions
+                                const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
+                                
+                                if (hasMaxPoints) {
+                                  console.log(`🔍 TOTAL-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
+                                  if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty1Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
+                                  }
+                                  if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty2Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
+                                  }
+                                  if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
+                                    totalNumerator += subSkill.difficulty3Correct || 0;
+                                    totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
+                                  }
+                                } else {
+                                  // For regular skills, count each difficulty level with questions
+                                  if (subSkill.difficulty1Questions > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
+                                    totalNumerator += subSkill.difficulty1Correct || 0;
+                                    totalDenominator += subSkill.difficulty1Questions || 0;
+                                  }
+                                  if (subSkill.difficulty2Questions > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
+                                    totalNumerator += subSkill.difficulty2Correct || 0;
+                                    totalDenominator += subSkill.difficulty2Questions || 0;
+                                  }
+                                  if (subSkill.difficulty3Questions > 0) {
+                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
+                                    totalNumerator += subSkill.difficulty3Correct || 0;
+                                    totalDenominator += subSkill.difficulty3Questions || 0;
+                                  }
                                 }
                               }
                             });
