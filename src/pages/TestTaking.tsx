@@ -581,8 +581,17 @@ const TestTaking: React.FC = () => {
           console.log('🔄 Attempting to resume session:', actualSessionId, 'for testType:', testType);
           console.log('🔄 Is drill session?', testType === 'drill');
           
-          // Load session based on test type
-          const savedSession = testType === 'drill' ? 
+          // Check if this is a writing drill - writing drills use TestSessionService like diagnostic/practice
+          const isWritingDrillForResume = testType === 'drill' && (
+            sectionName.toLowerCase().includes('writing') ||
+            sectionName.toLowerCase().includes('written') ||
+            sectionName.toLowerCase().includes('expression')
+          );
+          
+          console.log('🔄 Is writing drill for resume?', isWritingDrillForResume);
+          
+          // Load session based on test type and drill type
+          const savedSession = (testType === 'drill' && !isWritingDrillForResume) ? 
             await loadDrillSession(actualSessionId) : 
             await SessionService.loadSession(actualSessionId);
             

@@ -96,24 +96,41 @@ const Drill: React.FC = () => {
       const dbProductType = getDbProductType(selectedProduct);
       console.log('🔧 DRILL: Loading progress for product:', dbProductType);
       
-      const { data: sessions, error } = await supabase
-        .from('drill_sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('product_type', dbProductType);
+      // Load progress from both drill_sessions (for regular drills) and user_test_sessions (for writing drills)
+      const [drillSessionsResult, userTestSessionsResult] = await Promise.all([
+        supabase
+          .from('drill_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_type', dbProductType),
+        supabase
+          .from('user_test_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_type', dbProductType)
+          .eq('test_mode', 'drill')
+      ]);
 
-      if (error) {
-        console.error('Error loading drill progress:', error);
-        return {};
+      if (drillSessionsResult.error) {
+        console.error('Error loading drill_sessions:', drillSessionsResult.error);
+      }
+      
+      if (userTestSessionsResult.error) {
+        console.error('Error loading user_test_sessions:', userTestSessionsResult.error);
       }
 
-      console.log('🔧 DRILL: Loaded drill sessions:', sessions);
+      const drillSessions = drillSessionsResult.data || [];
+      const userTestSessions = userTestSessionsResult.data || [];
+      
+      console.log('🔧 DRILL: Loaded drill sessions:', drillSessions.length);
+      console.log('🔧 DRILL: Loaded writing drill sessions (user_test_sessions):', userTestSessions.length);
 
       // Organize sessions by sub_skill_id and difficulty
       const progressMap: Record<string, any> = {};
       
-      sessions?.forEach(session => {
-        console.log(`🔧 DRILL: Processing session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
+      // Process regular drill sessions from drill_sessions table
+      drillSessions?.forEach(session => {
+        console.log(`🔧 DRILL: Processing drill_session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
         
         const key = `${session.sub_skill_id}-${session.difficulty}`;
         if (!progressMap[session.sub_skill_id]) {
@@ -138,6 +155,56 @@ const Drill: React.FC = () => {
           sessionId: session.id, // Store session ID for navigation
           isCompleted: session.status === 'completed' // Track completion status
         };
+      });
+      
+      // Process writing drill sessions from user_test_sessions table
+      userTestSessions?.forEach(session => {
+        console.log(`🔧 WRITING-DRILL: Processing user_test_session: "${session.section_name}", status: ${session.status}`);
+        
+        // For writing drills, we need to extract difficulty from URL or determine it another way
+        // For now, let's derive it from section name or use a default approach
+        const sectionName = session.section_name || '';
+        
+        // Check if this is a writing drill session
+        const isWritingSession = sectionName.toLowerCase().includes('writing') || 
+                                sectionName.toLowerCase().includes('written') ||
+                                sectionName.toLowerCase().includes('expression');
+        
+        if (isWritingSession) {
+          // For writing drills, we need to map the section name to a sub_skill_id
+          // This is tricky because user_test_sessions doesn't have sub_skill_id
+          // We'll use the section_name as the key for now
+          const subSkillKey = sectionName;
+          
+          if (!progressMap[subSkillKey]) {
+            progressMap[subSkillKey] = {
+              easy: { completed: 0, total: 0, bestScore: undefined },
+              medium: { completed: 0, total: 0, bestScore: undefined },
+              hard: { completed: 0, total: 0, bestScore: undefined }
+            };
+          }
+          
+          // TODO: We need a way to determine difficulty for writing drills
+          // For now, let's check all difficulty levels and mark the first available one
+          // In a proper implementation, we'd store the difficulty in the session or derive it from the URL
+          
+          // Mark as completed (at least one difficulty level) to show progress
+          const questionsAnswered = session.current_question_index + 1 || 1;
+          const totalQuestions = session.total_questions || 1;
+          const completionScore = session.status === 'completed' ? 100 : Math.round((questionsAnswered / totalQuestions) * 100);
+          
+          console.log(`🔧 WRITING-DRILL: Setting progress for "${subSkillKey}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
+          
+          // For now, assume difficulty 2 (medium) for writing drills - this needs improvement
+          progressMap[subSkillKey]['medium'] = {
+            completed: questionsAnswered,
+            total: totalQuestions,
+            bestScore: session.status === 'completed' ? completionScore : undefined,
+            correctAnswers: questionsAnswered, // For writing, attempted = correct for progress tracking
+            sessionId: session.id,
+            isCompleted: session.status === 'completed'
+          };
+        }
       });
 
       console.log('🔧 DRILL: Processed progress map:', progressMap);
