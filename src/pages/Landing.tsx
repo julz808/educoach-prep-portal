@@ -486,11 +486,11 @@ const Landing = () => {
                   </div>
                   <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col flex-grow space-y-6">
-                  {/* Test Features */}
-                  <div className="text-center space-y-2">
+                <CardContent className="flex flex-col h-full">
+                  {/* Test Features - Fixed height container */}
+                  <div className="text-center space-y-2 flex-grow">
                     <p className="text-sm font-semibold text-[#3B4F6B]">Diagnostic, Practice Tests and Question Bank for:</p>
-                    <div className="text-sm text-[#6B7280]">
+                    <div className="text-sm text-[#6B7280] min-h-[60px] flex items-center justify-center">
                       {course.title === "Year 5 NAPLAN" && (
                         <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
                       )}
@@ -512,12 +512,12 @@ const Landing = () => {
                     </div>
                   </div>
 
-                  {/* Price */}
-                  <div className="text-center">
+                  {/* Price - Fixed position */}
+                  <div className="text-center py-4">
                     <span className="text-3xl font-bold text-[#FF6B6B]">${course.price}</span>
                   </div>
 
-                  {/* CTA - Pushed to bottom */}
+                  {/* CTA - Fixed position at bottom */}
                   <div className="mt-auto">
                     <Button 
                       className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
