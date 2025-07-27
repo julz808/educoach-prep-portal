@@ -94,6 +94,15 @@ const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0); // Start with first slide
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Handle carousel navigation with animation
+  const handleSlideChange = (newSlide: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlide(newSlide);
+    setTimeout(() => setIsTransitioning(false), 500);
+  };
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -467,14 +476,16 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Infinite Netflix-style Carousel */}
+          {/* Sliding Netflix-style Carousel */}
           <div className="relative max-w-7xl mx-auto">
             {/* Left Arrow */}
             <button
               onClick={() => {
-                setCurrentSlide((prev) => (prev - 1 + courses.length) % courses.length);
+                const newSlide = (currentSlide - 1 + courses.length) % courses.length;
+                handleSlideChange(newSlide);
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+              disabled={isTransitioning}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
             >
               <ChevronLeft className="h-6 w-6 text-[#2C3E50]" />
             </button>
@@ -482,30 +493,52 @@ const Landing = () => {
             {/* Right Arrow */}
             <button
               onClick={() => {
-                setCurrentSlide((prev) => (prev + 1) % courses.length);
+                const newSlide = (currentSlide + 1) % courses.length;
+                handleSlideChange(newSlide);
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+              disabled={isTransitioning}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
             >
               <ChevronRight className="h-6 w-6 text-[#2C3E50]" />
             </button>
 
             {/* Carousel Track */}
-            <div className="overflow-visible px-20 py-8">
-              <div className="flex justify-center items-center gap-6">
-                {/* Show 3 cards: previous, current (center), next */}
-                {[-1, 0, 1].map((offset) => {
-                  const courseIndex = (currentSlide + offset + courses.length) % courses.length;
-                  const course = courses[courseIndex];
-                  const isCenter = offset === 0;
+            <div className="overflow-hidden px-20 py-8">
+              <div 
+                className="flex transition-transform duration-500 ease-out"
+                style={{
+                  transform: `translateX(-${currentSlide * 400}px)`,
+                  width: `${courses.length * 400}px`,
+                  marginLeft: `${courses.length * 200 - 200}px` // Center the first item
+                }}
+              >
+                {/* Render all cards in sequence */}
+                {courses.map((course, index) => {
+                  const distanceFromCenter = Math.abs(index - currentSlide);
+                  const isCenter = index === currentSlide;
+                  const isVisible = distanceFromCenter <= 1;
                   
                   return (
-                    <div
-                      key={`${courseIndex}-${offset}`}
-                      className={`flex-shrink-0 transition-all duration-500 ease-out ${
+                    <motion.div
+                      key={course.id}
+                      className={`flex-shrink-0 px-2 transition-all duration-500 ease-out ${
                         isCenter 
                           ? 'w-96 scale-105 z-20' 
                           : 'w-80 scale-90 opacity-60'
                       }`}
+                      initial={{ opacity: 0, y: 60 }}
+                      animate={{ 
+                        opacity: isVisible ? (isCenter ? 1 : 0.6) : 0.3,
+                        y: 0,
+                        scale: isCenter ? 1.05 : 0.9
+                      }}
+                      transition={{ 
+                        duration: 0.5,
+                        delay: 0,
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20
+                      }}
                     >
                       <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
                         isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
@@ -560,7 +593,7 @@ const Landing = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -571,8 +604,9 @@ const Landing = () => {
               {courses.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
+                  onClick={() => handleSlideChange(index)}
+                  disabled={isTransitioning}
+                  className={`w-3 h-3 rounded-full transition-colors disabled:opacity-50 ${
                     index === currentSlide ? 'bg-[#4ECDC4]' : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                 />
