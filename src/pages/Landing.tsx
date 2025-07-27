@@ -32,6 +32,7 @@ const Landing = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -40,9 +41,13 @@ const Landing = () => {
     }
   }, [user, isLoading, navigate]);
 
-  // Scroll effect for parallax
+  // Scroll effect for parallax and nav transparency
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+      setIsScrolled(currentScrollY > 50);
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -121,18 +126,30 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation Bar */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-sm">
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/95 backdrop-blur-sm shadow-sm' 
+          : 'bg-transparent'
+      }`}>
         <div className="container mx-auto px-4 h-16">
           <div className="flex items-center justify-between h-full">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="text-2xl font-bold text-[#3B4F6B]">EduCourse</div>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/images/educourse-logo v2.png" 
+                alt="EduCourse" 
+                className="h-8"
+              />
             </Link>
 
-            {/* Menu Items */}
-            <div className="hidden md:flex items-center space-x-8">
+            {/* Menu Items - Moved closer to login */}
+            <div className="hidden md:flex items-center space-x-6">
               <div className="relative group">
-                <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+                <button className={`flex items-center space-x-1 transition-colors ${
+                  isScrolled 
+                    ? 'text-[#3B4F6B] hover:text-[#4ECDC4]' 
+                    : 'text-white hover:text-[#4ECDC4]'
+                }`}>
                   <span>Learning Products</span>
                   <ChevronDown className="h-4 w-4" />
                 </button>
@@ -150,7 +167,14 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
-              <Link to="/insights" className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+              <Link 
+                to="/insights" 
+                className={`transition-colors ${
+                  isScrolled 
+                    ? 'text-[#3B4F6B] hover:text-[#4ECDC4]' 
+                    : 'text-white hover:text-[#4ECDC4]'
+                }`}
+              >
                 Insights
               </Link>
             </div>
@@ -161,7 +185,7 @@ const Landing = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-[#3B4F6B]"
+                className={isScrolled ? 'text-[#3B4F6B]' : 'text-white'}
               >
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
@@ -171,7 +195,11 @@ const Landing = () => {
             <Button
               variant="outline"
               asChild
-              className="hidden md:flex border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white"
+              className={`hidden md:flex transition-colors ${
+                isScrolled 
+                  ? 'border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white' 
+                  : 'border-white text-white hover:bg-white hover:text-[#3B4F6B]'
+              }`}
             >
               <Link to="/auth">
                 <User className="h-4 w-4 mr-2" />
@@ -235,26 +263,25 @@ const Landing = () => {
             <div className="space-y-8 scroll-animate">
               <div className="space-y-6">
                 <h1 className="text-5xl lg:text-6xl font-bold text-[#2C3E50] leading-tight">
-                  Help Your Child{' '}
-                  <span className="text-[#4ECDC4]">Ace</span>{' '}
-                  Their Next Competitive Test
+                  We're here to help you{' '}
+                  <span className="text-[#4ECDC4]">ace</span>{' '}
+                  your next test!
                 </h1>
-                <p className="text-xl text-[#6B7280] leading-relaxed max-w-lg">
-                  Expert-designed test prep with detailed performance insights. From diagnostic to mastery - we've got every step covered.
+                <p className="text-xl text-[#4B5563] leading-relaxed max-w-lg">
+                  Australia's best test prep platform for scholarship, selective entry and NAPLAN tests.
                 </p>
               </div>
 
               {/* Key Points */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[
                   'Designed by expert teachers and instructors',
-                  'Mapped to official test curriculums',
-                  '1000+ practice questions with detailed analytics',
-                  'Sub-skill level performance tracking'
+                  '1000+ practice questions, with full-length practice tests',
+                  'Detailed performance feedback and insights'
                 ].map((point, index) => (
                   <div key={index} className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0" />
-                    <span className="text-[#3B4F6B]">{point}</span>
+                    <CheckCircle className="h-6 w-6 text-[#4ECDC4] flex-shrink-0" />
+                    <span className="text-lg text-[#3B4F6B]">{point}</span>
                   </div>
                 ))}
               </div>
@@ -291,14 +318,36 @@ const Landing = () => {
               </div>
             </div>
 
-            {/* Hero Image */}
+            {/* Hero Images - Three Screenshots */}
             <div className="relative scroll-animate">
-              <div className="bg-white rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <BarChart3 className="h-16 w-16 mx-auto mb-4" />
-                    <p className="text-lg font-semibold">Platform Screenshot</p>
-                    <p className="text-sm opacity-90">Test Interface & Analytics</p>
+              <div className="grid grid-cols-1 gap-6">
+                {/* First Screenshot */}
+                <div className="bg-white rounded-xl shadow-xl p-4 transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                  <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <Target className="h-12 w-12 mx-auto mb-2" />
+                      <p className="text-sm font-semibold">Diagnostic Dashboard</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Second Screenshot */}
+                <div className="bg-white rounded-xl shadow-xl p-4 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <div className="aspect-video bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <BookOpen className="h-12 w-12 mx-auto mb-2" />
+                      <p className="text-sm font-semibold">Practice Test Interface</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Third Screenshot */}
+                <div className="bg-white rounded-xl shadow-xl p-4 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <div className="aspect-video bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <BarChart3 className="h-12 w-12 mx-auto mb-2" />
+                      <p className="text-sm font-semibold">Performance Analytics</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -323,7 +372,7 @@ const Landing = () => {
             {courses.map((course, index) => (
               <Card 
                 key={course.id} 
-                className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] scroll-animate"
+                className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] scroll-animate flex flex-col"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardHeader className="text-center">
@@ -332,38 +381,26 @@ const Landing = () => {
                   </div>
                   <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="flex flex-col flex-grow space-y-6">
                   <p className="text-[#6B7280] text-center">{course.shortDescription}</p>
-                  
-                  {/* Features */}
-                  <div className="space-y-2">
-                    {[
-                      '500+ practice questions',
-                      'Detailed performance analytics',
-                      'Sub-skill level insights'
-                    ].map((feature, idx) => (
-                      <div key={idx} className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                        <span className="text-sm text-[#3B4F6B]">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
 
                   {/* Price */}
                   <div className="text-center">
                     <span className="text-3xl font-bold text-[#FF6B6B]">${course.price}</span>
                   </div>
 
-                  {/* CTA */}
-                  <Button 
-                    className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
-                    asChild
-                  >
-                    <Link to={`/course/${course.slug}`}>
-                      Start Preparation
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  {/* CTA - Pushed to bottom */}
+                  <div className="mt-auto">
+                    <Button 
+                      className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
+                      asChild
+                    >
+                      <Link to={`/course/${course.slug}`}>
+                        See what's included
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -387,6 +424,7 @@ const Landing = () => {
             {[
               {
                 step: '01',
+                prefix: 'Diagnostic:',
                 title: 'Uncover Strengths & Gaps',
                 description: 'Start with our comprehensive diagnostic test. Get detailed insights into your child\'s current performance across all sub-skills and question types.',
                 icon: <Target className="h-12 w-12" />,
@@ -394,6 +432,7 @@ const Landing = () => {
               },
               {
                 step: '02',
+                prefix: 'Skill Drills:',
                 title: 'Targeted Skill Building',
                 description: 'Access 500+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
                 icon: <Brain className="h-12 w-12" />,
@@ -401,7 +440,8 @@ const Landing = () => {
               },
               {
                 step: '03',
-                title: 'Master the Real Test',
+                prefix: 'Practice Tests:',
+                title: 'Simulate the Real Test',
                 description: 'Take full-length practice tests that perfectly simulate the real exam environment. Track improvement with detailed analytics.',
                 icon: <Trophy className="h-12 w-12" />,
                 image: 'Practice test results with comprehensive performance charts'
@@ -420,7 +460,9 @@ const Landing = () => {
                     </div>
                     <div className="text-4xl font-bold text-[#4ECDC4]">{step.step}</div>
                   </div>
-                  <h3 className="text-3xl font-bold text-[#2C3E50]">{step.title}</h3>
+                  <h3 className="text-3xl font-bold text-[#2C3E50]">
+                    <span className="text-[#FF6B6B]">{step.prefix}</span> {step.title}
+                  </h3>
                   <p className="text-lg text-[#6B7280] leading-relaxed">{step.description}</p>
                 </div>
                 <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
