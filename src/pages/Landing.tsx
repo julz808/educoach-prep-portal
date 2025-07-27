@@ -320,45 +320,64 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            transform: `translateY(${scrollY * 0.5}px)`,
-            background: 'radial-gradient(circle at 30% 20%, #4ECDC4 0%, transparent 50%)'
-          }}
-        />
+      <section className="pt-32 pb-20 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Content */}
-            <div className="space-y-8 scroll-animate">
-              <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl font-bold text-[#2C3E50] leading-tight">
-                  We're here to help you{' '}
-                  <span className="text-[#4ECDC4]">ace</span>{' '}
-                  your next test!
-                </h1>
-                <p className="text-xl text-[#4B5563] leading-relaxed max-w-lg">
+            <motion.div 
+              className="space-y-10"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div className="space-y-8">
+                <AnimatedText 
+                  text="We're here to help you ace your next test!"
+                  className="text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
+                  delay={0.2}
+                />
+                <motion.p 
+                  className="text-xl text-[#4B5563] leading-relaxed max-w-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.2 }}
+                >
                   Australia's best test prep platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
-                </p>
+                </motion.p>
               </div>
 
               {/* Key Points */}
-              <div className="space-y-4">
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.8 }}
+              >
                 {[
                   'Designed by expert teachers and instructors',
                   '1000+ practice questions, with full-length practice tests',
                   'Detailed performance feedback and insights'
                 ].map((point, index) => (
-                  <div key={index} className="flex items-center space-x-3">
+                  <motion.div 
+                    key={index} 
+                    className="flex items-center space-x-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 2 + index * 0.1 }}
+                  >
                     <CheckCircle className="h-6 w-6 text-[#4ECDC4] flex-shrink-0" />
                     <span className="text-lg text-[#3B4F6B]">{point}</span>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* CTA */}
-              <div className="flex justify-center sm:justify-start">
+              <motion.div 
+                className="flex justify-center sm:justify-start"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 2.5 }}
+              >
                 <Button 
                   size="lg" 
                   className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
@@ -369,46 +388,55 @@ const Landing = () => {
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
-              </div>
-
-              {/* Trust Indicator */}
-              <div className="flex items-center space-x-2 text-[#6B7280]">
-                <Sparkles className="h-5 w-5 text-[#FF6B6B]" />
-                <span>Trusted by 1000+ families across Australia</span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Hero Images - Overlapping Screenshots */}
-            <div className="relative scroll-animate h-96">
+            <div className="relative h-96">
               {/* Background Screenshot */}
-              <div className="absolute top-0 right-0 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10">
+              <motion.div 
+                className="absolute top-0 right-0 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
+                initial={{ opacity: 0, y: 50, rotate: 10 }}
+                animate={{ opacity: 1, y: 0, rotate: 3 }}
+                transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
+              >
                 <div className="w-full h-full bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <Target className="h-8 w-8 mx-auto mb-1" />
                     <p className="text-xs font-semibold">Diagnostic Dashboard</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
               {/* Middle Screenshot */}
-              <div className="absolute top-16 left-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20">
+              <motion.div 
+                className="absolute top-16 left-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
+                initial={{ opacity: 0, y: 50, rotate: -10 }}
+                animate={{ opacity: 1, y: 0, rotate: -2 }}
+                transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
+              >
                 <div className="w-full h-full bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BookOpen className="h-8 w-8 mx-auto mb-1" />
                     <p className="text-xs font-semibold">Practice Test Interface</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
               {/* Front Screenshot - Adjusted position */}
-              <div className="absolute top-48 right-12 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+              <motion.div 
+                className="absolute top-48 right-12 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
+                initial={{ opacity: 0, y: 50, rotate: 8 }}
+                animate={{ opacity: 1, y: 0, rotate: 1 }}
+                transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
+              >
                 <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BarChart3 className="h-8 w-8 mx-auto mb-1" />
                     <p className="text-xs font-semibold">Performance Analytics</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -502,7 +530,7 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          <div className="space-y-16">
+          <div className="space-y-24">
             {[
               {
                 step: '01',
@@ -529,35 +557,156 @@ const Landing = () => {
                 image: 'Practice test results with comprehensive performance charts'
               }
             ].map((step, index) => (
-              <div 
+              <motion.div 
                 key={index} 
-                className={`grid lg:grid-cols-2 gap-12 items-center scroll-animate ${
+                className={`grid lg:grid-cols-2 gap-16 items-center ${
                   index % 2 === 1 ? 'lg:flex-row-reverse' : ''
                 }`}
+                initial={{ opacity: 0, y: 100 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.8,
+                  delay: 0.2,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20
+                }}
+                viewport={{ once: true, margin: "-100px" }}
               >
-                <div className={`space-y-6 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white">
+                <motion.div 
+                  className={`space-y-8 ${index % 2 === 1 ? 'lg:order-2' : ''}`}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.7,
+                    delay: 0.4,
+                    type: "spring",
+                    stiffness: 120
+                  }}
+                  viewport={{ once: true }}
+                >
+                  <motion.div 
+                    className="flex items-center space-x-6"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      duration: 0.6,
+                      delay: 0.6,
+                      type: "spring",
+                      stiffness: 150
+                    }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div 
+                      className="w-20 h-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white shadow-xl"
+                      whileHover={{ 
+                        scale: 1.1, 
+                        rotate: 5,
+                        boxShadow: "0 20px 40px rgba(78, 205, 196, 0.3)"
+                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    >
                       {step.icon}
-                    </div>
-                    <div className="text-4xl font-bold text-[#4ECDC4]">{step.step}</div>
-                  </div>
-                  <h3 className="text-3xl font-bold text-[#2C3E50]">
-                    <span className="text-[#FF6B6B]">{step.prefix}</span> {step.title}
-                  </h3>
-                  <p className="text-lg text-[#6B7280] leading-relaxed">{step.description}</p>
-                </div>
-                <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                  <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 hover:-rotate-1 transition-all duration-500">
-                    <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
-                      <div className="text-white text-center">
-                        <BarChart3 className="h-12 w-12 mx-auto mb-2" />
-                        <p className="text-sm">{step.image}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </motion.div>
+                    <motion.div 
+                      className="text-5xl font-bold text-[#4ECDC4]"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        duration: 0.5,
+                        delay: 0.8,
+                        type: "spring",
+                        stiffness: 200
+                      }}
+                      viewport={{ once: true }}
+                    >
+                      {step.step}
+                    </motion.div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.6,
+                      delay: 1.0,
+                      type: "spring",
+                      stiffness: 100
+                    }}
+                    viewport={{ once: true }}
+                  >
+                    <h3 className="text-4xl font-bold text-[#2C3E50] leading-tight">
+                      <span className="text-[#FF6B6B]">{step.prefix}</span> {step.title}
+                    </h3>
+                  </motion.div>
+                  
+                  <motion.p 
+                    className="text-xl text-[#6B7280] leading-relaxed"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.6,
+                      delay: 1.2,
+                      type: "spring",
+                      stiffness: 100
+                    }}
+                    viewport={{ once: true }}
+                  >
+                    {step.description}
+                  </motion.p>
+                </motion.div>
+                
+                <motion.div 
+                  className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50, rotate: index % 2 === 0 ? 5 : -5 }}
+                  whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                  transition={{ 
+                    duration: 0.8,
+                    delay: 0.5,
+                    type: "spring",
+                    stiffness: 80,
+                    damping: 20
+                  }}
+                  viewport={{ once: true }}
+                >
+                  <motion.div 
+                    className="bg-white rounded-3xl shadow-2xl p-8 group"
+                    whileHover={{ 
+                      scale: 1.05, 
+                      rotate: index % 2 === 0 ? 2 : -2,
+                      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)"
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <motion.div 
+                      className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl flex items-center justify-center overflow-hidden"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <motion.div 
+                        className="text-white text-center"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ 
+                          duration: 0.6,
+                          delay: 0.8,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                        viewport={{ once: true }}
+                      >
+                        <motion.div
+                          whileHover={{ rotate: 360, scale: 1.2 }}
+                          transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
+                        >
+                          <BarChart3 className="h-16 w-16 mx-auto mb-3" />
+                        </motion.div>
+                        <p className="text-lg font-medium">{step.image}</p>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         </div>
