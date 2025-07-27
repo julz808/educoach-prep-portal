@@ -93,7 +93,7 @@ const Landing = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(1); // Start with middle slide
+  const [currentSlide, setCurrentSlide] = useState(0); // Start with first slide
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -467,13 +467,12 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Netflix-style Carousel */}
+          {/* Infinite Netflix-style Carousel */}
           <div className="relative max-w-6xl mx-auto">
             {/* Left Arrow */}
             <button
               onClick={() => {
-                const newSlide = currentSlide > 0 ? currentSlide - 1 : courses.length - 3;
-                setCurrentSlide(newSlide);
+                setCurrentSlide((prev) => (prev - 1 + courses.length) % courses.length);
               }}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
             >
@@ -483,8 +482,7 @@ const Landing = () => {
             {/* Right Arrow */}
             <button
               onClick={() => {
-                const newSlide = currentSlide < courses.length - 3 ? currentSlide + 1 : 0;
-                setCurrentSlide(newSlide);
+                setCurrentSlide((prev) => (prev + 1) % courses.length);
               }}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
             >
@@ -493,34 +491,33 @@ const Landing = () => {
 
             {/* Carousel Track */}
             <div className="overflow-hidden px-16">
-              <div 
-                className="flex transition-transform duration-500 ease-out"
-                style={{ 
-                  transform: `translateX(-${currentSlide * 320}px)`,
-                  width: `${courses.length * 320}px`
-                }}
-              >
-                {courses.map((course, index) => {
-                  const isCenter = index === currentSlide + 1;
-                  const isVisible = index >= currentSlide && index < currentSlide + 3;
+              <div className="flex justify-center items-center gap-8">
+                {/* Show 3 cards: previous, current (center), next */}
+                {[-1, 0, 1].map((offset) => {
+                  const courseIndex = (currentSlide + offset + courses.length) % courses.length;
+                  const course = courses[courseIndex];
+                  const isCenter = offset === 0;
                   
                   return (
                     <motion.div
-                      key={course.id}
-                      className={`flex-shrink-0 px-4 transition-all duration-500 ${
+                      key={`${courseIndex}-${offset}`}
+                      className={`flex-shrink-0 transition-all duration-500 ${
                         isCenter 
                           ? 'w-80 scale-110 z-20' 
                           : 'w-80 scale-95 opacity-70'
                       }`}
                       initial={{ opacity: 0, y: 60 }}
-                      whileInView={{ opacity: isVisible ? (isCenter ? 1 : 0.7) : 0.3, y: 0 }}
-                      transition={{ 
-                        duration: 0.6, 
-                        delay: index * 0.1,
-                        type: "spring",
-                        stiffness: 100
+                      animate={{ 
+                        opacity: isCenter ? 1 : 0.7,
+                        y: 0,
+                        scale: isCenter ? 1.1 : 0.95
                       }}
-                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20
+                      }}
                     >
                       <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
                         isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
@@ -583,7 +580,7 @@ const Landing = () => {
             
             {/* Slide Indicators */}
             <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: courses.length - 2 }).map((_, index) => (
+              {courses.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
