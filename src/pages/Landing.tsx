@@ -468,13 +468,13 @@ const Landing = () => {
           </div>
 
           {/* Infinite Netflix-style Carousel */}
-          <div className="relative max-w-6xl mx-auto">
+          <div className="relative max-w-7xl mx-auto">
             {/* Left Arrow */}
             <button
               onClick={() => {
                 setCurrentSlide((prev) => (prev - 1 + courses.length) % courses.length);
               }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
             >
               <ChevronLeft className="h-6 w-6 text-[#2C3E50]" />
             </button>
@@ -484,14 +484,14 @@ const Landing = () => {
               onClick={() => {
                 setCurrentSlide((prev) => (prev + 1) % courses.length);
               }}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
             >
               <ChevronRight className="h-6 w-6 text-[#2C3E50]" />
             </button>
 
             {/* Carousel Track */}
-            <div className="overflow-hidden px-16">
-              <div className="flex justify-center items-center gap-8">
+            <div className="overflow-visible px-20 py-8">
+              <div className="flex justify-center items-center gap-6">
                 {/* Show 3 cards: previous, current (center), next */}
                 {[-1, 0, 1].map((offset) => {
                   const courseIndex = (currentSlide + offset + courses.length) % courses.length;
@@ -499,25 +499,13 @@ const Landing = () => {
                   const isCenter = offset === 0;
                   
                   return (
-                    <motion.div
+                    <div
                       key={`${courseIndex}-${offset}`}
-                      className={`flex-shrink-0 transition-all duration-500 ${
+                      className={`flex-shrink-0 transition-all duration-500 ease-out ${
                         isCenter 
-                          ? 'w-80 scale-110 z-20' 
-                          : 'w-80 scale-95 opacity-70'
+                          ? 'w-96 scale-105 z-20' 
+                          : 'w-80 scale-90 opacity-60'
                       }`}
-                      initial={{ opacity: 0, y: 60 }}
-                      animate={{ 
-                        opacity: isCenter ? 1 : 0.7,
-                        y: 0,
-                        scale: isCenter ? 1.1 : 0.95
-                      }}
-                      transition={{ 
-                        duration: 0.5,
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 20
-                      }}
                     >
                       <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
                         isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
@@ -572,7 +560,7 @@ const Landing = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
