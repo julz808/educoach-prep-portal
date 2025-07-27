@@ -630,29 +630,29 @@ const PerformanceDashboard = () => {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  {/* Summary Cards - Responsive grid for tablets */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {/* Summary Cards - Mobile-optimized responsive grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {/* Overall Score */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                    <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                       <div className="text-center">
-                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                          Overall Score
-                          <div className="relative inline-block">
-                            <Info size={14} className="text-slate-400 cursor-help" />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                        <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                          <span className="truncate">Overall Score</span>
+                          <div className="relative inline-block flex-shrink-0">
+                            <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                               <div className="font-semibold mb-1">Score</div>
                               <div>Measures your performance against the total number of questions in the test, including unanswered questions.</div>
                               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center justify-center gap-4">
-                          <div className="text-3xl font-bold text-slate-900">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                          <div className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">
                             {performanceData.diagnostic.totalQuestionsCorrect}
                             <span className="text-slate-600">/{performanceData.diagnostic.totalQuestions}</span>
                           </div>
-                          <div className="h-10 w-px bg-slate-200"></div>
-                          <div className={`text-3xl font-bold ${
+                          <div className="hidden sm:block h-6 md:h-10 w-px bg-slate-200"></div>
+                          <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                             performanceData.diagnostic.overallScore >= 80 ? 'text-green-600' : 
                             performanceData.diagnostic.overallScore >= 60 ? 'text-orange-600' : 
                             'text-red-600'
@@ -662,20 +662,20 @@ const PerformanceDashboard = () => {
                     </div>
 
                     {/* Simple Average Score */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                    <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                       <div className="text-center">
-                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                          Average Score
-                          <div className="relative inline-block">
-                            <Info size={14} className="text-slate-400 cursor-help" />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                        <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                          <span className="truncate">Average Score</span>
+                          <div className="relative inline-block flex-shrink-0">
+                            <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                               <div className="font-semibold mb-1">Average Score</div>
                               <div>Simple average percentage across all test sections.</div>
                               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                             </div>
                           </div>
                         </div>
-                        <div className={`text-3xl font-bold ${
+                        <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                           (() => {
                             // Calculate simple average across all sections
                             const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
@@ -698,26 +698,26 @@ const PerformanceDashboard = () => {
                     </div>
 
                     {/* Overall Accuracy */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                    <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                       <div className="text-center">
-                        <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                          Overall Accuracy
-                          <div className="relative inline-block">
-                            <Info size={14} className="text-slate-400 cursor-help" />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                        <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                          <span className="truncate">Overall Accuracy</span>
+                          <div className="relative inline-block flex-shrink-0">
+                            <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                               <div className="font-semibold mb-1">Accuracy</div>
                               <div>Shows how well you performed on questions you actually attempted, excluding skipped or timed-out questions.</div>
                               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center justify-center gap-4">
-                          <div className="text-3xl font-bold text-slate-900">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                          <div className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">
                             {performanceData.diagnostic.totalQuestionsCorrect}
                             <span className="text-slate-600">/{performanceData.diagnostic.totalQuestionsAttempted}</span>
                           </div>
-                          <div className="h-10 w-px bg-slate-200"></div>
-                          <div className={`text-3xl font-bold ${
+                          <div className="hidden sm:block h-6 md:h-10 w-px bg-slate-200"></div>
+                          <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                             performanceData.diagnostic.overallAccuracy >= 80 ? 'text-green-600' : 
                             performanceData.diagnostic.overallAccuracy >= 60 ? 'text-orange-600' : 
                             'text-red-600'
@@ -1379,29 +1379,29 @@ const PerformanceDashboard = () => {
                 
                 return (
                   <div className="space-y-8">
-                    {/* Overall Performance Cards - Responsive grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    {/* Overall Performance Cards - Mobile-optimized responsive grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                       {/* Overall Score */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                      <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                         <div className="text-center">
-                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                            Overall Score
-                            <div className="relative inline-block">
-                              <Info size={14} className="text-slate-400 cursor-help" />
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                          <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            <span className="truncate">Overall Score</span>
+                            <div className="relative inline-block flex-shrink-0">
+                              <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                                 <div className="font-semibold mb-1">Score</div>
                                 <div>Measures your performance against the total number of questions in the test, including unanswered questions.</div>
                                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-center gap-4">
-                            <div className="text-3xl font-bold text-slate-900">
+                          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">
                               {questionsCorrect}
                               <span className="text-slate-600">/{totalQuestions || questionsAttempted}</span>
                             </div>
-                            <div className="h-10 w-px bg-slate-200"></div>
-                            <div className={`text-3xl font-bold ${
+                            <div className="hidden sm:block h-6 md:h-10 w-px bg-slate-200"></div>
+                            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                               overallScore >= 80 ? 'text-green-600' : 
                               overallScore >= 60 ? 'text-orange-600' : 
                               'text-red-600'
@@ -1411,20 +1411,20 @@ const PerformanceDashboard = () => {
                       </div>
 
                       {/* Average Score */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                      <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                         <div className="text-center">
-                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                            Average Score
-                            <div className="relative inline-block">
-                              <Info size={14} className="text-slate-400 cursor-help" />
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                          <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            <span className="truncate">Average Score</span>
+                            <div className="relative inline-block flex-shrink-0">
+                              <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                                 <div className="font-semibold mb-1">Average Score</div>
                                 <div>Simple average percentage across all test sections.</div>
                                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                               </div>
                             </div>
                           </div>
-                          <div className={`text-3xl font-bold ${
+                          <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                             (() => {
                               // Calculate simple average across all sections
                               const sectionScores = selectedTest.sectionBreakdown?.map(s => s.score) || [];
@@ -1448,26 +1448,26 @@ const PerformanceDashboard = () => {
                       </div>
 
                       {/* Overall Accuracy */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group">
+                      <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                         <div className="text-center">
-                          <div className="text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
-                            Overall Accuracy
-                            <div className="relative inline-block">
-                              <Info size={14} className="text-slate-400 cursor-help" />
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                          <div className="text-sm sm:text-base font-medium text-slate-600 mb-2 flex items-center justify-center gap-1">
+                            <span className="truncate">Overall Accuracy</span>
+                            <div className="relative inline-block flex-shrink-0">
+                              <Info size={12} className="sm:w-3.5 sm:h-3.5 text-slate-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 sm:w-64 p-2 sm:p-3 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                                 <div className="font-semibold mb-1">Accuracy</div>
                                 <div>Shows how well you performed on questions you actually attempted, excluding skipped or timed-out questions.</div>
                                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-center gap-4">
-                            <div className="text-3xl font-bold text-slate-900">
+                          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">
                               {questionsCorrect}
                               <span className="text-slate-600">/{questionsAttempted}</span>
                             </div>
-                            <div className="h-10 w-px bg-slate-200"></div>
-                            <div className={`text-3xl font-bold ${
+                            <div className="hidden sm:block h-6 md:h-10 w-px bg-slate-200"></div>
+                            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                               overallAccuracy >= 80 ? 'text-green-600' : 
                               overallAccuracy >= 60 ? 'text-orange-600' : 
                               'text-red-600'

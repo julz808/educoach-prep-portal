@@ -724,44 +724,47 @@ const PracticeTests: React.FC = () => {
                 )}
               >
                 <CardHeader 
-                  className="pb-4 bg-gradient-to-r from-slate-50/30 to-white"
+                  className="pb-3 sm:pb-4 bg-gradient-to-r from-slate-50/30 to-white p-3 sm:p-4 md:p-6"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-4 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl shadow-lg">
-                        <FileText size={28} className="text-white" />
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                    <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+                      <div className="p-3 sm:p-4 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0">
+                        <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
                       </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-slate-900">{test.name}</CardTitle>
-                        <div className="flex items-center space-x-3 mt-2">
-                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
-                            <Users size={14} />
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 truncate">{test.name}</CardTitle>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 sm:mt-2">
+                          <div className="flex items-center space-x-1 sm:space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-2 sm:px-3 py-1">
+                            <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="font-medium text-xs">{test.sections.length} sections</span>
                           </div>
-                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
-                            <Clock size={14} />
+                          <div className="flex items-center space-x-1 sm:space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-2 sm:px-3 py-1">
+                            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="font-medium text-xs">{formatTimeToHours(test.estimatedTime)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end sm:justify-start">
                       {test.status === 'completed' && (
-                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full">
-                          <CheckCircle2 size={12} className="mr-1" />
-                          Completed
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full text-xs px-2 py-1">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          <span className="hidden xs:inline">Completed</span>
+                          <span className="xs:hidden">✓</span>
                         </Badge>
                       )}
                       {test.status === 'in-progress' && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
-                          <Timer size={12} className="mr-1" />
-                          In Progress
+                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full text-xs px-2 py-1">
+                          <Timer className="w-3 h-3 mr-1" />
+                          <span className="hidden xs:inline">In Progress</span>
+                          <span className="xs:hidden">⏱</span>
                         </Badge>
                       )}
                       {test.status === 'not-started' && (
-                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full">
-                          Not Started
+                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full text-xs px-2 py-1">
+                          <span className="hidden xs:inline">Not Started</span>
+                          <span className="xs:hidden">○</span>
                         </Badge>
                       )}
                       {test.totalQuestions > 0 && (
@@ -784,22 +787,22 @@ const PracticeTests: React.FC = () => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="bg-white">
+                <CardContent className="bg-white p-3 sm:p-4 md:p-6">
                   {test.totalQuestions === 0 ? (
-                    <div className="text-center py-8">
-                      <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                      <p className="text-slate-500 font-medium">Questions coming soon</p>
+                    <div className="text-center py-6 sm:py-8">
+                      <AlertCircle className="h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-slate-500 font-medium text-sm sm:text-base">Questions coming soon</p>
                     </div>
                   ) : (
                     <>
                       {/* Collapsed View - Summary */}
                       {expandedTest !== test.id && (
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                          <div className="text-sm text-slate-600">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pt-3 sm:pt-4 border-t border-slate-100">
+                          <div className="text-xs sm:text-sm text-slate-600 w-full sm:w-auto">
                             {test.lastAttempt ? (
-                              <div className="flex items-center space-x-2">
-                                <Calendar size={12} />
-                                <span>Last attempt: {test.lastAttempt}</span>
+                              <div className="flex items-center space-x-1 sm:space-x-2">
+                                <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                                <span className="truncate">Last attempt: {test.lastAttempt}</span>
                               </div>
                             ) : (
                               <span>Ready to start</span>
@@ -808,11 +811,12 @@ const PracticeTests: React.FC = () => {
                           {test.status === 'completed' && (
                             <Button 
                               size="sm"
-                              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-full px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200 shadow-sm hover:shadow-md text-xs sm:text-sm w-full sm:w-auto"
                               onClick={() => setExpandedTest(expandedTest === test.id ? null : test.id)}
                             >
-                              <BarChart3 size={14} className="mr-1" />
-                              View Results
+                              <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" />
+                              <span className="hidden xs:inline">View Results</span>
+                              <span className="xs:hidden">Results</span>
                             </Button>
                           )}
                         </div>
