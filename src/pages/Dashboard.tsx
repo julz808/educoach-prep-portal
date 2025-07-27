@@ -189,7 +189,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
 
@@ -197,27 +197,27 @@ const Dashboard: React.FC = () => {
       <MetricsCards metrics={metricsConfig} />
 
       {/* Main Content - Three Card Layout - Optimized for tablets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* 1. Diagnostic Assessment Card */}
-        <Card className={`md:col-span-1 ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 
+        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 
           ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
           : 'bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 border-slate-200 shadow-xl shadow-purple-100'}`}>
-          <CardHeader className="pb-4 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <div className={`p-4 rounded-2xl shadow-lg ${
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
                 dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                   ? 'bg-green-500' 
                   : 'bg-purple-500'
               }`}>
-                <Activity size={32} className="text-white" />
+                <Activity className="text-white w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <CardTitle className={`text-2xl font-bold ${
+              <div className="text-center sm:text-left flex-1">
+                <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
                   dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                     ? 'text-green-900' 
                     : 'text-purple-900'
                 }`}>Diagnostic Assessment</CardTitle>
-                <p className={`text-sm mt-2 ${
+                <p className={`text-sm leading-tight ${
                   dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                     ? 'text-green-700' 
                     : 'text-purple-700'
@@ -225,53 +225,53 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6 px-6 md:px-8 pb-8">
-            <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'text-green-600' : 'text-purple-600'}`}>Sections Completed</div>
-                <div className={`text-xl font-bold ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'text-green-700' : 'text-purple-900'}`}>
+          <CardContent className="flex flex-col flex-1 pb-6 px-4 sm:px-6">
+            <div className="flex-1 flex items-center justify-center mb-6">
+              <div className={`w-full max-w-[200px] p-4 rounded-xl text-center ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-xs sm:text-sm mb-1 font-medium ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'text-green-600' : 'text-purple-600'}`}>Sections Completed</div>
+                <div className={`text-2xl sm:text-3xl font-bold ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 ? 'text-green-700' : 'text-purple-900'}`}>
                   {dashboardMetrics.diagnostic.sectionsCompleted}/{dashboardMetrics.diagnostic.totalSections}
                 </div>
               </div>
             </div>
             <Button 
               onClick={() => navigate('/dashboard/diagnostic')}
-              className={`w-full h-12 text-sm md:text-base shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap ${
+              className={`w-full h-12 sm:h-14 text-sm sm:text-base font-medium shadow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 ${
                 dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                   ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-green-200'
                   : 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-purple-200'
               }`}
             >
-              <Sparkles size={18} className="mr-2" />
-              {dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                 ? 'View Results' 
                 : dashboardMetrics.diagnostic.sectionsCompleted === 0 
                   ? 'Start Diagnostic' 
-                  : 'Continue Diagnostic'}
+                  : 'Continue Diagnostic'}</span>
             </Button>
           </CardContent>
         </Card>
 
         {/* 2. Skill Drills Card */}
-        <Card className={`md:col-span-1 ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 
+        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 
           ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
           : 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-slate-200 shadow-xl shadow-orange-100'}`}>
-          <CardHeader className="pb-4 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <div className={`p-4 rounded-2xl shadow-lg ${
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
                 dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
                   ? 'bg-green-500' 
                   : 'bg-orange-500'
               }`}>
-                <TargetIcon size={32} className="text-white" />
+                <TargetIcon className="text-white w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <CardTitle className={`text-2xl font-bold ${
+              <div className="text-center sm:text-left flex-1">
+                <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
                   dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
                     ? 'text-green-900' 
                     : 'text-orange-900'
                 }`}>Skill Drills</CardTitle>
-                <p className={`text-sm mt-2 ${
+                <p className={`text-sm leading-tight ${
                   dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
                     ? 'text-green-700' 
                     : 'text-orange-700'
@@ -279,53 +279,53 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6 px-6 md:px-8 pb-8">
-            <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Attempted</div>
-                <div className={`text-xl font-bold ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-700' : 'text-orange-900'}`}>
+          <CardContent className="flex flex-col flex-1 pb-6 px-4 sm:px-6">
+            <div className="flex-1 flex items-center justify-center mb-6">
+              <div className={`w-full max-w-[200px] p-4 rounded-xl text-center ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-xs sm:text-sm mb-1 font-medium ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-600' : 'text-orange-600'}`}>Sub-Skills Attempted</div>
+                <div className={`text-2xl sm:text-3xl font-bold ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 ? 'text-green-700' : 'text-orange-900'}`}>
                   {dashboardMetrics.drill.subSkillsCompleted}/{dashboardMetrics.drill.totalSubSkills}
                 </div>
               </div>
             </div>
             <Button 
               onClick={() => navigate('/dashboard/drill')}
-              className={`w-full h-12 text-sm md:text-base shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap ${
+              className={`w-full h-12 sm:h-14 text-sm sm:text-base font-medium shadow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 ${
                 dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
                   ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-green-200'
                   : 'bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-orange-200'
               }`}
             >
-              <Zap size={18} className="mr-2" />
-              {dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
                 ? 'View Results' 
                 : dashboardMetrics.drill.subSkillsCompleted === 0 
                   ? 'Start Drilling' 
-                  : 'Continue Drilling'}
+                  : 'Continue Drilling'}</span>
             </Button>
           </CardContent>
         </Card>
 
-        {/* 3. Practice Tests Card - Spans 2 columns on md screens, 1 on xl */}
-        <Card className={`md:col-span-2 xl:col-span-1 ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests 
+        {/* 3. Practice Tests Card - Spans columns appropriately */}
+        <Card className={`lg:col-span-2 xl:col-span-1 relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests 
           ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
           : 'bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 border-slate-200 shadow-xl shadow-rose-100'}`}>
-          <CardHeader className="pb-4 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <div className={`p-4 rounded-2xl shadow-lg ${
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
                 dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
                   ? 'bg-green-500' 
                   : 'bg-rose-500'
               }`}>
-                <FileText size={32} className="text-white" />
+                <FileText className="text-white w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <CardTitle className={`text-2xl font-bold ${
+              <div className="text-center sm:text-left flex-1">
+                <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
                   dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
                     ? 'text-green-900' 
                     : 'text-rose-900'
                 }`}>Practice Tests</CardTitle>
-                <p className={`text-sm mt-2 ${
+                <p className={`text-sm leading-tight ${
                   dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
                     ? 'text-green-700' 
                     : 'text-rose-700'
@@ -333,29 +333,29 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6 px-6 md:px-8 pb-8">
-            <div className="text-center space-y-4">
-              <div className={`p-4 rounded-xl ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
-                <div className={`text-sm mb-1 ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'text-green-600' : 'text-rose-600'}`}>Tests Completed</div>
-                <div className={`text-xl font-bold ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'text-green-700' : 'text-rose-900'}`}>
+          <CardContent className="flex flex-col flex-1 pb-6 px-4 sm:px-6">
+            <div className="flex-1 flex items-center justify-center mb-6">
+              <div className={`w-full max-w-[200px] p-4 rounded-xl text-center ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'bg-green-100 border border-green-200' : 'bg-white/60'}`}>
+                <div className={`text-xs sm:text-sm mb-1 font-medium ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'text-green-600' : 'text-rose-600'}`}>Tests Completed</div>
+                <div className={`text-2xl sm:text-3xl font-bold ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests ? 'text-green-700' : 'text-rose-900'}`}>
                   {dashboardMetrics.practice.testsCompleted}/{dashboardMetrics.practice.totalTests}
                 </div>
               </div>
             </div>
             <Button 
               onClick={() => navigate('/dashboard/practice-tests')}
-              className={`w-full h-12 text-sm md:text-base shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap ${
+              className={`w-full h-12 sm:h-14 text-sm sm:text-base font-medium shadow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 ${
                 dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
                   ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-green-200'
                   : 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-rose-200'
               }`}
             >
-              <Play size={18} className="mr-2" />
-              {dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
+              <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
                 ? 'View Results' 
                 : dashboardMetrics.practice.testsCompleted === 0 
                   ? 'Start Practice Test' 
-                  : 'Continue Practice Tests'}
+                  : 'Continue Practice Tests'}</span>
             </Button>
           </CardContent>
         </Card>

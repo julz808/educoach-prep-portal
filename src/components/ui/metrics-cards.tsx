@@ -46,21 +46,23 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
 }) => {
   return (
     <div className={cn(
-      "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6",
+      "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6",
       className
     )}>
       {metrics.map((metric, index) => (
-        <Card key={index} className={cn("border-0", metric.color.bg)}>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className={cn("p-2 rounded-lg flex-shrink-0", metric.color.iconBg)}>
-                {React.cloneElement(metric.icon as React.ReactElement, { size: 20 })}
+        <Card key={index} className={cn("border-0 transition-all duration-300 hover:shadow-lg", metric.color.bg)}>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
+              <div className={cn("p-2 sm:p-3 rounded-lg flex-shrink-0", metric.color.iconBg)}>
+                {React.cloneElement(metric.icon as React.ReactElement, { 
+                  className: "w-4 h-4 sm:w-5 sm:h-5 text-white"
+                })}
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className={cn("text-lg md:text-xl font-bold", metric.color.text)}>
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <h3 className={cn("text-base sm:text-lg md:text-xl font-bold leading-tight", metric.color.text)}>
                   {metric.value}
                 </h3>
-                <p className={cn("text-xs md:text-sm", metric.color.text + '/70')}>
+                <p className={cn("text-xs sm:text-sm leading-tight mt-0.5", metric.color.text + '/70')}>
                   {metric.title}
                 </p>
               </div>

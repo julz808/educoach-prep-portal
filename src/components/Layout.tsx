@@ -364,33 +364,33 @@ const Layout: React.FC = () => {
       </aside>
 
       {/* Mobile/Tablet Header - Show on all screens below XL (1280px) */}
-      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-12">
-        <div className="flex items-center justify-between px-3 h-full">
-          <div className="flex items-center space-x-3">
+      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 md:h-18">
+        <div className="flex items-center justify-between px-3 md:px-4 h-full">
+          <div className="flex items-center space-x-2 md:space-x-3 flex-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="p-1.5"
+              className="p-1.5 md:p-2 flex-shrink-0"
             >
-              <Menu size={22} />
+              <Menu size={20} className="md:w-6 md:h-6" />
             </Button>
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-20 md:h-28 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-12 md:h-14 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <Select value={selectedProduct} onValueChange={handleProductChange}>
-              <SelectTrigger className="w-32 sm:w-36 md:w-40">
+              <SelectTrigger className="w-28 sm:w-32 md:w-36 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {allProducts.map((product) => (
-                  <SelectItem key={product.id} value={product.id}>
+                  <SelectItem key={product.id} value={product.id} className="text-xs sm:text-sm">
                     {product.shortName}
                   </SelectItem>
                 ))}
@@ -399,10 +399,10 @@ const Layout: React.FC = () => {
             {/* User profile button for smaller screens */}
             <button
               onClick={() => navigate('/profile')}
-              className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center hover:bg-edu-teal/90 transition-colors"
+              className="w-9 h-9 md:w-10 md:h-10 bg-edu-teal rounded-full flex items-center justify-center hover:bg-edu-teal/90 transition-colors flex-shrink-0"
               title="Profile"
             >
-              <User size={18} className="text-white" />
+              <User size={16} className="text-white md:w-5 md:h-5" />
             </button>
           </div>
         </div>
@@ -411,20 +411,20 @@ const Layout: React.FC = () => {
       {/* Mobile Sidebar Overlay - Show on all screens below XL */}
       {sidebarOpen && (
         <div className="xl:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)}>
-          <aside className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
+          <aside className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-4 md:p-6 border-b min-h-[80px]">
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-32 md:h-36 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-12 md:h-16 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
                   }}
                 />
-                <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
-                  <X size={24} />
+                <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)} className="p-2">
+                  <X size={20} className="md:w-6 md:h-6" />
                 </Button>
               </div>
               
@@ -445,32 +445,33 @@ const Layout: React.FC = () => {
                 </Select>
               </div>
               
-              <nav className="flex-1 p-6">
-                <div className="space-y-2">
+              <nav className="flex-1 p-4 md:p-6">
+                <div className="space-y-1 md:space-y-2">
                   {navigationItems.map((item) => (
                     <button
                       key={item.id}
                       data-nav-id={item.id}
                       onClick={() => handleNavigation(item.path)}
                       className={cn(
-                        "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200",
+                        "w-full flex items-center space-x-3 px-3 md:px-4 py-3 md:py-4 rounded-xl transition-all duration-200 text-left min-h-[56px] md:min-h-[60px]",
                         location.pathname === item.path
                           ? (() => {
                               switch (item.id) {
                                 case 'diagnostic':
-                                  return 'bg-purple-500 text-white';
+                                  return 'bg-purple-500 text-white shadow-lg';
                                 case 'drills':
-                                  return 'bg-orange-500 text-white';
+                                  return 'bg-orange-500 text-white shadow-lg';
                                 case 'practice':
-                                  return 'bg-rose-500 text-white';
+                                  return 'bg-rose-500 text-white shadow-lg';
                                 default:
-                                  return 'bg-edu-teal text-white';
+                                  return 'bg-edu-teal text-white shadow-lg';
                               }
                             })()
-                          : "text-edu-navy/70 hover:bg-edu-light-blue/50"
+                          : "text-edu-navy/70 hover:bg-edu-light-blue/50 hover:text-edu-navy"
                       )}
                     >
                       <div className={cn(
+                        "flex-shrink-0 w-5 h-5 md:w-6 md:h-6",
                         location.pathname === item.path 
                           ? "text-white" 
                           : (() => {
@@ -486,9 +487,12 @@ const Layout: React.FC = () => {
                               }
                             })()
                       )}>
-                        {item.icon}
+                        {React.cloneElement(item.icon as React.ReactElement, {
+                          size: undefined,
+                          className: "w-full h-full"
+                        })}
                       </div>
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-medium text-base md:text-lg">{item.label}</span>
                       {item.badge && (
                         <Badge variant="secondary" className="ml-auto text-xs">
                           {item.badge}
@@ -508,7 +512,7 @@ const Layout: React.FC = () => {
               </nav>
               
               {/* Mobile User Profile */}
-              <div className="p-6 border-t border-gray-100">
+              <div className="p-4 md:p-6 border-t border-gray-100 bg-gray-50/50">
                 <Button
                   onClick={() => {
                     handleStartTutorial();
@@ -516,27 +520,27 @@ const Layout: React.FC = () => {
                   }}
                   variant="ghost"
                   size="sm"
-                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-4"
+                  className="w-full flex items-center space-x-2 text-edu-navy/70 hover:text-edu-navy hover:bg-edu-light-blue/50 mb-3 md:mb-4 h-10 md:h-12 text-sm md:text-base"
                 >
-                  <HelpCircle size={16} />
+                  <HelpCircle size={16} className="md:w-5 md:h-5" />
                   <span>How it works</span>
                 </Button>
                 <button
                   onClick={() => handleNavigation('/profile')}
-                  className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-edu-light-blue/30 transition-colors"
+                  className="w-full flex items-center space-x-3 p-3 md:p-4 rounded-lg hover:bg-edu-light-blue/30 transition-colors bg-white border border-gray-100 shadow-sm"
                 >
-                  <div className="w-10 h-10 bg-edu-teal rounded-full flex items-center justify-center">
-                    <User size={20} className="text-white" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-edu-teal rounded-full flex items-center justify-center flex-shrink-0">
+                    <User size={18} className="text-white md:w-6 md:h-6" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-edu-navy">
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-medium text-edu-navy text-sm md:text-base truncate">
                       {userProfile ? `${userProfile.student_first_name} ${userProfile.student_last_name}` : 'Student'}
                     </div>
-                    <div className="text-xs text-edu-navy/60">
+                    <div className="text-xs md:text-sm text-edu-navy/60">
                       {userProfile ? `Year ${userProfile.year_level}` : 'Loading...'}
                     </div>
                   </div>
-                  <ChevronRight size={16} className="text-edu-navy/40" />
+                  <ChevronRight size={16} className="text-edu-navy/40 flex-shrink-0 md:w-5 md:h-5" />
                 </button>
               </div>
             </div>
@@ -547,12 +551,12 @@ const Layout: React.FC = () => {
       {/* Main Content - Adjust for XL breakpoint */}
       <main className={cn(
         "transition-all duration-300",
-        "xl:ml-80 xl:pl-0 pt-12 xl:pt-0",
+        "xl:ml-80 xl:pl-0 pt-16 md:pt-18 xl:pt-0",
         sidebarCollapsed && "xl:ml-20"
       )}>
         <div className="min-h-screen">
-          {/* Page Content - No more page header */}
-          <div className="p-4 lg:p-8">
+          {/* Page Content - Responsive padding */}
+          <div className="p-3 sm:p-4 md:p-6 lg:p-8">
             <Outlet />
           </div>
         </div>
