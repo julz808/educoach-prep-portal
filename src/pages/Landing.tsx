@@ -488,8 +488,7 @@ const Landing = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col h-full">
                   {/* Test Features - Fixed height container */}
-                  <div className="text-center space-y-2 flex-grow">
-                    <p className="text-sm font-semibold text-[#3B4F6B]">Diagnostic, Practice Tests and Question Bank for:</p>
+                  <div className="text-center flex-grow">
                     <div className="text-sm text-[#6B7280] min-h-[60px] flex items-center justify-center">
                       {course.title === "Year 5 NAPLAN" && (
                         <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
@@ -514,7 +513,7 @@ const Landing = () => {
 
                   {/* Price - Fixed position */}
                   <div className="text-center py-4">
-                    <span className="text-3xl font-bold text-[#FF6B6B]">${course.price}</span>
+                    <span className="text-xl font-bold text-[#2C3E50]">${course.price}</span>
                   </div>
 
                   {/* CTA - Fixed position at bottom */}
