@@ -1,16 +1,37 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { BookOpen, BarChart2, PenTool, Award, ArrowRight } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { courses } from '@/data/courses';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { 
+  ChevronDown, 
+  User, 
+  Target, 
+  TrendingUp, 
+  Award, 
+  BookOpen, 
+  BarChart3, 
+  Clock, 
+  CheckCircle, 
+  Play,
+  ArrowRight,
+  Star,
+  Sparkles,
+  Zap,
+  Eye,
+  Brain,
+  Trophy,
+  Menu,
+  X
+} from 'lucide-react';
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
+  const [scrollY, setScrollY] = useState(0);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -19,135 +40,602 @@ const Landing = () => {
     }
   }, [user, isLoading, navigate]);
 
-  const handleBuyNow = async (courseId: string) => {
-    try {
-      // This is a mock function that would normally create a Stripe checkout session
-      // For now, we'll just show a toast
-      toast({
-        title: "Checkout initiated",
-        description: "This would normally redirect to Stripe Checkout. Feature coming soon!",
-      });
-    } catch (error) {
-      console.error("Checkout error:", error);
-      toast({
-        title: "Checkout Error",
-        description: "There was a problem initiating checkout.",
-        variant: "destructive",
-      });
+  // Scroll effect for parallax
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    const animatedElements = document.querySelectorAll('.scroll-animate');
+    animatedElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Testimonials rotation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const testimonials = [
+    {
+      quote: "The sub-skill analytics were a game-changer. We could see exactly where Sarah needed improvement and track her progress week by week. She went from 60th percentile to 90th percentile in just 8 weeks.",
+      name: "Michelle K.",
+      details: "Parent of Year 6 student",
+      stars: 5
+    },
+    {
+      quote: "Finally, a platform that actually prepares kids for the real test environment. The questions are spot-on, and the detailed feedback helped Tom understand his mistakes.",
+      name: "David R.",
+      details: "Parent of Year 9 student",
+      stars: 5
+    },
+    {
+      quote: "Worth every dollar. The diagnostic test revealed gaps we didn't even know existed. The targeted drilling really works.",
+      name: "Sarah L.",
+      details: "Parent of Year 7 student",
+      stars: 5
     }
-  };
+  ];
+
+  const features = [
+    {
+      icon: <Eye className="h-8 w-8" />,
+      title: "Real Test Simulation",
+      description: "Authentic test environment that mirrors the actual exam conditions and timing"
+    },
+    {
+      icon: <BarChart3 className="h-8 w-8" />,
+      title: "Sub-Skill Analytics",
+      description: "Performance tracking beyond test sections - see progress in specific question types"
+    },
+    {
+      icon: <Zap className="h-8 w-8" />,
+      title: "Instant Feedback",
+      description: "Detailed explanations for every question with improvement suggestions"
+    },
+    {
+      icon: <TrendingUp className="h-8 w-8" />,
+      title: "Progress Tracking",
+      description: "Visual dashboards showing improvement over time with actionable insights"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-edu-light-blue">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">Prepare for Success with EduCourse</h1>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-8">
-            The comprehensive platform for mastering standardized tests through personalized practice and analytics.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" asChild>
+    <div className="min-h-screen bg-white">
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-sm">
+        <div className="container mx-auto px-4 h-16">
+          <div className="flex items-center justify-between h-full">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="text-2xl font-bold text-[#3B4F6B]">EduCourse</div>
+            </Link>
+
+            {/* Menu Items */}
+            <div className="hidden md:flex items-center space-x-8">
+              <div className="relative group">
+                <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+                  <span>Learning Products</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="p-2">
+                    {courses.map((course) => (
+                      <Link
+                        key={course.id}
+                        to={`/course/${course.slug}`}
+                        className="block px-4 py-2 text-sm text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                      >
+                        {course.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <Link to="/insights" className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+                Insights
+              </Link>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-[#3B4F6B]"
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
+
+            {/* Login Button */}
+            <Button
+              variant="outline"
+              asChild
+              className="hidden md:flex border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white"
+            >
               <Link to="/auth">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/question-generation-demo">
-                Try Demo
-              </Link>
-            </Button>
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/edutest-generator">
-                EduTest Generator
+                <User className="h-4 w-4 mr-2" />
+                Login
               </Link>
             </Button>
           </div>
-        </div>
-      </div>
 
-      {/* Courses Section */}
-      <div className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Test Preparation Courses</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map(course => (
-              <Card key={course.id} className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-2">
-                  <CardTitle>{course.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <div className="h-32 bg-gray-100 rounded-md mb-4 flex items-center justify-center text-gray-400">
-                    Course Image
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t">
+              <div className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <p className="font-semibold text-[#3B4F6B]">Learning Products</p>
+                  {courses.map((course) => (
+                    <Link
+                      key={course.id}
+                      to={`/course/${course.slug}`}
+                      className="block px-4 py-2 text-sm text-[#6B7280] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {course.title}
+                    </Link>
+                  ))}
+                </div>
+                <Link 
+                  to="/insights" 
+                  className="block text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Insights
+                </Link>
+                <Button
+                  asChild
+                  className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Link to="/auth">
+                    <User className="h-4 w-4 mr-2" />
+                    Login
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 bg-gradient-to-br from-[#E6F7F5] via-white to-[#F8F9FA] relative overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            transform: `translateY(${scrollY * 0.5}px)`,
+            background: 'radial-gradient(circle at 30% 20%, #4ECDC4 0%, transparent 50%)'
+          }}
+        />
+        <div className="container mx-auto px-4 relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="space-y-8 scroll-animate">
+              <div className="space-y-6">
+                <h1 className="text-5xl lg:text-6xl font-bold text-[#2C3E50] leading-tight">
+                  Help Your Child{' '}
+                  <span className="text-[#4ECDC4]">Ace</span>{' '}
+                  Their Next Competitive Test
+                </h1>
+                <p className="text-xl text-[#6B7280] leading-relaxed max-w-lg">
+                  Expert-designed test prep with detailed performance insights. From diagnostic to mastery - we've got every step covered.
+                </p>
+              </div>
+
+              {/* Key Points */}
+              <div className="space-y-3">
+                {[
+                  'Designed by expert teachers and instructors',
+                  'Mapped to official test curriculums',
+                  '1000+ practice questions with detailed analytics',
+                  'Sub-skill level performance tracking'
+                ].map((point, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0" />
+                    <span className="text-[#3B4F6B]">{point}</span>
                   </div>
-                  <p className="text-gray-600 mb-4">{course.shortDescription}</p>
-                  <p className="font-semibold text-lg">${course.price}</p>
-                  <p className="text-sm text-gray-500">Target: {course.target}</p>
+                ))}
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg" 
+                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
+                  asChild
+                >
+                  <Link to="#products">
+                    Choose Your Test Package
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white px-8 py-4 text-lg group"
+                  asChild
+                >
+                  <Link to="#methodology">
+                    <Play className="mr-2 h-5 w-5" />
+                    See How It Works
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Trust Indicator */}
+              <div className="flex items-center space-x-2 text-[#6B7280]">
+                <Sparkles className="h-5 w-5 text-[#FF6B6B]" />
+                <span>Trusted by 1000+ families across Australia</span>
+              </div>
+            </div>
+
+            {/* Hero Image */}
+            <div className="relative scroll-animate">
+              <div className="bg-white rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <BarChart3 className="h-16 w-16 mx-auto mb-4" />
+                    <p className="text-lg font-semibold">Platform Screenshot</p>
+                    <p className="text-sm opacity-90">Test Interface & Analytics</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Test Products Section */}
+      <section id="products" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16 scroll-animate">
+            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
+              Choose Your Test Preparation Package
+            </h2>
+            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+              Each package includes diagnostic tests, targeted drills, and full-length practice exams
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course, index) => (
+              <Card 
+                key={course.id} 
+                className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] scroll-animate"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <p className="text-[#6B7280] text-center">{course.shortDescription}</p>
+                  
+                  {/* Features */}
+                  <div className="space-y-2">
+                    {[
+                      '500+ practice questions',
+                      'Detailed performance analytics',
+                      'Sub-skill level insights'
+                    ].map((feature, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                        <span className="text-sm text-[#3B4F6B]">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Price */}
+                  <div className="text-center">
+                    <span className="text-3xl font-bold text-[#FF6B6B]">${course.price}</span>
+                  </div>
+
+                  {/* CTA */}
+                  <Button 
+                    className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
+                    asChild
+                  >
+                    <Link to={`/course/${course.slug}`}>
+                      Start Preparation
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline" asChild>
-                    <Link to={`/course/${course.slug}`}>Learn More</Link>
-                  </Button>
-                  <Button onClick={() => handleBuyNow(course.id)}>
-                    Buy Now
-                  </Button>
-                </CardFooter>
               </Card>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <div className="bg-gray-50 py-16">
+      {/* Methodology Section */}
+      <section id="methodology" className="py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose EduCourse?</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FeatureCard
-              icon={<BookOpen className="h-10 w-10" />}
-              title="Comprehensive Content"
-              description="Access thousands of practice questions across all test subjects and topics."
-            />
-            <FeatureCard
-              icon={<BarChart2 className="h-10 w-10" />}
-              title="Detailed Analytics"
-              description="Track your progress with detailed performance metrics and insights."
-            />
-            <FeatureCard
-              icon={<PenTool className="h-10 w-10" />}
-              title="Personalized Practice"
-              description="Focus on your weak areas with adaptive learning technology."
-            />
-            <FeatureCard
-              icon={<Award className="h-10 w-10" />}
-              title="Proven Results"
-              description="Join thousands of successful students who improved their scores."
-            />
+          <div className="text-center mb-16 scroll-animate">
+            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
+              Our Proven 3-Step Methodology
+            </h2>
+            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+              From identifying gaps to mastering skills - every step designed for success
+            </p>
+          </div>
+
+          <div className="space-y-16">
+            {[
+              {
+                step: '01',
+                title: 'Uncover Strengths & Gaps',
+                description: 'Start with our comprehensive diagnostic test. Get detailed insights into your child\'s current performance across all sub-skills and question types.',
+                icon: <Target className="h-12 w-12" />,
+                image: 'Diagnostic results dashboard showing performance breakdown'
+              },
+              {
+                step: '02',
+                title: 'Targeted Skill Building',
+                description: 'Access 500+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
+                icon: <Brain className="h-12 w-12" />,
+                image: 'Drill interface showing question types and progress tracking'
+              },
+              {
+                step: '03',
+                title: 'Master the Real Test',
+                description: 'Take full-length practice tests that perfectly simulate the real exam environment. Track improvement with detailed analytics.',
+                icon: <Trophy className="h-12 w-12" />,
+                image: 'Practice test results with comprehensive performance charts'
+              }
+            ].map((step, index) => (
+              <div 
+                key={index} 
+                className={`grid lg:grid-cols-2 gap-12 items-center scroll-animate ${
+                  index % 2 === 1 ? 'lg:flex-row-reverse' : ''
+                }`}
+              >
+                <div className={`space-y-6 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white">
+                      {step.icon}
+                    </div>
+                    <div className="text-4xl font-bold text-[#4ECDC4]">{step.step}</div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-[#2C3E50]">{step.title}</h3>
+                  <p className="text-lg text-[#6B7280] leading-relaxed">{step.description}</p>
+                </div>
+                <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                  <div className="bg-white rounded-2xl shadow-xl p-8">
+                    <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
+                      <div className="text-white text-center">
+                        <BarChart3 className="h-12 w-12 mx-auto mb-2" />
+                        <p className="text-sm">{step.image}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">Ready to boost your test scores?</h2>
-        <p className="text-xl text-gray-700 max-w-2xl mx-auto mb-8">
-          Join EduCourse today and start your journey to academic success.
-        </p>
-        <Button size="lg" asChild>
-          <Link to="/auth">Sign Up Now</Link>
-        </Button>
-      </div>
-    </div>
-  );
-};
+      {/* Platform Features Showcase */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16 scroll-animate">
+            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
+              Best-in-Class Test Platform & Analytics
+            </h2>
+            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+              See exactly how your child is performing - not just overall, but at the sub-skill level
+            </p>
+          </div>
 
-const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => {
-  return (
-    <div className="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-all">
-      <div className="text-primary mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-3">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="text-center space-y-4 scroll-animate group"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto text-white group-hover:scale-110 transition-transform">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-[#2C3E50]">{feature.title}</h3>
+                <p className="text-[#6B7280]">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Platform Screenshot */}
+          <div className="scroll-animate">
+            <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-8">
+              <div className="bg-white rounded-xl shadow-2xl aspect-video flex items-center justify-center">
+                <div className="text-center">
+                  <BarChart3 className="h-20 w-20 mx-auto mb-4 text-[#4ECDC4]" />
+                  <p className="text-xl font-semibold text-[#2C3E50]">Platform Analytics Dashboard</p>
+                  <p className="text-[#6B7280]">Real-time performance tracking and insights</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* School Logos Placeholder Section */}
+      <section className="py-16 bg-[#F8F9FA]">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 scroll-animate">
+            <h2 className="text-3xl font-bold text-[#2C3E50] mb-4">
+              Trusted by Students Entering Australia's Top Schools
+            </h2>
+          </div>
+          {/* School logos carousel - to be implemented later */}
+          <div className="flex justify-center items-center space-x-8 overflow-hidden">
+            {[...Array(8)].map((_, index) => (
+              <div 
+                key={index}
+                className="w-[120px] h-[60px] bg-gray-200 rounded-lg flex items-center justify-center"
+              >
+                <span className="text-gray-400 text-xs">School Logo</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16 scroll-animate">
+            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
+              What Parents Are Saying
+            </h2>
+            <p className="text-xl text-[#6B7280]">
+              Real results from real families across Australia
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="relative bg-white rounded-2xl shadow-xl p-8 scroll-animate">
+              <div className="text-center space-y-6">
+                <div className="flex justify-center space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-6 w-6 fill-[#FF6B6B] text-[#FF6B6B]" />
+                  ))}
+                </div>
+                <blockquote className="text-xl text-[#2C3E50] italic leading-relaxed">
+                  "{testimonials[activeTestimonial].quote}"
+                </blockquote>
+                <div className="space-y-1">
+                  <p className="font-semibold text-[#2C3E50]">{testimonials[activeTestimonial].name}</p>
+                  <p className="text-[#6B7280]">{testimonials[activeTestimonial].details}</p>
+                </div>
+              </div>
+
+              {/* Testimonial Navigation */}
+              <div className="flex justify-center space-x-2 mt-8">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveTestimonial(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      index === activeTestimonial ? 'bg-[#4ECDC4]' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mailing List Placeholder Section */}
+      <section className="py-16 bg-[#4ECDC4]">
+        <div className="container mx-auto px-4">
+          <div className="text-center scroll-animate">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Stay Updated on Your Child's Test Prep Journey
+            </h2>
+            <p className="text-xl text-white/90 mb-8">
+              Get expert tips, practice questions, and exam updates delivered to your inbox
+            </p>
+            {/* Typeform mailing list embed - to be added later */}
+            <div className="max-w-md mx-auto bg-white/20 rounded-xl p-8">
+              <p className="text-white">Typeform mailing list integration - to be implemented</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="bg-[#2C3E50] text-white py-16">
+        <div className="container mx-auto px-4">
+          {/* Final CTA */}
+          <div className="text-center mb-16 scroll-animate">
+            <h2 className="text-4xl font-bold mb-4">Ready to Help Your Child Succeed?</h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Join 1000+ families who trust EduCourse for test preparation
+            </p>
+            <Button 
+              size="lg" 
+              className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-8 py-4 text-lg"
+              asChild
+            >
+              <Link to="/auth">
+                Get Started Today
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+
+          {/* Footer Links */}
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-2xl font-bold text-[#4ECDC4] mb-4">EduCourse</h3>
+              <p className="text-gray-300">
+                Australia's premier test preparation platform for competitive entrance exams.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <div className="space-y-2">
+                <Link to="/insights" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors">
+                  Insights
+                </Link>
+                <Link to="/auth" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors">
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Products</h4>
+              <div className="space-y-2">
+                {courses.slice(0, 3).map((course) => (
+                  <Link
+                    key={course.id}
+                    to={`/course/${course.slug}`}
+                    className="block text-gray-300 hover:text-[#4ECDC4] transition-colors"
+                  >
+                    {course.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <div className="space-y-2 text-gray-300">
+                <p>support@educourse.com.au</p>
+                <p>1800 EDU COURSE</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-600 mt-12 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 EduCourse. All rights reserved. | Privacy Policy | Terms of Service</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

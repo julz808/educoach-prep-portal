@@ -71,11 +71,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// EduCourse custom colors
-				"edu-teal": "#7accc8",
-				"edu-coral": "#f26c5a",
-				"edu-navy": "#1d3557",
-				"edu-light-blue": "#e6f7f7",
+				// EduCourse custom colors (Updated to CLAUDE.md specifications)
+				"edu-teal": "#4ECDC4",
+				"edu-coral": "#FF6B6B", 
+				"edu-navy": "#3B4F6B",
+				"edu-purple": "#6366F1",
+				"edu-light-blue": "#E6F7F5",
+				"edu-light-gray": "#F8F9FA",
+				"edu-dark-text": "#2C3E50",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
