@@ -378,7 +378,7 @@ const Layout: React.FC = () => {
             <img 
               src="/images/educourse-logo.png" 
               alt="EduCourse" 
-              className="h-12 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-16 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/dashboard')}
             />
           </div>
@@ -417,7 +417,7 @@ const Layout: React.FC = () => {
                 <img 
                   src="/images/educourse-logo.png" 
                   alt="EduCourse" 
-                  className="h-24 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-28 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => {
                     navigate('/dashboard');
                     setSidebarOpen(false);
