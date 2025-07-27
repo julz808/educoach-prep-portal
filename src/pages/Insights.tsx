@@ -14,6 +14,7 @@ import {
 } from '@/services/analyticsService';
 import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 
 // Map frontend product IDs to curriculum product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
