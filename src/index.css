@@ -101,16 +101,16 @@
   }
 }
 
-/* Landing page scroll animations */
+/* Landing page scroll animations - Enhanced */
 .scroll-animate {
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(60px) scale(0.95);
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .scroll-animate.animate-fade-in {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 /* Enhanced button hover effects */

@@ -138,74 +138,65 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-8"
+                className="h-12"
               />
             </Link>
 
-            {/* Menu Items - Moved closer to login */}
-            <div className="hidden md:flex items-center space-x-6">
-              <div className="relative group">
-                <button className={`flex items-center space-x-1 transition-colors ${
-                  isScrolled 
-                    ? 'text-[#3B4F6B] hover:text-[#4ECDC4]' 
-                    : 'text-white hover:text-[#4ECDC4]'
-                }`}>
-                  <span>Learning Products</span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="p-2">
-                    {courses.map((course) => (
-                      <Link
-                        key={course.id}
-                        to={`/course/${course.slug}`}
-                        className="block px-4 py-2 text-sm text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
-                      >
-                        {course.title}
-                      </Link>
-                    ))}
+            {/* Right Side Menu Items */}
+            <div className="flex items-center space-x-6">
+              {/* Desktop Menu */}
+              <div className="hidden md:flex items-center space-x-6">
+                <div className="relative group">
+                  <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+                    <span>Learning Products</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="p-2">
+                      {courses.map((course) => (
+                        <Link
+                          key={course.id}
+                          to={`/course/${course.slug}`}
+                          className="block px-4 py-2 text-sm text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                        >
+                          {course.title}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                <Link 
+                  to="/insights" 
+                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors"
+                >
+                  Insights
+                </Link>
+                
+                {/* Login Button */}
+                <Button
+                  variant="outline"
+                  asChild
+                  className="border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white transition-colors"
+                >
+                  <Link to="/auth">
+                    <User className="h-4 w-4 mr-2" />
+                    Login
+                  </Link>
+                </Button>
               </div>
-              <Link 
-                to="/insights" 
-                className={`transition-colors ${
-                  isScrolled 
-                    ? 'text-[#3B4F6B] hover:text-[#4ECDC4]' 
-                    : 'text-white hover:text-[#4ECDC4]'
-                }`}
-              >
-                Insights
-              </Link>
-            </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={isScrolled ? 'text-[#3B4F6B]' : 'text-white'}
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-[#3B4F6B]"
+                >
+                  {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </Button>
+              </div>
             </div>
-
-            {/* Login Button */}
-            <Button
-              variant="outline"
-              asChild
-              className={`hidden md:flex transition-colors ${
-                isScrolled 
-                  ? 'border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white' 
-                  : 'border-white text-white hover:bg-white hover:text-[#3B4F6B]'
-              }`}
-            >
-              <Link to="/auth">
-                <User className="h-4 w-4 mr-2" />
-                Login
-              </Link>
-            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -318,36 +309,34 @@ const Landing = () => {
               </div>
             </div>
 
-            {/* Hero Images - Three Screenshots */}
-            <div className="relative scroll-animate">
-              <div className="grid grid-cols-1 gap-6">
-                {/* First Screenshot */}
-                <div className="bg-white rounded-xl shadow-xl p-4 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                  <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <Target className="h-12 w-12 mx-auto mb-2" />
-                      <p className="text-sm font-semibold">Diagnostic Dashboard</p>
-                    </div>
+            {/* Hero Images - Overlapping Screenshots */}
+            <div className="relative scroll-animate h-96">
+              {/* Background Screenshot */}
+              <div className="absolute top-0 right-0 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10">
+                <div className="w-full h-full bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <Target className="h-8 w-8 mx-auto mb-1" />
+                    <p className="text-xs font-semibold">Diagnostic Dashboard</p>
                   </div>
                 </div>
-                
-                {/* Second Screenshot */}
-                <div className="bg-white rounded-xl shadow-xl p-4 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <div className="aspect-video bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <BookOpen className="h-12 w-12 mx-auto mb-2" />
-                      <p className="text-sm font-semibold">Practice Test Interface</p>
-                    </div>
+              </div>
+              
+              {/* Middle Screenshot */}
+              <div className="absolute top-16 left-8 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20">
+                <div className="w-full h-full bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <BookOpen className="h-8 w-8 mx-auto mb-1" />
+                    <p className="text-xs font-semibold">Practice Test Interface</p>
                   </div>
                 </div>
-                
-                {/* Third Screenshot */}
-                <div className="bg-white rounded-xl shadow-xl p-4 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <div className="aspect-video bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <BarChart3 className="h-12 w-12 mx-auto mb-2" />
-                      <p className="text-sm font-semibold">Performance Analytics</p>
-                    </div>
+              </div>
+              
+              {/* Front Screenshot */}
+              <div className="absolute top-32 right-12 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+                <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <BarChart3 className="h-8 w-8 mx-auto mb-1" />
+                    <p className="text-xs font-semibold">Performance Analytics</p>
                   </div>
                 </div>
               </div>
@@ -466,7 +455,7 @@ const Landing = () => {
                   <p className="text-lg text-[#6B7280] leading-relaxed">{step.description}</p>
                 </div>
                 <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                  <div className="bg-white rounded-2xl shadow-xl p-8">
+                  <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 hover:-rotate-1 transition-all duration-500">
                     <div className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
                       <div className="text-white text-center">
                         <BarChart3 className="h-12 w-12 mx-auto mb-2" />
@@ -511,7 +500,7 @@ const Landing = () => {
 
           {/* Platform Screenshot */}
           <div className="scroll-animate">
-            <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-8">
+            <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-8 transform hover:scale-105 hover:rotate-1 transition-all duration-500">
               <div className="bg-white rounded-xl shadow-2xl aspect-video flex items-center justify-center">
                 <div className="text-center">
                   <BarChart3 className="h-20 w-20 mx-auto mb-4 text-[#4ECDC4]" />
