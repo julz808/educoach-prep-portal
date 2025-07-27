@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
                   dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
                     ? 'text-green-700' 
                     : 'text-purple-700'
-                }`}>Identify your strengths and areas for improvement</p>
+                }`}>Identify your strengths and weaknesses</p>
               </div>
             </div>
           </CardHeader>
