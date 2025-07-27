@@ -138,7 +138,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-32"
+                className="h-40"
               />
             </Link>
 
@@ -240,7 +240,7 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-b from-[#E6F7F5] via-[#F8F9FA] to-white relative overflow-hidden">
+      <section className="pt-24 pb-16 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
         <div 
           className="absolute inset-0 opacity-30"
           style={{
@@ -321,7 +321,7 @@ const Landing = () => {
               </div>
               
               {/* Front Screenshot - Adjusted position */}
-              <div className="absolute top-40 left-20 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+              <div className="absolute top-48 right-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
                 <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BarChart3 className="h-8 w-8 mx-auto mb-1" />
