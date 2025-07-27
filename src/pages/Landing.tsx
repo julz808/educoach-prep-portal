@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { courses } from '@/data/courses';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import Lenis from 'lenis';
 import { 
   ChevronDown, 
   User, 
@@ -25,6 +28,61 @@ import {
   Menu,
   X
 } from 'lucide-react';
+
+// Animated Text Component for letter-by-letter reveals
+const AnimatedText = ({ text, className = "", delay = 0 }: { text: string, className?: string, delay?: number }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const letters = text.split("");
+
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({
+      opacity: 1,
+      transition: { staggerChildren: 0.03, delayChildren: delay * i },
+    }),
+  };
+
+  const child = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+      scale: 0.9,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 500,
+      },
+    },
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ overflow: "hidden", display: "flex", flexWrap: "wrap" }}
+      variants={container}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      className={className}
+    >
+      {letters.map((letter, index) => (
+        <motion.span
+          variants={child}
+          key={index}
+          style={{ display: "inline-block" }}
+        >
+          {letter === " " ? "\u00A0" : letter}
+        </motion.span>
+      ))}
+    </motion.div>
+  );
+};
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -77,6 +135,28 @@ const Landing = () => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Initialize Lenis smooth scrolling
+  useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.1,
+      wheelMultiplier: 0.8,
+      gestureOrientation: 'vertical',
+      normalizeWheel: false,
+      smoothTouch: false
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
   }, []);
 
   const testimonials = [
@@ -138,7 +218,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-40"
+                className="h-44"
               />
             </Link>
 
@@ -321,7 +401,7 @@ const Landing = () => {
               </div>
               
               {/* Front Screenshot - Adjusted position */}
-              <div className="absolute top-48 right-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+              <div className="absolute top-48 right-12 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
                 <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BarChart3 className="h-8 w-8 mx-auto mb-1" />
@@ -338,21 +418,37 @@ const Landing = () => {
       <section id="products" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 scroll-animate">
-            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
-              Choose Your Test Preparation Package
-            </h2>
-            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+            <AnimatedText 
+              text="Choose Your Test Preparation Package"
+              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+            />
+            <motion.p 
+              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
               Each package includes diagnostic tests, targeted drills, and full-length practice exams
-            </p>
+            </motion.p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course, index) => (
-              <Card 
-                key={course.id} 
-                className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] scroll-animate flex flex-col"
-                style={{ animationDelay: `${index * 100}ms` }}
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                viewport={{ once: true }}
               >
+                <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full"
+                >
                 <CardHeader className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
                     <BookOpen className="h-8 w-8 text-white" />
@@ -380,7 +476,8 @@ const Landing = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -390,12 +487,19 @@ const Landing = () => {
       <section id="methodology" className="py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 scroll-animate">
-            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
-              Our Proven 3-Step Methodology
-            </h2>
-            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+            <AnimatedText 
+              text="Our Proven 3-Step Methodology"
+              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+            />
+            <motion.p 
+              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
               From identifying gaps to mastering skills - every step designed for success
-            </p>
+            </motion.p>
           </div>
 
           <div className="space-y-16">
@@ -463,12 +567,19 @@ const Landing = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 scroll-animate">
-            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
-              Best-in-Class Test Platform & Analytics
-            </h2>
-            <p className="text-xl text-[#6B7280] max-w-3xl mx-auto">
+            <AnimatedText 
+              text="Best-in-Class Test Platform & Analytics"
+              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+            />
+            <motion.p 
+              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
               See exactly how your child is performing - not just overall, but at the sub-skill level
-            </p>
+            </motion.p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
