@@ -491,22 +491,22 @@ const Landing = () => {
                   <div className="text-center space-y-2">
                     <p className="text-sm font-semibold text-[#3B4F6B]">Diagnostic, Practice Tests and Question Bank for:</p>
                     <div className="text-sm text-[#6B7280]">
-                      {course.title === "Year 5 NAPLAN Preparation" && (
+                      {course.title === "Year 5 NAPLAN" && (
                         <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
                       )}
-                      {course.title === "Year 7 NAPLAN Preparation" && (
+                      {course.title === "Year 7 NAPLAN" && (
                         <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
                       )}
-                      {course.title === "ACER Scholarship Exam Preparation" && (
+                      {course.title === "ACER Scholarship" && (
                         <div>Written Expression, Mathematics, Humanities</div>
                       )}
-                      {course.title === "EduTest Scholarship Preparation" && (
+                      {course.title === "EduTest Scholarship" && (
                         <div>Reading Comprehension, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression</div>
                       )}
-                      {course.title === "NSW Selective Entry High School Preparation" && (
+                      {course.title === "NSW Selective Entry" && (
                         <div>Reading, Mathematical Reasoning, Thinking Skills, Writing</div>
                       )}
-                      {course.title === "VIC Selective Entry High School Preparation" && (
+                      {course.title === "VIC Selective Entry" && (
                         <div>Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing</div>
                       )}
                     </div>
