@@ -138,7 +138,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-12"
+                className="h-20"
               />
             </Link>
 
@@ -147,7 +147,7 @@ const Landing = () => {
               {/* Desktop Menu */}
               <div className="hidden md:flex items-center space-x-6">
                 <div className="relative group">
-                  <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors">
+                  <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold">
                     <span>Learning Products</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>
@@ -167,7 +167,7 @@ const Landing = () => {
                 </div>
                 <Link 
                   to="/insights" 
-                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors"
+                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold"
                 >
                   Insights
                 </Link>
@@ -259,7 +259,7 @@ const Landing = () => {
                   your next test!
                 </h1>
                 <p className="text-xl text-[#4B5563] leading-relaxed max-w-lg">
-                  Australia's best test prep platform for scholarship, selective entry and NAPLAN tests.
+                  Australia's best test prep platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
                 </p>
               </div>
 
@@ -312,7 +312,7 @@ const Landing = () => {
             {/* Hero Images - Overlapping Screenshots */}
             <div className="relative scroll-animate h-96">
               {/* Background Screenshot */}
-              <div className="absolute top-0 right-0 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10">
+              <div className="absolute top-0 right-0 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10">
                 <div className="w-full h-full bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <Target className="h-8 w-8 mx-auto mb-1" />
@@ -322,7 +322,7 @@ const Landing = () => {
               </div>
               
               {/* Middle Screenshot */}
-              <div className="absolute top-16 left-8 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20">
+              <div className="absolute top-16 left-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20">
                 <div className="w-full h-full bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BookOpen className="h-8 w-8 mx-auto mb-1" />
@@ -331,8 +331,8 @@ const Landing = () => {
                 </div>
               </div>
               
-              {/* Front Screenshot */}
-              <div className="absolute top-32 right-12 w-72 h-48 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+              {/* Front Screenshot - Adjusted position */}
+              <div className="absolute top-32 right-4 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
                 <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BarChart3 className="h-8 w-8 mx-auto mb-1" />
