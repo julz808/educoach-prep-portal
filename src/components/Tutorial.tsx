@@ -1,8 +1,9 @@
 import { useState, useEffect, createContext, useContext } from "react";
-import { X } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 interface TutorialStep {
   target: string | null;
@@ -147,15 +148,27 @@ function TutorialComponent({ initialShow = false, onClose }: TutorialComponentPr
 
   const step = tutorialSteps[currentStep];
   const isLastStep = currentStep === tutorialSteps.length - 1;
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Calculate position
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Calculate position - use center for mobile, calculated position for desktop
   let style: React.CSSProperties = {
     position: "fixed",
     zIndex: 9999,
   };
 
-  if (step.position === "center" || !targetRect) {
-    // Center position for welcome message or fallback
+  if (isMobile || step.position === "center" || !targetRect) {
+    // Center position for mobile, welcome message, or fallback
     style.left = "50%";
     style.top = "50%";
     style.transform = "translate(-50%, -50%)";
@@ -172,8 +185,8 @@ function TutorialComponent({ initialShow = false, onClose }: TutorialComponentPr
         onClick={handleClose}
       />
       
-      {/* Highlight box - only show if we have a target */}
-      {targetRect && (
+      {/* Highlight box - only show if we have a target and not mobile */}
+      {targetRect && !isMobile && (
         <div
           className="fixed border-2 border-primary rounded-lg z-[9998]"
           style={{
@@ -187,42 +200,100 @@ function TutorialComponent({ initialShow = false, onClose }: TutorialComponentPr
 
       {/* Tutorial card */}
       <Card 
-        className="w-96 p-6 shadow-xl"
+        className={cn(
+          "shadow-xl relative",
+          isMobile 
+            ? "w-[90vw] max-w-sm p-4 mx-4" 
+            : "w-96 p-6"
+        )}
         style={style}
       >
         <button
           onClick={handleClose}
-          className="absolute right-2 top-2 p-1 rounded-lg hover:bg-gray-100"
+          className="absolute right-2 top-2 p-1 rounded-lg hover:bg-gray-100 z-10"
         >
-          <X className="h-4 w-4" />
+          <X className={cn("w-4 h-4", isMobile && "w-5 h-5")} />
         </button>
 
-        <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-        <p className="text-base text-gray-600 mb-4">{step.content}</p>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">
-            Step {currentStep + 1} of {tutorialSteps.length}
-          </span>
-          
-          <div className="flex gap-2">
-            {currentStep > 0 && (
+        {/* Mobile carousel mode */}
+        {isMobile ? (
+          <div className="text-center">
+            <div className="mb-4">
+              <div className="flex justify-center mb-2">
+                <div className="flex gap-1">
+                  {tutorialSteps.map((_, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "w-2 h-2 rounded-full transition-colors",
+                        index === currentStep ? "bg-edu-teal" : "bg-gray-300"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">
+                Step {currentStep + 1} of {tutorialSteps.length}
+              </span>
+            </div>
+            
+            <h3 className="text-lg font-semibold mb-3">{step.title}</h3>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">{step.content}</p>
+            
+            <div className="flex items-center justify-between">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentStep(currentStep - 1)}
+                disabled={currentStep === 0}
+                className="w-20"
               >
-                Previous
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                <span className="hidden xs:inline">Prev</span>
               </Button>
-            )}
-            <Button
-              size="sm"
-              onClick={handleNext}
-            >
-              {isLastStep ? "Finish" : "Next"}
-            </Button>
+              
+              <Button
+                size="sm"
+                onClick={handleNext}
+                className="w-20"
+              >
+                <span className="hidden xs:inline">{isLastStep ? "Finish" : "Next"}</span>
+                <span className="xs:hidden">{isLastStep ? "Done" : "Next"}</span>
+                {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" />}
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Desktop mode */
+          <>
+            <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+            <p className="text-base text-gray-600 mb-4">{step.content}</p>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">
+                Step {currentStep + 1} of {tutorialSteps.length}
+              </span>
+              
+              <div className="flex gap-2">
+                {currentStep > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentStep(currentStep - 1)}
+                  >
+                    Previous
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  onClick={handleNext}
+                >
+                  {isLastStep ? "Finish" : "Next"}
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </Card>
     </>
   );

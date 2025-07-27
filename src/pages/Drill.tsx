@@ -1200,16 +1200,17 @@ const Drill: React.FC = () => {
 
                       {/* Expanded View - Sub-Skills */}
                       {skillArea.isExpanded && (
-                        <div className="space-y-4 pt-4 border-t border-slate-100">
-                          <div className="space-y-4">
-                            <h4 className="font-semibold text-slate-900">Sub-Skills</h4>
-                            <div className="grid gap-4">
+                        <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4 border-t border-slate-100 px-2 sm:px-0">
+                          <div className="space-y-3 sm:space-y-4">
+                            <h4 className="font-semibold text-slate-900 text-sm sm:text-base">Sub-Skills</h4>
+                            <div className="grid gap-3 sm:gap-4">
                               {skillArea.subSkills.map((subSkill, index) => (
                                 <div 
                                   key={subSkill.id}
                                   className={cn(
-                                    "p-4 rounded-lg border-2 transition-all duration-200 relative",
-                                    subSkill.totalQuestions > 0 ? "hover:shadow-md cursor-pointer" : "opacity-60",
+                                    "p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 relative",
+                                    "mx-1 sm:mx-0",
+                                    subSkill.totalQuestions > 0 ? "sm:hover:shadow-md cursor-pointer" : "opacity-60",
                                     subSkill.isComplete
                                       ? "border-emerald-200 bg-emerald-50/30"
                                       : subSkill.completedQuestions > 0
@@ -1219,46 +1220,50 @@ const Drill: React.FC = () => {
                                   onClick={() => selectSubSkill(skillArea, subSkill)}
                                 >
                                   {subSkill.isRecommended && (
-                                    <Badge className="absolute top-2 left-2 bg-rose-100 text-rose-700 border-rose-200 text-xs">
-                                      Recommended
+                                    <Badge className="absolute top-2 left-2 bg-rose-100 text-rose-700 border-rose-200 text-xs px-1.5 py-0.5">
+                                      <span className="hidden xs:inline">Recommended</span>
+                                      <span className="xs:hidden">★</span>
                                     </Badge>
                                   )}
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                      <div className={cn("mb-2", subSkill.isRecommended && "mt-8")}>
+                                  <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-0">
+                                    <div className="flex-1 min-w-0">
+                                      <div className={cn("mb-2", subSkill.isRecommended && "mt-6 xs:mt-8")}>
                                         <div>
-                                          <h5 className="font-semibold text-slate-900">{subSkill.name}</h5>
-                                          <div className="flex items-center space-x-2 text-sm text-slate-600">
-                                            <CheckCircle2 size={12} className="text-emerald-500" />
-                                            <span>{subSkill.completedQuestions} of {subSkill.totalQuestions} questions completed</span>
+                                          <h5 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{subSkill.name}</h5>
+                                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 mt-1">
+                                            <CheckCircle2 size={10} className="text-emerald-500 flex-shrink-0 sm:w-3 sm:h-3" />
+                                            <span className="truncate">{subSkill.completedQuestions} of {subSkill.totalQuestions} completed</span>
                                           </div>
                                         </div>
                                       </div>
                                     </div>
                                     
-                                    <div className="ml-4 flex items-center space-x-3">
+                                    <div className="flex items-center gap-2 xs:gap-3 flex-wrap xs:flex-nowrap justify-end xs:justify-start">
                                       {subSkill.isComplete && (
-                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                                          <CheckCircle2 size={12} className="mr-1" />
-                                          Complete
+                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-1 flex-shrink-0">
+                                          <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
+                                          <span className="hidden xs:inline">Complete</span>
+                                          <span className="xs:hidden">✓</span>
                                         </Badge>
                                       )}
                                       {!subSkill.isComplete && hasAnyProgress(subSkill.progress) && (
-                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                                          In Progress
+                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-1 flex-shrink-0">
+                                          <span className="hidden xs:inline">In Progress</span>
+                                          <span className="xs:hidden">⏱</span>
                                         </Badge>
                                       )}
                                       
                                       {subSkill.totalQuestions === 0 ? (
-                                        <div className="text-center py-2">
-                                          <AlertCircle className="h-5 w-5 text-slate-400 mx-auto mb-1" />
-                                          <p className="text-xs text-slate-500">Coming soon</p>
+                                        <div className="text-center py-1 flex-shrink-0">
+                                          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 mx-auto mb-1" />
+                                          <p className="text-xs text-slate-500">Soon</p>
                                         </div>
                                       ) : (
                                         <Button 
                                           size="sm"
                                           className={cn(
-                                            "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
+                                            "font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0",
+                                            "px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 text-xs xs:text-sm min-w-0",
                                             !hasAnyProgress(subSkill.progress) && !subSkill.isComplete
                                               ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
                                               : subSkill.isComplete
@@ -1270,9 +1275,16 @@ const Drill: React.FC = () => {
                                             selectSubSkill(skillArea, subSkill);
                                           }}
                                         >
-                                          <Play size={14} className="mr-1" />
-                                          {!hasAnyProgress(subSkill.progress) && !subSkill.isComplete ? 'Start Practice' : 
-                                           subSkill.isComplete ? 'View Results' : 'Continue Practice'}
+                                          <div className="flex items-center min-w-0">
+                                            <Play size={10} className="mr-1 xs:mr-1.5 flex-shrink-0 xs:w-3 xs:h-3 sm:w-4 sm:h-4" />
+                                            <span className="truncate text-xs xs:text-sm">
+                                              {!hasAnyProgress(subSkill.progress) && !subSkill.isComplete ? 
+                                                (<><span className="hidden xs:inline">Start Practice</span><span className="xs:hidden">Start</span></>) : 
+                                               subSkill.isComplete ? 
+                                                (<><span className="hidden xs:inline">View Results</span><span className="xs:hidden">View</span></>) : 
+                                                (<><span className="hidden xs:inline">Continue Practice</span><span className="xs:hidden">Continue</span></>)}
+                                            </span>
+                                          </div>
                                         </Button>
                                       )}
                                     </div>

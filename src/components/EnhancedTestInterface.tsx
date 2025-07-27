@@ -338,15 +338,15 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
       {/* Main Content Area */}
       <div className={cn(
         "flex-1 transition-all duration-300 ease-in-out",
-        sidebarCollapsed ? "mr-16" : "mr-80"
+        sidebarCollapsed ? "mr-12 sm:mr-16" : "mr-64 sm:mr-80"
       )}>
-        <div className="p-6 max-w-none">
+        <div className="p-2 sm:p-4 md:p-6 max-w-none">
           {/* Header */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border mb-6">
+          <div className="bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border mb-3 sm:mb-4 md:mb-6 mx-2 sm:mx-0">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-edu-navy">{testTitle}</h1>
@@ -378,13 +378,13 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 
           {/* Content Area - Dual Panel for Reading Questions */}
           {hasPassage ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {/* Reading Passage Panel */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg text-edu-navy">Reading Passage</CardTitle>
+              <Card className="border-0 shadow-lg mx-2 sm:mx-0">
+                <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 pt-3 sm:pt-6">
+                  <CardTitle className="text-base sm:text-lg text-edu-navy">Reading Passage</CardTitle>
                 </CardHeader>
-                <CardContent className="max-h-[600px] overflow-y-auto rounded-xl">
+                <CardContent className="max-h-[400px] sm:max-h-[600px] overflow-y-auto rounded-xl px-3 sm:px-6 pb-3 sm:pb-6">
                   <div className={cn(
                     "prose prose-gray max-w-none text-base leading-relaxed transition-all duration-300 ease-out",
                     questionTransition ? "opacity-0 transform translate-x-4" : "opacity-100 transform translate-x-0"
@@ -399,15 +399,18 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
               </Card>
 
               {/* Question Panel */}
-              <Card className="border-0 shadow-lg rounded-xl relative">
-                <CardContent className="p-8">
+              <Card className="border-0 shadow-lg rounded-xl relative mx-2 sm:mx-0">
+                <CardContent className="p-3 sm:p-6 md:p-8">
                   <div className={cn(
                     "space-y-6 transition-all duration-300 ease-out",
                     questionTransition ? "opacity-0 transform translate-x-4" : "opacity-100 transform translate-x-0"
                   )}>
                     {/* Navigation Controls Header */}
-                    <div className="flex items-center justify-end pb-4 border-b border-gray-100">
-                      <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-gray-100">
+                      <div className="text-xs sm:text-sm text-gray-500">
+                        Question {currentQuestionIndex + 1} of {questions.length}
+                      </div>
+                      <div className="flex items-center gap-2 sm:gap-3">
                         {/* Flag Button */}
                         {!isReviewMode && (
                           <Button
@@ -415,44 +418,46 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                             size="sm"
                             onClick={() => onFlag(currentQuestionIndex)}
                             className={cn(
-                              "w-8 h-8 p-0 hover:bg-transparent",
+                              "w-7 h-7 sm:w-8 sm:h-8 p-0 hover:bg-transparent",
                               flaggedQuestions.has(currentQuestionIndex) 
                                 ? "text-red-500 hover:text-red-600" 
                                 : "text-gray-500 hover:text-red-500"
                             )}
                           >
-                            <Flag size={20} />
+                            <Flag size={16} className="sm:w-5 sm:h-5" />
                           </Button>
                         )}
                         
                         {/* Navigation Controls */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={onPrevious}
                             disabled={isFirstQuestion}
-                            className="w-10 h-10 p-0 rounded-full border-2 hover:border-edu-teal hover:text-edu-teal transition-colors"
+                            className="w-8 h-8 sm:w-10 sm:h-10 p-0 rounded-full border-2 hover:border-edu-teal hover:text-edu-teal transition-colors"
                           >
-                            <ArrowLeft size={16} />
+                            <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
                           </Button>
                           
                           {isLastQuestion ? (
                             isReviewMode ? (
                               <Button
                                 onClick={onFinish}
-                                className="bg-edu-teal hover:bg-edu-teal/90 text-white rounded-full px-4 h-10 font-medium text-sm"
+                                className="bg-edu-teal hover:bg-edu-teal/90 text-white rounded-full px-3 sm:px-4 h-8 sm:h-10 font-medium text-xs sm:text-sm"
                               >
-                                <CheckCircle size={14} className="mr-1.5" />
-                                Exit Review
+                                <CheckCircle size={12} className="mr-1 sm:mr-1.5 sm:w-3.5 sm:h-3.5" />
+                                <span className="hidden xs:inline">Exit Review</span>
+                                <span className="xs:hidden">Exit</span>
                               </Button>
                             ) : (
                               <Button
                                 onClick={onFinish}
-                                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-4 h-10 font-medium text-sm"
+                                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-3 sm:px-4 h-8 sm:h-10 font-medium text-xs sm:text-sm"
                               >
-                                <CheckCircle size={14} className="mr-1.5" />
-                                Finish
+                                <CheckCircle size={12} className="mr-1 sm:mr-1.5 sm:w-3.5 sm:h-3.5" />
+                                <span className="hidden xs:inline">Finish</span>
+                                <span className="xs:hidden">Done</span>
                               </Button>
                             )
                           ) : (
@@ -462,17 +467,18 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                               className={cn(
                                 "rounded-full bg-edu-teal hover:bg-edu-teal/90 text-white transition-colors",
                                 isDrillMode && selectedAnswer !== null && !showDrillFeedback 
-                                  ? "px-4 h-10 font-medium text-sm" 
-                                  : "w-10 h-10 p-0"
+                                  ? "px-3 sm:px-4 h-8 sm:h-10 font-medium text-xs sm:text-sm" 
+                                  : "w-8 h-8 sm:w-10 sm:h-10 p-0"
                               )}
                             >
                               {isDrillMode && selectedAnswer !== null && !showDrillFeedback ? (
                                 <>
-                                  <ArrowRight size={14} className="mr-1.5" />
-                                  Show Answer
+                                  <ArrowRight size={12} className="mr-1 sm:mr-1.5 sm:w-3.5 sm:h-3.5" />
+                                  <span className="hidden xs:inline">Show Answer</span>
+                                  <span className="xs:hidden">Show</span>
                                 </>
                               ) : (
-                                <ArrowRight size={16} />
+                                <ArrowRight size={14} className="sm:w-4 sm:h-4" />
                               )}
                             </Button>
                           )}
@@ -778,9 +784,9 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
       {/* Progress Sidebar */}
       <div className={cn(
         "fixed right-0 top-0 h-full bg-white border-l shadow-lg transition-all duration-300 ease-in-out z-30",
-        sidebarCollapsed ? "w-16" : "w-80"
+        sidebarCollapsed ? "w-12 sm:w-16" : "w-64 sm:w-80"
       )}>
-        <div className="p-4 h-full flex flex-col">
+        <div className="p-2 sm:p-4 h-full flex flex-col">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between mb-6">
             {!sidebarCollapsed && (
@@ -805,7 +811,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
           {/* Question Grid */}
           {!sidebarCollapsed && (
             <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-6 gap-2 mb-6 p-2">
+              <div className="grid grid-cols-5 xs:grid-cols-6 sm:grid-cols-6 gap-1.5 sm:gap-2 mb-4 sm:mb-6 p-2">
                 {questions.map((_, questionIndex) => {
                   const status = getQuestionStatus(questionIndex);
                   return (

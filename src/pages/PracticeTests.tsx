@@ -825,35 +825,36 @@ const PracticeTests: React.FC = () => {
 
                       {/* Expanded View - Sections */}
                       {expandedTest === test.id && (
-                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                        <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4 border-t border-slate-100 px-2 sm:px-0">
                           {/* Sections List */}
-                          <div className="space-y-4">
-                            <h4 className="font-semibold text-slate-900">Test Sections</h4>
-                            <div className="grid gap-4">
+                          <div className="space-y-3 sm:space-y-4">
+                            <h4 className="font-semibold text-slate-900 text-sm sm:text-base">Test Sections</h4>
+                            <div className="grid gap-3 sm:gap-4">
                               {test.sections.map((section, index) => (
                                 <div 
                                   key={section.id}
                                   className={cn(
-                                    "p-4 rounded-lg border-2 transition-all duration-200",
-                                    section.questions > 0 ? "hover:shadow-md" : "opacity-60",
+                                    "p-3 sm:p-4 rounded-lg border-2 transition-all duration-200",
+                                    "mx-1 sm:mx-0",
+                                    section.questions > 0 ? "sm:hover:shadow-md" : "opacity-60",
                                     getStatusColor(section.status)
                                   )}
                                 >
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                      <div className="flex items-center space-x-3 mb-2">
-                                        <div className="flex items-center justify-center w-8 h-8 bg-rose-100 rounded-full">
-                                          <span className="text-sm font-bold text-rose-600">{index + 1}</span>
+                                  <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-0">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 xs:gap-3 mb-2">
+                                        <div className="flex items-center justify-center w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-rose-100 rounded-full flex-shrink-0">
+                                          <span className="text-xs xs:text-sm font-bold text-rose-600">{index + 1}</span>
                                         </div>
-                                        <div>
-                                          <h5 className="font-semibold text-slate-900">{section.name}</h5>
-                                          <div className="flex items-center space-x-3 text-sm text-slate-600">
-                                            <div className="flex items-center space-x-1">
-                                              <BookOpen size={12} />
+                                        <div className="flex-1 min-w-0">
+                                          <h5 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{section.name}</h5>
+                                          <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-3 text-xs sm:text-sm text-slate-600 mt-1">
+                                            <div className="flex items-center gap-1">
+                                              <BookOpen size={10} className="flex-shrink-0 sm:w-3 sm:h-3" />
                                               <span>{section.questions} questions</span>
                                             </div>
-                                            <div className="flex items-center space-x-1">
-                                              <Timer size={12} />
+                                            <div className="flex items-center gap-1">
+                                              <Timer size={10} className="flex-shrink-0 sm:w-3 sm:h-3" />
                                               <span>{section.timeLimit} min</span>
                                             </div>
                                           </div>
@@ -867,29 +868,32 @@ const PracticeTests: React.FC = () => {
                                       )}
                                     </div>
                                     
-                                    <div className="ml-4 flex items-center space-x-3">
+                                    <div className="flex items-center gap-2 xs:gap-3 flex-wrap xs:flex-nowrap justify-end xs:justify-start">
                                       {section.status === 'completed' && (
-                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                                          <CheckCircle2 size={12} className="mr-1" />
-                                          Complete
+                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-1 flex-shrink-0">
+                                          <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
+                                          <span className="hidden xs:inline">Complete</span>
+                                          <span className="xs:hidden">✓</span>
                                         </Badge>
                                       )}
                                       {section.status === 'in-progress' && (
-                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                                          In Progress
+                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-1 flex-shrink-0">
+                                          <span className="hidden xs:inline">In Progress</span>
+                                          <span className="xs:hidden">⏱</span>
                                         </Badge>
                                       )}
                                       
                                       {section.questions === 0 ? (
-                                        <div className="text-center py-2">
-                                          <AlertCircle className="h-5 w-5 text-slate-400 mx-auto mb-1" />
-                                          <p className="text-xs text-slate-500">Coming soon</p>
+                                        <div className="text-center py-1 flex-shrink-0">
+                                          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 mx-auto mb-1" />
+                                          <p className="text-xs text-slate-500">Soon</p>
                                         </div>
                                       ) : (
                                         <Button 
                                           size="sm"
                                           className={cn(
-                                            "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md",
+                                            "font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0",
+                                            "px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 text-xs xs:text-sm min-w-0",
                                             section.status === 'not-started' 
                                               ? 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white' 
                                               : section.status === 'completed'
@@ -909,8 +913,18 @@ const PracticeTests: React.FC = () => {
                                             }
                                           }}
                                         >
-                                          {getSectionButtonIcon(section.status)}
-                                          {getSectionButtonText(section.status)}
+                                          <div className="flex items-center min-w-0">
+                                            <span className="w-3 h-3 xs:w-4 xs:h-4 flex-shrink-0">
+                                              {getSectionButtonIcon(section.status)}
+                                            </span>
+                                            <span className="ml-1 xs:ml-2 truncate text-xs xs:text-sm">
+                                              {section.status === 'not-started' ? 
+                                                (<><span className="hidden xs:inline">Start Section</span><span className="xs:hidden">Start</span></>) : 
+                                               section.status === 'completed' ? 
+                                                (<><span className="hidden xs:inline">View Results</span><span className="xs:hidden">View</span></>) : 
+                                                (<><span className="hidden xs:inline">Continue</span><span className="xs:hidden">Continue</span></>)}
+                                            </span>
+                                          </div>
                                         </Button>
                                       )}
                                     </div>
