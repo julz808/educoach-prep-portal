@@ -138,7 +138,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-20"
+                className="h-32"
               />
             </Link>
 
@@ -240,7 +240,7 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-[#E6F7F5] via-white to-[#F8F9FA] relative overflow-hidden">
+      <section className="pt-24 pb-16 bg-gradient-to-b from-[#E6F7F5] via-[#F8F9FA] to-white relative overflow-hidden">
         <div 
           className="absolute inset-0 opacity-30"
           style={{
@@ -277,27 +277,16 @@ const Landing = () => {
                 ))}
               </div>
 
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              {/* CTA */}
+              <div className="flex justify-center sm:justify-start">
                 <Button 
                   size="lg" 
                   className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
                   asChild
                 >
                   <Link to="#products">
-                    Choose Your Test Package
+                    Find Your Test
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4] hover:text-white px-8 py-4 text-lg group"
-                  asChild
-                >
-                  <Link to="#methodology">
-                    <Play className="mr-2 h-5 w-5" />
-                    See How It Works
                   </Link>
                 </Button>
               </div>
@@ -332,7 +321,7 @@ const Landing = () => {
               </div>
               
               {/* Front Screenshot - Adjusted position */}
-              <div className="absolute top-32 right-4 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
+              <div className="absolute top-40 left-20 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30">
                 <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <BarChart3 className="h-8 w-8 mx-auto mb-1" />
