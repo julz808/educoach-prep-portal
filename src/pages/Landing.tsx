@@ -337,7 +337,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  We're here to help you <span className="text-[#FF6B6B]">ace</span> your next test!
+                  We're here to help you <span className="text-[#FF6B6B] underline">ace</span> your next test!
                 </motion.h1>
                 <motion.p 
                   className="text-xl text-[#4B5563] leading-relaxed max-w-lg"
@@ -488,6 +488,33 @@ const Landing = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col flex-grow space-y-6">
                   <p className="text-[#6B7280] text-center">{course.shortDescription}</p>
+
+                  {/* Test Features */}
+                  <div className="space-y-3">
+                    <div className="text-center space-y-2">
+                      <p className="text-sm font-semibold text-[#3B4F6B]">Diagnostic, Practice Tests and Question Bank for:</p>
+                      <div className="text-sm text-[#6B7280]">
+                        {course.title === "Year 5 NAPLAN" && (
+                          <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
+                        )}
+                        {course.title === "Year 7 NAPLAN" && (
+                          <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
+                        )}
+                        {course.title === "ACER Scholarship (Year 7 Entry)" && (
+                          <div>Written Expression, Mathematics, Humanities</div>
+                        )}
+                        {course.title === "EduTest Scholarship (Year 7 Entry)" && (
+                          <div>Reading Comprehension, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression</div>
+                        )}
+                        {course.title === "NSW Selective Entry (Year 7 Entry)" && (
+                          <div>Reading, Mathematical Reasoning, Thinking Skills, Writing</div>
+                        )}
+                        {course.title === "VIC Selective Entry (Year 9 Entry)" && (
+                          <div>Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Price */}
                   <div className="text-center">
