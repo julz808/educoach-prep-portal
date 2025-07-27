@@ -1081,26 +1081,26 @@ const DiagnosticTests: React.FC = () => {
                             <div 
                               key={section.id}
                               className={cn(
-                                "p-4 rounded-lg border-2 transition-all duration-200",
+                                "p-3 sm:p-4 rounded-lg border-2 transition-all duration-200",
                                 section.questions > 0 ? "hover:shadow-md" : "opacity-60",
                                 getStatusColor(section.status)
                               )}
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                                <div className="flex-1 w-full sm:w-auto">
                                   <div className="flex items-center space-x-3 mb-2">
-                                    <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
-                                      <span className="text-sm font-bold text-purple-600">{index + 1}</span>
+                                    <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex-shrink-0">
+                                      <span className="text-xs sm:text-sm font-bold text-purple-600">{index + 1}</span>
                                     </div>
-                                    <div>
-                                      <h5 className="font-semibold text-slate-900">{section.name}</h5>
-                                      <div className="flex items-center space-x-3 text-sm text-slate-600">
+                                    <div className="flex-1 min-w-0">
+                                      <h5 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{section.name}</h5>
+                                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-slate-600 mt-1">
                                         <div className="flex items-center space-x-1">
-                                          <BookOpen size={12} />
+                                          <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                           <span>{section.questions} questions</span>
                                         </div>
                                         <div className="flex items-center space-x-1">
-                                          <Timer size={12} />
+                                          <Timer className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                           <span>{section.timeLimit} min</span>
                                         </div>
                                       </div>
@@ -1114,29 +1114,32 @@ const DiagnosticTests: React.FC = () => {
                                   )}
                                 </div>
                                 
-                                <div className="ml-4 flex items-center space-x-3">
+                                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end sm:justify-start flex-wrap">
                                   {section.status === 'completed' && (
-                                    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                                      <CheckCircle2 size={12} className="mr-1" />
-                                      Complete
+                                    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs sm:text-sm px-2 py-1 flex-shrink-0">
+                                      <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
+                                      <span className="hidden xs:inline">Complete</span>
+                                      <span className="xs:hidden">✓</span>
                                     </Badge>
                                   )}
                                   {section.status === 'in-progress' && (
-                                    <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                                      In Progress
+                                    <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs sm:text-sm px-2 py-1 flex-shrink-0">
+                                      <span className="hidden xs:inline">In Progress</span>
+                                      <span className="xs:hidden">⏱</span>
                                     </Badge>
                                   )}
                                   
                                   {section.questions === 0 ? (
-                                    <div className="text-center py-2">
-                                      <AlertCircle className="h-5 w-5 text-slate-400 mx-auto mb-1" />
+                                    <div className="text-center py-2 flex-shrink-0">
+                                      <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 mx-auto mb-1" />
                                       <p className="text-xs text-slate-500">Coming soon</p>
                                     </div>
                                   ) : (
                                     <Button
                                       size="sm"
                                       className={cn(
-                                        "font-medium rounded-full px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md relative z-10",
+                                        "font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md relative z-10 flex-shrink-0",
+                                        "px-3 py-1.5 xs:px-4 xs:py-2 text-xs xs:text-sm min-w-0",
                                         section.status === 'completed' 
                                           ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white cursor-pointer" 
                                           : section.status === 'in-progress'
@@ -1160,10 +1163,12 @@ const DiagnosticTests: React.FC = () => {
                                         console.log(`🔘 BUTTON: Rendering button for "${section.name}" with status: "${section.status}"`);
                                         console.log(`🔘 BUTTON: Button text will be: "${getSectionButtonText(section.status)}"`);
                                         return (
-                                          <>
-                                            {getSectionButtonIcon(section.status)}
-                                            <span className="ml-1">{getSectionButtonText(section.status)}</span>
-                                          </>
+                                          <div className="flex items-center min-w-0">
+                                            <span className="w-3 h-3 xs:w-4 xs:h-4 flex-shrink-0">
+                                              {getSectionButtonIcon(section.status)}
+                                            </span>
+                                            <span className="ml-1 xs:ml-2 truncate text-xs xs:text-sm">{getSectionButtonText(section.status)}</span>
+                                          </div>
                                         );
                                       })()}
                                     </Button>

@@ -718,8 +718,9 @@ const PracticeTests: React.FC = () => {
               <Card 
                 key={test.id} 
                 className={cn(
-                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-2xl overflow-hidden",
-                  test.totalQuestions > 0 ? "hover:border-edu-teal/30 hover:-translate-y-1" : "opacity-60",
+                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-xl sm:rounded-2xl overflow-hidden",
+                  "mx-2 sm:mx-0",
+                  test.totalQuestions > 0 ? "hover:border-edu-teal/30 sm:hover:-translate-y-1" : "opacity-60",
                   getStatusColor(test.status)
                 )}
               >

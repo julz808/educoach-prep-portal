@@ -578,25 +578,26 @@ const PerformanceDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex justify-center mb-8">
-          <div className="flex space-x-2 bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
+        <div className="flex justify-center mb-6 sm:mb-8 px-2 sm:px-0">
+          <div className="flex flex-col xs:flex-row gap-2 xs:gap-0 xs:space-x-2 bg-white p-2 rounded-xl sm:rounded-2xl shadow-lg border border-slate-200 w-full xs:w-auto max-w-sm xs:max-w-none">
             {[
-              { id: 'diagnostic', label: 'Diagnostic', icon: <Activity size={18} /> },
-              { id: 'practice', label: 'Practice Tests', icon: <FileText size={18} /> },
-              { id: 'drills', label: 'Drills', icon: <Target size={18} /> }
+              { id: 'diagnostic', label: 'Diagnostic', icon: <Activity size={16} className="xs:w-4 xs:h-4 sm:w-5 sm:h-5" /> },
+              { id: 'practice', label: 'Practice Tests', icon: <FileText size={16} className="xs:w-4 xs:h-4 sm:w-5 sm:h-5" /> },
+              { id: 'drills', label: 'Drills', icon: <Target size={16} className="xs:w-4 xs:h-4 sm:w-5 sm:h-5" /> }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-8 py-4 rounded-xl font-bold transition-all duration-200 ease-out transform hover:scale-105 ${
+                className={cn(
+                  "flex-1 xs:flex-none px-3 xs:px-4 sm:px-6 md:px-8 py-2.5 xs:py-3 sm:py-4 rounded-lg xs:rounded-xl font-semibold xs:font-bold transition-all duration-200 ease-out text-sm xs:text-base sm:hover:scale-105",
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
+                )}
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center xs:justify-start gap-1.5 xs:gap-2">
                   {tab.icon}
-                  <span>{tab.label}</span>
+                  <span className="truncate">{tab.label}</span>
                 </div>
               </button>
             ))}
@@ -604,7 +605,7 @@ const PerformanceDashboard = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-8">
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg p-3 sm:p-6 md:p-8 mx-2 sm:mx-0">
 
           {/* Diagnostic Tab */}
           {activeTab === 'diagnostic' && (
@@ -773,22 +774,22 @@ const PerformanceDashboard = () => {
                       </div>
                     </div>
                     
-                    <div className="flex">
-                      {/* Spider Chart - Left Side */}
-                      <div className="w-1/2 p-6 flex items-center justify-center border-r border-slate-200">
+                    <div className="flex flex-col lg:flex-row">
+                      {/* Spider Chart - Top on mobile, Left on desktop */}
+                      <div className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
                         <SpiderChart 
                           data={performanceData.diagnostic.sectionBreakdown.map(section => ({
                             label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
                             value: sectionView === 'score' ? section.score : section.accuracy,
                             maxValue: 100
                           }))}
-                          size={320}
+                          size={280}
                           animate={animateSpiderChart}
                         />
                       </div>
                       
-                      {/* Section List - Right Side */}
-                      <div className="w-1/2 divide-y divide-slate-100">
+                      {/* Section List - Bottom on mobile, Right on desktop */}
+                      <div className="w-full lg:w-1/2 divide-y divide-slate-100">
                         {performanceData.diagnostic.sectionBreakdown
                           .sort((a, b) => {
                             const aValue = sectionView === 'score' ? a.score : a.accuracy;
@@ -850,19 +851,19 @@ const PerformanceDashboard = () => {
                   </div>
 
                   {/* Sub-Skill Overview */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
                     {/* Top 5 Strengths */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                      <div className="px-6 py-4 border-b border-slate-200">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-200">
+                        <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 xs:gap-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                             Top 5 Sub-Skills
                           </h3>
-                          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 text-xs sm:text-sm">
                             <button
                               onClick={() => setTopBottomView('score')}
-                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              className={`px-2 xs:px-3 py-1 text-xs xs:text-sm font-medium rounded transition-colors ${
                                 topBottomView === 'score' 
                                   ? 'bg-white text-slate-900 shadow-sm' 
                                   : 'text-slate-600 hover:text-slate-900'
@@ -872,7 +873,7 @@ const PerformanceDashboard = () => {
                             </button>
                             <button
                               onClick={() => setTopBottomView('accuracy')}
-                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              className={`px-2 xs:px-3 py-1 text-xs xs:text-sm font-medium rounded transition-colors ${
                                 topBottomView === 'accuracy' 
                                   ? 'bg-white text-slate-900 shadow-sm' 
                                   : 'text-slate-600 hover:text-slate-900'
@@ -946,7 +947,7 @@ const PerformanceDashboard = () => {
                           <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
                             <button
                               onClick={() => setTopBottomView('score')}
-                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              className={`px-2 xs:px-3 py-1 text-xs xs:text-sm font-medium rounded transition-colors ${
                                 topBottomView === 'score' 
                                   ? 'bg-white text-slate-900 shadow-sm' 
                                   : 'text-slate-600 hover:text-slate-900'
@@ -956,7 +957,7 @@ const PerformanceDashboard = () => {
                             </button>
                             <button
                               onClick={() => setTopBottomView('accuracy')}
-                              className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                              className={`px-2 xs:px-3 py-1 text-xs xs:text-sm font-medium rounded transition-colors ${
                                 topBottomView === 'accuracy' 
                                   ? 'bg-white text-slate-900 shadow-sm' 
                                   : 'text-slate-600 hover:text-slate-900'
@@ -1523,22 +1524,22 @@ const PerformanceDashboard = () => {
                       </div>
                     </div>
               
-                    <div className="flex">
-                      {/* Spider Chart - Left Side */}
-                      <div className="w-1/2 p-6 flex items-center justify-center border-r border-slate-200">
+                    <div className="flex flex-col lg:flex-row">
+                      {/* Spider Chart - Top on mobile, Left on desktop */}
+                      <div className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
                         <SpiderChart 
                           data={(selectedTest.sectionBreakdown || []).map((section) => ({
                             label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
                             value: sectionView === 'score' ? section.score : section.accuracy,
                             maxValue: 100
                           }))}
-                          size={320}
+                          size={280}
                           animate={animateSpiderChart}
                         />
                       </div>
                       
-                      {/* Section List - Right Side */}
-                      <div className="w-1/2 divide-y divide-slate-100">
+                      {/* Section List - Bottom on mobile, Right on desktop */}
+                      <div className="w-full lg:w-1/2 divide-y divide-slate-100">
                         {selectedTest.sectionBreakdown && selectedTest.sectionBreakdown.length > 0 ? (
                           selectedTest.sectionBreakdown.map((section, index) => {
                             const displayScore = section.score;

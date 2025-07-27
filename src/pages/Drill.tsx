@@ -1111,66 +1111,69 @@ const Drill: React.FC = () => {
               <Card 
                 key={skillArea.id} 
                 className={cn(
-                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-2xl overflow-hidden",
-                  skillArea.totalQuestions > 0 ? "hover:border-orange-300 hover:-translate-y-1" : "opacity-60",
+                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-xl sm:rounded-2xl overflow-hidden",
+                  "mx-2 sm:mx-0",
+                  skillArea.totalQuestions > 0 ? "hover:border-orange-300 sm:hover:-translate-y-1" : "opacity-60",
                   getStatusColor(skillArea.completedQuestions, skillArea.totalQuestions)
                 )}
               >
-                <CardHeader className="pb-4 bg-gradient-to-r from-slate-50/30 to-white">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <CardTitle className="text-xl font-bold text-slate-900">{skillArea.name}</CardTitle>
-                        <div className="flex items-center space-x-3 mt-2">
-                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
-                            <Users size={14} />
-                            <span className="font-medium text-xs">{skillArea.subSkills.length} sub-skills</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-edu-navy bg-edu-teal/10 rounded-full px-3 py-1">
-                            <CheckCircle2 size={14} />
-                            <span className="font-medium text-xs">{skillArea.totalQuestions} questions available</span>
-                          </div>
+                <CardHeader className="p-3 sm:p-4 md:pb-4 bg-gradient-to-r from-slate-50/30 to-white">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 truncate">{skillArea.name}</CardTitle>
+                      <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 mt-2">
+                        <div className="flex items-center gap-1.5 text-edu-navy bg-edu-teal/10 rounded-full px-2.5 py-1 text-xs">
+                          <Users size={12} className="flex-shrink-0" />
+                          <span className="font-medium">{skillArea.subSkills.length} sub-skills</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-edu-navy bg-edu-teal/10 rounded-full px-2.5 py-1 text-xs">
+                          <CheckCircle2 size={12} className="flex-shrink-0" />
+                          <span className="font-medium">{skillArea.totalQuestions} questions</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
                       {skillArea.completedQuestions === skillArea.totalQuestions && skillArea.totalQuestions > 0 && (
-                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full">
-                          <CheckCircle2 size={12} className="mr-1" />
-                          Completed
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
+                          <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
+                          <span className="hidden xs:inline">Completed</span>
+                          <span className="xs:hidden">✓</span>
                         </Badge>
                       )}
                       {skillArea.completedQuestions > 0 && skillArea.completedQuestions < skillArea.totalQuestions && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
-                          <Timer size={12} className="mr-1" />
-                          In Progress
+                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
+                          <Timer size={10} className="mr-1 sm:w-3 sm:h-3" />
+                          <span className="hidden xs:inline">In Progress</span>
+                          <span className="xs:hidden">⏱</span>
                         </Badge>
                       )}
                       {skillArea.completedQuestions === 0 && !skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
-                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full">
-                          Not Started
+                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
+                          <span className="hidden xs:inline">Not Started</span>
+                          <span className="xs:hidden">○</span>
                         </Badge>
                       )}
                       {skillArea.completedQuestions === 0 && skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full">
-                          <Timer size={12} className="mr-1" />
-                          In Progress
+                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
+                          <Timer size={10} className="mr-1 sm:w-3 sm:h-3" />
+                          <span className="hidden xs:inline">In Progress</span>
+                          <span className="xs:hidden">⏱</span>
                         </Badge>
                       )}
                       {skillArea.totalQuestions > 0 && (
                         <Button 
                           size="sm"
                           variant="ghost"
-                          className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                          className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleSkillArea(skillArea);
                           }}
                         >
                           {skillArea.isExpanded ? 
-                            <ChevronUp size={20} className="text-slate-600" /> : 
-                            <ChevronDown size={20} className="text-slate-600" />
+                            <ChevronUp size={16} className="text-slate-600 sm:w-5 sm:h-5" /> : 
+                            <ChevronDown size={16} className="text-slate-600 sm:w-5 sm:h-5" />
                           }
                         </Button>
                       )}
@@ -1178,7 +1181,7 @@ const Drill: React.FC = () => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="bg-white">
+                <CardContent className="bg-white p-3 sm:p-6">
                   {skillArea.totalQuestions === 0 ? (
                     <div className="text-center py-8">
                       <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
