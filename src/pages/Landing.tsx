@@ -331,18 +331,21 @@ const Landing = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <div className="space-y-8">
-                <AnimatedText 
-                  text="We're here to help you ace your next test!"
+                <motion.h1 
                   className="text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
-                  delay={0.2}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  We're here to help you <span className="text-[#FF6B6B]">ace</span> your next test!
+                </motion.h1>
                 <motion.p 
                   className="text-xl text-[#4B5563] leading-relaxed max-w-lg"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
-                  Australia's best test prep platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
+                  Australia's best test prep platform for <span className="font-bold text-[#FF6B6B]">scholarship</span>, <span className="font-bold text-[#FF6B6B]">selective entry</span> and <span className="font-bold text-[#FF6B6B]">NAPLAN</span> tests.
                 </motion.p>
               </div>
 
@@ -383,8 +386,8 @@ const Landing = () => {
                   className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
                   asChild
                 >
-                  <Link to="#products">
-                    Find Your Test
+                  <Link to="#methodology">
+                    See how it works
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
