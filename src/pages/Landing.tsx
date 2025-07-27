@@ -26,7 +26,9 @@ import {
   Brain,
   Trophy,
   Menu,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 // Animated Text Component for letter-by-letter reveals
@@ -91,6 +93,7 @@ const Landing = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(1); // Start with middle slide
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -464,95 +467,129 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Carousel Container */}
-          <div className="relative">
-            <div className="overflow-hidden">
-              <div className="flex gap-8 transition-transform duration-500 ease-in-out" id="carousel-track">
-                {courses.map((course, index) => (
-                  <motion.div
-                    key={course.id}
-                    className="flex-shrink-0 w-80"
-                    initial={{ opacity: 0, y: 60 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ 
-                      duration: 0.6, 
-                      delay: index * 0.1,
-                      type: "spring",
-                      stiffness: 100
-                    }}
-                    viewport={{ once: true }}
-                  >
-                    <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full"
+          {/* Netflix-style Carousel */}
+          <div className="relative max-w-6xl mx-auto">
+            {/* Left Arrow */}
+            <button
+              onClick={() => {
+                const newSlide = currentSlide > 0 ? currentSlide - 1 : courses.length - 3;
+                setCurrentSlide(newSlide);
+              }}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+            >
+              <ChevronLeft className="h-6 w-6 text-[#2C3E50]" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => {
+                const newSlide = currentSlide < courses.length - 3 ? currentSlide + 1 : 0;
+                setCurrentSlide(newSlide);
+              }}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110"
+            >
+              <ChevronRight className="h-6 w-6 text-[#2C3E50]" />
+            </button>
+
+            {/* Carousel Track */}
+            <div className="overflow-hidden px-16">
+              <div 
+                className="flex transition-transform duration-500 ease-out"
+                style={{ 
+                  transform: `translateX(-${currentSlide * 320}px)`,
+                  width: `${courses.length * 320}px`
+                }}
+              >
+                {courses.map((course, index) => {
+                  const isCenter = index === currentSlide + 1;
+                  const isVisible = index >= currentSlide && index < currentSlide + 3;
+                  
+                  return (
+                    <motion.div
+                      key={course.id}
+                      className={`flex-shrink-0 px-4 transition-all duration-500 ${
+                        isCenter 
+                          ? 'w-80 scale-110 z-20' 
+                          : 'w-80 scale-95 opacity-70'
+                      }`}
+                      initial={{ opacity: 0, y: 60 }}
+                      whileInView={{ opacity: isVisible ? (isCenter ? 1 : 0.7) : 0.3, y: 0 }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      viewport={{ once: true }}
                     >
-                    <CardHeader className="text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <BookOpen className="h-8 w-8 text-white" />
-                      </div>
-                      <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col h-full">
-                      {/* Test Features - Fixed height container */}
-                      <div className="text-center flex-grow">
-                        <div className="text-sm text-[#6B7280] min-h-[60px] flex items-center justify-center">
-                          {course.title === "Year 5 NAPLAN" && (
-                            <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
-                          )}
-                          {course.title === "Year 7 NAPLAN" && (
-                            <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
-                          )}
-                          {course.title === "ACER Scholarship" && (
-                            <div>Written Expression, Mathematics, Humanities</div>
-                          )}
-                          {course.title === "EduTest Scholarship" && (
-                            <div>Reading Comprehension, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression</div>
-                          )}
-                          {course.title === "NSW Selective Entry" && (
-                            <div>Reading, Mathematical Reasoning, Thinking Skills, Writing</div>
-                          )}
-                          {course.title === "VIC Selective Entry" && (
-                            <div>Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing</div>
-                          )}
-                        </div>
-                      </div>
+                      <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
+                        isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
+                      }`}>
+                        <CardHeader className="text-center">
+                          <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
+                            <BookOpen className="h-8 w-8 text-white" />
+                          </div>
+                          <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col h-full">
+                          {/* Test Features - Fixed height container */}
+                          <div className="text-center flex-grow">
+                            <div className="text-sm text-[#6B7280] min-h-[60px] flex items-center justify-center">
+                              {course.title === "Year 5 NAPLAN" && (
+                                <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
+                              )}
+                              {course.title === "Year 7 NAPLAN" && (
+                                <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
+                              )}
+                              {course.title === "ACER Scholarship" && (
+                                <div>Written Expression, Mathematics, Humanities</div>
+                              )}
+                              {course.title === "EduTest Scholarship" && (
+                                <div>Reading Comprehension, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression</div>
+                              )}
+                              {course.title === "NSW Selective Entry" && (
+                                <div>Reading, Mathematical Reasoning, Thinking Skills, Writing</div>
+                              )}
+                              {course.title === "VIC Selective Entry" && (
+                                <div>Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing</div>
+                              )}
+                            </div>
+                          </div>
 
-                      {/* Price - Fixed position */}
-                      <div className="text-center py-4">
-                        <span className="text-xl font-bold text-[#2C3E50]">${course.price}</span>
-                      </div>
+                          {/* Price - Fixed position */}
+                          <div className="text-center py-4">
+                            <span className="text-xl font-bold text-[#2C3E50]">${course.price}</span>
+                          </div>
 
-                      {/* CTA - Fixed position at bottom */}
-                      <div className="mt-auto">
-                        <Button 
-                          className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
-                          asChild
-                        >
-                          <Link to={`/course/${course.slug}`}>
-                            See what's included
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                          {/* CTA - Fixed position at bottom */}
+                          <div className="mt-auto">
+                            <Button 
+                              className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
+                              asChild
+                            >
+                              <Link to={`/course/${course.slug}`}>
+                                See what's included
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
             
-            {/* Carousel Navigation */}
+            {/* Slide Indicators */}
             <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: Math.ceil(courses.length / 3) }).map((_, pageIndex) => (
+              {Array.from({ length: courses.length - 2 }).map((_, index) => (
                 <button
-                  key={pageIndex}
-                  onClick={() => {
-                    const track = document.getElementById('carousel-track');
-                    if (track) {
-                      const cardWidth = 320 + 32; // 320px width + 32px gap
-                      const offset = pageIndex * cardWidth * 3;
-                      track.style.transform = `translateX(-${offset}px)`;
-                    }
-                  }}
-                  className="w-3 h-3 rounded-full bg-gray-300 hover:bg-[#4ECDC4] transition-colors"
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    index === currentSlide ? 'bg-[#4ECDC4]' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
                 />
               ))}
             </div>
