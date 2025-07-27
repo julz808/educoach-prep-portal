@@ -364,8 +364,8 @@ const Layout: React.FC = () => {
       </aside>
 
       {/* Mobile/Tablet Header - Show on all screens below XL (1280px) */}
-      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-3 py-1">
+      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-12">
+        <div className="flex items-center justify-between px-3 h-full">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -547,7 +547,7 @@ const Layout: React.FC = () => {
       {/* Main Content - Adjust for XL breakpoint */}
       <main className={cn(
         "transition-all duration-300",
-        "xl:ml-80 xl:pl-0 pt-14 xl:pt-0",
+        "xl:ml-80 xl:pl-0 pt-12 xl:pt-0",
         sidebarCollapsed && "xl:ml-20"
       )}>
         <div className="min-h-screen">
