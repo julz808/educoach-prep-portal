@@ -309,7 +309,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-48"
+                className="h-52"
               />
             </Link>
 
