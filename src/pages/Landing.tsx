@@ -28,7 +28,9 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Activity,
+  FileText
 } from 'lucide-react';
 
 // Animated Text Component for letter-by-letter reveals
@@ -842,7 +844,7 @@ const Landing = () => {
                 prefix: 'Diagnostic:',
                 title: 'Uncover Strengths & Gaps',
                 description: 'Start with our comprehensive diagnostic test. Get detailed insights into your child\'s current performance across all sub-skills and question types.',
-                icon: <Target className="h-8 w-8 md:h-12 md:w-12" />,
+                icon: <Activity className="h-8 w-8 md:h-12 md:w-12" />,
                 image: 'diagnostic home 3.png'
               },
               {
@@ -850,7 +852,7 @@ const Landing = () => {
                 prefix: 'Skill Drills:',
                 title: 'Targeted Skill Building',
                 description: 'Access 500+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
-                icon: <Brain className="h-8 w-8 md:h-12 md:w-12" />,
+                icon: <Target className="h-8 w-8 md:h-12 md:w-12" />,
                 image: 'writing feedback 3.png'
               },
               {
@@ -858,7 +860,7 @@ const Landing = () => {
                 prefix: 'Practice Tests:',
                 title: 'Simulate the Real Test',
                 description: 'Take full-length practice tests that perfectly simulate the real exam environment. Track improvement with detailed analytics.',
-                icon: <Trophy className="h-8 w-8 md:h-12 md:w-12" />,
+                icon: <FileText className="h-8 w-8 md:h-12 md:w-12" />,
                 image: 'test taking maths 2.png'
               }
             ].map((step, index) => (
