@@ -13,8 +13,8 @@ export function cleanOptionText(text: string): string {
     // Remove option prefixes like A), B), C), D) at the beginning
     .replace(/^[A-Za-z][).:]\s*/, '')
     
-    // Remove numbered prefixes like 1), 2), 3), 4)
-    .replace(/^\d+[).:]\s*/, '')
+    // Remove numbered prefixes like 1), 2), 3), 4) - but NOT decimal points
+    .replace(/^\d+[):]\s*/, '')
     
     // Fix spacing between numbers and units (months, years, etc.)
     .replace(/(\d+)months/g, '$1 months')
