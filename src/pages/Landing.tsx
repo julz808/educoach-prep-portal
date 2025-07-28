@@ -183,28 +183,41 @@ const Landing = () => {
     };
   }, []);
 
-  // School logos array - you can replace these with actual logo paths
+  // School logos array with actual uploaded logos
   const schoolLogos = [
-    { name: "Melbourne Grammar", logo: "/images/schools/melbourne-grammar.png" },
-    { name: "Scotch College", logo: "/images/schools/scotch-college.png" },
-    { name: "Xavier College", logo: "/images/schools/xavier-college.png" },
-    { name: "Trinity Grammar", logo: "/images/schools/trinity-grammar.png" },
-    { name: "Carey Baptist Grammar", logo: "/images/schools/carey-baptist.png" },
-    { name: "Camberwell Grammar", logo: "/images/schools/camberwell-grammar.png" },
-    { name: "Ivanhoe Grammar", logo: "/images/schools/ivanhoe-grammar.png" },
-    { name: "Mentone Grammar", logo: "/images/schools/mentone-grammar.png" },
-    { name: "Sydney Grammar", logo: "/images/schools/sydney-grammar.png" },
-    { name: "Knox Grammar", logo: "/images/schools/knox-grammar.png" },
-    { name: "Cranbrook School", logo: "/images/schools/cranbrook.png" },
-    { name: "Barker College", logo: "/images/schools/barker-college.png" },
-    { name: "SHORE School", logo: "/images/schools/shore.png" },
-    { name: "St Ignatius College", logo: "/images/schools/st-ignatius.png" },
-    { name: "The King's School", logo: "/images/schools/kings-school.png" },
-    { name: "Newington College", logo: "/images/schools/newington.png" },
-    { name: "St Joseph's College", logo: "/images/schools/st-josephs.png" },
-    { name: "Redlands", logo: "/images/schools/redlands.png" },
-    { name: "PLC Sydney", logo: "/images/schools/plc-sydney.png" },
-    { name: "MLC School", logo: "/images/schools/mlc.png" }
+    // Victorian Schools
+    { name: "Brighton Grammar School", logo: "/images/school logos/vic/brighton-grammar-school.svg" },
+    { name: "Camberwell Girls Grammar", logo: "/images/school logos/vic/camberwell-girls-grammar-school.svg" },
+    { name: "Camberwell Grammar School", logo: "/images/school logos/vic/camberwell-grammar-school.svg" },
+    { name: "Carey Baptist Grammar", logo: "/images/school logos/vic/carey-baptist-grammar-school.svg" },
+    { name: "Caulfield Grammar School", logo: "/images/school logos/vic/caulfield-grammar-school.svg" },
+    { name: "Firbank Grammar School", logo: "/images/school logos/vic/firbank-grammar-school.svg" },
+    { name: "Geelong College", logo: "/images/school logos/vic/geelong-college.svg" },
+    { name: "Geelong Grammar School", logo: "/images/school logos/vic/geelong-grammar-school.svg" },
+    { name: "Genazzano FCJ College", logo: "/images/school logos/vic/genazzano-fcj-college.svg" },
+    { name: "Goulburn Valley Grammar", logo: "/images/school logos/vic/goulburn-valley-grammar-school.svg" },
+    { name: "Haileybury College", logo: "/images/school logos/vic/haileybury-college.svg" },
+    { name: "Huntingtower School", logo: "/images/school logos/vic/huntingtower-school.svg" },
+    { name: "Ivanhoe Girls Grammar", logo: "/images/school logos/vic/ivanhoe-girls-grammar-school.svg" },
+    { name: "Ivanhoe Grammar School", logo: "/images/school logos/vic/ivanhoe-grammar-school.svg" },
+    { name: "Kilvington Grammar", logo: "/images/school logos/vic/kilvington-grammar-school.svg" },
+    
+    // NSW Schools
+    { name: "Arden Anglican School", logo: "/images/school logos/nsw/arden_anglican_school.png" },
+    { name: "Barker College", logo: "/images/school logos/nsw/barker_college.png" },
+    { name: "Our Lady of the Sacred Heart", logo: "/images/school logos/nsw/our_lady_of_the_sacred_heart_college_kensington.png" },
+    { name: "Ravenswood School", logo: "/images/school logos/nsw/ravenswood_school_for_girls.png" },
+    { name: "Redfield College", logo: "/images/school logos/nsw/redfield_college.png" },
+    { name: "St Aloysius College", logo: "/images/school logos/nsw/st_aloysius_college_sydney.png" },
+    { name: "St Augustine's College", logo: "/images/school logos/nsw/st_augustines_college_brookvale.png" },
+    { name: "St Catherine's School", logo: "/images/school logos/nsw/st_catherines_school_sydney.png" },
+    { name: "St Clare's College", logo: "/images/school logos/nsw/st_clares_college_waverley.png" },
+    { name: "St Stanislaus College", logo: "/images/school logos/nsw/st_stanislaus_college.png" },
+    { name: "Sydney Grammar School", logo: "/images/school logos/nsw/sydney_grammar_school.png" },
+    { name: "The King's School", logo: "/images/school logos/nsw/the_kings_school.png" },
+    { name: "Trinity Catholic College", logo: "/images/school logos/nsw/trinity_catholic_college_auburn.png" },
+    { name: "Trinity Grammar School", logo: "/images/school logos/nsw/trinity_grammar_school_sydney.png" },
+    { name: "Waverley College", logo: "/images/school logos/nsw/waverley_college.png" }
   ];
 
   const testimonials = [
@@ -462,12 +475,18 @@ const Landing = () => {
                 <Button 
                   size="lg" 
                   className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
-                  asChild
+                  onClick={() => {
+                    const methodologySection = document.getElementById('methodology');
+                    if (methodologySection) {
+                      methodologySection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }
+                  }}
                 >
-                  <Link to="#methodology">
-                    See how it works
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  See how it works
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </motion.div>
             </motion.div>
@@ -970,7 +989,7 @@ const Landing = () => {
             <motion.div 
               className="flex items-center space-x-8"
               animate={{ 
-                x: [0, -schoolLogos.length * 160]
+                x: [0, -schoolLogos.length * 180]
               }}
               transition={{ 
                 duration: 70, // 70 seconds for full cycle (slower)
@@ -982,7 +1001,7 @@ const Landing = () => {
               {[...schoolLogos, ...schoolLogos].map((school, index) => (
                 <div 
                   key={`${school.name}-${index}`}
-                  className="flex-shrink-0 w-[120px] h-[60px] bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center p-3 hover:shadow-md transition-shadow"
+                  className="flex-shrink-0 w-[150px] h-[80px] flex items-center justify-center"
                 >
                   <img 
                     src={school.logo} 
