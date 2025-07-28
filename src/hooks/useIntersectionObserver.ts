@@ -44,6 +44,16 @@ export const useIntersectionObserver = (
 
     observer.observe(element);
 
+    // Check if element is already in view on mount
+    const rect = element.getBoundingClientRect();
+    const isAlreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    if (isAlreadyVisible && !hasTriggered) {
+      setIsIntersecting(true);
+      if (triggerOnce) {
+        setHasTriggered(true);
+      }
+    }
+
     return () => {
       observer.unobserve(element);
     };

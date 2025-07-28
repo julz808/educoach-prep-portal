@@ -372,21 +372,18 @@ const PerformanceDashboard = () => {
     loadTabData(activeTab);
   }, [activeTab, user, selectedProduct]);
   
-  // Counting animation for overall score and accuracy - triggered on viewport entry
+  // Counting animation for overall score and accuracy - triggered on viewport entry or data load
   useEffect(() => {
-    // Check if we have the data and the element is intersecting
-    if (!performanceData.diagnostic?.overallScore && !performanceData.diagnostic?.overallAccuracy) return;
-    if (!overallStatsObserver.isIntersecting) return;
+    if (!performanceData.diagnostic) return;
     
     const targetScore = performanceData.diagnostic?.overallScore || 0;
     const targetAccuracy = performanceData.diagnostic?.overallAccuracy || 0;
     
-    // Skip animation if both values are 0
-    if (targetScore === 0 && targetAccuracy === 0) {
-      setAnimatedOverallScore(0);
-      setAnimatedOverallAccuracy(0);
-      return;
-    }
+    // Only animate if intersection observer is working OR as fallback after data loads
+    const shouldAnimate = overallStatsObserver.isIntersecting || 
+                         (!overallStatsObserver.hasTriggered && performanceData.diagnostic);
+    
+    if (!shouldAnimate) return;
     
     // Reset and animate
     setAnimatedOverallScore(0);
@@ -410,7 +407,7 @@ const PerformanceDashboard = () => {
     }, stepDuration);
     
     return () => clearInterval(timer);
-  }, [performanceData.diagnostic, overallStatsObserver.isIntersecting]);
+  }, [performanceData.diagnostic, overallStatsObserver.isIntersecting, overallStatsObserver.hasTriggered]);
   
   // Trigger spider chart animation on viewport entry and view toggle
   useEffect(() => {
@@ -423,7 +420,12 @@ const PerformanceDashboard = () => {
   
   // Animate section scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.diagnostic?.sectionBreakdown || !sectionScoresObserver.isIntersecting) return;
+    if (!performanceData.diagnostic?.sectionBreakdown) return;
+    
+    const shouldAnimate = sectionScoresObserver.isIntersecting || 
+                         (!sectionScoresObserver.hasTriggered && performanceData.diagnostic?.sectionBreakdown);
+    
+    if (!shouldAnimate) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -453,11 +455,16 @@ const PerformanceDashboard = () => {
     });
     
     setAnimatedSectionScores(newScores);
-  }, [performanceData.diagnostic, sectionView, sectionScoresObserver.isIntersecting]);
+  }, [performanceData.diagnostic, sectionView, sectionScoresObserver.isIntersecting, sectionScoresObserver.hasTriggered]);
   
   // Animate sub-skill scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.diagnostic?.allSubSkills || !sectionScoresObserver.isIntersecting) return;
+    if (!performanceData.diagnostic?.allSubSkills) return;
+    
+    const shouldAnimate = sectionScoresObserver.isIntersecting || 
+                         (!sectionScoresObserver.hasTriggered && performanceData.diagnostic?.allSubSkills);
+    
+    if (!shouldAnimate) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -489,11 +496,16 @@ const PerformanceDashboard = () => {
     });
     
     setAnimatedSubSkillScores(newScores);
-  }, [performanceData.diagnostic, subSkillView, sectionScoresObserver.isIntersecting]);
+  }, [performanceData.diagnostic, subSkillView, sectionScoresObserver.isIntersecting, sectionScoresObserver.hasTriggered]);
   
   // Animate practice test scores - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.practice?.tests || !practiceTestObserver.isIntersecting) return;
+    if (!performanceData.practice?.tests) return;
+    
+    const shouldAnimate = practiceTestObserver.isIntersecting || 
+                         (!practiceTestObserver.hasTriggered && performanceData.practice?.tests);
+    
+    if (!shouldAnimate) return;
     
     const selectedTest = performanceData.practice.tests.find(t => t.testNumber === selectedPracticeTest);
     if (!selectedTest || selectedTest.status !== 'completed') return;
@@ -523,11 +535,16 @@ const PerformanceDashboard = () => {
     }, stepDuration);
     
     return () => clearInterval(timer);
-  }, [performanceData.practice, selectedPracticeTest, practiceTestObserver.isIntersecting]);
+  }, [performanceData.practice, selectedPracticeTest, practiceTestObserver.isIntersecting, practiceTestObserver.hasTriggered]);
 
   // Animate top and bottom skills - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.diagnostic?.allSubSkills || !topBottomSkillsObserver.isIntersecting) return;
+    if (!performanceData.diagnostic?.allSubSkills) return;
+    
+    const shouldAnimate = topBottomSkillsObserver.isIntersecting || 
+                         (!topBottomSkillsObserver.hasTriggered && performanceData.diagnostic?.allSubSkills);
+    
+    if (!shouldAnimate) return;
     
     const allSubSkills = performanceData.diagnostic.allSubSkills;
     const topSkills = topBottomView === 'score' 
@@ -590,7 +607,7 @@ const PerformanceDashboard = () => {
     
     setAnimatedTopSkillScores(newTopScores);
     setAnimatedBottomSkillScores(newBottomScores);
-  }, [performanceData.diagnostic, topBottomView, topBottomSkillsObserver.isIntersecting]);
+  }, [performanceData.diagnostic, topBottomView, topBottomSkillsObserver.isIntersecting, topBottomSkillsObserver.hasTriggered]);
 
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
