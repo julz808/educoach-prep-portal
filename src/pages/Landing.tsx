@@ -95,6 +95,7 @@ const Landing = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0); // Start with first slide
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [logoCarouselIndex, setLogoCarouselIndex] = useState(0);
 
   // Handle carousel navigation with smooth infinite scroll
   const handleSlideChange = (direction: 'next' | 'prev' | number) => {
@@ -158,6 +159,8 @@ const Landing = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // School logos continuous rotation - removed for CSS animation approach
+
   // Initialize Lenis smooth scrolling
   useEffect(() => {
     const lenis = new Lenis({
@@ -180,6 +183,30 @@ const Landing = () => {
     };
   }, []);
 
+  // School logos array - you can replace these with actual logo paths
+  const schoolLogos = [
+    { name: "Melbourne Grammar", logo: "/images/schools/melbourne-grammar.png" },
+    { name: "Scotch College", logo: "/images/schools/scotch-college.png" },
+    { name: "Xavier College", logo: "/images/schools/xavier-college.png" },
+    { name: "Trinity Grammar", logo: "/images/schools/trinity-grammar.png" },
+    { name: "Carey Baptist Grammar", logo: "/images/schools/carey-baptist.png" },
+    { name: "Camberwell Grammar", logo: "/images/schools/camberwell-grammar.png" },
+    { name: "Ivanhoe Grammar", logo: "/images/schools/ivanhoe-grammar.png" },
+    { name: "Mentone Grammar", logo: "/images/schools/mentone-grammar.png" },
+    { name: "Sydney Grammar", logo: "/images/schools/sydney-grammar.png" },
+    { name: "Knox Grammar", logo: "/images/schools/knox-grammar.png" },
+    { name: "Cranbrook School", logo: "/images/schools/cranbrook.png" },
+    { name: "Barker College", logo: "/images/schools/barker-college.png" },
+    { name: "SHORE School", logo: "/images/schools/shore.png" },
+    { name: "St Ignatius College", logo: "/images/schools/st-ignatius.png" },
+    { name: "The King's School", logo: "/images/schools/kings-school.png" },
+    { name: "Newington College", logo: "/images/schools/newington.png" },
+    { name: "St Joseph's College", logo: "/images/schools/st-josephs.png" },
+    { name: "Redlands", logo: "/images/schools/redlands.png" },
+    { name: "PLC Sydney", logo: "/images/schools/plc-sydney.png" },
+    { name: "MLC School", logo: "/images/schools/mlc.png" }
+  ];
+
   const testimonials = [
     {
       quote: "The sub-skill analytics were a game-changer. We could see exactly where Sarah needed improvement and track her progress week by week. She went from 60th percentile to 90th percentile in just 8 weeks.",
@@ -197,6 +224,36 @@ const Landing = () => {
       quote: "Worth every dollar. The diagnostic test revealed gaps we didn't even know existed. The targeted drilling really works.",
       name: "Sarah L.",
       details: "Parent of Year 7 student",
+      stars: 5
+    },
+    {
+      quote: "The writing feedback was incredibly detailed. Emma improved her narrative writing score by 40% after following the specific suggestions. She's now confident for her selective entry test.",
+      name: "James M.",
+      details: "Parent of Year 5 student",
+      stars: 5
+    },
+    {
+      quote: "I love how the platform tracks progress in real-time. We could see Alex's numeracy improving week by week. He went from struggling with basic concepts to scoring in the top 10%.",
+      name: "Lisa T.",
+      details: "Parent of Year 8 student",
+      stars: 5
+    },
+    {
+      quote: "The diagnostic test was eye-opening. We thought our daughter was ready, but it showed specific areas that needed work. Three months later, she aced her scholarship exam.",
+      name: "Robert C.",
+      details: "Parent of Year 6 student",
+      stars: 5
+    },
+    {
+      quote: "Best investment we made for our son's education. The practice tests perfectly simulated the real exam conditions. He felt completely prepared on test day.",
+      name: "Amanda H.",
+      details: "Parent of Year 7 student",
+      stars: 5
+    },
+    {
+      quote: "The instant feedback feature is brilliant. Instead of waiting for results, our child could learn from mistakes immediately. Her reading comprehension scores improved dramatically.",
+      name: "Michael D.",
+      details: "Parent of Year 9 student",
       stars: 5
     }
   ];
@@ -416,46 +473,49 @@ const Landing = () => {
             </motion.div>
 
             {/* Hero Images - Overlapping Screenshots */}
-            <div className="relative h-96">
+            <div className="relative h-[500px]">
               {/* Background Screenshot */}
               <motion.div 
-                className="absolute top-0 right-0 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
+                className="absolute top-0 right-0 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
                 initial={{ opacity: 0, y: 50, rotate: 10 }}
                 animate={{ opacity: 1, y: 0, rotate: 3 }}
                 transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
               >
                 <img 
-                  src="/images/overall-dashboard-view.png" 
+                  src="/images/dashboard view 2.png" 
                   alt="EduCourse Dashboard" 
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-contain"
+                  loading="eager"
                 />
               </motion.div>
               
               {/* Middle Screenshot */}
               <motion.div 
-                className="absolute top-16 left-8 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
+                className="absolute top-16 left-8 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
                 initial={{ opacity: 0, y: 50, rotate: -10 }}
                 animate={{ opacity: 1, y: 0, rotate: -2 }}
                 transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
               >
                 <img 
-                  src="/images/mathematics-test-taking.png" 
-                  alt="Practice Test Interface" 
-                  className="w-full h-full object-cover rounded-lg"
+                  src="/images/reading simulation 2.png" 
+                  alt="Reading Simulation" 
+                  className="w-full h-full object-contain"
+                  loading="eager"
                 />
               </motion.div>
               
               {/* Front Screenshot - Adjusted position */}
               <motion.div 
-                className="absolute top-48 right-12 w-80 h-52 bg-white rounded-xl shadow-2xl p-3 transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
+                className="absolute top-48 right-12 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
                 initial={{ opacity: 0, y: 50, rotate: 8 }}
                 animate={{ opacity: 1, y: 0, rotate: 1 }}
                 transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
               >
                 <img 
-                  src="/images/diagnostic-insights-1.png" 
+                  src="/images/insights 5.png" 
                   alt="Performance Analytics" 
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-contain"
+                  loading="eager"
                 />
               </motion.div>
             </div>
@@ -789,23 +849,26 @@ const Landing = () => {
                     >
                       {index === 0 && (
                         <img 
-                          src="/images/diagnostic-home-view.png" 
+                          src="/images/diagnostic home 3.png" 
                           alt="Diagnostic Assessment Dashboard" 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain bg-gray-50"
+                          loading="eager"
                         />
                       )}
                       {index === 1 && (
                         <img 
-                          src="/images/detailed-solutions.png" 
+                          src="/images/writing feedback 3.png" 
                           alt="Skill Drills Interface" 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain bg-gray-50"
+                          loading="eager"
                         />
                       )}
                       {index === 2 && (
                         <img 
-                          src="/images/writing-assessment-pic-1.png" 
-                          alt="Writing Assessment Results" 
-                          className="w-full h-full object-cover"
+                          src="/images/test taking maths 2.png" 
+                          alt="Practice Test Interface" 
+                          className="w-full h-full object-contain bg-gray-50"
+                          loading="eager"
                         />
                       )}
                     </motion.div>
@@ -836,31 +899,58 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="text-center space-y-4 scroll-animate group"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto text-white group-hover:scale-110 transition-transform">
-                  {feature.icon}
+          {/* Platform Demo Layout */}
+          <div className="grid lg:grid-cols-3 gap-8 items-center">
+            {/* Left side - 3 Key Features */}
+            <div className="lg:col-span-1 space-y-8">
+              <div className="space-y-6">
+                {/* Progress Tracking */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Progress Tracking</h3>
+                    <p className="text-[#6B7280] leading-relaxed">Visual dashboards showing improvement over time with actionable insights</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-[#2C3E50]">{feature.title}</h3>
-                <p className="text-[#6B7280]">{feature.description}</p>
-              </div>
-            ))}
-          </div>
 
-          {/* Platform Screenshot */}
-          <div className="scroll-animate">
-            <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-8 transform hover:scale-105 hover:rotate-1 transition-all duration-500">
-              <div className="bg-white rounded-xl shadow-2xl aspect-video overflow-hidden">
-                <img 
-                  src="/images/diagnostic-insights-2.png" 
-                  alt="Platform Analytics Dashboard" 
-                  className="w-full h-full object-cover"
-                />
+                {/* Sub-Skill Analytics */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Sub-Skill Analytics</h3>
+                    <p className="text-[#6B7280] leading-relaxed">Performance tracking beyond test sections - see progress in specific question types</p>
+                  </div>
+                </div>
+
+                {/* Instant Feedback */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Instant Feedback</h3>
+                    <p className="text-[#6B7280] leading-relaxed">Detailed explanations for every question with improvement suggestions</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - GIF Demo (2/3 space) */}
+            <div className="lg:col-span-2 scroll-animate">
+              <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-6">
+                <div className="bg-white rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
+                  <img 
+                    src="/images/CleanShot 2025-07-28 at 19.48.04.gif" 
+                    alt="Platform Analytics Demo"
+                    className="max-w-full max-h-full"
+                    loading="eager"
+                    style={{ imageRendering: 'crisp-edges' }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -875,16 +965,42 @@ const Landing = () => {
               Trusted by Students Entering Australia's Top Schools
             </h2>
           </div>
-          {/* School logos carousel - to be implemented later */}
-          <div className="flex justify-center items-center space-x-8 overflow-hidden">
-            {[...Array(8)].map((_, index) => (
-              <div 
-                key={index}
-                className="w-[120px] h-[60px] bg-gray-200 rounded-lg flex items-center justify-center"
-              >
-                <span className="text-gray-400 text-xs">School Logo</span>
-              </div>
-            ))}
+          {/* School logos continuous scrolling carousel */}
+          <div className="relative overflow-hidden">
+            <motion.div 
+              className="flex items-center space-x-8"
+              animate={{ 
+                x: [0, -schoolLogos.length * 160]
+              }}
+              transition={{ 
+                duration: 70, // 70 seconds for full cycle (slower)
+                ease: "linear",
+                repeat: Infinity
+              }}
+            >
+              {/* Render logos twice for seamless infinite scroll */}
+              {[...schoolLogos, ...schoolLogos].map((school, index) => (
+                <div 
+                  key={`${school.name}-${index}`}
+                  className="flex-shrink-0 w-[120px] h-[60px] bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center p-3 hover:shadow-md transition-shadow"
+                >
+                  <img 
+                    src={school.logo} 
+                    alt={`${school.name} logo`}
+                    className="max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                    onError={(e) => {
+                      // Fallback to text if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<span class="text-gray-600 text-xs font-medium text-center">${school.name}</span>`;
+                      }
+                    }}
+                  />
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
