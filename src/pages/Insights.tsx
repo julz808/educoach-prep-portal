@@ -235,9 +235,7 @@ const PerformanceDashboard = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   // Intersection observer hooks for viewport-triggered animations
-  const overallStatsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const sectionScoresObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
-  const practiceTestObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const spiderChartObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const topBottomSkillsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
 
@@ -372,42 +370,17 @@ const PerformanceDashboard = () => {
     loadTabData(activeTab);
   }, [activeTab, user, selectedProduct]);
   
-  // Counting animation for overall score and accuracy - triggered on viewport entry or data load
+  // Set static values for overall score and accuracy (no animation for headline cards)
   useEffect(() => {
     if (!performanceData.diagnostic) return;
     
     const targetScore = performanceData.diagnostic?.overallScore || 0;
     const targetAccuracy = performanceData.diagnostic?.overallAccuracy || 0;
     
-    // Only animate if intersection observer is working OR as fallback after data loads
-    const shouldAnimate = overallStatsObserver.isIntersecting || 
-                         (!overallStatsObserver.hasTriggered && performanceData.diagnostic);
-    
-    if (!shouldAnimate) return;
-    
-    // Reset and animate
-    setAnimatedOverallScore(0);
-    setAnimatedOverallAccuracy(0);
-    
-    const duration = 1500; // 1.5 seconds
-    const steps = 30;
-    const stepDuration = duration / steps;
-    
-    let currentStep = 0;
-    const timer = setInterval(() => {
-      currentStep++;
-      const progress = currentStep / steps;
-      
-      setAnimatedOverallScore(Math.round(targetScore * progress));
-      setAnimatedOverallAccuracy(Math.round(targetAccuracy * progress));
-      
-      if (currentStep >= steps) {
-        clearInterval(timer);
-      }
-    }, stepDuration);
-    
-    return () => clearInterval(timer);
-  }, [performanceData.diagnostic, overallStatsObserver.isIntersecting, overallStatsObserver.hasTriggered]);
+    // Set values directly without animation for headline cards
+    setAnimatedOverallScore(targetScore);
+    setAnimatedOverallAccuracy(targetAccuracy);
+  }, [performanceData.diagnostic]);
   
   // Trigger spider chart animation on viewport entry and view toggle
   useEffect(() => {
@@ -498,14 +471,9 @@ const PerformanceDashboard = () => {
     setAnimatedSubSkillScores(newScores);
   }, [performanceData.diagnostic, subSkillView, sectionScoresObserver.isIntersecting, sectionScoresObserver.hasTriggered]);
   
-  // Animate practice test scores - triggered on viewport entry
+  // Set static values for practice test scores (no animation for headline cards)
   useEffect(() => {
     if (!performanceData.practice?.tests) return;
-    
-    const shouldAnimate = practiceTestObserver.isIntersecting || 
-                         (!practiceTestObserver.hasTriggered && performanceData.practice?.tests);
-    
-    if (!shouldAnimate) return;
     
     const selectedTest = performanceData.practice.tests.find(t => t.testNumber === selectedPracticeTest);
     if (!selectedTest || selectedTest.status !== 'completed') return;
@@ -513,29 +481,10 @@ const PerformanceDashboard = () => {
     const targetScore = selectedTest.score || 0;
     const targetAccuracy = selectedTest.overallAccuracy || 0;
     
-    // Reset and animate
-    setAnimatedPracticeScore(0);
-    setAnimatedPracticeAccuracy(0);
-    
-    const duration = 1500; // 1.5 seconds
-    const steps = 30;
-    const stepDuration = duration / steps;
-    
-    let currentStep = 0;
-    const timer = setInterval(() => {
-      currentStep++;
-      const progress = currentStep / steps;
-      
-      setAnimatedPracticeScore(Math.round(targetScore * progress));
-      setAnimatedPracticeAccuracy(Math.round(targetAccuracy * progress));
-      
-      if (currentStep >= steps) {
-        clearInterval(timer);
-      }
-    }, stepDuration);
-    
-    return () => clearInterval(timer);
-  }, [performanceData.practice, selectedPracticeTest, practiceTestObserver.isIntersecting, practiceTestObserver.hasTriggered]);
+    // Set values directly without animation for headline cards
+    setAnimatedPracticeScore(targetScore);
+    setAnimatedPracticeAccuracy(targetAccuracy);
+  }, [performanceData.practice, selectedPracticeTest]);
 
   // Animate top and bottom skills - triggered on viewport entry
   useEffect(() => {
@@ -763,7 +712,7 @@ const PerformanceDashboard = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Summary Cards - Mobile-optimized responsive grid */}
-                  <div ref={overallStatsObserver.ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {/* Overall Score */}
                     <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                       <div className="text-center">
@@ -1520,7 +1469,7 @@ const PerformanceDashboard = () => {
                 return (
                   <div className="space-y-8">
                     {/* Overall Performance Cards - Mobile-optimized responsive grid */}
-                    <div ref={practiceTestObserver.ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                       {/* Overall Score */}
                       <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                         <div className="text-center">
