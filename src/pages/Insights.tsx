@@ -16,6 +16,7 @@ import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/da
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import Lenis from 'lenis';
 
 // Map frontend product IDs to curriculum product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
@@ -227,15 +228,40 @@ const PerformanceDashboard = () => {
   const [animatedSubSkillScores, setAnimatedSubSkillScores] = useState<Record<string, number>>({});
   const [animatedPracticeScore, setAnimatedPracticeScore] = useState(0);
   const [animatedPracticeAccuracy, setAnimatedPracticeAccuracy] = useState(0);
+  const [animatedTopSkillScores, setAnimatedTopSkillScores] = useState<Record<string, number>>({});
+  const [animatedBottomSkillScores, setAnimatedBottomSkillScores] = useState<Record<string, number>>({});
   
   // User profile state
   const [userProfile, setUserProfile] = useState<any>(null);
 
   // Intersection observer hooks for viewport-triggered animations
-  const overallStatsObserver = useIntersectionObserver({ threshold: 0.3 });
-  const sectionScoresObserver = useIntersectionObserver({ threshold: 0.3 });
-  const practiceTestObserver = useIntersectionObserver({ threshold: 0.3 });
-  const spiderChartObserver = useIntersectionObserver({ threshold: 0.3 });
+  const overallStatsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
+  const sectionScoresObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
+  const practiceTestObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
+  const spiderChartObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
+  const topBottomSkillsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
+
+  // Initialize Lenis smooth scrolling
+  useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.1,
+      wheelMultiplier: 0.8,
+      gestureOrientation: 'vertical',
+      normalizeWheel: false,
+      smoothTouch: false
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   // Load essential data first (user profile and overall performance)
   useEffect(() => {
@@ -348,10 +374,19 @@ const PerformanceDashboard = () => {
   
   // Counting animation for overall score and accuracy - triggered on viewport entry
   useEffect(() => {
-    if (!overallStatsObserver.isIntersecting || !performanceData.diagnostic) return;
+    // Check if we have the data and the element is intersecting
+    if (!performanceData.diagnostic?.overallScore && !performanceData.diagnostic?.overallAccuracy) return;
+    if (!overallStatsObserver.isIntersecting) return;
     
     const targetScore = performanceData.diagnostic?.overallScore || 0;
     const targetAccuracy = performanceData.diagnostic?.overallAccuracy || 0;
+    
+    // Skip animation if both values are 0
+    if (targetScore === 0 && targetAccuracy === 0) {
+      setAnimatedOverallScore(0);
+      setAnimatedOverallAccuracy(0);
+      return;
+    }
     
     // Reset and animate
     setAnimatedOverallScore(0);
@@ -388,7 +423,7 @@ const PerformanceDashboard = () => {
   
   // Animate section scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!sectionScoresObserver.isIntersecting || !performanceData.diagnostic?.sectionBreakdown) return;
+    if (!performanceData.diagnostic?.sectionBreakdown || !sectionScoresObserver.isIntersecting) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -422,7 +457,7 @@ const PerformanceDashboard = () => {
   
   // Animate sub-skill scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!sectionScoresObserver.isIntersecting || !performanceData.diagnostic?.allSubSkills) return;
+    if (!performanceData.diagnostic?.allSubSkills || !sectionScoresObserver.isIntersecting) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -458,7 +493,7 @@ const PerformanceDashboard = () => {
   
   // Animate practice test scores - triggered on viewport entry
   useEffect(() => {
-    if (!practiceTestObserver.isIntersecting || !performanceData.practice?.tests) return;
+    if (!performanceData.practice?.tests || !practiceTestObserver.isIntersecting) return;
     
     const selectedTest = performanceData.practice.tests.find(t => t.testNumber === selectedPracticeTest);
     if (!selectedTest || selectedTest.status !== 'completed') return;
@@ -489,6 +524,73 @@ const PerformanceDashboard = () => {
     
     return () => clearInterval(timer);
   }, [performanceData.practice, selectedPracticeTest, practiceTestObserver.isIntersecting]);
+
+  // Animate top and bottom skills - triggered on viewport entry
+  useEffect(() => {
+    if (!performanceData.diagnostic?.allSubSkills || !topBottomSkillsObserver.isIntersecting) return;
+    
+    const allSubSkills = performanceData.diagnostic.allSubSkills;
+    const topSkills = topBottomView === 'score' 
+      ? [...allSubSkills].sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 5)
+      : [...allSubSkills].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0)).slice(0, 5);
+    
+    const bottomSkills = topBottomView === 'score' 
+      ? [...allSubSkills].sort((a, b) => (a.score || 0) - (b.score || 0)).slice(0, 5)
+      : [...allSubSkills].sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0)).slice(0, 5);
+
+    const newTopScores: Record<string, number> = {};
+    const newBottomScores: Record<string, number> = {};
+    const duration = 1200;
+    const steps = 24;
+    const stepDuration = duration / steps;
+    
+    // Animate top skills
+    topSkills.forEach((skill, index) => {
+      const targetValue = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
+      const delay = index * 120;
+      
+      newTopScores[skill.subSkill] = 0;
+      
+      setTimeout(() => {
+        let currentStep = 0;
+        const timer = setInterval(() => {
+          currentStep++;
+          const progress = currentStep / steps;
+          newTopScores[skill.subSkill] = Math.round(targetValue * progress);
+          setAnimatedTopSkillScores({...newTopScores});
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+          }
+        }, stepDuration);
+      }, delay);
+    });
+
+    // Animate bottom skills
+    bottomSkills.forEach((skill, index) => {
+      const targetValue = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
+      const delay = index * 120;
+      
+      newBottomScores[skill.subSkill] = 0;
+      
+      setTimeout(() => {
+        let currentStep = 0;
+        const timer = setInterval(() => {
+          currentStep++;
+          const progress = currentStep / steps;
+          newBottomScores[skill.subSkill] = Math.round(targetValue * progress);
+          setAnimatedBottomSkillScores({...newBottomScores});
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+          }
+        }, stepDuration);
+      }, delay);
+    });
+    
+    setAnimatedTopSkillScores(newTopScores);
+    setAnimatedBottomSkillScores(newBottomScores);
+  }, [performanceData.diagnostic, topBottomView, topBottomSkillsObserver.isIntersecting]);
 
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
@@ -577,7 +679,7 @@ const PerformanceDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white scroll-smooth">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -865,7 +967,7 @@ const PerformanceDashboard = () => {
                   {/* Sub-Skill Overview */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Top 5 Strengths */}
-                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div ref={topBottomSkillsObserver.ref} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-200">
                         <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 xs:gap-0">
                           <h3 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
@@ -926,12 +1028,16 @@ const PerformanceDashboard = () => {
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-lg font-semibold text-green-600">
-                                  {Math.round(topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%
+                                  {animatedTopSkillScores[item.subSkill] !== undefined ? animatedTopSkillScores[item.subSkill] : (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%
                                 </div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
-                                    className="h-full rounded-full bg-green-500"
-                                    style={{ width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%` }}
+                                    key={`${item.subSkill}-${topBottomView}`}
+                                    className="h-full rounded-full bg-green-500 growToRight"
+                                    style={{ 
+                                      width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%`,
+                                      animationDelay: `${index * 150}ms`
+                                    }}
                                   />
                                 </div>
                               </div>
@@ -1011,13 +1117,17 @@ const PerformanceDashboard = () => {
                               <div className="flex items-center gap-3">
                                 <div className={`text-lg font-semibold ${
                                   (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'text-orange-600' : 'text-red-600'
-                                }`}>{Math.round(topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%</div>
+                                }`}>{animatedBottomSkillScores[item.subSkill] !== undefined ? animatedBottomSkillScores[item.subSkill] : (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%</div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                                   <div 
-                                    className={`h-full rounded-full ${
+                                    key={`${item.subSkill}-${topBottomView}`}
+                                    className={`h-full rounded-full growToRight ${
                                       (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'bg-orange-500' : 'bg-red-500'
                                     }`}
-                                    style={{ width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%` }}
+                                    style={{ 
+                                      width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%`,
+                                      animationDelay: `${index * 150}ms`
+                                    }}
                                   />
                                 </div>
                               </div>
