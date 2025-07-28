@@ -15,6 +15,7 @@ import {
 import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 // Map frontend product IDs to curriculum product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
@@ -230,6 +231,12 @@ const PerformanceDashboard = () => {
   // User profile state
   const [userProfile, setUserProfile] = useState<any>(null);
 
+  // Intersection observer hooks for viewport-triggered animations
+  const overallStatsObserver = useIntersectionObserver({ threshold: 0.3 });
+  const sectionScoresObserver = useIntersectionObserver({ threshold: 0.3 });
+  const practiceTestObserver = useIntersectionObserver({ threshold: 0.3 });
+  const spiderChartObserver = useIntersectionObserver({ threshold: 0.3 });
+
   // Load essential data first (user profile and overall performance)
   useEffect(() => {
     const loadEssentialData = async () => {
@@ -339,8 +346,10 @@ const PerformanceDashboard = () => {
     loadTabData(activeTab);
   }, [activeTab, user, selectedProduct]);
   
-  // Counting animation for overall score and accuracy
+  // Counting animation for overall score and accuracy - triggered on viewport entry
   useEffect(() => {
+    if (!overallStatsObserver.isIntersecting || !performanceData.diagnostic) return;
+    
     const targetScore = performanceData.diagnostic?.overallScore || 0;
     const targetAccuracy = performanceData.diagnostic?.overallAccuracy || 0;
     
@@ -366,18 +375,20 @@ const PerformanceDashboard = () => {
     }, stepDuration);
     
     return () => clearInterval(timer);
-  }, [performanceData.diagnostic]);
+  }, [performanceData.diagnostic, overallStatsObserver.isIntersecting]);
   
-  // Trigger spider chart animation on view toggle
+  // Trigger spider chart animation on viewport entry and view toggle
   useEffect(() => {
+    if (!spiderChartObserver.isIntersecting) return;
+    
     setAnimateSpiderChart(false);
     const timer = setTimeout(() => setAnimateSpiderChart(true), 50);
     return () => clearTimeout(timer);
-  }, [sectionView]);
+  }, [sectionView, spiderChartObserver.isIntersecting]);
   
-  // Animate section scores when view changes or data loads
+  // Animate section scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.diagnostic?.sectionBreakdown) return;
+    if (!sectionScoresObserver.isIntersecting || !performanceData.diagnostic?.sectionBreakdown) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -407,11 +418,11 @@ const PerformanceDashboard = () => {
     });
     
     setAnimatedSectionScores(newScores);
-  }, [performanceData.diagnostic, sectionView]);
+  }, [performanceData.diagnostic, sectionView, sectionScoresObserver.isIntersecting]);
   
-  // Animate sub-skill scores when view changes or data loads
+  // Animate sub-skill scores when view changes or data loads - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.diagnostic?.allSubSkills) return;
+    if (!sectionScoresObserver.isIntersecting || !performanceData.diagnostic?.allSubSkills) return;
     
     const newScores: Record<string, number> = {};
     const duration = 1200; // Match the growToRight animation duration
@@ -443,11 +454,11 @@ const PerformanceDashboard = () => {
     });
     
     setAnimatedSubSkillScores(newScores);
-  }, [performanceData.diagnostic, subSkillView]);
+  }, [performanceData.diagnostic, subSkillView, sectionScoresObserver.isIntersecting]);
   
-  // Animate practice test scores
+  // Animate practice test scores - triggered on viewport entry
   useEffect(() => {
-    if (!performanceData.practice?.tests) return;
+    if (!practiceTestObserver.isIntersecting || !performanceData.practice?.tests) return;
     
     const selectedTest = performanceData.practice.tests.find(t => t.testNumber === selectedPracticeTest);
     if (!selectedTest || selectedTest.status !== 'completed') return;
@@ -477,7 +488,7 @@ const PerformanceDashboard = () => {
     }, stepDuration);
     
     return () => clearInterval(timer);
-  }, [performanceData.practice, selectedPracticeTest]);
+  }, [performanceData.practice, selectedPracticeTest, practiceTestObserver.isIntersecting]);
 
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
@@ -566,7 +577,7 @@ const PerformanceDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white scroll-smooth">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -633,7 +644,7 @@ const PerformanceDashboard = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Summary Cards - Mobile-optimized responsive grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                  <div ref={overallStatsObserver.ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {/* Overall Score */}
                     <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                       <div className="text-center">
@@ -730,7 +741,7 @@ const PerformanceDashboard = () => {
                   </div>
 
                   {/* Section Results */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div ref={sectionScoresObserver.ref} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-slate-900">Section Results</h3>
                       <div className="flex items-center gap-2">
@@ -777,7 +788,7 @@ const PerformanceDashboard = () => {
                     
                     <div className="flex flex-col lg:flex-row">
                       {/* Spider Chart - Top on mobile, Left on desktop */}
-                      <div className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
+                      <div ref={spiderChartObserver.ref} className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
                         <SpiderChart 
                           data={performanceData.diagnostic.sectionBreakdown.map(section => ({
                             label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
@@ -852,7 +863,7 @@ const PerformanceDashboard = () => {
                   </div>
 
                   {/* Sub-Skill Overview */}
-                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Top 5 Strengths */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-200">
@@ -1382,7 +1393,7 @@ const PerformanceDashboard = () => {
                 return (
                   <div className="space-y-8">
                     {/* Overall Performance Cards - Mobile-optimized responsive grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                    <div ref={practiceTestObserver.ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                       {/* Overall Score */}
                       <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 md:p-6 shadow-sm relative group">
                         <div className="text-center">

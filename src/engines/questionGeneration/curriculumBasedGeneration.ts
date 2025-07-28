@@ -358,7 +358,36 @@ export class CurriculumBasedGenerator {
       
       // Call Claude API
       const response = await callClaudeAPIWithRetry(questionPrompt);
-      const parsedResponse = parseClaudeResponse(response);
+      let parsedResponse = parseClaudeResponse(response);
+      
+      // Two-stage validation: hallucinations + answer verification
+      const { validateAndRegenerateIfNeeded } = await import('./questionValidator');
+      const regenerationFunction = async () => {
+        const retryResponse = await callClaudeAPIWithRetry(questionPrompt);
+        return parseClaudeResponse(retryResponse);
+      };
+      
+      const validationResult = await validateAndRegenerateIfNeeded(
+        parsedResponse,
+        regenerationFunction,
+        3 // max retries
+      );
+      
+      parsedResponse = validationResult.questionData;
+      
+      if (validationResult.wasRegenerated) {
+        console.log(`   🔄 Question regenerated ${validationResult.attempts - 1} times`);
+        
+        const validation = validationResult.finalValidation;
+        if (validation.hasHallucinations) {
+          console.log(`     - Hallucinations detected: ${validation.hallucinationIndicators.join(', ')}`);
+        }
+        if (!validation.answerIsCorrect && validation.answerValidationDetails) {
+          console.log(`     - Answer verification failed: Expected ${validation.answerValidationDetails.originalAnswer}, got ${validation.answerValidationDetails.independentAnswer}`);
+        }
+      } else {
+        console.log(`   ✅ Question passed validation on first attempt`);
+      }
       
       // Store question with passageId (all questions now have passages in database)
       await storeQuestion(

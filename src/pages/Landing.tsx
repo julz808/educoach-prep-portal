@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { courses } from '@/data/courses';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import Lenis from 'lenis';
 import { 
@@ -96,12 +96,21 @@ const Landing = () => {
   const [currentSlide, setCurrentSlide] = useState(0); // Start with first slide
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Handle carousel navigation with animation
-  const handleSlideChange = (newSlide: number) => {
+  // Handle carousel navigation with smooth infinite scroll
+  const handleSlideChange = (direction: 'next' | 'prev' | number) => {
     if (isTransitioning) return;
+    
     setIsTransitioning(true);
-    setCurrentSlide(newSlide);
-    setTimeout(() => setIsTransitioning(false), 500);
+    
+    if (direction === 'next') {
+      setCurrentSlide((prev) => (prev + 1) % courses.length);
+    } else if (direction === 'prev') {
+      setCurrentSlide((prev) => (prev - 1 + courses.length) % courses.length);
+    } else {
+      setCurrentSlide(direction);
+    }
+    
+    setTimeout(() => setIsTransitioning(false), 600);
   };
 
   // Redirect to dashboard if already logged in
@@ -230,7 +239,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-44"
+                className="h-48"
               />
             </Link>
 
@@ -349,7 +358,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  We're here to help you <span className="text-[#FF6B6B] underline">ace</span> your next test!
+                  We're here to help you <span className="text-[#4ECDC4] underline">ace</span> your next test!
                 </motion.h1>
                 <motion.p 
                   className="text-xl text-[#4B5563] leading-relaxed max-w-lg"
@@ -357,7 +366,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
-                  Australia's best test prep platform for <span className="font-bold text-[#FF6B6B]">scholarship</span>, <span className="font-bold text-[#FF6B6B]">selective entry</span> and <span className="font-bold text-[#FF6B6B]">NAPLAN</span> tests.
+                  Australia's best test prep platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
                 </motion.p>
               </div>
 
@@ -415,12 +424,11 @@ const Landing = () => {
                 animate={{ opacity: 1, y: 0, rotate: 3 }}
                 transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
               >
-                <div className="w-full h-full bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-lg flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <Target className="h-8 w-8 mx-auto mb-1" />
-                    <p className="text-xs font-semibold">Diagnostic Dashboard</p>
-                  </div>
-                </div>
+                <img 
+                  src="/images/overall-dashboard-view.png" 
+                  alt="EduCourse Dashboard" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
               </motion.div>
               
               {/* Middle Screenshot */}
@@ -430,12 +438,11 @@ const Landing = () => {
                 animate={{ opacity: 1, y: 0, rotate: -2 }}
                 transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
               >
-                <div className="w-full h-full bg-gradient-to-br from-[#6366F1] to-[#FF6B6B] rounded-lg flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <BookOpen className="h-8 w-8 mx-auto mb-1" />
-                    <p className="text-xs font-semibold">Practice Test Interface</p>
-                  </div>
-                </div>
+                <img 
+                  src="/images/mathematics-test-taking.png" 
+                  alt="Practice Test Interface" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
               </motion.div>
               
               {/* Front Screenshot - Adjusted position */}
@@ -445,12 +452,11 @@ const Landing = () => {
                 animate={{ opacity: 1, y: 0, rotate: 1 }}
                 transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
               >
-                <div className="w-full h-full bg-gradient-to-br from-[#FF6B6B] to-[#4ECDC4] rounded-lg flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <BarChart3 className="h-8 w-8 mx-auto mb-1" />
-                    <p className="text-xs font-semibold">Performance Analytics</p>
-                  </div>
-                </div>
+                <img 
+                  src="/images/diagnostic-insights-1.png" 
+                  alt="Performance Analytics" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
               </motion.div>
             </div>
           </div>
@@ -476,14 +482,11 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Sliding Netflix-style Carousel */}
+          {/* Infinite Netflix-style Carousel */}
           <div className="relative max-w-7xl mx-auto">
             {/* Left Arrow */}
             <button
-              onClick={() => {
-                const newSlide = (currentSlide - 1 + courses.length) % courses.length;
-                handleSlideChange(newSlide);
-              }}
+              onClick={() => handleSlideChange('prev')}
               disabled={isTransitioning}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
             >
@@ -492,10 +495,7 @@ const Landing = () => {
 
             {/* Right Arrow */}
             <button
-              onClick={() => {
-                const newSlide = (currentSlide + 1) % courses.length;
-                handleSlideChange(newSlide);
-              }}
+              onClick={() => handleSlideChange('next')}
               disabled={isTransitioning}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
             >
@@ -504,42 +504,40 @@ const Landing = () => {
 
             {/* Carousel Track */}
             <div className="overflow-hidden px-20 py-8">
-              <div 
-                className="flex transition-transform duration-500 ease-out"
-                style={{
-                  transform: `translateX(-${currentSlide * 400}px)`,
-                  width: `${courses.length * 400}px`,
-                  marginLeft: `${courses.length * 200 - 200}px` // Center the first item
-                }}
-              >
-                {/* Render all cards in sequence */}
-                {courses.map((course, index) => {
-                  const distanceFromCenter = Math.abs(index - currentSlide);
-                  const isCenter = index === currentSlide;
-                  const isVisible = distanceFromCenter <= 1;
-                  
-                  return (
-                    <motion.div
-                      key={course.id}
-                      className={`flex-shrink-0 px-2 transition-all duration-500 ease-out ${
-                        isCenter 
-                          ? 'w-96 scale-105 z-20' 
-                          : 'w-80 scale-90 opacity-60'
-                      }`}
-                      initial={{ opacity: 0, y: 60 }}
-                      animate={{ 
-                        opacity: isVisible ? (isCenter ? 1 : 0.6) : 0.3,
-                        y: 0,
-                        scale: isCenter ? 1.05 : 0.9
-                      }}
-                      transition={{ 
-                        duration: 0.5,
-                        delay: 0,
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 20
-                      }}
-                    >
+              <div className="relative h-[450px] flex items-center justify-center">
+                {/* Show 3 cards: previous, current, next */}
+                <AnimatePresence mode="popLayout">
+                  {[-1, 0, 1].map((offset) => {
+                    const slideIndex = (currentSlide + offset + courses.length) % courses.length;
+                    const course = courses[slideIndex];
+                    const isCenter = offset === 0;
+                    
+                    return (
+                      <motion.div
+                        key={`${slideIndex}-${currentSlide}-${offset}`}
+                        className="absolute w-96"
+                        initial={{ 
+                          x: offset * 420,
+                          scale: isCenter ? 1.1 : 0.9,
+                          opacity: isCenter ? 1 : 0.7
+                        }}
+                        animate={{
+                          x: offset * 420,
+                          scale: isCenter ? 1.1 : 0.9,
+                          opacity: isCenter ? 1 : 0.7,
+                          zIndex: isCenter ? 20 : 10
+                        }}
+                        exit={{
+                          x: offset * 420,
+                          scale: 0.8,
+                          opacity: 0
+                        }}
+                        transition={{
+                          x: { type: "spring", stiffness: 300, damping: 30 },
+                          scale: { duration: 0.3 },
+                          opacity: { duration: 0.3 }
+                        }}
+                      >
                       <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
                         isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
                       }`}>
@@ -593,9 +591,10 @@ const Landing = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  );
-                })}
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
             </div>
             
@@ -775,7 +774,7 @@ const Landing = () => {
                   viewport={{ once: true }}
                 >
                   <motion.div 
-                    className="bg-white rounded-3xl shadow-2xl p-8 group"
+                    className="bg-white rounded-3xl shadow-2xl overflow-hidden group"
                     whileHover={{ 
                       scale: 1.05, 
                       rotate: index % 2 === 0 ? 2 : -2,
@@ -784,30 +783,31 @@ const Landing = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <motion.div 
-                      className="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl flex items-center justify-center overflow-hidden"
+                      className="aspect-video rounded-2xl overflow-hidden"
                       whileHover={{ scale: 1.02 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
-                      <motion.div 
-                        className="text-white text-center"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ 
-                          duration: 0.6,
-                          delay: 0.8,
-                          type: "spring",
-                          stiffness: 200
-                        }}
-                        viewport={{ once: true }}
-                      >
-                        <motion.div
-                          whileHover={{ rotate: 360, scale: 1.2 }}
-                          transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
-                        >
-                          <BarChart3 className="h-16 w-16 mx-auto mb-3" />
-                        </motion.div>
-                        <p className="text-lg font-medium">{step.image}</p>
-                      </motion.div>
+                      {index === 0 && (
+                        <img 
+                          src="/images/diagnostic-home-view.png" 
+                          alt="Diagnostic Assessment Dashboard" 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {index === 1 && (
+                        <img 
+                          src="/images/detailed-solutions.png" 
+                          alt="Skill Drills Interface" 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {index === 2 && (
+                        <img 
+                          src="/images/writing-assessment-pic-1.png" 
+                          alt="Writing Assessment Results" 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </motion.div>
                   </motion.div>
                 </motion.div>
@@ -855,12 +855,12 @@ const Landing = () => {
           {/* Platform Screenshot */}
           <div className="scroll-animate">
             <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-8 transform hover:scale-105 hover:rotate-1 transition-all duration-500">
-              <div className="bg-white rounded-xl shadow-2xl aspect-video flex items-center justify-center">
-                <div className="text-center">
-                  <BarChart3 className="h-20 w-20 mx-auto mb-4 text-[#4ECDC4]" />
-                  <p className="text-xl font-semibold text-[#2C3E50]">Platform Analytics Dashboard</p>
-                  <p className="text-[#6B7280]">Real-time performance tracking and insights</p>
-                </div>
+              <div className="bg-white rounded-xl shadow-2xl aspect-video overflow-hidden">
+                <img 
+                  src="/images/diagnostic-insights-2.png" 
+                  alt="Platform Analytics Dashboard" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>

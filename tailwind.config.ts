@@ -115,6 +115,9 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
+			},
+			scrollBehavior: {
+				'smooth': 'smooth'
 			}
 		}
 	},

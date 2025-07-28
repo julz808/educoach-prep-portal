@@ -378,7 +378,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 
           {/* Content Area - Dual Panel for Reading Questions */}
           {hasPassage ? (
-            <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {/* Reading Passage Panel */}
               <Card className="border-0 shadow-lg mx-2 sm:mx-0">
                 <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 pt-3 sm:pt-6">

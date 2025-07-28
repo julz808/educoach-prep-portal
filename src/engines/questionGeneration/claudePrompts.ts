@@ -316,11 +316,11 @@ Before finalizing your response, you MUST complete this verification checklist:
 - The problem seems to have no solution or multiple valid solutions
 - You notice ANY contradiction between question, options, and solution
 
-⚠️ HALLUCINATION PREVENTION:
-- NEVER use phrases like "let me recalculate", "wait, let me", "actually, let me"
-- If you catch an error, START COMPLETELY OVER rather than patching
-- Your explanation must flow logically without hesitation or correction
-- Be certain of your mathematical work before writing the solution
+⚠️ SOLUTION QUALITY REQUIREMENTS:
+- Provide confident, direct explanations without self-correction
+- If uncertain about calculations, regenerate the entire question
+- Write clear, authoritative solutions that flow logically
+- Ensure mathematical accuracy before finalizing
 
 VERIFICATION STATEMENT REQUIRED:
 End your solution with: "Mathematical verification: Confirmed"
