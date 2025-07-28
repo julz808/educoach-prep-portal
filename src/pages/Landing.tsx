@@ -436,7 +436,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
-                  Australia's best test prep platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
+                  Australia's best test preparation platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests.
                 </motion.p>
               </div>
 
@@ -568,7 +568,7 @@ const Landing = () => {
           <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
               text="Choose Your Test Preparation Package"
-              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center px-2"
             />
             <motion.p 
               className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
@@ -821,7 +821,7 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
-              text="Our Proven 3-Step Methodology"
+              text="Confidently Prepare at Home in 3 Steps"
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
             />
             <motion.p 
@@ -992,8 +992,8 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
-              text="Best-in-Class Test Platform & Analytics"
-              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+              text="Best-in-Class Performance & Progress Insights"
+              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center px-2"
             />
             <motion.p 
               className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
