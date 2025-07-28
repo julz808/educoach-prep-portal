@@ -234,7 +234,7 @@ const PerformanceDashboard = () => {
   // User profile state
   const [userProfile, setUserProfile] = useState<any>(null);
 
-  // Intersection observer hooks for viewport-triggered animations
+  // Intersection observer hooks for viewport-triggered animations (only for progress bars)
   const sectionScoresObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const spiderChartObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const topBottomSkillsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
@@ -391,85 +391,33 @@ const PerformanceDashboard = () => {
     return () => clearTimeout(timer);
   }, [sectionView, spiderChartObserver.isIntersecting]);
   
-  // Animate section scores when view changes or data loads - triggered on viewport entry
+  // Set static values for section scores (no percentage animation, only progress bars animate)
   useEffect(() => {
     if (!performanceData.diagnostic?.sectionBreakdown) return;
     
-    const shouldAnimate = sectionScoresObserver.isIntersecting || 
-                         (!sectionScoresObserver.hasTriggered && performanceData.diagnostic?.sectionBreakdown);
-    
-    if (!shouldAnimate) return;
-    
     const newScores: Record<string, number> = {};
-    const duration = 1200; // Match the growToRight animation duration
-    const steps = 24;
-    const stepDuration = duration / steps;
-    
-    performanceData.diagnostic.sectionBreakdown.forEach((section, index) => {
+    performanceData.diagnostic.sectionBreakdown.forEach((section) => {
       const targetValue = sectionView === 'score' ? section.score : section.accuracy;
-      const delay = index * 150; // Match the animation delay
-      
-      // Start at 0
-      newScores[section.sectionName] = 0;
-      
-      setTimeout(() => {
-        let currentStep = 0;
-        const timer = setInterval(() => {
-          currentStep++;
-          const progress = currentStep / steps;
-          newScores[section.sectionName] = Math.round(targetValue * progress);
-          setAnimatedSectionScores({...newScores});
-          
-          if (currentStep >= steps) {
-            clearInterval(timer);
-          }
-        }, stepDuration);
-      }, delay);
+      newScores[section.sectionName] = targetValue;
     });
     
     setAnimatedSectionScores(newScores);
-  }, [performanceData.diagnostic, sectionView, sectionScoresObserver.isIntersecting, sectionScoresObserver.hasTriggered]);
+  }, [performanceData.diagnostic, sectionView]);
   
-  // Animate sub-skill scores when view changes or data loads - triggered on viewport entry
+  // Set static values for sub-skill scores (no percentage animation, only progress bars animate)
   useEffect(() => {
     if (!performanceData.diagnostic?.allSubSkills) return;
     
-    const shouldAnimate = sectionScoresObserver.isIntersecting || 
-                         (!sectionScoresObserver.hasTriggered && performanceData.diagnostic?.allSubSkills);
-    
-    if (!shouldAnimate) return;
-    
     const newScores: Record<string, number> = {};
-    const duration = 1200; // Match the growToRight animation duration
-    const steps = 24;
-    const stepDuration = duration / steps;
-    
-    performanceData.diagnostic.allSubSkills.forEach((skill, index) => {
+    performanceData.diagnostic.allSubSkills.forEach((skill) => {
       const targetValue = subSkillView === 'score' 
         ? (skill.questionsTotal > 0 ? Math.round((skill.questionsCorrect / skill.questionsTotal) * 100) : 0)
         : (skill.questionsAttempted > 0 ? Math.round((skill.questionsCorrect / skill.questionsAttempted) * 100) : 0);
-      const delay = index * 120; // Match the animation delay
-      
-      // Start at 0
-      newScores[skill.subSkill] = 0;
-      
-      setTimeout(() => {
-        let currentStep = 0;
-        const timer = setInterval(() => {
-          currentStep++;
-          const progress = currentStep / steps;
-          newScores[skill.subSkill] = Math.round(targetValue * progress);
-          setAnimatedSubSkillScores({...newScores});
-          
-          if (currentStep >= steps) {
-            clearInterval(timer);
-          }
-        }, stepDuration);
-      }, delay);
+      newScores[skill.subSkill] = targetValue;
     });
     
     setAnimatedSubSkillScores(newScores);
-  }, [performanceData.diagnostic, subSkillView, sectionScoresObserver.isIntersecting, sectionScoresObserver.hasTriggered]);
+  }, [performanceData.diagnostic, subSkillView]);
   
   // Set static values for practice test scores (no animation for headline cards)
   useEffect(() => {
@@ -486,14 +434,9 @@ const PerformanceDashboard = () => {
     setAnimatedPracticeAccuracy(targetAccuracy);
   }, [performanceData.practice, selectedPracticeTest]);
 
-  // Animate top and bottom skills - triggered on viewport entry
+  // Set static values for top and bottom skills (no percentage animation, only progress bars animate)
   useEffect(() => {
     if (!performanceData.diagnostic?.allSubSkills) return;
-    
-    const shouldAnimate = topBottomSkillsObserver.isIntersecting || 
-                         (!topBottomSkillsObserver.hasTriggered && performanceData.diagnostic?.allSubSkills);
-    
-    if (!shouldAnimate) return;
     
     const allSubSkills = performanceData.diagnostic.allSubSkills;
     const topSkills = topBottomView === 'score' 
@@ -506,57 +449,22 @@ const PerformanceDashboard = () => {
 
     const newTopScores: Record<string, number> = {};
     const newBottomScores: Record<string, number> = {};
-    const duration = 1200;
-    const steps = 24;
-    const stepDuration = duration / steps;
     
-    // Animate top skills
-    topSkills.forEach((skill, index) => {
+    // Set static values for top skills
+    topSkills.forEach((skill) => {
       const targetValue = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
-      const delay = index * 120;
-      
-      newTopScores[skill.subSkill] = 0;
-      
-      setTimeout(() => {
-        let currentStep = 0;
-        const timer = setInterval(() => {
-          currentStep++;
-          const progress = currentStep / steps;
-          newTopScores[skill.subSkill] = Math.round(targetValue * progress);
-          setAnimatedTopSkillScores({...newTopScores});
-          
-          if (currentStep >= steps) {
-            clearInterval(timer);
-          }
-        }, stepDuration);
-      }, delay);
+      newTopScores[skill.subSkill] = targetValue;
     });
 
-    // Animate bottom skills
-    bottomSkills.forEach((skill, index) => {
+    // Set static values for bottom skills
+    bottomSkills.forEach((skill) => {
       const targetValue = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
-      const delay = index * 120;
-      
-      newBottomScores[skill.subSkill] = 0;
-      
-      setTimeout(() => {
-        let currentStep = 0;
-        const timer = setInterval(() => {
-          currentStep++;
-          const progress = currentStep / steps;
-          newBottomScores[skill.subSkill] = Math.round(targetValue * progress);
-          setAnimatedBottomSkillScores({...newBottomScores});
-          
-          if (currentStep >= steps) {
-            clearInterval(timer);
-          }
-        }, stepDuration);
-      }, delay);
+      newBottomScores[skill.subSkill] = targetValue;
     });
     
     setAnimatedTopSkillScores(newTopScores);
     setAnimatedBottomSkillScores(newBottomScores);
-  }, [performanceData.diagnostic, topBottomView, topBottomSkillsObserver.isIntersecting, topBottomSkillsObserver.hasTriggered]);
+  }, [performanceData.diagnostic, topBottomView]);
 
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
