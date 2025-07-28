@@ -309,7 +309,7 @@ const Landing = () => {
               <img 
                 src="/images/educourse-logo v2.png" 
                 alt="EduCourse" 
-                className="h-52"
+                className="h-[140px] md:h-52"
               />
             </Link>
 
@@ -411,19 +411,19 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
+      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Content */}
             <motion.div 
-              className="space-y-10"
+              className="space-y-8 md:space-y-10 text-center lg:text-left"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 <motion.h1 
-                  className="text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
+                  className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
@@ -431,7 +431,7 @@ const Landing = () => {
                   We're here to help you <span className="text-[#4ECDC4] underline">ace</span> your next test!
                 </motion.h1>
                 <motion.p 
-                  className="text-xl text-[#4B5563] leading-relaxed max-w-lg"
+                  className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
@@ -442,7 +442,7 @@ const Landing = () => {
 
               {/* Key Points */}
               <motion.div 
-                className="space-y-4"
+                className="space-y-3 md:space-y-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1.8 }}
@@ -454,27 +454,27 @@ const Landing = () => {
                 ].map((point, index) => (
                   <motion.div 
                     key={index} 
-                    className="flex items-center space-x-3"
+                    className="flex items-start lg:items-center space-x-3 text-left"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 2 + index * 0.1 }}
                   >
-                    <CheckCircle className="h-6 w-6 text-[#4ECDC4] flex-shrink-0" />
-                    <span className="text-lg text-[#3B4F6B]">{point}</span>
+                    <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-[#4ECDC4] flex-shrink-0 mt-0.5 lg:mt-0" />
+                    <span className="text-base md:text-lg text-[#3B4F6B] leading-relaxed">{point}</span>
                   </motion.div>
                 ))}
               </motion.div>
 
               {/* CTA */}
               <motion.div 
-                className="flex justify-center sm:justify-start"
+                className="flex justify-center lg:justify-start pt-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 2.5 }}
               >
                 <Button 
                   size="lg" 
-                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg group"
+                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group w-full sm:w-auto"
                   onClick={() => {
                     const methodologySection = document.getElementById('methodology');
                     if (methodologySection) {
@@ -486,72 +486,92 @@ const Landing = () => {
                   }}
                 >
                   See how it works
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </motion.div>
             </motion.div>
 
-            {/* Hero Images - Overlapping Screenshots */}
-            <div className="relative h-[500px]">
-              {/* Background Screenshot */}
-              <motion.div 
-                className="absolute top-0 right-0 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
-                initial={{ opacity: 0, y: 50, rotate: 10 }}
-                animate={{ opacity: 1, y: 0, rotate: 3 }}
-                transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
-              >
-                <img 
-                  src="/images/dashboard view 2.png" 
-                  alt="EduCourse Dashboard" 
-                  className="w-full h-full object-contain"
-                  loading="eager"
-                />
-              </motion.div>
+            {/* Hero Images - Responsive Screenshots */}
+            <div className="relative h-[300px] sm:h-[400px] lg:h-[500px] mt-8 lg:mt-0">
+              {/* Mobile: Single centered image */}
+              <div className="block lg:hidden">
+                <motion.div 
+                  className="w-full max-w-sm mx-auto h-[280px] bg-white rounded-xl shadow-2xl overflow-hidden"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                >
+                  <img 
+                    src="/images/insights 5.png" 
+                    alt="Performance Analytics" 
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                  />
+                </motion.div>
+              </div>
               
-              {/* Middle Screenshot */}
-              <motion.div 
-                className="absolute top-16 left-8 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
-                initial={{ opacity: 0, y: 50, rotate: -10 }}
-                animate={{ opacity: 1, y: 0, rotate: -2 }}
-                transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
-              >
-                <img 
-                  src="/images/reading simulation 2.png" 
-                  alt="Reading Simulation" 
-                  className="w-full h-full object-contain"
-                  loading="eager"
-                />
-              </motion.div>
-              
-              {/* Front Screenshot - Adjusted position */}
-              <motion.div 
-                className="absolute top-48 right-12 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
-                initial={{ opacity: 0, y: 50, rotate: 8 }}
-                animate={{ opacity: 1, y: 0, rotate: 1 }}
-                transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
-              >
-                <img 
-                  src="/images/insights 5.png" 
-                  alt="Performance Analytics" 
-                  className="w-full h-full object-contain"
-                  loading="eager"
-                />
-              </motion.div>
+              {/* Desktop: Overlapping Screenshots */}
+              <div className="hidden lg:block">
+                {/* Background Screenshot */}
+                <motion.div 
+                  className="absolute top-0 right-0 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
+                  initial={{ opacity: 0, y: 50, rotate: 10 }}
+                  animate={{ opacity: 1, y: 0, rotate: 3 }}
+                  transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
+                >
+                  <img 
+                    src="/images/dashboard view 2.png" 
+                    alt="EduCourse Dashboard" 
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                  />
+                </motion.div>
+                
+                {/* Middle Screenshot */}
+                <motion.div 
+                  className="absolute top-16 left-8 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
+                  initial={{ opacity: 0, y: 50, rotate: -10 }}
+                  animate={{ opacity: 1, y: 0, rotate: -2 }}
+                  transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
+                >
+                  <img 
+                    src="/images/reading simulation 2.png" 
+                    alt="Reading Simulation" 
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                  />
+                </motion.div>
+                
+                {/* Front Screenshot */}
+                <motion.div 
+                  className="absolute top-48 right-12 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
+                  initial={{ opacity: 0, y: 50, rotate: 8 }}
+                  animate={{ opacity: 1, y: 0, rotate: 1 }}
+                  transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
+                >
+                  <img 
+                    src="/images/insights 5.png" 
+                    alt="Performance Analytics" 
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                  />
+                </motion.div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Test Products Section */}
-      <section id="products" className="py-20 bg-white">
+      <section id="products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 scroll-animate">
+          <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
               text="Choose Your Test Preparation Package"
-              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
             />
             <motion.p 
-              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
@@ -561,8 +581,110 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Infinite Netflix-style Carousel */}
-          <div className="relative max-w-7xl mx-auto">
+          {/* Mobile: Horizontal Scrollable, Tablet+: Grid/Carousel */}
+          <div className="block sm:hidden">
+            {/* Mobile Horizontal Scroll Layout */}
+            <div className="overflow-x-auto pb-4">
+              <div className="flex space-x-4 px-4" style={{ width: 'max-content' }}>
+                {courses.map((course) => (
+                  <Card key={course.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col w-72 flex-shrink-0">
+                    <CardHeader className="text-center pb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <BookOpen className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col h-full pt-0">
+                      <div className="text-center flex-grow">
+                        <div className="text-sm text-[#6B7280] mb-6">
+                          {course.title === "Year 5 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                          {course.title === "Year 7 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                          {course.title === "Year 9 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                          {course.title === "ACER Scholarship" && "Written Expression, Mathematics, Humanities"}
+                          {course.title === "EduTest Scholarship" && "Reading, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression"}
+                          {course.title === "NSW Selective Entry" && "Reading, Mathematical Reasoning, Thinking Skills, Writing"}
+                          {course.title === "VIC Selective Entry" && "Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing"}
+                          {course.title === "CogAT" && "Verbal Battery, Quantitative Battery, Nonverbal Battery"}
+                        </div>
+                      </div>
+                      
+                      <div className="mt-auto">
+                        <div className="text-center mb-4">
+                          <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
+                        </div>
+                        <Button 
+                          asChild 
+                          className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
+                        >
+                          <Link to={`/course/${course.slug}`}>
+                            Start Preparation
+                            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Tablet: Simple Grid */}
+          <div className="hidden sm:block md:hidden">
+            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {courses.map((course) => (
+                <Card key={course.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full">
+                  <CardHeader className="text-center pb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-3">
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                    <CardTitle className="text-lg text-[#2C3E50]">{course.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col h-full pt-0">
+                    <div className="text-center flex-grow">
+                      <div className="text-sm text-[#6B7280] mb-4">
+                        {course.title === "Year 5 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                        {course.title === "Year 7 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                        {course.title === "Year 9 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
+                        {course.title === "ACER Scholarship" && "Written Expression, Mathematics, Humanities"}
+                        {course.title === "EduTest Scholarship" && "Reading, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression"}
+                        {course.title === "NSW Selective Entry" && "Reading, Mathematical Reasoning, Thinking Skills, Writing"}
+                        {course.title === "VIC Selective Entry" && "Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing"}
+                        {course.title === "CogAT" && "Verbal Battery, Quantitative Battery, Nonverbal Battery"}
+                      </div>
+                      
+                      <div className="space-y-2 mb-6">
+                        {['500+ practice questions', 'Detailed performance analytics', 'Sub-skill level insights'].map((feature, idx) => (
+                          <div key={idx} className="flex items-center text-sm text-[#6B7280]">
+                            <CheckCircle className="h-4 w-4 text-[#4ECDC4] mr-2 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mt-auto">
+                      <div className="text-center mb-4">
+                        <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
+                      </div>
+                      <Button 
+                        asChild 
+                        className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
+                      >
+                        <Link to={`/course/${course.slug}`}>
+                          Start Preparation
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Carousel */}
+          <div className="hidden md:block relative max-w-7xl mx-auto">
             {/* Left Arrow */}
             <button
               onClick={() => handleSlideChange('prev')}
@@ -653,7 +775,7 @@ const Landing = () => {
 
                           {/* Price - Fixed position */}
                           <div className="text-center py-4">
-                            <span className="text-xl font-bold text-[#2C3E50]">${course.price}</span>
+                            <span className="text-lg font-bold text-[#3B4F6B]">${course.price}</span>
                           </div>
 
                           {/* CTA - Fixed position at bottom */}
@@ -695,15 +817,15 @@ const Landing = () => {
       </section>
 
       {/* Methodology Section */}
-      <section id="methodology" className="py-20 bg-[#F8F9FA]">
+      <section id="methodology" className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 scroll-animate">
+          <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
               text="Our Proven 3-Step Methodology"
-              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
             />
             <motion.p 
-              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
@@ -713,123 +835,106 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          <div className="space-y-24">
+          <div className="space-y-16 md:space-y-24">
             {[
               {
                 step: '01',
                 prefix: 'Diagnostic:',
                 title: 'Uncover Strengths & Gaps',
                 description: 'Start with our comprehensive diagnostic test. Get detailed insights into your child\'s current performance across all sub-skills and question types.',
-                icon: <Target className="h-12 w-12" />,
-                image: 'Diagnostic results dashboard showing performance breakdown'
+                icon: <Target className="h-8 w-8 md:h-12 md:w-12" />,
+                image: 'diagnostic home 3.png'
               },
               {
                 step: '02',
                 prefix: 'Skill Drills:',
                 title: 'Targeted Skill Building',
                 description: 'Access 500+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
-                icon: <Brain className="h-12 w-12" />,
-                image: 'Drill interface showing question types and progress tracking'
+                icon: <Brain className="h-8 w-8 md:h-12 md:w-12" />,
+                image: 'writing feedback 3.png'
               },
               {
                 step: '03',
                 prefix: 'Practice Tests:',
                 title: 'Simulate the Real Test',
                 description: 'Take full-length practice tests that perfectly simulate the real exam environment. Track improvement with detailed analytics.',
-                icon: <Trophy className="h-12 w-12" />,
-                image: 'Practice test results with comprehensive performance charts'
+                icon: <Trophy className="h-8 w-8 md:h-12 md:w-12" />,
+                image: 'test taking maths 2.png'
               }
             ].map((step, index) => (
               <motion.div 
                 key={index} 
-                className={`grid lg:grid-cols-2 gap-16 items-center ${
-                  index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-                }`}
-                initial={{ opacity: 0, y: 100 }}
+                className="grid lg:grid-cols-2 gap-8 md:gap-16 items-center"
+                initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ 
-                  duration: 0.8,
+                  duration: 0.6,
                   delay: 0.2,
                   type: "spring",
                   stiffness: 100,
                   damping: 20
                 }}
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-50px" }}
               >
+                {/* Content - Always first on mobile, alternating on desktop */}
                 <motion.div 
-                  className={`space-y-8 ${index % 2 === 1 ? 'lg:order-2' : ''}`}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  className={`space-y-6 md:space-y-8 text-center lg:text-left ${index % 2 === 1 ? 'lg:order-2' : ''}`}
+                  initial={{ opacity: 0, x: 0 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ 
-                    duration: 0.7,
-                    delay: 0.4,
+                    duration: 0.6,
+                    delay: 0.3,
                     type: "spring",
                     stiffness: 120
                   }}
                   viewport={{ once: true }}
                 >
+                  {/* Step indicator */}
                   <motion.div 
-                    className="flex items-center space-x-6"
+                    className="flex items-center justify-center lg:justify-start space-x-4 md:space-x-6"
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ 
-                      duration: 0.6,
-                      delay: 0.6,
+                      duration: 0.5,
+                      delay: 0.4,
                       type: "spring",
                       stiffness: 150
                     }}
                     viewport={{ once: true }}
                   >
-                    <motion.div 
-                      className="w-20 h-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white shadow-xl"
-                      whileHover={{ 
-                        scale: 1.1, 
-                        rotate: 5,
-                        boxShadow: "0 20px 40px rgba(78, 205, 196, 0.3)"
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    >
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white shadow-xl">
                       {step.icon}
-                    </motion.div>
-                    <motion.div 
-                      className="text-5xl font-bold text-[#4ECDC4]"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ 
-                        duration: 0.5,
-                        delay: 0.8,
-                        type: "spring",
-                        stiffness: 200
-                      }}
-                      viewport={{ once: true }}
-                    >
+                    </div>
+                    <div className="text-3xl md:text-5xl font-bold text-[#4ECDC4]">
                       {step.step}
-                    </motion.div>
+                    </div>
                   </motion.div>
                   
+                  {/* Title */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ 
-                      duration: 0.6,
-                      delay: 1.0,
+                      duration: 0.5,
+                      delay: 0.5,
                       type: "spring",
                       stiffness: 100
                     }}
                     viewport={{ once: true }}
                   >
-                    <h3 className="text-4xl font-bold text-[#2C3E50] leading-tight">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] leading-tight">
                       <span className="text-[#FF6B6B]">{step.prefix}</span> {step.title}
                     </h3>
                   </motion.div>
                   
+                  {/* Description */}
                   <motion.p 
-                    className="text-xl text-[#6B7280] leading-relaxed"
+                    className="text-base md:text-xl text-[#6B7280] leading-relaxed max-w-lg mx-auto lg:mx-0"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ 
-                      duration: 0.6,
-                      delay: 1.2,
+                      duration: 0.5,
+                      delay: 0.6,
                       type: "spring",
                       stiffness: 100
                     }}
@@ -839,13 +944,14 @@ const Landing = () => {
                   </motion.p>
                 </motion.div>
                 
+                {/* Screenshot */}
                 <motion.div 
                   className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50, rotate: index % 2 === 0 ? 5 : -5 }}
-                  whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ 
-                    duration: 0.8,
-                    delay: 0.5,
+                    duration: 0.6,
+                    delay: 0.4,
                     type: "spring",
                     stiffness: 80,
                     damping: 20
@@ -853,43 +959,25 @@ const Landing = () => {
                   viewport={{ once: true }}
                 >
                   <motion.div 
-                    className="bg-white rounded-3xl shadow-2xl overflow-hidden group"
+                    className="bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden max-w-md mx-auto lg:max-w-none group"
                     whileHover={{ 
-                      scale: 1.05, 
-                      rotate: index % 2 === 0 ? 2 : -2,
+                      scale: 1.02,
+                      rotate: index % 2 === 0 ? 1 : -1,
                       boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)"
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <motion.div 
-                      className="aspect-video rounded-2xl overflow-hidden"
+                      className="aspect-video overflow-hidden"
                       whileHover={{ scale: 1.02 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
-                      {index === 0 && (
-                        <img 
-                          src="/images/diagnostic home 3.png" 
-                          alt="Diagnostic Assessment Dashboard" 
-                          className="w-full h-full object-contain bg-gray-50"
-                          loading="eager"
-                        />
-                      )}
-                      {index === 1 && (
-                        <img 
-                          src="/images/writing feedback 3.png" 
-                          alt="Skill Drills Interface" 
-                          className="w-full h-full object-contain bg-gray-50"
-                          loading="eager"
-                        />
-                      )}
-                      {index === 2 && (
-                        <img 
-                          src="/images/test taking maths 2.png" 
-                          alt="Practice Test Interface" 
-                          className="w-full h-full object-contain bg-gray-50"
-                          loading="eager"
-                        />
-                      )}
+                      <img 
+                        src={`/images/${step.image}`}
+                        alt={`Step ${step.step} - ${step.title}`}
+                        className="w-full h-full object-contain bg-gray-50"
+                        loading="eager"
+                      />
                     </motion.div>
                   </motion.div>
                 </motion.div>
@@ -900,15 +988,15 @@ const Landing = () => {
       </section>
 
       {/* Platform Features Showcase */}
-      <section className="py-20 bg-white">
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 scroll-animate">
+          <div className="text-center mb-12 md:mb-16 scroll-animate">
             <AnimatedText 
               text="Best-in-Class Test Platform & Analytics"
-              className="text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
             />
             <motion.p 
-              className="text-xl text-[#6B7280] max-w-3xl mx-auto"
+              className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
@@ -918,57 +1006,59 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* Platform Demo Layout */}
-          <div className="grid lg:grid-cols-3 gap-8 items-center">
-            {/* Left side - 3 Key Features */}
-            <div className="lg:col-span-1 space-y-8">
-              <div className="space-y-6">
+          {/* Mobile: Stacked Layout, Desktop: Side-by-side */}
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 items-center">
+            {/* Features - Top on mobile, left on desktop */}
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <div className="space-y-6 md:space-y-8">
                 {/* Progress Tracking */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <TrendingUp className="h-6 w-6" />
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Progress Tracking</h3>
-                    <p className="text-[#6B7280] leading-relaxed">Visual dashboards showing improvement over time with actionable insights</p>
+                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Progress Tracking</h3>
+                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Visual dashboards showing improvement over time with actionable insights</p>
                   </div>
                 </div>
 
                 {/* Sub-Skill Analytics */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <BarChart3 className="h-6 w-6" />
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Sub-Skill Analytics</h3>
-                    <p className="text-[#6B7280] leading-relaxed">Performance tracking beyond test sections - see progress in specific question types</p>
+                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Sub-Skill Analytics</h3>
+                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Performance tracking beyond test sections - see progress in specific question types</p>
                   </div>
                 </div>
 
                 {/* Instant Feedback */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <Zap className="h-6 w-6" />
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <Zap className="h-5 w-5 md:h-6 md:w-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Instant Feedback</h3>
-                    <p className="text-[#6B7280] leading-relaxed">Detailed explanations for every question with improvement suggestions</p>
+                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Instant Feedback</h3>
+                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Detailed explanations for every question with improvement suggestions</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right side - GIF Demo (2/3 space) */}
-            <div className="lg:col-span-2 scroll-animate">
-              <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-6">
-                <div className="bg-white rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
-                  <img 
-                    src="/images/CleanShot 2025-07-28 at 19.48.04.gif" 
-                    alt="Platform Analytics Demo"
-                    className="max-w-full max-h-full"
-                    loading="eager"
-                    style={{ imageRendering: 'crisp-edges' }}
-                  />
+            {/* GIF Demo - Top on mobile, right on desktop */}
+            <div className="lg:col-span-2 order-1 lg:order-2 scroll-animate">
+              <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-xl md:rounded-2xl p-4 md:p-6">
+                <div className="bg-white rounded-lg md:rounded-xl shadow-2xl overflow-hidden">
+                  <div className="aspect-video flex items-center justify-center">
+                    <img 
+                      src="/images/CleanShot 2025-07-28 at 19.48.04.gif" 
+                      alt="Platform Analytics Demo"
+                      className="w-full h-full object-contain"
+                      loading="eager"
+                      style={{ imageRendering: 'crisp-edges' }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -976,20 +1066,20 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* School Logos Placeholder Section */}
-      <section className="py-16 bg-[#F8F9FA]">
+      {/* School Logos Section */}
+      <section className="py-12 md:py-16 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 scroll-animate">
-            <h2 className="text-3xl font-bold text-[#2C3E50] mb-4">
+          <div className="text-center mb-8 md:mb-12 scroll-animate">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#2C3E50] mb-4">
               Trusted by Students Entering Australia's Top Schools
             </h2>
           </div>
           {/* School logos continuous scrolling carousel */}
           <div className="relative overflow-hidden">
             <motion.div 
-              className="flex items-center space-x-8"
+              className="flex items-center space-x-6 md:space-x-8"
               animate={{ 
-                x: [0, -schoolLogos.length * 180]
+                x: [0, -schoolLogos.length * 140]
               }}
               transition={{ 
                 duration: 70, // 70 seconds for full cycle (slower)
@@ -1001,7 +1091,7 @@ const Landing = () => {
               {[...schoolLogos, ...schoolLogos].map((school, index) => (
                 <div 
                   key={`${school.name}-${index}`}
-                  className="flex-shrink-0 w-[150px] h-[80px] flex items-center justify-center"
+                  className="flex-shrink-0 w-[120px] h-[60px] md:w-[150px] md:h-[80px] flex items-center justify-center"
                 >
                   <img 
                     src={school.logo} 
@@ -1013,7 +1103,7 @@ const Landing = () => {
                       target.style.display = 'none';
                       const parent = target.parentElement;
                       if (parent) {
-                        parent.innerHTML = `<span class="text-gray-600 text-xs font-medium text-center">${school.name}</span>`;
+                        parent.innerHTML = `<span class="text-gray-600 text-xs font-medium text-center px-2">${school.name}</span>`;
                       }
                     }}
                   />
@@ -1025,41 +1115,41 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 scroll-animate">
-            <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
+          <div className="text-center mb-12 md:mb-16 scroll-animate">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
               What Parents Are Saying
             </h2>
-            <p className="text-xl text-[#6B7280]">
+            <p className="text-lg md:text-xl text-[#6B7280]">
               Real results from real families across Australia
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="relative bg-white rounded-2xl shadow-xl p-8 scroll-animate">
-              <div className="text-center space-y-6">
+            <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl p-6 md:p-8 scroll-animate">
+              <div className="text-center space-y-4 md:space-y-6">
                 <div className="flex justify-center space-x-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-6 w-6 fill-[#FF6B6B] text-[#FF6B6B]" />
+                    <Star key={i} className="h-5 w-5 md:h-6 md:w-6 fill-[#FF6B6B] text-[#FF6B6B]" />
                   ))}
                 </div>
-                <blockquote className="text-xl text-[#2C3E50] italic leading-relaxed">
+                <blockquote className="text-lg md:text-xl text-[#2C3E50] italic leading-relaxed px-4">
                   "{testimonials[activeTestimonial].quote}"
                 </blockquote>
                 <div className="space-y-1">
-                  <p className="font-semibold text-[#2C3E50]">{testimonials[activeTestimonial].name}</p>
-                  <p className="text-[#6B7280]">{testimonials[activeTestimonial].details}</p>
+                  <p className="font-semibold text-[#2C3E50] text-base md:text-lg">{testimonials[activeTestimonial].name}</p>
+                  <p className="text-[#6B7280] text-sm md:text-base">{testimonials[activeTestimonial].details}</p>
                 </div>
               </div>
 
               {/* Testimonial Navigation */}
-              <div className="flex justify-center space-x-2 mt-8">
+              <div className="flex justify-center space-x-2 mt-6 md:mt-8">
                 {testimonials.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setActiveTestimonial(index)}
-                    className={`w-3 h-3 rounded-full transition-colors ${
+                    className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-colors ${
                       index === activeTestimonial ? 'bg-[#4ECDC4]' : 'bg-gray-300'
                     }`}
                   />
@@ -1071,88 +1161,88 @@ const Landing = () => {
       </section>
 
       {/* Mailing List Placeholder Section */}
-      <section className="py-16 bg-[#4ECDC4]">
+      <section className="py-12 md:py-16 bg-[#4ECDC4]">
         <div className="container mx-auto px-4">
           <div className="text-center scroll-animate">
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               Stay Updated on Your Child's Test Prep Journey
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 px-4">
               Get expert tips, practice questions, and exam updates delivered to your inbox
             </p>
             {/* Typeform mailing list embed - to be added later */}
-            <div className="max-w-md mx-auto bg-white/20 rounded-xl p-8">
-              <p className="text-white">Typeform mailing list integration - to be implemented</p>
+            <div className="max-w-md mx-auto bg-white/20 rounded-lg md:rounded-xl p-6 md:p-8">
+              <p className="text-white text-sm md:text-base">Typeform mailing list integration - to be implemented</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer Section */}
-      <footer className="bg-[#2C3E50] text-white py-16">
+      <footer className="bg-[#2C3E50] text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
           {/* Final CTA */}
-          <div className="text-center mb-16 scroll-animate">
-            <h2 className="text-4xl font-bold mb-4">Ready to Help Your Child Succeed?</h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <div className="text-center mb-12 md:mb-16 scroll-animate">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Ready to Help Your Child Succeed?</h2>
+            <p className="text-lg md:text-xl text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
               Join 1000+ families who trust EduCourse for test preparation
             </p>
             <Button 
               size="lg" 
-              className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-8 py-4 text-lg"
+              className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
               asChild
             >
               <Link to="/auth">
                 Get Started Today
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               </Link>
             </Button>
           </div>
 
           {/* Footer Links */}
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold text-[#4ECDC4] mb-4">EduCourse</h3>
-              <p className="text-gray-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="text-center sm:text-left">
+              <h3 className="text-xl md:text-2xl font-bold text-[#4ECDC4] mb-3 md:mb-4">EduCourse</h3>
+              <p className="text-gray-300 text-sm md:text-base">
                 Australia's premier test preparation platform for competitive entrance exams.
               </p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4">Quick Links</h4>
               <div className="space-y-2">
-                <Link to="/insights" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors">
+                <Link to="/insights" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors text-sm md:text-base">
                   Insights
                 </Link>
-                <Link to="/auth" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors">
+                <Link to="/auth" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors text-sm md:text-base">
                   Sign Up
                 </Link>
               </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Products</h4>
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4">Products</h4>
               <div className="space-y-2">
                 {courses.slice(0, 3).map((course) => (
                   <Link
                     key={course.id}
                     to={`/course/${course.slug}`}
-                    className="block text-gray-300 hover:text-[#4ECDC4] transition-colors"
+                    className="block text-gray-300 hover:text-[#4ECDC4] transition-colors text-sm md:text-base"
                   >
                     {course.title}
                   </Link>
                 ))}
               </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-300">
+            <div className="text-center sm:text-left">
+              <h4 className="font-semibold mb-3 md:mb-4">Contact</h4>
+              <div className="space-y-2 text-gray-300 text-sm md:text-base">
                 <p>support@educourse.com.au</p>
                 <p>1800 EDU COURSE</p>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-600 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 EduCourse. All rights reserved. | Privacy Policy | Terms of Service</p>
+          <div className="border-t border-gray-600 mt-8 md:mt-12 pt-6 md:pt-8 text-center text-gray-400">
+            <p className="text-xs md:text-sm">&copy; 2024 EduCourse. All rights reserved. | Privacy Policy | Terms of Service</p>
           </div>
         </div>
       </footer>
