@@ -26,6 +26,19 @@ import { AnalyticsService } from '@/services/analyticsService';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { DeveloperTools } from '@/components/DeveloperTools';
+import { getUnifiedTimeLimit } from '@/utils/timeUtils';
+
+// Map frontend course IDs to database product_type values for consistent lookup
+const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
+  'year-5-naplan': 'Year 5 NAPLAN',
+  'year-7-naplan': 'Year 7 NAPLAN',
+  'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
+  'acer-year-7': 'ACER Scholarship (Year 7 Entry)',
+  'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
+  'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+  'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
+  'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+};
 
 interface DiagnosticSection {
   id: string;
@@ -70,33 +83,7 @@ const DiagnosticTests: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
 
-  // Helper function to get individual section time from curriculum data
-  const getSectionTimeLimit = (testType: string, sectionName: string): number => {
-    const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
-    if (!testStructure) return 30; // Default fallback
-
-    // Try exact match first
-    const exactMatch = (testStructure as any)[sectionName];
-    if (exactMatch && typeof exactMatch === 'object' && exactMatch.time) {
-      return exactMatch.time;
-    }
-
-    // Try partial match (case-insensitive)
-    const sectionKeys = Object.keys(testStructure);
-    const partialMatch = sectionKeys.find(key => 
-      key.toLowerCase().includes(sectionName.toLowerCase()) ||
-      sectionName.toLowerCase().includes(key.toLowerCase())
-    );
-
-    if (partialMatch) {
-      const matchedSection = (testStructure as any)[partialMatch];
-      if (matchedSection && typeof matchedSection === 'object' && matchedSection.time) {
-        return matchedSection.time;
-      }
-    }
-
-    return 30; // Default fallback
-  };
+  // Use unified time lookup function - removed old getSectionTimeLimit
 
   // Helper function to calculate total time from curriculum data
   const calculateTotalTime = (testType: string, sections: DiagnosticSection[]): number => {
@@ -391,7 +378,13 @@ const DiagnosticTests: React.FC = () => {
         id: section.id,
         name: section.name,
         questions: section.totalQuestions,
-        timeLimit: getSectionTimeLimit(selectedProduct, section.name),
+        timeLimit: (() => {
+          const mappedProductName = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
+          console.log(`🔥 DIAGNOSTIC CARD: Calling getUnifiedTimeLimit with product="${mappedProductName}" section="${section.name}"`);
+          const time = getUnifiedTimeLimit(mappedProductName, section.name);
+          console.log(`🔥 DIAGNOSTIC CARD: Got time=${time} for ${mappedProductName} - ${section.name}`);
+          return time;
+        })(),
         status,
         score,
         // Convert first few questions to sample format for preview

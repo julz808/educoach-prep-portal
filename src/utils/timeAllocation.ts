@@ -2,6 +2,11 @@
 // TIME ALLOCATION UTILITY
 // ============================================================================
 // Handles time allocation logic for different test modes across all products
+// 
+// Time allocation rules:
+// - Practice tests: Use full time from curriculum data
+// - Diagnostic tests: Use same time as practice tests (no pro-rating)
+// - Drill mode: No time limit (immediate feedback)
 
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 
@@ -16,7 +21,7 @@ export interface TimeAllocationResult {
  * @param productType - The test product (e.g., "Year 5 NAPLAN")
  * @param sectionName - The section name (e.g., "Reading")
  * @param testMode - The test mode ("practice", "diagnostic", "drill", or specific like "practice_1")
- * @param diagnosticQuestionCount - Number of questions in diagnostic (for pro-rating)
+ * @param diagnosticQuestionCount - Number of questions in diagnostic (unused - kept for compatibility)
  * @returns TimeAllocationResult with time in minutes and reasoning
  */
 export function calculateTimeAllocation(
@@ -93,32 +98,12 @@ export function calculateTimeAllocation(
     };
   }
   
-  // DIAGNOSTIC MODE: Pro-rate from practice test time
+  // DIAGNOSTIC MODE: Use same time as practice test (no pro-rating)
   if (testMode === 'diagnostic') {
-    if (!diagnosticQuestionCount) {
-      console.log('⏰ DIAGNOSTIC: No question count provided, using 80% of practice time');
-      const diagnosticTime = Math.ceil(practiceTimeMinutes * 0.8);
-      const roundedTime = Math.ceil(diagnosticTime / 5) * 5; // Round up to nearest 5
-      
-      return {
-        timeMinutes: roundedTime,
-        reason: `Diagnostic time (80% of practice, rounded up to nearest 5 min)`
-      };
-    }
-    
-    // Calculate pro-rated time: (diagnostic_questions / practice_questions) * practice_time
-    const timePerQuestion = practiceTimeMinutes / practiceQuestionCount;
-    const proratedTime = timePerQuestion * diagnosticQuestionCount;
-    const roundedTime = Math.ceil(proratedTime / 5) * 5; // Round up to nearest 5 minutes
-    
-    console.log('⏰ DIAGNOSTIC: Pro-rated calculation:');
-    console.log('  - Time per question:', timePerQuestion.toFixed(2), 'min');
-    console.log('  - Raw pro-rated time:', proratedTime.toFixed(2), 'min');
-    console.log('  - Rounded up to nearest 5:', roundedTime, 'min');
-    
+    console.log('⏰ DIAGNOSTIC: Using same time as practice test:', practiceTimeMinutes, 'minutes');
     return {
-      timeMinutes: roundedTime,
-      reason: `Diagnostic time pro-rated from practice (${diagnosticQuestionCount}/${practiceQuestionCount} × ${practiceTimeMinutes}min = ${proratedTime.toFixed(1)}min → ${roundedTime}min)`
+      timeMinutes: practiceTimeMinutes,
+      reason: `Diagnostic test time matches practice test time from curriculum data`
     };
   }
   

@@ -82,7 +82,8 @@ export class TestSessionService {
     testMode: 'diagnostic' | 'practice' | 'drill',
     sectionName: string,
     totalQuestions?: number,
-    questionOrder?: string[]
+    questionOrder?: string[],
+    timeLimitSeconds?: number
   ): Promise<string> {
     try {
       console.log('🚀 Creating/resuming session with question order:', {
@@ -91,7 +92,8 @@ export class TestSessionService {
         testMode,
         sectionName,
         totalQuestions,
-        questionOrderLength: questionOrder?.length || 0
+        questionOrderLength: questionOrder?.length || 0,
+        timeLimitSeconds
       });
 
       // Convert string array to UUID array for database function
@@ -109,7 +111,8 @@ export class TestSessionService {
         p_test_mode: testMode,
         p_section_name: sectionName,
         p_total_questions: totalQuestions || null,
-        p_question_order: questionOrderUUIDs
+        p_question_order: questionOrderUUIDs,
+        p_time_limit_seconds: timeLimitSeconds || 3600 // Pass time limit or default to 60 min
       });
 
       if (error) {

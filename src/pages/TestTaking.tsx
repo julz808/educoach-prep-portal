@@ -23,6 +23,7 @@ import { DeveloperToolsReplicaService } from '@/services/developerToolsReplicaSe
 import { supabase } from '@/integrations/supabase/client';
 import { TEST_STRUCTURES } from '@/data/curriculumData';
 import { calculateTimeAllocation, shouldShowImmediateAnswerFeedback, shouldHaveTimer } from '@/utils/timeAllocation';
+import { getUnifiedTimeLimit } from '@/utils/timeUtils';
 import { getOrCreateSubSkillUUID } from '@/utils/uuidUtils';
 
 // Map frontend course IDs back to proper display names (same as in TestInstructionsPage)
@@ -184,15 +185,27 @@ const TestTaking: React.FC = () => {
   
   console.log('🔍 REVIEW MODE: isReviewMode =', isReviewMode, 'from searchParams.review =', searchParams.get('review'));
 
-  // Get time limit using new time allocation system
-  // NEW TIME ALLOCATION RULES:
+  // Get time limit using unified time allocation system
+  // UNIFIED TIME ALLOCATION RULES:
   // - Practice tests: Use curriculumData.ts times
-  // - Diagnostic tests: Pro-rate from practice, round up to nearest 5 min
+  // - Diagnostic tests: Same time as practice (no pro-rating)
   // - Drill tests: No timer (null), immediate answer reveal
   const getTimeAllocation = (productType: string, sectionName: string, testMode: string, questionCount?: number): { timeMinutes: number | null; reason: string } => {
     console.log('⏰ TIME ALLOCATION: Getting time for:', { productType, sectionName, testMode, questionCount });
     
-    return calculateTimeAllocation(productType, sectionName, testMode, questionCount);
+    // For drill mode, return null (no timer)
+    if (testMode === 'drill') {
+      return { timeMinutes: null, reason: 'Drill mode has no time limit' };
+    }
+    
+    // For both practice and diagnostic, use the unified time lookup
+    const timeMinutes = getUnifiedTimeLimit(productType, sectionName);
+    console.log('⏰ UNIFIED: Retrieved time:', timeMinutes, 'minutes for', productType, '-', sectionName);
+    
+    return { 
+      timeMinutes, 
+      reason: `Time from curriculum data (${testMode} mode uses same time as practice)` 
+    };
   };
 
   // Load questions for the section
@@ -877,9 +890,22 @@ const TestTaking: React.FC = () => {
         console.log('🆕 TIMER: properDisplayName =', properDisplayName);
         console.log('🆕 TIMER: sectionName =', sectionName);
         
+        console.log('🔥 TIMER DEBUG: About to calculate time for:', {
+          productType: properDisplayName,
+          sectionName,
+          testMode: actualTestMode
+        });
+        
         const timeAllocation = getTimeAllocation(properDisplayName, sectionName, actualTestMode, questions.length);
         const timeLimitMinutes = timeAllocation.timeMinutes;
         const timeLimitSeconds = timeLimitMinutes ? timeLimitMinutes * 60 : 0;
+        
+        console.log('🔥 TIMER DEBUG: Time allocation result:', {
+          timeAllocation,
+          timeLimitMinutes,
+          timeLimitSeconds,
+          calculatedFrom: timeAllocation.reason
+        });
         
         console.log('⏰ TIME ALLOCATION: Result:', timeAllocation);
         console.log('⏰ TIME ALLOCATION: Final time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
@@ -987,7 +1013,8 @@ const TestTaking: React.FC = () => {
                   actualTestMode as 'diagnostic' | 'practice' | 'drill',
                   sectionWithDifficulty, // Use section name with difficulty for writing drills
                   questions.length,
-                  questions.map(q => q.id)
+                  questions.map(q => q.id),
+                  timeLimitSeconds // Pass the calculated time limit
                 );
               }
             } else {
@@ -998,7 +1025,8 @@ const TestTaking: React.FC = () => {
                 actualTestMode as 'diagnostic' | 'practice' | 'drill', // Use specific test mode (practice_1, practice_2, etc.)
                 sectionName,
                 questions.length,
-                questions.map(q => q.id)
+                questions.map(q => q.id),
+                timeLimitSeconds // Pass the calculated time limit
               );
             }
             
@@ -1118,7 +1146,9 @@ const TestTaking: React.FC = () => {
         };
 
         setSession(newSession);
+        console.log('🔥 TIMER SET: About to setTimeRemaining with seconds:', timeLimitSeconds);
         setTimeRemaining(timeLimitSeconds || 0);
+        console.log('🔥 TIMER SET: Timer initialized with', timeLimitSeconds, 'seconds (', timeLimitMinutes, 'minutes)');
         console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
         
         // Update URL with session ID so it can be resumed

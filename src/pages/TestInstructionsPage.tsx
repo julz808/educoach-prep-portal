@@ -11,6 +11,7 @@ import {
   fetchDiagnosticModes,
   fetchQuestionsFromSupabase
 } from '@/services/supabaseQuestionService';
+import { getUnifiedTimeLimit, getSectionFormat } from '@/utils/timeUtils';
 
 // Map frontend course IDs back to proper display names (same as in TestTaking.tsx)
 const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
@@ -60,29 +61,10 @@ const TestInstructionsPage: React.FC = () => {
         console.log('properDisplayName:', properDisplayName);
         console.log('sectionName:', sectionName);
 
-        // Get section details from CurriculumData.ts using proper display name
-        const testStructure = TEST_STRUCTURES[properDisplayName as keyof typeof TEST_STRUCTURES];
-        let timeLimit = 30; // Default
-        let format: 'Multiple Choice' | 'Written Response' = 'Multiple Choice';
-        let questionCount = 0;
-
-        if (testStructure) {
-          // Try to find section in curriculum data
-          const sectionData = Object.entries(testStructure).find(([key]) => {
-            const keyLower = key.toLowerCase();
-            const sectionLower = sectionName.toLowerCase();
-            return keyLower === sectionLower || 
-                   keyLower.includes(sectionLower) || 
-                   sectionLower.includes(keyLower);
-          });
-
-          if (sectionData) {
-            const [, data] = sectionData as [string, any];
-            timeLimit = data.time || 30;
-            format = data.format || 'Multiple Choice';
-            questionCount = data.questions || 0;
-          }
-        }
+        // Get section details from unified functions for consistency
+        let timeLimit = getUnifiedTimeLimit(properDisplayName, sectionName);
+        let format = getSectionFormat(properDisplayName, sectionName);
+        let questionCount = 0; // Will be updated from database below
 
         // Get actual question count from database
         if (testType === 'diagnostic') {
