@@ -14,22 +14,9 @@ interface ValidationResult {
 // Hallucination patterns to detect
 const HALLUCINATION_PATTERNS = [
   /\blet me\b/gi,
-  /\bwait,?\s*let me\b/gi,
-  /\bactually,?\s*let me\b/gi,
-  /\blet me recalculate\b/gi,
-  /\blet me check\b/gi,
-  /\blet me verify\b/gi,
-  /\blet me calculate\b/gi,
-  /\bhmm,?\s*let me\b/gi,
-  /\boops,?\s*let me\b/gi,
-  /\bsorry,?\s*let me\b/gi,
-  /\bi need to\b/gi,
-  /\bi should\b/gi,
-  /\bi'll\b/gi,
   /\bmy mistake\b/gi,
-  /\bmy apologies\b/gi,
-  /\bon second thought\b/gi,
-  /\bupon reflection\b/gi
+  /\bupon reflection\b/gi,
+  /\bon second thought\b/gi
 ];
 
 /**
@@ -76,7 +63,7 @@ export function validateQuestionForHallucinations(questionData: any): Validation
 export async function validateAndRegenerateIfNeeded(
   questionData: any,
   regenerationFunction: () => Promise<any>,
-  maxRetries: number = 3
+  maxRetries: number = 5
 ): Promise<{ questionData: any; wasRegenerated: boolean; attempts: number }> {
   let currentQuestionData = questionData;
   let attempts = 0;
@@ -111,8 +98,11 @@ export async function validateAndRegenerateIfNeeded(
     }
   }
 
-  console.log(`⚠️ Question still contains hallucinations after ${maxRetries} attempts`);
-  return { questionData: currentQuestionData, wasRegenerated, attempts };
+  console.log(`❌ Question validation failed after ${maxRetries} attempts - REJECTING QUESTION`);
+  console.log(`   This question contains hallucinations and will NOT be saved to database`);
+  
+  // Throw error to prevent hallucinated question from being saved
+  throw new Error(`Question validation failed after ${maxRetries} attempts. Contains hallucinations like "Let me". Question rejected to maintain quality standards.`);
 }
 
 /**

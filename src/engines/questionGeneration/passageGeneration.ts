@@ -453,7 +453,7 @@ function validatePassageContent(passage: GeneratedPassage, request: PassageGener
  * Generates a mini-passage for drill questions (1:1 ratio)
  */
 export async function generateMiniPassage(request: PassageGenerationRequest): Promise<GeneratedPassage> {
-  const maxAttempts = 3;
+  const maxAttempts = 5;
   let lastError: Error | null = null;
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -584,7 +584,7 @@ export async function generateMiniPassage(request: PassageGenerationRequest): Pr
  * Generates a single reading passage
  */
 export async function generatePassage(request: PassageGenerationRequest): Promise<GeneratedPassage> {
-  const maxAttempts = 3;
+  const maxAttempts = 5;
   let lastError: Error | null = null;
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {

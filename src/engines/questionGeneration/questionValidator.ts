@@ -187,7 +187,7 @@ export async function validateQuestion(questionData: any): Promise<ValidationRes
 export async function validateAndRegenerateIfNeeded(
   questionData: any,
   regenerationFunction: () => Promise<any>,
-  maxRetries: number = 3
+  maxRetries: number = 5
 ): Promise<{
   questionData: any;
   wasRegenerated: boolean;
@@ -234,7 +234,12 @@ export async function validateAndRegenerateIfNeeded(
   }
 
   if (!finalValidation.isValid && attempts >= maxRetries) {
-    console.log(`⚠️ Question still invalid after ${maxRetries} attempts`);
+    console.log(`❌ Question validation failed after ${maxRetries} attempts - REJECTING QUESTION`);
+    console.log(`   Errors: ${finalValidation.hasHallucinations ? 'Hallucinations detected' : 'Answer verification failed'}`);
+    console.log(`   This question will NOT be saved to database`);
+    
+    // Throw error to prevent invalid question from being saved
+    throw new Error(`Question validation failed after ${maxRetries} attempts. ${finalValidation.hasHallucinations ? 'Contains hallucinations like "Let me"' : 'Answer verification failed'}. Question rejected to maintain quality standards.`);
   }
 
   return {

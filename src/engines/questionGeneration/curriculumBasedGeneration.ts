@@ -370,7 +370,7 @@ export class CurriculumBasedGenerator {
       const validationResult = await validateAndRegenerateIfNeeded(
         parsedResponse,
         regenerationFunction,
-        3 // max retries
+        5 // max retries - increased to prevent hallucinations
       );
       
       parsedResponse = validationResult.questionData;

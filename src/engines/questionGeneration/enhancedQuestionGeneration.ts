@@ -95,7 +95,7 @@ export async function generateQuestionWithValidation(
   request: EnhancedQuestionRequest
 ): Promise<EnhancedGenerationResult> {
   const startTime = Date.now();
-  const maxAttempts = request.maxRegenerationAttempts || 3;
+  const maxAttempts = request.maxRegenerationAttempts || 5;
   let regenerationCount = 0;
   let lastValidationResult: any = null;
 
@@ -173,22 +173,15 @@ export async function generateQuestionWithValidation(
         continue; // Try again
       }
 
-      // Validation failed but we've reached max attempts or shouldn't regenerate
-      if (validationResult.requiresManualReview) {
-        console.log(`🔴 Question requires manual review after ${attempt} attempts`);
-        console.log(`   Final confidence: ${validationResult.confidence}%`);
-        console.log(`   Issues: ${[...validationResult.errors, ...validationResult.warnings].join('; ')}`);
-        
-        // Return the question but mark it for manual review
-        const totalDuration = Date.now() - startTime;
-        return {
-          question,
-          validationResult,
-          regenerationCount,
-          totalDuration,
-          wasValidated: true
-        };
-      }
+      // Validation failed and we've reached max attempts - reject the question completely
+      console.log(`❌ Question validation failed after ${attempt} attempts - REJECTING QUESTION`);
+      console.log(`   Final confidence: ${validationResult.confidence}%`);
+      console.log(`   Errors: ${validationResult.errors.join('; ')}`);
+      console.log(`   This question will NOT be saved to database`);
+      
+      // Throw error to prevent question from being saved
+      const totalDuration = Date.now() - startTime;
+      throw new Error(`Question validation failed after ${maxAttempts} attempts. Errors: ${validationResult.errors.join('; ')}. Question rejected to maintain quality standards.`);
 
     } catch (error) {
       console.error(`❌ Generation attempt ${attempt} failed:`, error);

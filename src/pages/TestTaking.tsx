@@ -1460,9 +1460,14 @@ const TestTaking: React.FC = () => {
         if (updatedSession.type === 'drill' && !isWritingDrill) {
           // For NON-WRITING drill sessions, update drill-specific progress
           const questionsAnswered = Object.keys(stringAnswers).length + Object.keys(stringTextAnswers).length;
-          const questionsCorrect = Object.values(stringAnswers).filter((answer, index) => {
-            const question = updatedSession.questions[parseInt(Object.keys(stringAnswers)[index])];
-            const answerIndex = answer.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
+          const questionsCorrect = Object.entries(stringAnswers).filter(([qIndex, answer]) => {
+            const question = updatedSession.questions[parseInt(qIndex)];
+            if (!question || !question.options) return false;
+            
+            // Find the answer index by matching the option text
+            const answerIndex = question.options.findIndex(option => option === answer);
+            console.log('💾 DRILL-SAVE: Question', qIndex, 'answer:', answer, 'correct answer index:', question.correctAnswer, 'user answer index:', answerIndex);
+            
             return answerIndex === question.correctAnswer;
           }).length;
           
