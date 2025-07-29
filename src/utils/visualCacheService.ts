@@ -57,7 +57,7 @@ class VisualCacheService {
     additionalParams?: Record<string, any>
   ): VisualData | null {
     this.stats.totalRequests++;
-    
+
     const key = this.generateCacheKey(subSkill, difficulty, visualType, additionalParams);
     const entry = this.cache.get(key);
 
@@ -201,7 +201,7 @@ class VisualCacheService {
 
     // Note: This would integrate with the actual visual generation service
     // For now, we're just setting up the cache structure
-    console.log('Preloading common visual patterns...', commonCombinations.length);
+
   }
 
   /**
@@ -240,4 +240,4 @@ class VisualCacheService {
 
 // Export singleton instance
 export const visualCacheService = new VisualCacheService();
-export default visualCacheService; 
+export default visualCacheService;

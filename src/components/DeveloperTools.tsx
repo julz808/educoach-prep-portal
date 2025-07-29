@@ -71,15 +71,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
 
     try {
       // First, let's see what data actually exists
-      console.log('🔍 DEV: Checking existing data...');
-      
       const { data: existingSessions } = await supabase
         .from('user_test_sessions')
         .select('*')
         .eq('user_id', user.id);
       
-      console.log('🔍 DEV: Existing user_test_sessions:', existingSessions);
-
       if (testType === 'drill') {
         console.log('🧹 DEV: Clearing drill_sessions...');
         const { data: existingDrills } = await supabase
@@ -87,8 +83,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           .select('*')
           .eq('user_id', user.id);
         
-        console.log('🔍 DEV: Existing drill_sessions:', existingDrills);
-
         const { error: drillSessionsError } = await supabase
           .from('drill_sessions')
           .delete()
@@ -146,16 +140,13 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         if (writingError && writingError.code !== '42P01') {
           console.error('❌ DEV: Error clearing writing assessments:', writingError);
         } else {
-          console.log('✅ DEV: Successfully cleared ALL writing_assessments for user');
-          
           // Verify no writing assessments remain
           const { data: remainingAssessments } = await supabase
             .from('writing_assessments')
             .select('id')
             .eq('user_id', user.id);
             
-          console.log(`🔍 DEV: Remaining writing_assessments: ${remainingAssessments?.length || 0}`);
-        }
+          }
       } catch (e) {
         console.error('❌ DEV: Exception clearing writing_assessments:', e);
       }
@@ -181,8 +172,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           if (sectionStatesError) {
             console.error('❌ DEV: Error clearing section states:', sectionStatesError);
           } else {
-            console.log('✅ DEV: Successfully cleared test_section_states');
-          }
+            }
         } catch (e) {
           console.error('❌ DEV: Exception clearing test_section_states:', e);
         }
@@ -216,7 +206,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           console.error('❌ DEV: Error deleting sessions:', sessionsError);
           
           // Let's check what's still referencing these sessions
-          console.log('🔍 DEV: Checking what still references sessions...');
           for (const sessionId of sessionIdArray.slice(0, 3)) {
             const { data: stillReferenced } = await supabase
               .from('writing_assessments')
@@ -227,8 +216,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           
           throw new Error(`Failed to clear user_test_sessions: ${sessionsError.message}`);
         } else {
-          console.log(`✅ DEV: Successfully deleted ${sessionsToDelete.length} user_test_sessions`);
-        }
+          }
       } else {
         console.log('🧹 DEV: No sessions to delete');
       }
@@ -273,13 +261,9 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
   };
 
   const createSimpleHalfCompleteData = async (dbProductType: string) => {
-    console.log(`🎯 DEV: Creating simple half-complete data for ${testType} with product ${dbProductType}`);
-    
     try {
       // Get available sections/questions from the database with more detailed logging
       const testModeQuery = testType === 'practice' ? 'practice_1' : testType;
-      console.log(`🎯 DEV: Querying questions with product_type='${dbProductType}', test_mode='${testModeQuery}'`);
-      
       const { data: availableQuestions, error: queryError } = await supabase
         .from('questions')
         .select('section_name, sub_skill_id, difficulty, id')
@@ -291,9 +275,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         throw queryError;
       }
 
-      console.log(`🎯 DEV: Found ${availableQuestions?.length || 0} questions for ${testType}`);
-      console.log(`🎯 DEV: Sample questions:`, availableQuestions?.slice(0, 3));
-
       if (!availableQuestions || availableQuestions.length === 0) {
         console.warn(`❌ DEV: No questions found for ${testType} with product ${dbProductType}`);
         
@@ -302,60 +283,44 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           .from('questions')
           .select('product_type, test_mode')
           .limit(10);
-        console.log(`🔍 DEV: Available products/modes in database:`, allQuestions);
         return;
       }
 
       if (testType === 'diagnostic' || testType === 'practice') {
         // Get unique sections and filter out null/undefined
         const sections = [...new Set(availableQuestions.map(q => q.section_name))].filter(Boolean);
-        console.log(`🎯 DEV: Creating sessions for ${sections.length} sections:`, sections);
-
         for (let i = 0; i < sections.length; i++) {
           const sectionName = sections[i];
-          console.log(`🎯 DEV: Processing section ${i+1}/${sections.length}: "${sectionName}"`);
-          
           if (i < Math.floor(sections.length * 0.4)) {
             // 40% completed
-            console.log(`🎯 DEV: Creating COMPLETED session for "${sectionName}"`);
             await createBasicSession(dbProductType, sectionName, 'completed', testType);
           } else if (i < Math.floor(sections.length * 0.7)) {
             // 30% in-progress
-            console.log(`🎯 DEV: Creating ACTIVE session for "${sectionName}"`);
             await createBasicSession(dbProductType, sectionName, 'active', testType);
           } else {
-            console.log(`🎯 DEV: Leaving "${sectionName}" as NOT STARTED`);
-          }
+            }
         }
       } else if (testType === 'drill') {
         // Get unique sub-skills and filter out null/undefined
         const subSkills = [...new Set(availableQuestions.map(q => q.sub_skill_id))].filter(Boolean);
-        console.log(`🎯 DEV: Creating drill sessions for ${subSkills.length} sub-skills:`, subSkills);
-
         for (let i = 0; i < subSkills.length; i++) {
           const subSkillId = subSkills[i];
-          console.log(`🎯 DEV: Processing sub-skill ${i+1}/${subSkills.length}: ${subSkillId}`);
-          
           if (i < Math.floor(subSkills.length * 0.4)) {
             // 40% of sub-skills: complete ALL difficulties
-            console.log(`🎯 DEV: Creating COMPLETED drill sessions for all difficulties of ${subSkillId}`);
             for (const difficulty of [1, 2, 3]) {
               await createBasicDrillSession(dbProductType, subSkillId, difficulty, 'completed');
             }
           } else if (i < Math.floor(subSkills.length * 0.7)) {
             // 30% of sub-skills: partially complete (only some difficulties)
-            console.log(`🎯 DEV: Creating PARTIAL drill sessions for ${subSkillId}`);
             await createBasicDrillSession(dbProductType, subSkillId, 1, 'completed'); // Easy completed
             await createBasicDrillSession(dbProductType, subSkillId, 2, 'active'); // Medium in-progress
             // Hard not started (no session created)
           } else {
-            console.log(`🎯 DEV: Leaving all difficulties of ${subSkillId} as NOT STARTED`);
-          }
+            }
         }
       }
 
-      console.log(`✅ DEV: Successfully created half-complete data for ${testType}`);
-    } catch (error) {
+      } catch (error) {
       console.error(`❌ DEV: Error creating half-complete data:`, error);
       throw error;
     }
@@ -419,7 +384,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           .from('questions')
           .select('product_type, test_mode')
           .limit(10);
-        console.log(`🔍 DEV: Available products/modes in database:`, allQuestions);
         return;
       }
 
@@ -484,16 +448,13 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
 
-      console.log(`✅ DEV: Successfully created finish-all data for ${testType}`);
-    } catch (error) {
+      } catch (error) {
       console.error(`❌ DEV: Error creating finish-all data:`, error);
       throw error;
     }
   };
 
   const createRealisticSession = async (dbProductType: string, sectionName: string, status: string, mode: string) => {
-    console.log(`📝 DEV: Creating REALISTIC ${status} session for ${sectionName}...`);
-    
     let questions: any[] = [];
     
     try {
@@ -513,7 +474,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           if (testMode.id && testMode.id.startsWith('practice_')) {
             foundSection = testMode.sections.find(section => section.name === sectionName);
             if (foundSection && foundSection.questions.length > 0) {
-              console.log(`📝 DEV: Found section in mode: ${testMode.name}`);
               break;
             }
           }
@@ -525,15 +485,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
 
         questions = foundSection.questions;
-        console.log(`📝 DEV: Found ${questions.length} practice questions for ${sectionName}`);
-        
         // Apply same Reading section reorganization as for diagnostic tests
         const isReadingSection = sectionName.toLowerCase().includes('reading') || 
                                  sectionName.toLowerCase().includes('comprehension');
         
         if (isReadingSection) {
-          console.log(`📝 DEV: Applying Reading section reorganization for practice ${sectionName}`);
-          
           // Group questions by passage content, keeping non-passage questions at the end
           const questionsWithPassage = questions.filter(q => q.passageContent);
           const questionsWithoutPassage = questions.filter(q => !q.passageContent);
@@ -555,8 +511,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
             ...questionsWithoutPassage
           ];
           
-          console.log(`📝 DEV: Reorganized Practice Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions`);
-        }
+          }
         
       } else if (mode === 'diagnostic') {
         // Use direct Supabase query for diagnostic (more reliable)  
@@ -607,15 +562,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           };
         });
         
-        console.log(`📝 DEV: Found ${questions.length} diagnostic questions for ${sectionName}`);
-        
         // Apply same Reading section reorganization as TestTaking.tsx
         const isReadingSection = sectionName.toLowerCase().includes('reading') || 
                                  sectionName.toLowerCase().includes('comprehension');
         
         if (isReadingSection) {
-          console.log(`📝 DEV: Applying Reading section reorganization for ${sectionName}`);
-          
           // Group questions by passage_id, keeping non-passage questions at the end
           const questionsWithPassage = questions.filter(q => q.passageContent);
           const questionsWithoutPassage = questions.filter(q => !q.passageContent);
@@ -637,8 +588,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
             ...questionsWithoutPassage
           ];
           
-          console.log(`📝 DEV: Reorganized Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions`);
-        }
+          }
       }
 
       if (questions.length === 0) {
@@ -649,8 +599,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       const totalQuestions = questions.length;
       
       // NEW RULES FOR REALISTIC TEST DATA
-      console.log(`🎯 DEV: Creating realistic test data for ${sectionName} with ${totalQuestions} questions`);
-      
       // 1. Random number of blank questions (0 to 5 max, strictly enforced)
       const blankQuestions = Math.floor(Math.random() * 6); // 0 to 5, exactly as specified
       const questionsAttempted = totalQuestions - blankQuestions;
@@ -663,15 +611,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       
       // Ensure we don't have more correct answers than attempted questions
       const finalCorrectAnswers = Math.min(correctAnswers, questionsAttempted);
-      
-      console.log(`🎯 DEV: ${sectionName} realistic data:`, {
-        totalQuestions,
-        questionsAttempted,
-        blankQuestions,
-        desiredOverallScore: desiredOverallScore + '%',
-        correctAnswers: finalCorrectAnswers,
-        calculation: `${finalCorrectAnswers}/${questionsAttempted} attempted, ${finalCorrectAnswers}/${totalQuestions} total = ${Math.round((finalCorrectAnswers/totalQuestions)*100)}% overall score`
-      });
       
       // Create realistic answer data with some blank answers
       const answersData: Record<string, string> = {};
@@ -719,21 +658,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
       
-      console.log(`📝 DEV: Created realistic answers:`, {
-        totalAnswers: Object.keys(answersData).length,
-        expectedAttempted: questionsAttempted,
-        blankQuestionIndices: Array.from(blankQuestionIndices).sort(),
-        sampleAnswers: Object.entries(answersData).slice(0, 3),
-        flaggedQuestions: flaggedQuestions,
-        sampleQuestions: questions.slice(0, 2).map((q, i) => ({
-          index: i,
-          id: q.id,
-          text: q.text?.substring(0, 50) + '...',
-          options: q.options,
-          correctAnswer: q.correctAnswer
-        }))
-      });
-      
       const sessionData = {
         user_id: user.id,
         product_type: dbProductType,
@@ -763,15 +687,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         throw error;
       }
 
-      console.log(`✅ DEV: Created realistic ${status} session for ${sectionName}:`, {
-        sessionId: sessionResult.id,
-        totalQuestions,
-        questionsAttempted,
-        correctAnswers: finalCorrectAnswers,
-        overallScore: Math.round((finalCorrectAnswers / totalQuestions) * 100) + '%',
-        accuracyOfAttempted: Math.round((finalCorrectAnswers / questionsAttempted) * 100) + '%'
-      });
-      
       // Create individual question attempt records for attempted questions only
       for (const [qIndexStr, userAnswerText] of Object.entries(answersData)) {
         const qIndex = parseInt(qIndexStr);
@@ -817,8 +732,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
   };
 
   const createBasicSession = async (dbProductType: string, sectionName: string, status: string, mode: string) => {
-    console.log(`📝 DEV: Creating ${status} session for ${sectionName} with real answers...`);
-    
     let questions: any[] = [];
     
     try {
@@ -838,7 +751,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           if (testMode.id && testMode.id.startsWith('practice_')) {
             foundSection = testMode.sections.find(section => section.name === sectionName);
             if (foundSection && foundSection.questions.length > 0) {
-              console.log(`📝 DEV: Found section in mode: ${testMode.name}`);
               break;
             }
           }
@@ -850,15 +762,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
 
         questions = foundSection.questions;
-        console.log(`📝 DEV: Found ${questions.length} practice questions for ${sectionName}`);
-        
         // Apply same Reading section reorganization as for diagnostic tests
         const isReadingSection = sectionName.toLowerCase().includes('reading') || 
                                  sectionName.toLowerCase().includes('comprehension');
         
         if (isReadingSection) {
-          console.log(`📝 DEV: Applying Reading section reorganization for practice ${sectionName} (basic session)`);
-          
           // Group questions by passage content, keeping non-passage questions at the end
           const questionsWithPassage = questions.filter(q => q.passageContent);
           const questionsWithoutPassage = questions.filter(q => !q.passageContent);
@@ -880,8 +788,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
             ...questionsWithoutPassage
           ];
           
-          console.log(`📝 DEV: Reorganized Practice Reading section into ${passageGroups.size} passage groups with ${questionsWithoutPassage.length} non-passage questions (basic session)`);
-        }
+          }
         
       } else if (mode === 'diagnostic') {
         // Use direct Supabase query for diagnostic (more reliable)
@@ -909,8 +816,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           explanation: q.solution || 'No explanation provided'
         }));
         
-        console.log(`📝 DEV: Found ${questions.length} diagnostic questions for ${sectionName}`);
-      }
+        }
 
       if (questions.length === 0) {
         console.warn(`No questions found for ${sectionName} in ${mode} mode, creating basic session anyway`);
@@ -935,13 +841,10 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       }
       
       questionsAnswered = Math.min(calculatedAnswered, maxAnswered);
-      console.log(`📝 DEV: ACTIVE session - calculation: totalQuestions=${totalQuestions}, targetPercentage=${targetPercentage}, calculatedAnswered=${calculatedAnswered}, maxAnswered=${maxAnswered}, final questionsAnswered=${questionsAnswered}`);
-    }
+      }
     // Use a higher score range for better test data (80-95%)
     const mockScore = Math.floor(Math.random() * 15) + 80; // 80-95%
     const correctAnswers = Math.floor(questionsAnswered * (mockScore / 100));
-    
-    console.log(`📝 DEV: ${sectionName} - mockScore: ${mockScore}%, questionsAnswered: ${questionsAnswered}, correctAnswers: ${correctAnswers}`);
     
     // Create realistic answer data with actual question responses
     const answersData: Record<string, string> = {};
@@ -969,16 +872,13 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Store the full option text (same format as what TestTaking expects)
       if (question.options && question.options[selectedAnswerIndex]) {
         answersData[qIndex.toString()] = question.options[selectedAnswerIndex];
-        console.log(`📝 DEV: Question ${qIndex}: selected "${question.options[selectedAnswerIndex]}" (index ${selectedAnswerIndex})`);
-      }
+        }
       
       // Random flagging (5% chance)
       if (Math.random() < 0.05) {
         flaggedQuestions.push(qIndex);
       }
     }
-    
-    console.log(`📝 DEV: Created ${Object.keys(answersData).length} realistic answers for ${sectionName}`);
     
     const sessionData = {
       user_id: user.id,
@@ -1008,8 +908,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       throw error;
     }
 
-    console.log(`✅ DEV: Created ${status} session for ${sectionName} with ${questionsAnswered} answered questions`);
-    
     // Create individual question attempt records with realistic data
     for (let qIndex = 0; qIndex < questionsAnswered; qIndex++) {
       const question = questions[qIndex];
@@ -1048,8 +946,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       }
     }
     
-    console.log(`✅ DEV: Created ${questionsAnswered} question attempts for ${sectionName}`);
-    
     } catch (error) {
       console.error(`❌ DEV: Error in createBasicSession:`, error);
       throw error;
@@ -1057,9 +953,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
   };
 
   const createBasicDrillSession = async (dbProductType: string, subSkillId: string, difficulty: number, status: string) => {
-    console.log(`🔧 DEV: Creating ${status} drill session for sub-skill "${subSkillId}", difficulty ${difficulty} with real answers...`);
-    console.log(`🔧 DEV: subSkillId type:`, typeof subSkillId, 'length:', subSkillId?.length);
-    
     // Safety check and clean up sub_skill_id
     if (!subSkillId || typeof subSkillId !== 'string') {
       console.error(`🔧 DEV: Invalid subSkillId:`, subSkillId);
@@ -1069,10 +962,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     // Clean up any problematic Unicode characters or escape sequences
     const cleanSubSkillId = subSkillId.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
     if (cleanSubSkillId !== subSkillId) {
-      console.log(`🔧 DEV: Cleaned subSkillId from "${subSkillId}" to "${cleanSubSkillId}"`);
-    }
-    
-    console.log(`🔧 DEV: Using clean subSkillId: "${cleanSubSkillId}"`);
+      }
     
     try {
       // Get real questions using direct Supabase query (since drills work with sub_skill_id)
@@ -1090,11 +980,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         return;
       }
 
-
       // Helper function to parse and clean answer options
       const parseAnswerOptions = (answerOptions: any): string[] => {
-        console.log('🔧 DEV: Raw answer_options:', answerOptions, 'type:', typeof answerOptions);
-        
         if (!answerOptions) return [];
         
         let options: string[] = [];
@@ -1120,7 +1007,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
           }
         }
         
-        console.log('🔧 DEV: Parsed options:', options);
         return options;
       };
 
@@ -1141,8 +1027,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
 
       // Filter out questions with no valid options
       const validQuestions = questions.filter(q => q.options && q.options.length > 0);
-      console.log(`🔧 DEV: Found ${validQuestions.length} valid drill questions (${questions.length - validQuestions.length} filtered out) for sub-skill "${cleanSubSkillId}"`);
-    
       if (validQuestions.length === 0) {
         console.warn(`No valid drill questions found for sub-skill "${cleanSubSkillId}", difficulty ${difficulty}`);
         return;
@@ -1153,8 +1037,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       let questionsAnswered: number;
       if (status === 'completed') {
         questionsAnswered = totalQuestions; // All questions answered for completed sessions
-        console.log(`🔧 DEV: COMPLETED session - answering ALL ${questionsAnswered} questions`);
-      } else {
+        } else {
         // For active sessions, ensure we never answer all questions (leave at least 1 unanswered)
         // Handle inconsistent database question counts by ensuring we always have incomplete sessions
         const targetPercentage = 0.6; // Answer 60% of questions
@@ -1167,8 +1050,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
         
         questionsAnswered = Math.min(calculatedAnswered, maxAnswered);
-        console.log(`🔧 DEV: ACTIVE session - calculation: totalQuestions=${totalQuestions}, targetPercentage=${targetPercentage}, calculatedAnswered=${calculatedAnswered}, maxAnswered=${maxAnswered}, final questionsAnswered=${questionsAnswered}`);
-      }
+        }
       const mockScore = Math.floor(Math.random() * 30) + 70; // 70-100%
       const correctAnswers = Math.floor(questionsAnswered * (mockScore / 100));
       
@@ -1213,11 +1095,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         const selectedAnswerLetter = String.fromCharCode(65 + selectedAnswerIndex); // 0=A, 1=B, 2=C, 3=D
         answersData[question.id] = selectedAnswerLetter;
         
-        console.log(`🔧 DEV: Drill Question ${qIndex}: selected index ${selectedAnswerIndex} (${selectedAnswerLetter}) for "${question.options[selectedAnswerIndex] || 'N/A'}"`);
-      }
+        }
     
-    console.log(`🔧 DEV: Created ${Object.keys(answersData).length} realistic drill answers`);
-
     // Clean all string data that goes to the database
     const cleanAnswersData: Record<string, string> = {};
     Object.entries(answersData).forEach(([key, value]) => {
@@ -1238,17 +1117,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       completed_at: status === 'completed' ? new Date().toISOString() : null
     };
 
-    console.log('🔧 DEV: Final drill data (cleaned):', {
-      sub_skill_id: drillData.sub_skill_id,
-      product_type: drillData.product_type,
-      status: drillData.status,
-      questions_total: drillData.questions_total,
-      questions_answered: drillData.questions_answered,
-      answers_data_keys: Object.keys(drillData.answers_data).length,
-      question_ids_count: drillData.question_ids.length,
-      is_truly_incomplete: drillData.questions_answered < drillData.questions_total
-    });
-
     const { data: sessionResult, error } = await supabase
       .from('drill_sessions')
       .insert(drillData)
@@ -1260,9 +1128,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       throw error;
     }
 
-    console.log(`✅ DEV: Created ${status} drill session for sub-skill "${cleanSubSkillId}", difficulty ${difficulty}`);
-    
-      // Create individual question attempt records with realistic data
+    // Create individual question attempt records with realistic data
       for (let qIndex = 0; qIndex < questionsAnswered; qIndex++) {
         const question = questions[qIndex];
         const userAnswerLetter = answersData[question.id]; // This is already in letter format (A, B, C, D)
@@ -1292,9 +1158,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
       
-      console.log(`✅ DEV: Created ${questionsAnswered} drill question attempts for sub-skill "${cleanSubSkillId}"`);
-      
-    } catch (error) {
+      } catch (error) {
       console.error(`❌ DEV: Error in createBasicDrillSession:`, error);
       throw error;
     }
@@ -1313,8 +1177,6 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       try {
         await clearAllData(dbProductType);
         
-        console.log(`✅ DEV: Cleared all ${testType} data successfully`);
-        
         // Notify parent component and refresh
         if (onDataChanged) onDataChanged();
         setTimeout(() => window.location.reload(), 500);
@@ -1332,31 +1194,21 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     }
 
     const dbProductType = getDbProductType(selectedProduct);
-    console.log(`🎯 DEV: Half Complete clicked - testType: ${testType}, selectedProduct: ${selectedProduct}, dbProductType: ${dbProductType}`);
-    
     if (confirm(`🚨 DEV: Set ${testType} to half-complete state with mixed progress?`)) {
       try {
-        console.log(`🎯 DEV: Starting half complete for ${testType} - ${dbProductType}`);
-        
         // First clear existing data
         await clearAllData(dbProductType);
         
         // Wait for clear to complete
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        console.log(`🎯 DEV: Creating half-complete data for ${testType}...`);
         await createSimpleHalfCompleteData(dbProductType);
         
-        console.log(`✅ DEV: Set ${testType} to half-complete state successfully`);
-        
         if (onDataChanged) {
-          console.log(`🔄 DEV: Calling onDataChanged callback`);
           onDataChanged();
         }
         
-        console.log(`🔄 DEV: Scheduling page reload in 500ms`);
         setTimeout(() => {
-          console.log(`🔄 DEV: Reloading page now!`);
           window.location.reload();
         }, 500);
       } catch (error) {
@@ -1388,16 +1240,11 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.log(`🏁 DEV: Creating finish-all data for ${testType}...`);
         await createSimpleFinishAllData(dbProductType);
         
-        console.log(`✅ DEV: Completed all ${testType} exercises successfully`);
-        
         if (onDataChanged) {
-          console.log(`🔄 DEV: Calling onDataChanged callback`);
           onDataChanged();
         }
         
-        console.log(`🔄 DEV: Scheduling page reload in 500ms`);
         setTimeout(() => {
-          console.log(`🔄 DEV: Reloading page now!`);
           window.location.reload();
         }, 500);
       } catch (error) {

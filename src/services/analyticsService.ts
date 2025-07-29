@@ -85,12 +85,10 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
 
   const productMappings = sectionMappings[productType];
   if (productMappings && productMappings[sectionName]) {
-    console.log(`📝 SECTION-MAP: Mapped "${sectionName}" -> "${productMappings[sectionName]}" for ${productType}`);
     return productMappings[sectionName];
   }
   
   // Return original name if no mapping found
-  console.log(`📝 SECTION-MAP: No mapping found for "${sectionName}" in ${productType}, using original`);
   return sectionName;
 }
 
@@ -98,8 +96,6 @@ function mapSectionNameToCurriculum(sectionName: string, productType: string): s
 async function getTotalQuestionsAvailable(productType: string, testType: string, testNumber?: number) {
   try {
     const testMode = testNumber ? `${testType}_${testNumber}` : testType;
-    
-    console.log(`🔍 Getting total questions available for ${testMode}`);
     
     const { data: allQuestions, error } = await supabase
       .from('questions')
@@ -152,14 +148,6 @@ async function getTotalQuestionsAvailable(productType: string, testType: string,
     // Calculate total max_points across all questions
     const totalMaxPoints = allQuestions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
     
-    console.log(`📊 Total points available:`, {
-      totalQuestions: allQuestions?.length || 0,
-      totalMaxPoints,
-      sectionsCount: sectionTotals.size,
-      subSkillsCount: subSkillTotals.size,
-      sectionBreakdown: Object.fromEntries(sectionTotals)
-    });
-    
     return { sectionTotals, subSkillTotals, totalAvailable: totalMaxPoints };
   } catch (error) {
     console.error('❌ Error in getTotalQuestionsAvailable:', error);
@@ -170,29 +158,8 @@ async function getTotalQuestionsAvailable(productType: string, testType: string,
 // Get real test data using unified approach for all test types (diagnostic, practice, drill)
 async function getRealTestData(userId: string, productType: string, sessionId: string, testType: string = 'practice', testNumber?: number) {
   console.log(`\n🔄 ${testType.toUpperCase()} INSIGHTS: Getting real data for session ${sessionId}`);
-  console.log(`🔄 ${testType.toUpperCase()} INSIGHTS: Function called with:`, {
-    userId,
-    productType,
-    sessionId,
-    testType,
-    testNumber
-  });
-  
   try {
-    console.log(`📊 ${testType} test details:`, {
-      sessionId,
-      testType,
-      testNumber
-    });
-    
     // Get ALL question attempts for this specific session
-    console.log(`🔍 Querying question_attempt_history for:`, {
-      userId,
-      sessionId,
-      sessionIdType: typeof sessionId,
-      testType
-    });
-    
     let { data: questionAttempts, error: attemptsError } = await supabase
       .from('question_attempt_history')
       .select(`
@@ -211,23 +178,11 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       return null;
     }
     
-    console.log(`📊 Question attempts query result:`, {
-      found: questionAttempts?.length || 0,
-      sessionId,
-      userId,
-      error: attemptsError,
-      sampleAttempt: questionAttempts?.[0]
-    });
-    
     if (!questionAttempts || questionAttempts.length === 0) {
       console.log(`⚠️ No question attempts found for session ${sessionId}`);
-      console.log(`🔄 No granular insights available for ${testType} - session may be from before individual recording was implemented`);
-      
       // Return null for old sessions without individual question attempts
       return null;
     }
-    
-    console.log(`📊 Found ${questionAttempts.length} question attempts for session ${sessionId}`);
     
     // Get total questions available for this test to calculate correct denominators
     const { sectionTotals, subSkillTotals, totalAvailable } = await getTotalQuestionsAvailable(productType, testType, testNumber);
@@ -240,8 +195,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     
     // Get question details for all attempted questions
     const questionIds = questionAttempts.map(attempt => attempt.question_id);
-    console.log(`🔍 Getting question details for ${questionIds.length} questions`);
-    
     let { data: questionDetails, error: questionsError } = await supabase
       .from('questions')
       .select(`
@@ -257,8 +210,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
       console.error('❌ Error fetching question details:', questionsError);
       return null;
     }
-    
-    console.log(`📊 Got details for ${questionDetails?.length || 0} questions`);
     
     // Create a map for quick lookup
     const questionDetailsMap = new Map();
@@ -347,8 +298,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
           maxPoints = questionAssessment.max_possible_score || maxPoints;
         }
       }
-      
-      
+
       // Track overall totals
       totalQuestionsAttempted++;
       totalMaxPoints += maxPoints;
@@ -369,8 +319,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
           earnedPoints: 0
         });
       }
-      
-      
+
       const subSkillData = subSkillStats.get(subSkillName);
       subSkillData.questionsAttempted++;
       subSkillData.maxPoints += maxPoints;
@@ -462,8 +411,7 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         actualTotalQuestions = totalQuestions;
         questionsAttempted = section.questionsAttempted;
         
-        console.log(`📊 Section ${section.sectionName} - Score calculation: ${section.questionsCorrect}/${totalQuestions} = ${score}% (was using weighted: ${section.earnedPoints}/${section.maxPoints})`);
-      }
+        }
       
       return {
         sectionName: mapSectionNameToCurriculum(section.sectionName, productType),
@@ -474,15 +422,12 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
         questionsAttempted
       };
     });
-    
-    
-    
+
     // Build sub-skill breakdown
     const subSkillBreakdown = Array.from(subSkillStats.values()).map(subSkill => {
       // For practice tests, use max points as the total (like diagnostic) to properly handle written expression
       const totalQuestions = subSkill.maxPoints || subSkillTotals.get(subSkill.subSkillName)?.total || subSkill.questionsAttempted;
-      
-      
+
       // Calculate score using max points (earned points / max points)
       const score = subSkill.maxPoints > 0 ? Math.round((subSkill.earnedPoints / subSkill.maxPoints) * 100) : 0;
       
@@ -515,45 +460,14 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
     
     // Calculate overall score using max points (to properly account for written expression)
     const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-    console.log(`📊 Overall score calculation: ${totalEarnedPoints}/${totalMaxPoints} = ${overallScore}%`);
-    
     // For accuracy: use earned points / max points to properly account for written expression
     const overallAccuracy = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-    
-    console.log(`📊 Overall calculation details:`, {
-      totalMaxPoints,
-      totalEarnedPoints,
-      totalQuestionsAttempted,
-      totalQuestionsCorrect,
-      overallScore,
-      overallAccuracy
-    });
-    
-    
-    
-    console.log(`🎯 ${testType.toUpperCase()} RESULTS:`, {
-      sessionId,
-      totalMaxPoints,
-      totalEarnedPoints,
-      totalQuestionsAttempted,
-      totalQuestionsCorrect,
-      overallScore,
-      overallAccuracy,
-      sectionCount: sectionBreakdown.length,
-      subSkillCount: subSkillBreakdown.length
-    });
-    
-    console.log(`📊 Section breakdown:`, sectionBreakdown.map(s => 
-      `${s.sectionName}: ${s.questionsCorrect}/${s.questionsTotal} = ${s.score}%`
-    ));
     
     // Calculate correct total questions for display
     const displayTotalQuestions = useSessionBasedCalculation 
       ? totalQuestionsAttempted  // For session-based, use attempted as total
       : (totalAvailable || totalQuestionsAttempted); // For questions table, use available or attempted
     
-    console.log(`📊 Final totals - displayTotal: ${displayTotalQuestions}, attempted: ${totalQuestionsAttempted}, correct: ${totalQuestionsCorrect}, score: ${overallScore}%`);
-
     return {
       totalQuestions: displayTotalQuestions,
       questionsAttempted: totalQuestionsAttempted,
@@ -580,8 +494,6 @@ async function getRealTestData(userId: string, productType: string, sessionId: s
 
 // Fallback function to get practice test data from session data when no question attempts exist
 async function getSessionBasedPracticeData(userId: string, productType: string, testNumber: number, session: any) {
-  console.log(`🔄 SESSION-BASED APPROACH: Getting data from session for test ${testNumber}`);
-  
   try {
     const practiceTestMode = `practice_${testNumber}`;
     
@@ -633,8 +545,6 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
       practiceQuestions = genericQuestions;
     }
     
-    console.log(`📊 Found ${practiceQuestions.length} practice questions for structure`);
-    
     // Use session data for calculations
     const questionOrder = session.question_order || [];
     const answersData = session.answers_data || {};
@@ -646,15 +556,6 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     // For existing sessions without detailed data, use the practice questions structure
     const totalMaxPoints = practiceQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
     const estimatedCorrectPoints = Math.round((finalScore / 100) * totalMaxPoints);
-    
-    console.log(`📊 Session data summary:`, {
-      totalQuestions,
-      questionsAnswered,
-      correctAnswers,
-      finalScore,
-      questionOrderLength: questionOrder.length,
-      answersDataKeys: Object.keys(answersData).length
-    });
     
     // Create section breakdown using available questions and session score
     const sectionStats = new Map();
@@ -742,17 +643,6 @@ async function getSessionBasedPracticeData(userId: string, productType: string, 
     );
     
     const overallAccuracy = questionsAnswered > 0 ? Math.round((estimatedCorrectPoints / questionsAnswered) * 100) : 0;
-    
-    console.log(`🎯 SESSION-BASED RESULTS for test ${testNumber}:`, {
-      totalMaxPoints,
-      estimatedCorrectPoints,
-      questionsAnswered,
-      correctAnswers,
-      finalScore,
-      overallAccuracy,
-      sectionCount: sectionBreakdown.length,
-      subSkillCount: subSkillBreakdown.length
-    });
     
     return {
       totalQuestions: totalMaxPoints,
@@ -893,8 +783,6 @@ export interface DrillResults {
 export class AnalyticsService {
   static async getOverallPerformance(userId: string, productId: string): Promise<OverallPerformance> {
     const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
-    console.log('📊 Analytics: Fetching overall performance for', userId, productType, `(mapped from ${productId})`);
-
     // Return mock data for demo purposes if enabled
     if (USE_MOCK_DATA) {
       console.log('🎭 Returning mock overall performance data');
@@ -923,7 +811,6 @@ export class AnalyticsService {
         console.error('❌ Error fetching user progress:', progressError);
         // If no progress record exists, create a default one
         if (progressError.code === 'PGRST116') {
-          console.log('📝 No progress record found, returning default values');
           return {
             questionsCompleted: 0,
             questionsAttempted: 0,
@@ -955,8 +842,6 @@ export class AnalyticsService {
       const averageTestScore = testSessions && testSessions.length > 0
         ? Math.round(testSessions.reduce((sum, test) => sum + (test.final_score || 0), 0) / testSessions.length)
         : null;
-
-      console.log('✅ Overall performance data loaded successfully');
 
       return {
         questionsCompleted: progressData?.total_questions_completed || 0,
@@ -1009,8 +894,6 @@ export class AnalyticsService {
       console.log(`⚠️ Sub-skill "${subSkillName}" has no diagnostic questions`);
       return;
     }
-    
-    console.log(`📊 Sub-skill "${subSkillName}" total points: ${totalPoints} (from ${questions?.length} questions)`);
     
     // Note: We now use actual max_points from database instead of manual conversion
 
@@ -1116,13 +999,10 @@ export class AnalyticsService {
       sectionData.questionsAttempted += questionsAttempted;
     }
 
-    console.log(`📊 Sub-skill "${subSkillName}": ${questionsCorrect}/${questionsAttempted}/${totalPoints} (${accuracy}%) in ${sectionName}`);
-  }
+    }
 
   static async getDiagnosticResults(userId: string, productId: string): Promise<DiagnosticResults | null> {
     const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
-    console.log('🎯 Analytics: Fetching diagnostic results for', userId, productType, `(mapped from ${productId})`);
-
     // Return mock diagnostic data for demo purposes if enabled
     if (USE_MOCK_DATA) {
       console.log('🎭 Returning mock diagnostic results data');
@@ -1211,33 +1091,15 @@ export class AnalyticsService {
         return null;
       }
 
-      console.log(`📊 Found ${diagnosticSessions.length} completed diagnostic sections`);
-      console.log('🔍 Diagnostic sessions details:', diagnosticSessions.map(s => ({
-        id: s.id,
-        section: s.section_name,
-        score: s.final_score,
-        correct_answers: s.correct_answers,
-        total_questions: s.total_questions,
-        questions_answered: s.questions_answered,
-        status: s.status,
-        created: s.created_at
-      })));
-      
       // Check if ALL diagnostic sections are completed before showing insights
       const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
       const completedSectionNames = diagnosticSessions.map(s => s.section_name);
       const missingSections = expectedSections.filter(section => !completedSectionNames.includes(section));
       
-      console.log(`📊 Expected sections for ${productType}:`, expectedSections);
-      console.log(`📊 Completed sections:`, completedSectionNames);
-      console.log(`📊 Missing sections:`, missingSections);
-      
       if (missingSections.length > 0) {
         console.log(`ℹ️ Diagnostic insights not available - missing ${missingSections.length} sections: ${missingSections.join(', ')}`);
         return null;
       }
-      
-      console.log('✅ All diagnostic sections completed - showing insights');
       
       if (diagnosticSessions.length === 0) {
         console.log('ℹ️ No completed diagnostic sections found');
@@ -1245,8 +1107,6 @@ export class AnalyticsService {
       }
 
       // COMPLETELY REBUILD sub-skill performance calculation
-      console.log('📊 Rebuilding sub-skill performance from database...');
-      
       // Step 1: Try to get sub-skills from sub_skills table first
       const { data: subSkillsData, error: subSkillsError } = await supabase
         .from('sub_skills')
@@ -1263,14 +1123,10 @@ export class AnalyticsService {
         throw subSkillsError;
       }
 
-      console.log(`📊 Found ${subSkillsData?.length || 0} sub-skills from sub_skills table for ${productType}`);
-
       // Step 2: If no sub-skills found in sub_skills table, get them directly from questions
       const subSkillPerformance = [];
       
       if (!subSkillsData || subSkillsData.length === 0) {
-        console.log(`📊 No sub-skills in sub_skills table for ${productType}, checking questions table...`);
-        
         // Get unique sub-skills directly from diagnostic questions
         const { data: questionSubSkills, error: questionError } = await supabase
           .from('questions')
@@ -1291,8 +1147,6 @@ export class AnalyticsService {
             uniqueSubSkills.set(q.sub_skill, q.section_name);
           }
         });
-
-        console.log(`📊 Found ${uniqueSubSkills.size} unique sub-skills from questions table`);
 
         // Process each unique sub-skill
         for (const [subSkillName, sectionName] of uniqueSubSkills) {
@@ -1322,8 +1176,6 @@ export class AnalyticsService {
           console.log(`⚠️ Sub-skill "${subSkill.name}" has no diagnostic questions`);
           continue;
         }
-        
-        console.log(`📊 Sub-skill "${subSkill.name}" total points: ${totalPoints} (from ${questions?.length} questions)`);
         
         // Note: We now use actual max_points from database instead of manual conversion
 
@@ -1421,11 +1273,8 @@ export class AnalyticsService {
           sectionName
         });
 
-        console.log(`📊 Sub-skill "${subSkill.name}": ${questionsCorrect}/${questionsAttempted}/${totalPoints} (${accuracy}%) in ${sectionName}`);
-      }
+        }
       } // End of else block for sub_skills table processing
-
-      console.log(`📊 Calculated performance for ${subSkillPerformance.length} sub-skills with questions`);
 
       // Create a map for easy lookup in debugging
       const subSkillStats = new Map(
@@ -1460,29 +1309,10 @@ export class AnalyticsService {
         sectionAttemptedCounts.set(section, currentAttempted + skill.questionsAttempted);
       });
       
-      console.log('📊 Sub-skills analysis by section:', 
-        Array.from(sectionQuestionCounts.entries()).map(([section, count]) => ({
-          section,
-          subSkillQuestionTotal: count,
-          numSubSkills: sectionSubSkillCounts.get(section) || 0,
-          subSkillCorrectTotal: sectionCorrectCounts.get(section) || 0,
-          subSkillAttemptedTotal: sectionAttemptedCounts.get(section) || 0
-        }))
-      );
-
       // Process section breakdown from multiple sessions using REAL-TIME calculation
       // This matches the exact calculation used in TestTaking.tsx View Results
       const sectionBreakdownPromises = diagnosticSessions.map(async session => {
         const sessionId = session.id;
-        
-        console.log(`📊 Processing section ${session.section_name}:`, {
-          sessionId: session.id,
-          dbTotalQuestions: session.total_questions,
-          questionOrder: session.question_order?.length || 'null',
-          questionsAnswered: session.questions_answered,
-          correctAnswers: session.correct_answers,
-          finalScore: session.final_score
-        });
         
         // USE THE EXACT SAME CALCULATION AS VIEW RESULTS PAGE
         // View Results uses: questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length
@@ -1526,7 +1356,6 @@ export class AnalyticsService {
               
               // CRITICAL: Ensure we don't accidentally zero out writing scores
               if (questionsCorrect === 0 && totalEarnedScore > 0) {
-                console.log(`🔧 FIXING: Writing section ${session.section_name} had questionsCorrect=0 but totalEarnedScore=${totalEarnedScore}, fixing...`);
                 questionsCorrect = totalEarnedScore;
               }
             } else {
@@ -1581,17 +1410,8 @@ export class AnalyticsService {
             }
           } else {
             // Non-writing sections use standard calculation
-            console.log(`📊 Section ${session.section_name} - Using stored session data:`, {
-              storedCorrectAnswers: session.correct_answers,
-              storedTotalQuestions: session.total_questions,
-              storedQuestionsAnswered: session.questions_answered,
-              questionOrderLength: session.question_order?.length
-            });
-            
             // CRITICAL FIX: Get real-time correct answers from question_attempt_history table
             // instead of relying on session.correct_answers which appears to be 0
-            console.log(`📊 Section ${session.section_name} - Getting real-time correct answers from question_attempt_history...`);
-            
             const { data: sessionAttempts, error: attemptsError } = await supabase
               .from('question_attempt_history')
               .select('is_correct, question_id')
@@ -1601,8 +1421,7 @@ export class AnalyticsService {
             if (!attemptsError && sessionAttempts && sessionAttempts.length > 0) {
               questionsCorrect = sessionAttempts.filter(attempt => attempt.is_correct).length;
               questionsAttempted = sessionAttempts.length; // Use actual attempts count
-              console.log(`📊 Section ${session.section_name} - Real-time calculation: ${questionsCorrect} correct out of ${questionsAttempted} attempted`);
-            } else {
+              } else {
               console.log(`⚠️ No question attempts found for session ${session.id}, using answers_data calculation...`);
               
               // FALLBACK: Calculate from session's answers_data (same method as individual test reviews)
@@ -1633,8 +1452,7 @@ export class AnalyticsService {
               
               questionsCorrect = correctFromAnswers;
               questionsAttempted = attemptedFromAnswers;
-              console.log(`📊 Section ${session.section_name} - Calculated from answers_data: ${questionsCorrect} correct out of ${questionsAttempted} attempted`);
-            }
+              }
           }
           
           // For total points, get actual max_points from questions in this section
@@ -1650,16 +1468,14 @@ export class AnalyticsService {
               
             if (!sectionQError && sectionQuestions && sectionQuestions.length > 0) {
               actualTotalQuestions = sectionQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-              console.log(`📊 Section ${session.section_name} - Calculated max_points total: ${actualTotalQuestions} (from ${sectionQuestions.length} questions)`);
-            } else {
+              } else {
               // Fallback to question count if max_points query fails
               if (session.question_order && Array.isArray(session.question_order) && session.question_order.length > 0) {
                 actualTotalQuestions = session.question_order.length;
               } else {
                 actualTotalQuestions = session.total_questions || 0;
               }
-              console.log(`📊 Section ${session.section_name} - Fallback to question count: ${actualTotalQuestions}`);
-            }
+              }
           }
           // For writing sections, actualTotalQuestions is already set to weighted values above
           
@@ -1668,12 +1484,7 @@ export class AnalyticsService {
             questionsAttempted = Object.keys(session.answers_data).length;
           }
           
-          console.log(`📊 Section ${session.section_name} - FINAL VALUES:`, {
-            actualTotalQuestions,
-            questionsCorrect,
-            questionsAttempted
-          });
-        } catch (error) {
+          } catch (error) {
           console.error('Error in VIEW RESULTS calculation:', error);
           
           // Final fallback - try to get actual max_points, otherwise use question count
@@ -1688,16 +1499,14 @@ export class AnalyticsService {
                 
               if (!sectionQError && sectionQuestions && sectionQuestions.length > 0) {
                 actualTotalQuestions = sectionQuestions.reduce((sum, q) => sum + (q.max_points || 1), 0);
-                console.log(`📊 Section ${session.section_name} - Fallback calculated max_points total: ${actualTotalQuestions}`);
-              } else {
+                } else {
                 // Last resort: use question count
                 if (session.question_order && Array.isArray(session.question_order)) {
                   actualTotalQuestions = session.question_order.length;
                 } else {
                   actualTotalQuestions = session.total_questions || 0;
                 }
-                console.log(`📊 Section ${session.section_name} - Final fallback to question count: ${actualTotalQuestions}`);
-              }
+                }
             } catch (fallbackError) {
               console.error(`❌ Fallback max_points query failed for ${session.section_name}:`, fallbackError);
               // Ultimate fallback
@@ -1773,20 +1582,6 @@ export class AnalyticsService {
         const isWritingSectionForLog = session.section_name?.toLowerCase().includes('writing') || 
                                        session.section_name?.toLowerCase().includes('written expression');
         
-        console.log(`📊 Section ${session.section_name} FINAL RESULT:`, {
-          originalName: session.section_name,
-          mappedName,
-          actualTotalQuestions,
-          questionsCorrect,
-          questionsAttempted,
-          score: score + '%',
-          accuracy: accuracy + '%',
-          calculation: `${questionsCorrect}/${actualTotalQuestions} = ${score}%`,
-          dbTotalQuestions: session.total_questions,
-          questionOrderLength: session.question_order?.length,
-          isWritingSection: isWritingSectionForLog
-        });
-        
         // EXTRA DEBUG: Log if this is a writing section with zero score
         if (isWritingSectionForLog && score === 0) {
           console.warn(`⚠️ WRITING ZERO SCORE DEBUG: Section "${session.section_name}" -> "${mappedName}" has score=0. This might be incorrect!`);
@@ -1805,23 +1600,11 @@ export class AnalyticsService {
       const sectionBreakdown = await Promise.all(sectionBreakdownPromises);
 
       // Debug: Compare section totals with sub-skill totals
-      console.log('📊 COMPARISON - Section Results vs Sub-Skills:');
       sectionBreakdown.forEach(section => {
         const subSkillTotal = sectionQuestionCounts.get(section.sectionName) || 0;
         const subSkillCorrect = sectionCorrectCounts.get(section.sectionName) || 0;
         const subSkillAttempted = sectionAttemptedCounts.get(section.sectionName) || 0;
-        console.log(`📊 ${section.sectionName}:`, {
-          sectionResultTotal: section.questionsTotal,
-          sectionResultCorrect: section.questionsCorrect,
-          sectionResultAttempted: section.questionsAttempted,
-          subSkillsTotal: subSkillTotal,
-          subSkillsCorrect: subSkillCorrect,
-          subSkillsAttempted: subSkillAttempted,
-          questionsDifference: section.questionsTotal - subSkillTotal,
-          correctDifference: section.questionsCorrect - subSkillCorrect,
-          attemptedDifference: section.questionsAttempted - subSkillAttempted
         });
-      });
 
       // Calculate overall score from all completed sections
       const totalQuestions = sectionBreakdown.reduce((sum, section) => sum + section.questionsTotal, 0);
@@ -1831,16 +1614,6 @@ export class AnalyticsService {
       // Calculate total questions attempted from section breakdown (ensures consistency with weighted scores)
       let totalQuestionsAttempted = sectionBreakdown.reduce((sum, section) => sum + section.questionsAttempted, 0);
       
-      console.log('📊 Calculated totalQuestionsAttempted from sectionBreakdown:', {
-        sectionBreakdown: sectionBreakdown.map(s => ({ 
-          section: s.sectionName, 
-          attempted: s.questionsAttempted,
-          total: s.questionsTotal,
-          correct: s.questionsCorrect
-        })),
-        totalAttempted: totalQuestionsAttempted
-      });
-
       // If still 0, use total questions as attempted (all questions were attempted)
       if (totalQuestionsAttempted === 0 && totalQuestions > 0) {
         console.log('⚠️ No attempted questions found, using total questions as fallback');
@@ -1852,27 +1625,15 @@ export class AnalyticsService {
         ? Math.round((totalCorrect / totalQuestionsAttempted) * 100) 
         : 0;
 
-      console.log('📊 Diagnostic totals:', {
-        totalQuestions,
-        totalCorrect,
-        totalQuestionsAttempted,
-        overallScore,
-        overallAccuracy
-      });
-
       // Sort sub-skills by accuracy and prepare for return
       const sortedSkills = subSkillPerformance
         .filter(skill => skill.questionsTotal >= 1) // Include all sub-skills that have questions
         .sort((a, b) => b.accuracy - a.accuracy);
 
-      console.log('📊 Sub-skill performance sorted:', sortedSkills);
-
       // Keep strengths and weaknesses for backwards compatibility, but also return all skills
       const strengths = sortedSkills.slice(0, 5); // Top 5 performing sub-skills
       const weaknesses = sortedSkills.slice(-5).reverse(); // Bottom 5 performing sub-skills, reversed to show worst first
       const allSubSkills = sortedSkills; // All sub-skills for comprehensive display
-
-      console.log('✅ Diagnostic results aggregated from multiple sections successfully');
 
       return {
         overallScore,
@@ -2010,23 +1771,10 @@ export class AnalyticsService {
         throw sessionsError;
       }
 
-      console.log(`📊 Found ${practiceSessions?.length || 0} practice test sessions`);
-      console.log('🔍 Practice sessions details:', practiceSessions?.map(s => ({
-        id: s.id,
-        testMode: s.test_mode,
-        testNumber: s.test_number,
-        score: s.final_score,
-        status: s.status,
-        completedAt: s.completed_at,
-        created: s.created_at
-      })));
-
       // Separate sessions by test_mode type
       const specificModeSessions = practiceSessions?.filter(s => s.test_mode?.startsWith('practice_')) || [];
       const genericModeSessions = practiceSessions?.filter(s => s.test_mode === 'practice') || [];
       
-      console.log(`🔍 Found ${specificModeSessions.length} specific mode sessions, ${genericModeSessions.length} generic mode sessions`);
-
       // Determine which practice tests actually exist in the database
       const { data: practiceQuestions } = await supabase
         .from('questions')
@@ -2040,8 +1788,6 @@ export class AnalyticsService {
         .filter(num => !isNaN(num))
         .sort();
       
-      console.log(`📊 Available practice tests in database:`, availablePracticeTests);
-      
       // Create test results for available practice tests with REAL data
       const tests = [];
       
@@ -2050,17 +1796,7 @@ export class AnalyticsService {
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
       
-      console.log(`📊 Sorted generic sessions by creation date:`, sortedGenericSessions.map((s, idx) => ({
-        index: idx,
-        testMode: s.test_mode,
-        score: s.final_score,
-        status: s.status,
-        created: s.created_at
-      })));
-      
       // Use DIAGNOSTIC APPROACH for practice tests - get data directly from sub_skills table like diagnostic insights
-      console.log('📊 Using diagnostic approach for practice test processing...');
-      
       // Get sub-skills from sub_skills table (exactly like diagnostic)
       const { data: subSkillsData, error: subSkillsError } = await supabase
         .from('sub_skills')
@@ -2077,13 +1813,10 @@ export class AnalyticsService {
         throw subSkillsError;
       }
 
-      console.log(`📊 Found ${subSkillsData?.length || 0} sub-skills from sub_skills table for ${productType}`);
-      
       // Loop through all possible test numbers (1-5) but only process those that exist in database
       for (let i = 1; i <= 5; i++) {
         // Skip if this practice test doesn't exist in the database
         if (!availablePracticeTests.includes(i)) {
-          console.log(`🔍 Test ${i}: Skipping - not available in database`);
           continue;
         }
         
@@ -2092,13 +1825,9 @@ export class AnalyticsService {
           s.test_mode === testMode && s.status === 'completed'
         );
         
-        console.log(`🔍 Test ${i}: found ${testSessions.length} sessions with test_mode=${testMode}`);
-        
         let aggregatedTestData = null;
         
         if (testSessions.length > 0) {
-          console.log(`📊 Processing Test ${i} using diagnostic approach...`);
-          
           // Check if ALL sections of this practice test are completed
           const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
           const completedSectionsForThisTest = testSessions.map(s => s.section_name);
@@ -2109,16 +1838,12 @@ export class AnalyticsService {
             continue;
           }
           
-          console.log(`✅ Test ${i} - All sections completed - using diagnostic approach`);
-          
           // Process sub-skills using DIAGNOSTIC APPROACH
           const subSkillPerformance = [];
           const sectionTotals = new Map<string, {questionsCorrect: number, questionsTotal: number, questionsAttempted: number}>();
           
           // If no sub-skills found in sub_skills table, get them directly from questions (fallback like diagnostic)
           if (!subSkillsData || subSkillsData.length === 0) {
-            console.log(`📊 No sub-skills in sub_skills table for ${productType}, checking questions table...`);
-            
             // Get unique sub-skills directly from practice questions for this test
             const { data: questionSubSkills, error: questionError } = await supabase
               .from('questions')
@@ -2139,8 +1864,6 @@ export class AnalyticsService {
                 uniqueSubSkills.set(q.sub_skill, q.section_name);
               }
             });
-
-            console.log(`📊 Found ${uniqueSubSkills.size} unique sub-skills from questions table for Test ${i}`);
 
             // Process each unique sub-skill using diagnostic approach
             for (const [subSkillName, sectionName] of uniqueSubSkills) {
@@ -2170,8 +1893,6 @@ export class AnalyticsService {
               // Calculate total max_points for this sub-skill (like diagnostic)
               const totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
               
-              console.log(`📊 Sub-skill "${subSkill.name}" total points: ${totalPoints} (from ${questions?.length} questions) in Test ${i}`);
-
               // Get user responses for these questions (like diagnostic)
               const questionIds = questions?.map(q => q.id) || [];
               
@@ -2270,9 +1991,6 @@ export class AnalyticsService {
             accuracy: data.questionsAttempted > 0 ? Math.round((data.questionsCorrect / data.questionsAttempted) * 100) : 0
           }));
           
-          console.log(`📊 Test ${i} Section breakdown:`, sectionBreakdown);
-          console.log(`📊 Test ${i} Section totals map:`, Array.from(sectionTotals.entries()));
-          
           // Calculate totals (like diagnostic)
           const totalQuestionsCorrect = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsCorrect, 0);
           const totalQuestions = Array.from(sectionTotals.values()).reduce((sum, s) => sum + s.questionsTotal, 0);
@@ -2285,16 +2003,6 @@ export class AnalyticsService {
           const sectionScores = {};
           sectionBreakdown.forEach(section => {
             sectionScores[section.sectionName] = section.score;
-          });
-          
-          console.log(`🔍 PRACTICE TEST ${i} DIAGNOSTIC APPROACH CALCULATION:`, {
-            totalQuestionsCorrect,
-            totalQuestions,
-            totalQuestionsAttempted,
-            calculatedScore: overallScore,
-            calculatedAccuracy: overallAccuracy,
-            scoreFormula: `${totalQuestionsCorrect}/${totalQuestions} = ${overallScore}%`,
-            accuracyFormula: `${totalQuestionsCorrect}/${totalQuestions} = ${overallAccuracy}%`
           });
           
           aggregatedTestData = {
@@ -2313,8 +2021,7 @@ export class AnalyticsService {
             totalEarnedPoints: totalQuestionsCorrect
           };
           
-          console.log(`📊 Test ${i} processed using diagnostic approach - sections: ${sectionBreakdown.length}, sub-skills: ${subSkillPerformance.length}`);
-        } else {
+          } else {
           // No completed sessions found for this test
           aggregatedTestData = {
             testNumber: i,
@@ -2330,7 +2037,6 @@ export class AnalyticsService {
           };
         }
         
-        console.log(`📊 Final test data for Test ${i}:`, aggregatedTestData);
         tests.push(aggregatedTestData);
       }
 
@@ -2387,8 +2093,6 @@ export class AnalyticsService {
         };
       });
 
-      console.log('✅ Practice test results loaded successfully');
-
       return {
         tests,
         progressOverTime,
@@ -2403,8 +2107,6 @@ export class AnalyticsService {
 
   static async getDrillResults(userId: string, productId: string): Promise<DrillResults> {
     const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
-    console.log('🔧 Analytics: Fetching drill results for', userId, productType, `(mapped from ${productId})`);
-
     // Return mock drill data for demo purposes if enabled
     if (USE_MOCK_DATA) {
       console.log('🎭 Returning mock drill results data');
@@ -2616,11 +2318,7 @@ export class AnalyticsService {
       const drillSessions = drillSessionsResult.data || [];
       const writingDrillSessions = userTestSessionsResult.data || [];
 
-      console.log(`📊 Found ${drillSessions.length} completed drill sessions`);
-      console.log(`📊 Found ${writingDrillSessions.length} completed writing drill sessions`);
-
       if (drillSessions.length === 0 && writingDrillSessions.length === 0) {
-        console.log('📊 No completed drill sessions found');
         return {
           totalQuestions: 0,
           overallAccuracy: 0,
@@ -2683,10 +2381,8 @@ export class AnalyticsService {
               const essayMatch = session.section_name?.match(/Essay\s*(\d+)/i);
               if (essayMatch) {
                 const essayNumber = parseInt(essayMatch[1]);
-                console.log(`🎯 ANALYTICS: Mapping "${session.section_name}" Essay ${essayNumber} -> difficulty ${essayNumber}`);
                 return essayNumber; // Essay 1 -> difficulty 1, Essay 2 -> difficulty 2, Essay 3 -> difficulty 3
               }
-              console.log(`🎯 ANALYTICS: No essay number found in "${session.section_name}", defaulting to difficulty 2`);
               return 2; // Default to medium if no essay number found
             })(),
             isWritingDrill: true
@@ -2698,16 +2394,6 @@ export class AnalyticsService {
       
       // Combine both types of sessions
       const allSessionsWithSubSkillInfo = [...regularDrillSessionsWithInfo, ...writingDrillSessionsWithInfo];
-
-      console.log('🔍 All drill sessions with sub-skill info:', allSessionsWithSubSkillInfo.map(s => ({
-        id: s.id,
-        subSkill: s.subSkillName,
-        section: s.sectionName,
-        difficulty: s.difficulty,
-        questions: s.questions_answered,
-        correct: s.questions_correct,
-        status: s.status
-      })));
 
       // Calculate totals
       const totalQuestions = allSessionsWithSubSkillInfo.reduce((sum, session) => sum + (session.questions_answered || 0), 0);
@@ -2738,16 +2424,12 @@ export class AnalyticsService {
                                 subSkillName.toLowerCase().includes('written') ||
                                 subSkillName.toLowerCase().includes('expression');
           
-          console.log(`🎯 ANALYTICS: Processing session for "${subSkillName}": isWritingDrill=${isWritingDrill}, hasFlag=${!!session.isWritingDrill}, hasTextAnswers=${!!session.text_answers_data}`);
-          
           let totalQuestions = session.questions_answered || 0;
           let totalCorrect = session.questions_correct || 0;
           let totalMaxPoints = totalQuestions; // Default assumption for non-writing
           let totalEarnedPoints = totalCorrect;
           
           if (isWritingDrill && session.text_answers_data) {
-            console.log(`🎯 DRILL-ANALYTICS: Processing writing drill session ${session.id} for ${subSkillName}`);
-            
             // For writing drills, get the actual scoring from writing assessments
             try {
               // Get question IDs from this session
@@ -2765,8 +2447,7 @@ export class AnalyticsService {
                 
                 if (!sectionError && sectionQuestions && sectionQuestions.length > 0) {
                   questionIds = sectionQuestions.map(q => q.id);
-                  console.log(`🎯 DRILL-ANALYTICS: Found ${questionIds.length} questions for writing drill ${session.section_name}`);
-                }
+                  }
               }
               
               if (questionIds.length > 0) {
@@ -2793,11 +2474,9 @@ export class AnalyticsService {
                       totalMaxPoints = assessmentMaxPoints;
                     }
                     
-                    console.log(`🎯 DRILL-ANALYTICS: Writing drill ${session.id}: ${totalEarnedPoints}/${totalMaxPoints} points from assessments`);
-                  } else {
+                    } else {
                     // Fallback: if no writing assessments exist yet, use a default scoring
                     // This can happen if the essay hasn't been graded yet
-                    console.log(`🎯 DRILL-ANALYTICS: No writing assessments found for session ${session.id}, using fallback scoring`);
                     totalEarnedPoints = Math.round(totalMaxPoints * 0.75); // Default to 75% score for completed writing
                   }
                 }
@@ -2938,8 +2617,6 @@ export class AnalyticsService {
             : (session.totalQuestions > 0 ? Math.round((session.totalCorrect / session.totalQuestions) * 100) : 0),
           completedAt: session.completed_at || session.started_at,
         }));
-
-      console.log('✅ Drill results loaded successfully');
 
       return {
         totalQuestions,

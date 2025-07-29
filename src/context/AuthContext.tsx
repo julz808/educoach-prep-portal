@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
     } catch (error: any) {
-      console.error('Error refreshing session:', error);
+
       toast.error('Failed to refresh session. Please sign in again.');
       await signOut();
     }
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       toast.success('Verification email sent! Please check your inbox.');
     } catch (error: any) {
-      console.error('Error resending verification email:', error);
+
       toast.error(error.message || 'Failed to resend verification email');
     }
   };
@@ -82,19 +82,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Attempt global sign out first
       await supabase.auth.signOut({ scope: 'global' });
-      
+
       // Clean up auth state after successful sign out
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
           localStorage.removeItem(key);
         }
       });
-      
+
       // Redirect to auth page with full URL
       const baseUrl = window.location.origin;
       window.location.href = `${baseUrl}/auth`;
     } catch (error) {
-      console.error('Error signing out:', error);
+
       toast.error('Failed to sign out. Please try again.');
       // Still clean up local state and redirect even if sign out fails
       Object.keys(localStorage).forEach((key) => {

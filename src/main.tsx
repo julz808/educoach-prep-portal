@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
@@ -13,5 +12,5 @@ if (root) {
     </React.StrictMode>
   );
 } else {
-  console.error("Root element not found");
+
 }

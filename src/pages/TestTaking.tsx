@@ -105,9 +105,6 @@ const TestTaking: React.FC = () => {
   const urlSessionId = new URLSearchParams(window.location.search).get('sessionId');
   const actualSessionId = urlSessionId || sessionIdFromQuery || sessionId || sectionId;
   
-  console.log('🔍 SESSION-ID-DEBUG: searchParams sessionId:', sessionIdFromQuery);
-  console.log('🔍 SESSION-ID-DEBUG: URL sessionId:', urlSessionId);
-  console.log('🔍 SESSION-ID-DEBUG: Final actualSessionId:', actualSessionId);
   const navigate = useNavigate();
   const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
   const { user } = useAuth();
@@ -126,10 +123,6 @@ const TestTaking: React.FC = () => {
   
   // Determine the actual test mode to use for database operations
   const actualTestMode = testModeFromQuery || testType;
-  console.log('🔍 TEST MODE: URL testType:', testType, 'Query testMode:', testModeFromQuery, 'Final testMode:', actualTestMode);
-  console.log('🔍 TEST MODE: Full URL:', window.location.href);
-  console.log('🔍 TEST MODE: All search params:', Object.fromEntries(searchParams));
-  
   console.log('🔗 URL PARAMS: testType:', testType, 'subjectId:', subjectId, 'sectionId:', sectionId, 'sessionId:', sessionId);
   console.log('🔗 QUERY PARAMS: sessionId:', sessionIdFromQuery);
   console.log('🔗 ACTUAL SESSION ID:', actualSessionId);
@@ -159,11 +152,6 @@ const TestTaking: React.FC = () => {
       if (session && session.status === 'review' && !testScore && !calculatingScore) {
         try {
           setCalculatingScore(true);
-          console.log('📊 REVIEW: Calculating test score for review mode');
-          console.log('📊 REVIEW: Questions:', session.questions.map(q => ({ id: q.id, maxPoints: q.maxPoints, subSkill: q.subSkill })));
-          console.log('📊 REVIEW: Answers:', session.answers);
-          console.log('📊 REVIEW: Text answers:', session.textAnswers);
-          
           const reviewScore = await ScoringService.calculateTestScore(
             session.questions,
             session.answers,
@@ -171,8 +159,7 @@ const TestTaking: React.FC = () => {
             session.id
           );
           setTestScore(reviewScore);
-          console.log('📊 REVIEW: Score calculated:', reviewScore);
-        } catch (error) {
+          } catch (error) {
           console.error('📊 REVIEW: Failed to calculate score:', error);
         } finally {
           setCalculatingScore(false);
@@ -183,16 +170,12 @@ const TestTaking: React.FC = () => {
     calculateReviewScore();
   }, [session?.status, session?.id, testScore]);
   
-  console.log('🔍 REVIEW MODE: isReviewMode =', isReviewMode, 'from searchParams.review =', searchParams.get('review'));
-
   // Get time limit using unified time allocation system
   // UNIFIED TIME ALLOCATION RULES:
   // - Practice tests: Use curriculumData.ts times
   // - Diagnostic tests: Same time as practice (no pro-rating)
   // - Drill tests: No timer (null), immediate answer reveal
   const getTimeAllocation = (productType: string, sectionName: string, testMode: string, questionCount?: number): { timeMinutes: number | null; reason: string } => {
-    console.log('⏰ TIME ALLOCATION: Getting time for:', { productType, sectionName, testMode, questionCount });
-    
     // For drill mode, return null (no timer)
     if (testMode === 'drill') {
       return { timeMinutes: null, reason: 'Drill mode has no time limit' };
@@ -200,8 +183,6 @@ const TestTaking: React.FC = () => {
     
     // For both practice and diagnostic, use the unified time lookup
     const timeMinutes = getUnifiedTimeLimit(productType, sectionName);
-    console.log('⏰ UNIFIED: Retrieved time:', timeMinutes, 'minutes for', productType, '-', sectionName);
-    
     return { 
       timeMinutes, 
       reason: `Time from curriculum data (${testMode} mode uses same time as practice)` 
@@ -211,20 +192,15 @@ const TestTaking: React.FC = () => {
   // Load questions for the section
   const loadQuestions = async (): Promise<Question[]> => {
     if (testType === 'diagnostic') {
-      console.log('🔍 DIAGNOSTIC LOAD: Starting question load for subjectId:', subjectId, 'sectionName:', sectionName);
       const diagnosticModes = await fetchDiagnosticModes(selectedProduct);
-      console.log('🔍 DIAGNOSTIC LOAD: Fetched diagnostic modes:', diagnosticModes.length);
-      
       // Find the section containing questions
       let foundSection = null;
       for (const mode of diagnosticModes) {
-        console.log('🔍 DIAGNOSTIC LOAD: Checking mode:', mode.name, 'with sections:', mode.sections.map(s => s.id + ' (' + s.name + ')'));
         foundSection = mode.sections.find(section => 
           section.id === subjectId || 
           section.name.toLowerCase().includes(subjectId.toLowerCase())
         );
         if (foundSection) {
-          console.log('🔍 DIAGNOSTIC LOAD: Found section:', foundSection.name, 'with', foundSection.questions.length, 'questions');
           break;
         }
       }
@@ -252,8 +228,7 @@ const TestTaking: React.FC = () => {
         });
         if (sectionData && sectionData[1] && (sectionData[1] as any).format) {
           questionFormat = (sectionData[1] as any).format;
-          console.log('🔍 DIAGNOSTIC: Detected format for', sectionName, '→', questionFormat);
-        }
+          }
       }
       
       // For reading sections, organize questions by passage to keep related questions together
@@ -302,12 +277,7 @@ const TestTaking: React.FC = () => {
         maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
       }));
     } else if (testType === 'practice') {
-      console.log('🔍 Practice: Loading practice questions for product:', selectedProduct, 'subjectId:', subjectId);
-      console.log('🔍 Practice: Section name from params:', sectionName);
-      
       const organizedData = await fetchQuestionsFromSupabase();
-      console.log('🔍 Practice: Available test types:', organizedData.testTypes.map(tt => tt.id));
-      
       const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
       
       if (!currentTestType) {
@@ -315,22 +285,18 @@ const TestTaking: React.FC = () => {
         throw new Error('No test data found for this product');
       }
       
-      console.log('🔍 Practice: Found test type with modes:', currentTestType.testModes.map(tm => ({ id: tm.id, name: tm.name, sections: tm.sections.length })));
-
       // Find the section in the SPECIFIC practice mode requested (actualTestMode)
       let foundSection = null;
       const targetTestMode = currentTestType.testModes.find(mode => mode.id === actualTestMode);
       
       if (targetTestMode) {
-        console.log('🔍 Loading specific practice mode:', targetTestMode.name, 'with', targetTestMode.sections.length, 'sections');
         foundSection = targetTestMode.sections.find(section => 
           section.id === subjectId || 
           section.name.toLowerCase().includes(subjectId.toLowerCase()) ||
           subjectId.toLowerCase().includes(section.name.toLowerCase())
         );
         if (foundSection && foundSection.questions.length > 0) {
-          console.log('✅ Found section in specific practice mode:', targetTestMode.name, 'section:', foundSection.name, 'questions:', foundSection.questions.length);
-        }
+          }
       } else {
         console.error('🔍 Practice: Target test mode not found:', actualTestMode);
       }
@@ -361,8 +327,7 @@ const TestTaking: React.FC = () => {
         });
         if (sectionData && sectionData[1] && (sectionData[1] as any).format) {
           questionFormat = (sectionData[1] as any).format;
-          console.log('🔍 PRACTICE: Detected format for', sectionName, '→', questionFormat);
-        }
+          }
       }
       
       // For reading sections, organize questions by passage to keep related questions together
@@ -411,22 +376,13 @@ const TestTaking: React.FC = () => {
         maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
       }));
     } else if (testType === 'drill') {
-      console.log('🔧 DRILL: Loading drill questions for product:', selectedProduct, 'subjectId:', subjectId);
-      
       const drillModes = await fetchDrillModes(selectedProduct);
-      console.log('🔧 DRILL: Available drill modes:', drillModes.map(dm => dm.name));
-      
       // Find the section containing questions by subjectId or sectionName
       let foundSection = null;
-      console.log('🔧 DRILL: Looking for section with subjectId:', subjectId, 'or sectionName:', sectionName);
-      
       for (const mode of drillModes) {
         foundSection = mode.sections.find(section => {
-          console.log('🔧 DRILL: Checking section:', section.name, 'id:', section.id);
-          
           // First try exact matches
           if (section.id === subjectId || section.name === sectionName) {
-            console.log('🔧 DRILL: Exact match found!');
             return true;
           }
           
@@ -441,12 +397,6 @@ const TestTaking: React.FC = () => {
           const normalizedSectionName = normalizeString(sectionNameLower);
           const normalizedSubjectId = normalizeString(subjectIdLower);
           const normalizedSectionNameFromParams = normalizeString(sectionNameFromParams);
-          
-          console.log('🔧 DRILL: Normalized comparison:', {
-            normalizedSectionName,
-            normalizedSubjectId,
-            normalizedSectionNameFromParams
-          });
           
           // Use exact matching first, then very specific partial matching to avoid false positives
           const isExactMatch = normalizedSectionName === normalizedSubjectId ||
@@ -463,20 +413,12 @@ const TestTaking: React.FC = () => {
           const isMatch = isExactMatch || isPartialMatch;
                  
           if (isMatch) {
-            console.log('🔧 DRILL: Match found!', {
-              matchType: isExactMatch ? 'exact' : 'partial',
-              sectionName: section.name,
-              sectionId: section.id,
-              subjectId: subjectId,
-              sectionNameParam: sectionName
-            });
-          }
+            }
           
           return isMatch;
         });
         
         if (foundSection && foundSection.questions.length > 0) {
-          console.log('✅ DRILL: Found section:', foundSection.name, 'in mode:', mode.name, 'with', foundSection.questions.length, 'questions');
           break;
         }
       }
@@ -500,8 +442,7 @@ const TestTaking: React.FC = () => {
         const targetDifficulty = difficultyMap[difficulty as keyof typeof difficultyMap];
         if (targetDifficulty) {
           filteredQuestions = foundSection.questions.filter(q => q.difficulty === targetDifficulty);
-          console.log('🔧 DRILL: Filtered to', difficulty, 'questions:', filteredQuestions.length, 'out of', foundSection.questions.length, 'total');
-        }
+          }
       }
 
       if (filteredQuestions.length === 0) {
@@ -541,8 +482,6 @@ const TestTaking: React.FC = () => {
         maxPoints: isWritingDrill ? getMaxPointsForWriting(selectedProduct) : 1
       }));
       
-      console.log('🔧 DRILL: Converted questions:', convertedQuestions.length, 'questions with proper fallbacks');
-      
       // Validate that all questions have required properties
       const invalidQuestions = convertedQuestions.filter(q => !q.text || !q.options || q.options.length === 0);
       if (invalidQuestions.length > 0) {
@@ -557,34 +496,16 @@ const TestTaking: React.FC = () => {
 
   // Load drill session from drill_sessions table
   const loadDrillSession = async (sessionId: string) => {
-    console.log('🎯 DRILL: Loading drill session using DrillSessionService:', sessionId);
-    
     try {
-      console.log('🎯 DRILL: Calling DrillSessionService.getSessionForResume with:', sessionId);
       const drillSessionData = await DrillSessionService.getSessionForResume(sessionId);
-      console.log('🎯 DRILL: DrillSessionService returned:', drillSessionData);
-      
       if (!drillSessionData) {
-        console.log('🎯 DRILL: No drill session found:', sessionId);
         return null;
       }
-
-      console.log('🎯 DRILL: Drill session data loaded:', {
-        questionsTotal: drillSessionData.questionsTotal,
-        questionsAnswered: drillSessionData.questionsAnswered,
-        questionsCorrect: drillSessionData.questionsCorrect,
-        status: drillSessionData.status,
-        sessionCompleteRatio: `${drillSessionData.questionsAnswered}/${drillSessionData.questionsTotal}`
-      });
 
       // Get the skill name from URL parameters for a better display name
       const skillName = searchParams.get('skill') || 'Drill Practice';
       
       // Convert drill session to TestSession format
-      console.log('🎯 DRILL: Raw drill session answers data:', drillSessionData.answersData);
-      console.log('🎯 DRILL: Drill session status:', drillSessionData.status);
-      console.log('🎯 DRILL: Questions answered/total:', drillSessionData.questionsAnswered, '/', drillSessionData.questionsTotal);
-      
       const drillSession: TestSession = {
         id: drillSessionData.sessionId,
         userId: drillSessionData.userId,
@@ -602,7 +523,6 @@ const TestTaking: React.FC = () => {
         updatedAt: drillSessionData.startedAt
       };
 
-      console.log('🎯 DRILL: Converted drill session:', drillSession);
       return drillSession;
     } catch (error) {
       console.error('🎯 DRILL: Error loading drill session:', error);
@@ -621,27 +541,10 @@ const TestTaking: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        console.log('🚀 Initializing session with params:', { testType, subjectId, sessionId, actualSessionId, sectionName });
-        console.log('🚀 Selected product:', selectedProduct);
-
         const questions = await loadQuestions();
         
         // If we have a sessionId, try to resume
-        console.log('🔍 CONDITIONAL-DEBUG: Checking actualSessionId for resume...', {
-          actualSessionId,
-          type: typeof actualSessionId,
-          truthy: !!actualSessionId,
-          length: actualSessionId?.length,
-          isEmpty: actualSessionId === '',
-          isUndefined: actualSessionId === undefined,
-          isNull: actualSessionId === null
-        });
-        
         if (actualSessionId) {
-          console.log('🔄 Attempting to resume session:', actualSessionId, 'for testType:', testType);
-          console.log('🔄 Is drill session?', testType === 'drill');
-          console.log('🔄 CRITICAL: actualSessionId value and type:', actualSessionId, typeof actualSessionId);
-          
           // Check if this is a writing drill - writing drills use TestSessionService like diagnostic/practice
           const isWritingDrillForResume = testType === 'drill' && (
             sectionName.toLowerCase().includes('writing') ||
@@ -649,84 +552,27 @@ const TestTaking: React.FC = () => {
             sectionName.toLowerCase().includes('expression')
           );
           
-          console.log('🔄 Is writing drill for resume?', isWritingDrillForResume);
-          
           // Load session based on test type and drill type
-          console.log('🔄 LOAD-DEBUG: About to load session...', {
-            testType,
-            isWritingDrillForResume,
-            actualSessionId,
-            loadMethod: (testType === 'drill' && !isWritingDrillForResume) ? 'loadDrillSession' : 'SessionService.loadSession'
-          });
-          
           const savedSession = (testType === 'drill' && !isWritingDrillForResume) ? 
             await loadDrillSession(actualSessionId) : 
             await SessionService.loadSession(actualSessionId);
             
-          console.log('🔄 Session loaded result:', savedSession);
-          console.log('🔄 LOAD-DEBUG: Session load completed:', {
-            found: !!savedSession,
-            sessionId: savedSession?.id,
-            status: savedSession?.status,
-            actualSessionIdUsed: actualSessionId
-          });
-          console.log('🔄 RESUME: Session loaded?', !!savedSession);
-          console.log('🔄 RESUME: Session answers:', savedSession?.answers);
-          console.log('🔄 RESUME: Session status:', savedSession?.status);
-          
           if (savedSession) {
-            console.log('🔄 RESUME: Found existing session, proceeding with resume...');
-            console.log('🔄 RESUME: Loading saved session data:', {
-              sessionId: savedSession.id,
-              status: savedSession.status,
-              currentQuestionIndex: savedSession.currentQuestionIndex,
-              savedAnswers: Object.keys(savedSession.answers).length,
-              savedTextAnswers: Object.keys(savedSession.textAnswers || {}).length,
-              timeRemaining: savedSession.timeRemainingSeconds,
-              rawAnswers: savedSession.answers,
-              rawTextAnswers: savedSession.textAnswers
-            });
-
             // Check if this is a completed session - if so, go to review mode
-            console.log('🔄 RESUME: Checking session status for review mode...', {
-              sessionId: savedSession.sessionId,
-              status: savedSession.status,
-              testMode: savedSession.testMode,
-              sectionName: savedSession.sectionName,
-              isWritingDrill: (savedSession.testMode === 'drill' && (
-                savedSession.sectionName.toLowerCase().includes('writing') ||
-                savedSession.sectionName.toLowerCase().includes('written') ||
-                savedSession.sectionName.toLowerCase().includes('expression')
-              ))
-            });
-            
             if (savedSession.status === 'completed') {
-              console.log('🔄 RESUME: Session is completed, should go to review mode');
-              console.log('🔄 RESUME: Setting review=true in URL...');
               // Set review mode in URL
               const currentUrl = new URL(window.location.href);
               currentUrl.searchParams.set('review', 'true');
               setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
             } else {
-              console.log('🔄 RESUME: Session is not completed, status:', savedSession.status);
-            }
+              }
 
             // Convert saved session to our format
             const answers: Record<number, number> = {};
-            console.log('🔄 RESUME: Converting saved answers. Total questions loaded:', questions.length);
-            console.log('🔄 RESUME: Saved answers to convert:', savedSession.answers);
-            
             Object.entries(savedSession.answers).forEach(([qIndex, optionText]) => {
               // Both drill sessions and regular sessions use question index as key
               const questionIndex = parseInt(qIndex);
               const question = questions[questionIndex];
-              
-              console.log(`🔄 RESUME: Processing answer for question ${questionIndex}:`, {
-                savedOptionText: optionText,
-                questionExists: !!question,
-                questionText: question?.text?.substring(0, 50) + '...',
-                testType: testType
-              });
               
               if (question && question.options && questionIndex >= 0) {
                 let answerIndex = -1;
@@ -735,21 +581,16 @@ const TestTaking: React.FC = () => {
                 if (typeof optionText === 'number') {
                   // If optionText is already a number, use it directly as the answer index
                   answerIndex = optionText;
-                  console.log('🔄 RESUME: Numeric answer used directly:', optionText, '→', answerIndex);
-                } else if (testType === 'drill' && typeof optionText === 'string' && optionText.length === 1 && /[A-D]/.test(optionText)) {
+                  } else if (testType === 'drill' && typeof optionText === 'string' && optionText.length === 1 && /[A-D]/.test(optionText)) {
                   // For drill sessions, optionText might be a letter (A, B, C, D)
                   answerIndex = optionText.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
-                  console.log('🔧 DRILL: Letter answer conversion:', optionText, '→', answerIndex);
-                } else {
+                  } else {
                   // Try exact match first
                   answerIndex = question.options.findIndex(opt => opt === optionText);
-                  console.log('🔄 RESUME: Exact match result:', answerIndex);
-                  
                   // If no exact match, try trimmed comparison
                   if (answerIndex === -1) {
                     answerIndex = question.options.findIndex(opt => opt.trim() === optionText.trim());
-                    console.log('🔄 RESUME: Trimmed match result:', answerIndex);
-                  }
+                    }
                 }
                 
                 // If still no match, try case-insensitive
@@ -757,8 +598,7 @@ const TestTaking: React.FC = () => {
                   answerIndex = question.options.findIndex(opt => 
                     opt.toLowerCase().trim() === optionText.toLowerCase().trim()
                   );
-                  console.log('🔄 RESUME: Case-insensitive match result:', answerIndex);
-                }
+                  }
                 
                 // If still no match, try removing letter prefixes (A), B), etc.)
                 if (answerIndex === -1) {
@@ -766,8 +606,7 @@ const TestTaking: React.FC = () => {
                   answerIndex = question.options.findIndex(opt => 
                     opt.toLowerCase().trim() === cleanedOptionText.toLowerCase().trim()
                   );
-                  console.log('🔄 RESUME: Cleaned option text match (removed A), B), etc.):', answerIndex, 'cleaned text:', cleanedOptionText);
-                }
+                  }
                 
                 // If still no match, try the other way - add letter prefixes to question options
                 if (answerIndex === -1) {
@@ -775,13 +614,11 @@ const TestTaking: React.FC = () => {
                     const prefixedOption = `${String.fromCharCode(65 + idx)}) ${opt}`;
                     return prefixedOption.toLowerCase().trim() === optionText.toLowerCase().trim();
                   });
-                  console.log('🔄 RESUME: Prefixed option match:', answerIndex);
-                }
+                  }
                 
                 if (answerIndex !== -1) {
                   answers[questionIndex] = answerIndex;
-                  console.log('🔄 RESUME: ✅ Restored answer for question', questionIndex, '→', answerIndex, '(', optionText, ')');
-                } else {
+                  } else {
                   console.error('🔄 RESUME: ❌ Could not find answer for question', questionIndex);
                   console.error('🔄 RESUME: Saved text:', `"${optionText}"`);
                   console.error('🔄 RESUME: Available options:', question.options);
@@ -799,8 +636,7 @@ const TestTaking: React.FC = () => {
             Object.entries(savedSession.textAnswers || {}).forEach(([qIndex, textResponse]) => {
               const questionIndex = parseInt(qIndex);
               textAnswers[questionIndex] = textResponse;
-              console.log('🔄 RESUME: Restored text answer for question', questionIndex, '→', textResponse.substring(0, 50) + '...');
-            });
+              });
 
             const resumedSession: TestSessionState = {
               id: savedSession.id,
@@ -819,33 +655,19 @@ const TestTaking: React.FC = () => {
               isResumed: true
             };
             
-            console.log('🔄 RESUME: Final session state - currentQuestion:', resumedSession.currentQuestion, 'totalQuestions:', resumedSession.questions.length, 'isReviewMode:', isReviewMode);
-
             // Apply answers and text answers to questions
-            console.log('🔄 RESUME: Applying answers to questions. Total answers restored:', Object.keys(resumedSession.answers).length);
-            console.log('🔄 RESUME: Answers object:', resumedSession.answers);
             resumedSession.questions.forEach((question, index) => {
               if (resumedSession.answers[index] !== undefined) {
                 question.userAnswer = resumedSession.answers[index];
-                console.log(`🔄 RESUME: Applied answer to question ${index}: userAnswer = ${question.userAnswer}, option text = "${question.options[question.userAnswer]}"`);
-              } else {
-                console.log(`🔄 RESUME: No answer found for question ${index}`);
-              }
+                } else {
+                }
               if (resumedSession.textAnswers[index] !== undefined) {
                 question.userTextAnswer = resumedSession.textAnswers[index];
-                console.log('🔄 RESUME: Applied text answer to question', index, '→', resumedSession.textAnswers[index].substring(0, 50) + '...');
-              }
+                }
               question.flagged = resumedSession.flaggedQuestions.has(index);
               if (question.flagged) {
-                console.log(`🔄 RESUME: Question ${index} is flagged`);
-              }
+                }
             });
-            console.log('🔄 RESUME: Final session state:', {
-              totalQuestions: resumedSession.questions.length,
-              answersRestored: Object.keys(resumedSession.answers).length,
-              questionsWithUserAnswer: resumedSession.questions.filter(q => q.userAnswer !== undefined).length
-            });
-
             setSession(resumedSession);
             setTimeRemaining(savedSession.timeRemainingSeconds);
             
@@ -857,31 +679,11 @@ const TestTaking: React.FC = () => {
               console.log('🔗 URL-UPDATE: Added sessionId to initial resume URL via setSearchParams:', actualSessionId);
             }
             
-            console.log('✅ RESUME: Session resumed successfully with:', {
-              currentQuestion: resumedSession.currentQuestion,
-              answersRestored: Object.keys(resumedSession.answers).length,
-              textAnswersRestored: Object.keys(resumedSession.textAnswers).length,
-              timeRemaining: savedSession.timeRemainingSeconds
-            });
-            console.log('🔍 DEBUG: Questions maxPoints:', resumedSession.questions.map(q => ({ 
-              id: q.id, 
-              maxPoints: q.maxPoints, 
-              subSkill: q.subSkill, 
-              topic: q.topic 
-            })));
             return;
           } else {
-            console.log('🔄 RESUME: No existing session found for ID:', actualSessionId, 'proceeding to create new session');
-          }
+            }
         } else {
-          console.log('🔄 RESUME: No sessionId provided, creating new session');
-          console.log('🔍 ELSE-DEBUG: actualSessionId in else block:', {
-            actualSessionId,
-            type: typeof actualSessionId,
-            truthy: !!actualSessionId,
-            comparison: actualSessionId === undefined || actualSessionId === null || actualSessionId === ''
-          });
-        }
+          }
 
         // Create new session (or get existing active session)
         console.log('🆕 Creating/getting session');
@@ -907,9 +709,6 @@ const TestTaking: React.FC = () => {
           calculatedFrom: timeAllocation.reason
         });
         
-        console.log('⏰ TIME ALLOCATION: Result:', timeAllocation);
-        console.log('⏰ TIME ALLOCATION: Final time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
-        
         console.log('🆕 TIMER: Calculated time limit =', timeLimitMinutes, 'minutes (', timeLimitSeconds, 'seconds)');
         
         let sessionIdToUse: string;
@@ -930,17 +729,8 @@ const TestTaking: React.FC = () => {
           const firstQuestionWithUUID = questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
           
           const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
-          console.log('🎯 DRILL: SubSkill UUID for', subSkillText, '→', actualSubSkillId);
-          
           const difficulty = parseInt(searchParams.get('difficulty') === 'easy' ? '1' : 
                                    searchParams.get('difficulty') === 'medium' ? '2' : '3');
-          
-          console.log('🎯 DRILL: Creating/resuming NON-WRITING drill session:', {
-            subSkillId: actualSubSkillId,
-            difficulty,
-            productType: properDisplayName,
-            questionCount: questions.length
-          });
           
           sessionIdToUse = await DrillSessionService.createOrResumeSession(
             user.id,
@@ -955,25 +745,15 @@ const TestTaking: React.FC = () => {
           existingSession = await loadDrillSession(sessionIdToUse);
         } else {
           // For regular sessions (diagnostic/practice) AND writing drills, use TestSessionService
-          console.log('🚀 SESSION-CREATE: Using TestSessionService for:', isWritingDrill ? 'WRITING DRILL' : testType.toUpperCase());
-          
           // WRITING DRILL FIX: For writing drills, check for existing sessions by sub-skill/difficulty first
           try {
             if (isWritingDrill) {
-              console.log('🔍 WRITING-DRILL-CHECK: Checking for existing writing drill sessions before creating new one...');
-              
               // Get difficulty from URL parameters
               const urlDifficulty = searchParams.get('difficulty');
               const difficultyLevel = urlDifficulty === 'easy' ? 1 : urlDifficulty === 'medium' ? 2 : 3;
               
               // For writing drills, include difficulty in the section name to make each essay unique
               const sectionWithDifficulty = `${sectionName} - Essay ${difficultyLevel}`;
-              
-              console.log('🔍 WRITING-DRILL-CHECK: Looking for sessions with:', {
-                sectionName: sectionWithDifficulty,
-                difficulty: difficultyLevel,
-                originalSection: sectionName
-              });
               
               // Query user_test_sessions for existing sessions with same sub-skill AND difficulty
               const { data: existingSessions, error: queryError } = await supabase
@@ -989,24 +769,15 @@ const TestTaking: React.FC = () => {
                 console.error('🔍 WRITING-DRILL-CHECK: Error querying existing sessions:', queryError);
               } else if (existingSessions && existingSessions.length > 0) {
                 const mostRecentSession = existingSessions[0];
-                console.log('🔍 WRITING-DRILL-CHECK: Found existing sessions:', existingSessions.map(s => ({
-                  id: s.id,
-                  status: s.status,
-                  created_at: s.created_at
-                })));
-                console.log('🔍 WRITING-DRILL-CHECK: Using most recent session:', mostRecentSession.id, 'status:', mostRecentSession.status);
-                
                 sessionIdToUse = mostRecentSession.id;
                 
                 // If the session is completed, we should go to review mode
                 if (mostRecentSession.status === 'completed') {
-                  console.log('🔍 WRITING-DRILL-CHECK: Most recent session is completed, should go to review mode');
                   const currentUrl = new URL(window.location.href);
                   currentUrl.searchParams.set('review', 'true');
                   setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
                 }
               } else {
-                console.log('🔍 WRITING-DRILL-CHECK: No existing sessions found, will create new one');
                 sessionIdToUse = await TestSessionService.createOrResumeSession(
                   user.id,
                   properDisplayName,
@@ -1030,8 +801,6 @@ const TestTaking: React.FC = () => {
               );
             }
             
-            console.log('✅ SESSION-CREATE: Session ID determined:', sessionIdToUse);
-              
             if (!sessionIdToUse) {
               throw new Error('Session creation returned undefined');
             }
@@ -1054,8 +823,6 @@ const TestTaking: React.FC = () => {
         
         if (existingSession && existingSession.currentQuestionIndex > 0) {
           // This is an existing session we should resume
-          console.log('🔄 Resuming found session:', sessionIdToUse);
-          
           // Convert saved session to our format
           const answers: Record<number, number> = {};
           Object.entries(existingSession.answers).forEach(([qIndex, optionText]) => {
@@ -1093,8 +860,6 @@ const TestTaking: React.FC = () => {
             isResumed: true
           };
           
-          console.log('🔄 RESUME-CREATE: Final session state - currentQuestion:', resumedSession.currentQuestion, 'totalQuestions:', resumedSession.questions.length, 'isReviewMode:', isReviewMode);
-
           // Apply answers and text answers to questions
           resumedSession.questions.forEach((question, index) => {
             if (resumedSession.answers[index] !== undefined) {
@@ -1102,8 +867,7 @@ const TestTaking: React.FC = () => {
             }
             if (resumedSession.textAnswers[index] !== undefined) {
               question.userTextAnswer = resumedSession.textAnswers[index];
-              console.log('🔄 RESUME-CREATE: Restored text answer for question', index, '→', resumedSession.textAnswers[index].substring(0, 50) + '...');
-            }
+              }
             question.flagged = resumedSession.flaggedQuestions.has(index);
           });
 
@@ -1118,12 +882,6 @@ const TestTaking: React.FC = () => {
             console.log('🔗 URL-UPDATE: Added sessionId to resumed session URL via setSearchParams:', sessionIdToUse);
           }
           
-          console.log('✅ RESUME: Session resumed from createSession with:', {
-            currentQuestion: resumedSession.currentQuestion,
-            answersRestored: Object.keys(resumedSession.answers).length,
-            textAnswersRestored: Object.keys(resumedSession.textAnswers).length,
-            timeRemaining: existingSession.timeRemainingSeconds
-          });
           return;
         }
 
@@ -1149,21 +907,12 @@ const TestTaking: React.FC = () => {
         console.log('🔥 TIMER SET: About to setTimeRemaining with seconds:', timeLimitSeconds);
         setTimeRemaining(timeLimitSeconds || 0);
         console.log('🔥 TIMER SET: Timer initialized with', timeLimitSeconds, 'seconds (', timeLimitMinutes, 'minutes)');
-        console.log('✅ NEW: New session created with', timeLimitMinutes, 'minute time limit (', timeLimitSeconds, 'seconds)');
-        
         // Update URL with session ID so it can be resumed
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('sessionId', sessionIdToUse);
         setSearchParams(newSearchParams, { replace: true });
         console.log('🔗 URL-UPDATE: Added sessionId to URL via setSearchParams:', sessionIdToUse);
-        console.log('🔍 DEBUG: New session questions maxPoints:', newSession.questions.map(q => ({ 
-          id: q.id, 
-          maxPoints: q.maxPoints, 
-          subSkill: q.subSkill, 
-          topic: q.topic 
-        })));
-
-      } catch (err) {
+        } catch (err) {
         console.error('Error initializing session:', err);
         console.error('Error details:', {
           message: err instanceof Error ? err.message : 'Unknown error',
@@ -1194,14 +943,6 @@ const TestTaking: React.FC = () => {
       return;
     }
 
-    console.log('💾 SAVE: Starting saveProgress for current state:', {
-      sessionId: sessionToUse.id,
-      currentQuestion: sessionToUse.currentQuestion,
-      answersInState: Object.keys(sessionToUse.answers).length,
-      textAnswersInState: Object.keys(sessionToUse.textAnswers).length,
-      timeRemaining
-    });
-
     try {
       // Convert answers to string format
       const stringAnswers: Record<string, string> = {};
@@ -1209,20 +950,15 @@ const TestTaking: React.FC = () => {
         const question = sessionToUse.questions[parseInt(qIndex)];
         if (question && question.options && question.options[answerIndex]) {
           stringAnswers[qIndex] = question.options[answerIndex];
-          console.log('💾 SAVE: Converting answer for question', qIndex, ':', answerIndex, '->', question.options[answerIndex]);
-        }
+          }
       });
       
-      console.log('💾 SAVE: Total answers to save:', Object.keys(stringAnswers).length);
-      console.log('💾 SAVE: Answers object:', stringAnswers);
-
       // Convert text answers to string format
       const stringTextAnswers: Record<string, string> = {};
       Object.entries(sessionToUse.textAnswers).forEach(([qIndex, textAnswer]) => {
         if (textAnswer && textAnswer.trim().length > 0) {
           stringTextAnswers[qIndex] = textAnswer;
-          console.log('💾 SAVE: Converting text answer for question', qIndex, ':', textAnswer.substring(0, 50) + '...');
-        }
+          }
       });
 
       const flaggedQuestions = Array.from(sessionToUse.flaggedQuestions).map(q => q.toString());
@@ -1246,13 +982,6 @@ const TestTaking: React.FC = () => {
           return answerIndex === question.correctAnswer;
         }).length;
         
-        console.log('💾 DRILL-SAVE: Updating drill session progress:');
-        console.log('💾 DRILL-SAVE: - Session ID:', sessionToUse.id);
-        console.log('💾 DRILL-SAVE: - Questions Answered:', questionsAnswered);
-        console.log('💾 DRILL-SAVE: - Questions Correct:', questionsCorrect);
-        console.log('💾 DRILL-SAVE: - Answers:', stringAnswers);
-        console.log('💾 DRILL-SAVE: - Text Answers:', stringTextAnswers);
-
         await DrillSessionService.updateProgress(
           sessionToUse.id,
           questionsAnswered,
@@ -1262,14 +991,6 @@ const TestTaking: React.FC = () => {
         );
       } else {
         // For regular sessions (diagnostic/practice) AND writing drills, use SessionService
-        console.log('💾 SAVE: About to save with SessionService.saveProgress:');
-        console.log('💾 SAVE: - Session ID:', sessionToUse.id);
-        console.log('💾 SAVE: - Current Question:', sessionToUse.currentQuestion);
-        console.log('💾 SAVE: - String Answers:', stringAnswers);
-        console.log('💾 SAVE: - String Text Answers:', stringTextAnswers);
-        console.log('💾 SAVE: - Flagged Questions:', flaggedQuestions);
-        console.log('💾 SAVE: - Time Remaining:', timeRemaining);
-
         await SessionService.saveProgress(
           sessionToUse.id,
           sessionToUse.currentQuestion,
@@ -1280,8 +1001,7 @@ const TestTaking: React.FC = () => {
         );
       }
 
-      console.log('✅ SAVE COMPLETE: Progress saved successfully');
-    } catch (error) {
+      } catch (error) {
       console.error('❌ SAVE FAILED:', error);
     }
   };
@@ -1296,7 +1016,6 @@ const TestTaking: React.FC = () => {
     
     // Check if this test mode should have a timer
     if (!shouldHaveTimer(actualTestMode)) {
-      console.log('⏰ TIMER: Skipping timer for drill mode');
       return;
     }
 
@@ -1308,7 +1027,7 @@ const TestTaking: React.FC = () => {
         }
         return prev - 1;
       });
-    }, 1000);
+    }, import.meta.env.DEV ? 1000 : 10000);
 
     return () => clearInterval(interval);
   }, [session?.status, actualTestMode]);
@@ -1334,8 +1053,7 @@ const TestTaking: React.FC = () => {
         try {
           // Force immediate save
           await saveProgress(session);
-          console.log('✅ PAGE-UNLOAD: Text answers saved successfully');
-        } catch (error) {
+          } catch (error) {
           console.error('❌ PAGE-UNLOAD: Failed to save text answers:', error);
           // Show browser warning
           event.preventDefault();
@@ -1362,8 +1080,7 @@ const TestTaking: React.FC = () => {
           
           try {
             await saveProgress(session);
-            console.log('✅ VISIBILITY: Text answers saved successfully');
-          } catch (error) {
+            } catch (error) {
             console.error('❌ VISIBILITY: Failed to save text answers:', error);
           }
         }
@@ -1390,14 +1107,9 @@ const TestTaking: React.FC = () => {
   }, [session]);
 
   const handleAnswer = (answerIndex: number) => {
-    console.log('🎯 HANDLEANSWER: Function called with answerIndex:', answerIndex);
-    
     if (!session) {
-      console.log('🎯 HANDLEANSWER: No session, returning early');
       return;
     }
-    
-    console.log('📝 ANSWER: User selected answer', answerIndex, 'for question', session.currentQuestion);
     
     // Create the updated session state first
     const newAnswers = { ...session.answers };
@@ -1406,9 +1118,6 @@ const TestTaking: React.FC = () => {
     // Update the question's userAnswer
     const updatedQuestions = [...session.questions];
     updatedQuestions[session.currentQuestion].userAnswer = answerIndex;
-    
-    console.log('📝 ANSWER: Updated answers state:', newAnswers);
-    console.log('📝 ANSWER: Updated question', session.currentQuestion, 'userAnswer to:', answerIndex);
     
     const updatedSession = {
       ...session,
@@ -1419,39 +1128,25 @@ const TestTaking: React.FC = () => {
     setSession(updatedSession);
     
     // Save immediately after multiple choice answer using the updated state
-    console.log('💾 IMMEDIATE-SAVE: Starting immediate save for question', session.currentQuestion, 'answer', answerIndex);
-    console.log('💾 IMMEDIATE-SAVE: Session ID:', updatedSession.id);
-    console.log('💾 IMMEDIATE-SAVE: Session status:', updatedSession.status);
-    console.log('💾 IMMEDIATE-SAVE: Is review mode?', isReviewMode);
-    console.log('💾 IMMEDIATE-SAVE: New answers state:', newAnswers);
-    console.log('💾 IMMEDIATE-SAVE: Updated session answers:', updatedSession.answers);
-    
     // Don't save in review mode
     if (updatedSession.status === 'review' || isReviewMode) {
-      console.log('💾 IMMEDIATE-SAVE: Skipping save in review mode');
       return;
     }
     
     // Use immediate async execution instead of setTimeout
     (async () => {
       try {
-        console.log('💾 IMMEDIATE-SAVE: About to save immediately...');
-        
         // Convert answers to string format using the updated state
         const stringAnswers: Record<string, string> = {};
         Object.entries(newAnswers).forEach(([qIndex, answerIdx]) => {
           const question = updatedSession.questions[parseInt(qIndex)];
           if (question && question.options && question.options[answerIdx]) {
             stringAnswers[qIndex] = question.options[answerIdx];
-            console.log('💾 IMMEDIATE-SAVE: Converting answer for question', qIndex, ':', answerIdx, '->', question.options[answerIdx]);
-          } else {
+            } else {
             console.warn('💾 IMMEDIATE-SAVE: Failed to convert answer for question', qIndex, 'answerIdx:', answerIdx, 'question exists:', !!question, 'has options:', !!(question?.options));
           }
         });
         
-        console.log('💾 IMMEDIATE-SAVE: Total answers to save:', Object.keys(stringAnswers).length);
-        console.log('💾 IMMEDIATE-SAVE: Answers object:', stringAnswers);
-
         if (Object.keys(stringAnswers).length === 0) {
           console.error('💾 IMMEDIATE-SAVE: ❌ NO ANSWERS TO SAVE! This is the problem.');
           console.error('💾 IMMEDIATE-SAVE: newAnswers:', newAnswers);
@@ -1468,15 +1163,6 @@ const TestTaking: React.FC = () => {
         });
 
         const flaggedQuestions = Array.from(updatedSession.flaggedQuestions).map(q => q.toString());
-
-        console.log('💾 IMMEDIATE-SAVE: About to call SessionService.saveProgress with:', {
-          sessionId: updatedSession.id,
-          currentQuestion: updatedSession.currentQuestion,
-          stringAnswers,
-          flaggedQuestions,
-          timeRemaining,
-          stringTextAnswers
-        });
 
         // Use different save logic for drill vs regular sessions
         // EXCEPTION: Writing drills use TestSessionService like diagnostic/practice tests
@@ -1496,18 +1182,8 @@ const TestTaking: React.FC = () => {
             
             // Find the answer index by matching the option text
             const answerIndex = question.options.findIndex(option => option === answer);
-            console.log('💾 DRILL-SAVE: Question', qIndex, 'answer:', answer, 'correct answer index:', question.correctAnswer, 'user answer index:', answerIndex);
-            
             return answerIndex === question.correctAnswer;
           }).length;
-          
-          console.log('💾 DRILL-SAVE: Updating drill session progress:', {
-            sessionId: updatedSession.id,
-            questionsAnswered,
-            questionsCorrect,
-            answers: stringAnswers,
-            textAnswers: stringTextAnswers
-          });
           
           await DrillSessionService.updateProgress(
             updatedSession.id,
@@ -1528,8 +1204,6 @@ const TestTaking: React.FC = () => {
           );
         }
 
-        console.log('✅ IMMEDIATE-SAVE COMPLETE: Progress saved successfully');
-        
         // NOTE: Individual question attempts will be recorded during session completion
         // using the DeveloperToolsReplicaService to ensure insights compatibility
       } catch (error) {
@@ -1541,8 +1215,6 @@ const TestTaking: React.FC = () => {
 
   const handleTextAnswer = useCallback((text: string) => {
     if (!session) return;
-    
-    console.log('📝 TEXT: User entered text for question', session.currentQuestion, ':', text.substring(0, 50) + '...');
     
     // Update last change time for periodic saving
     lastTextChangeTimeRef.current = Date.now();
@@ -1557,8 +1229,6 @@ const TestTaking: React.FC = () => {
       const updatedQuestions = [...prev.questions];
       updatedQuestions[prev.currentQuestion].userTextAnswer = text;
       
-      console.log('📝 TEXT: Updated text answers state:', newTextAnswers);
-      
       const updatedSession = {
         ...prev,
         textAnswers: newTextAnswers,
@@ -1572,11 +1242,9 @@ const TestTaking: React.FC = () => {
       
       // Set new debounced auto-save (save after 1 second of no typing)
       textAutoSaveTimeoutRef.current = setTimeout(async () => {
-        console.log('💾 TEXT-AUTO-SAVE: Debounced save triggered for text answer');
         try {
           await saveProgress(updatedSession);
-          console.log('✅ TEXT-AUTO-SAVE: Text answer saved successfully');
-        } catch (error) {
+          } catch (error) {
           console.error('❌ TEXT-AUTO-SAVE: Failed to save text answer:', error);
         }
       }, 1000);
@@ -1587,14 +1255,12 @@ const TestTaking: React.FC = () => {
           // Only save if there were recent changes (within last 6 seconds)
           const timeSinceLastChange = Date.now() - lastTextChangeTimeRef.current;
           if (timeSinceLastChange < 6000 && timeSinceLastChange > 1000) {
-            console.log('💾 TEXT-PERIODIC-SAVE: Periodic save triggered');
             try {
               // Get current session state for periodic save
               setSession(currentSession => {
                 if (currentSession) {
                   saveProgress(currentSession).then(() => {
-                    console.log('✅ TEXT-PERIODIC-SAVE: Periodic save successful');
-                  }).catch(error => {
+                    }).catch(error => {
                     console.error('❌ TEXT-PERIODIC-SAVE: Periodic save failed:', error);
                   });
                 }
@@ -1615,8 +1281,6 @@ const TestTaking: React.FC = () => {
   const handleTextBlur = useCallback(async () => {
     if (!session) return;
     
-    console.log('💾 TEXT-BLUR-SAVE: Textarea lost focus, saving immediately');
-    
     // Clear any pending auto-save timeout since we're saving now
     if (textAutoSaveTimeoutRef.current) {
       clearTimeout(textAutoSaveTimeoutRef.current);
@@ -1625,8 +1289,7 @@ const TestTaking: React.FC = () => {
     
     try {
       await saveProgress(session);
-      console.log('✅ TEXT-BLUR-SAVE: Text saved on blur successfully');
-    } catch (error) {
+      } catch (error) {
       console.error('❌ TEXT-BLUR-SAVE: Failed to save text on blur:', error);
     }
   }, [session, saveProgress]);
@@ -1639,7 +1302,6 @@ const TestTaking: React.FC = () => {
     const isWrittenResponse = currentQuestion?.format === 'Written Response';
     
     if (isWrittenResponse) {
-      console.log('💾 NEXT-SAVE: Saving written response before moving to next question');
       await saveProgress(session); // Use current session state
       
       // ADDITIONALLY: Record individual written response attempt for insights (practice tests and drills)
@@ -1647,14 +1309,6 @@ const TestTaking: React.FC = () => {
         try {
           const textAnswer = session.textAnswers[session.currentQuestion];
           if (textAnswer && textAnswer.trim().length > 0) {
-            console.log('📊 WRITTEN-ATTEMPT: Recording written response attempt for insights:', {
-              questionId: currentQuestion.id,
-              sessionId: session.id,
-              textLength: textAnswer.length,
-              subSkill: currentQuestion.subSkill,
-              topic: currentQuestion.topic
-            });
-            
             // Record written response attempt to question_attempt_history table
             const { error: attemptError } = await supabase.rpc('save_question_attempt', {
               p_user_id: user.id,
@@ -1670,8 +1324,7 @@ const TestTaking: React.FC = () => {
             if (attemptError) {
               console.error('❌ WRITTEN-ATTEMPT: Error recording written response attempt:', attemptError);
             } else {
-              console.log('✅ WRITTEN-ATTEMPT: Written response attempt recorded successfully');
-            }
+              }
           }
         } catch (writtenAttemptError) {
           console.error('❌ WRITTEN-ATTEMPT: Failed to record written response attempt:', writtenAttemptError);
@@ -1834,8 +1487,6 @@ const TestTaking: React.FC = () => {
         );
       } else {
         // For regular sessions (diagnostic/practice) AND writing drills, use developer tools replica approach
-        console.log('🎯 DEV-REPLICA: Using developer tools completion approach for insights compatibility');
-        
         // Create the session structure in the exact format the replica service expects
         const sessionForReplica = {
           id: session.id,
@@ -1894,13 +1545,10 @@ const TestTaking: React.FC = () => {
             // The drill progress loading already handles user_test_sessions properly
             console.log('🌉 WRITING-DRILL-BRIDGE: Skipping drill_sessions bridge - using user_test_sessions only');
             console.log('🌉 WRITING-DRILL-BRIDGE: Main session completed in user_test_sessions:', session.id);
-            console.log('✅ WRITING-DRILL-BRIDGE: Bridge skipped - progress will be tracked via user_test_sessions only');
-            
             // PROGRESS REFRESH: Trigger drill progress refresh by setting a flag in localStorage
             // This will be picked up by the drill page visibility change handler
             localStorage.setItem('drill_progress_refresh_needed', 'true');
-            console.log('🔄 WRITING-DRILL-REFRESH: Set drill progress refresh flag for drill page');
-          } catch (bridgeError) {
+            } catch (bridgeError) {
             console.error('❌ WRITING-DRILL-BRIDGE: Error in bridge logic:', bridgeError);
             // Don't throw - this was just supplementary logic
           }

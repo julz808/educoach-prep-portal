@@ -28,7 +28,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { DrillSessionService } from '@/services/drillSessionService';
 import { DeveloperTools } from '@/components/DeveloperTools';
-import { getOrCreateSubSkillUUID } from '@/utils/uuidUtils';
+import { getOrCreateSubSkillUUID, generateDeterministicUUID } from '@/utils/uuidUtils';
 
 // Helper function to generate consistent UUIDs for writing drills
 const getWritingDrillUUID = (sectionName: string): string => {
@@ -101,10 +101,12 @@ const Drill: React.FC = () => {
     
     try {
       const dbProductType = getDbProductType(selectedProduct);
-      console.log('🔧 DRILL: Loading progress for product:', dbProductType);
-      
       // Load progress from both drill_sessions (for regular drills) and user_test_sessions (for writing drills)
-      console.log('🔧 DRILL-PROGRESS: Loading progress for user:', user.id, 'product:', dbProductType);
+      // First, let's check if ANY drill sessions exist at all
+      const allDrillSessionsResult = await supabase
+        .from('drill_sessions')
+        .select('*')
+        .limit(5);
       const [drillSessionsResult, userTestSessionsResult] = await Promise.all([
         supabase
           .from('drill_sessions')
@@ -124,7 +126,7 @@ const Drill: React.FC = () => {
           .eq('user_id', user.id)
           .eq('product_type', dbProductType)
       ]);
-
+      
       if (drillSessionsResult.error) {
         console.error('Error loading drill_sessions:', drillSessionsResult.error);
       }
@@ -136,18 +138,7 @@ const Drill: React.FC = () => {
       const drillSessions = drillSessionsResult.data || [];
       const userTestSessions = userTestSessionsResult.data || [];
       
-      console.log('🔧 DRILL: Loaded drill sessions:', drillSessions.length);
-      console.log('🔧 DRILL: Loaded writing drill sessions (user_test_sessions):', userTestSessions.length);
-      
       // Debug: Show ALL user test sessions to see what's actually in the database
-      console.log('🔧 DRILL-DEBUG: ALL user test sessions:', userTestSessions.map(s => ({
-        id: s.id,
-        section_name: s.section_name,
-        test_mode: s.test_mode,
-        status: s.status,
-        product_type: s.product_type
-      })));
-      
       // Debug: Show actual writing drill sessions found
       const writingSessions = userTestSessions.filter(session => {
         const sectionName = session.section_name || '';
@@ -155,22 +146,12 @@ const Drill: React.FC = () => {
                sectionName.toLowerCase().includes('written') ||
                sectionName.toLowerCase().includes('expression');
       });
-      console.log('🔧 DRILL-PROGRESS: Found writing drill sessions:', writingSessions.map(s => ({
-        id: s.id,
-        section: s.section_name,
-        status: s.status,
-        currentQuestionIndex: s.current_question_index,
-        hasTextAnswers: !!(s.text_answers_data && Object.keys(s.text_answers_data).length > 0)
-      })));
-
       // Organize sessions by sub_skill_id and difficulty
       const progressMap: Record<string, any> = {};
       
       // IMPORTANT: Process writing drill sessions FIRST to ensure they take priority
       // Writing drills in user_test_sessions should always override any drill_sessions entries
       userTestSessions?.forEach(session => {
-        console.log(`🔧 WRITING-DRILL: Processing user_test_session: "${session.section_name}", test_mode: ${session.test_mode}, status: ${session.status}`);
-        
         const sectionName = session.section_name || '';
         
         // Check if this is a writing drill session - look for both test_mode='drill' AND writing-related section names
@@ -191,13 +172,10 @@ const Drill: React.FC = () => {
             baseSectionName = essayMatch[1].trim();
             const essayNumber = parseInt(essayMatch[2]);
             assignedDifficulty = essayNumber === 1 ? 'easy' : essayNumber === 2 ? 'medium' : 'hard';
-            console.log(`🔧 WRITING-DRILL: Parsed section "${sectionName}" -> base: "${baseSectionName}", essay: ${essayNumber}, difficulty: ${assignedDifficulty}`);
-          }
+            }
           
           // Use centralized UUID generation for consistency - use base section name
           const actualSubSkillId = getWritingDrillUUID(baseSectionName);
-          console.log(`🔧 WRITING-DRILL: Generated sub_skill_id "${actualSubSkillId}" for base section "${baseSectionName}"`);
-          
           if (!progressMap[actualSubSkillId]) {
             progressMap[actualSubSkillId] = {
               easy: { completed: 0, total: 0, bestScore: undefined },
@@ -248,8 +226,6 @@ const Drill: React.FC = () => {
             completionScore = 0;
           }
           
-          console.log(`🔧 WRITING-DRILL: Setting progress for "${actualSubSkillId}": completed=${questionsAnswered}, total=${totalQuestions}, score=${completionScore}%`);
-          
           progressMap[actualSubSkillId][assignedDifficulty] = {
             completed: questionsAnswered,
             total: totalQuestions,
@@ -259,24 +235,16 @@ const Drill: React.FC = () => {
             isCompleted: session.status === 'completed'
           };
           
-          console.log(`🔧 WRITING-DRILL: Assigned session ${session.id} to ${assignedDifficulty} difficulty for "${actualSubSkillId}"`);
-          console.log(`🔧 WRITING-DRILL: Session details:`, {
-            sessionId: session.id,
-            status: session.status,
-            isCompleted: session.status === 'completed',
-            completionScore,
-            questionsAnswered,
-            totalQuestions
-          });
-          console.log(`🔧 WRITING-DRILL: Progress map for ${actualSubSkillId}.${assignedDifficulty}:`, progressMap[actualSubSkillId][assignedDifficulty]);
-        }
+          }
       });
       
       // Process regular drill sessions from drill_sessions table
       // IMPORTANT: Skip any drill_sessions that conflict with writing drill sessions already processed
+      // Debug: Try to reverse-engineer what sub-skill names these UUIDs came from
+      const existingProgressKeys = Object.keys(progressMap);
+      // Test what deterministic UUIDs would be generated for current sub-skills
+      const currentSubSkills = ['Logical Reasoning & Deduction', 'Spatial Reasoning (2D & 3D)', 'Critical Thinking & Problem-Solving', 'Verbal Reasoning & Analogies'];
       drillSessions?.forEach(session => {
-        console.log(`🔧 DRILL: Processing drill_session for sub_skill_id: "${session.sub_skill_id}", difficulty: ${session.difficulty}, status: ${session.status}`);
-        
         const key = `${session.sub_skill_id}-${session.difficulty}`;
         if (!progressMap[session.sub_skill_id]) {
           progressMap[session.sub_skill_id] = {
@@ -290,8 +258,6 @@ const Drill: React.FC = () => {
         // Calculate score as percentage of total questions, not just attempted ones
         const totalScore = session.questions_total > 0 ? Math.round((session.questions_correct / session.questions_total) * 100) : 0;
         
-        console.log(`🔧 DRILL: Setting progress for "${session.sub_skill_id}" ${difficultyKey}: completed=${session.questions_answered}, total=${session.questions_total}, totalScore=${totalScore}%`);
-        
         progressMap[session.sub_skill_id][difficultyKey] = {
           completed: session.questions_answered || 0,
           total: session.questions_total || 0,
@@ -300,20 +266,14 @@ const Drill: React.FC = () => {
           sessionId: session.id, // Store session ID for navigation
           isCompleted: session.status === 'completed' // Track completion status
         };
-      });
+        
+        });
 
-      console.log('🔧 DRILL: Processed progress map:', progressMap);
-      
       // Debug: Show final progress for writing skills
       Object.entries(progressMap).forEach(([subSkillId, progress]) => {
         const hasWritingProgress = progress.easy?.sessionId || progress.medium?.sessionId || progress.hard?.sessionId;
         if (hasWritingProgress) {
-          console.log(`🔧 DRILL-FINAL: Sub-skill "${subSkillId}" progress:`, {
-            easy: { completed: progress.easy?.completed, total: progress.easy?.total, sessionId: progress.easy?.sessionId, isCompleted: progress.easy?.isCompleted },
-            medium: { completed: progress.medium?.completed, total: progress.medium?.total, sessionId: progress.medium?.sessionId, isCompleted: progress.medium?.isCompleted },
-            hard: { completed: progress.hard?.completed, total: progress.hard?.total, sessionId: progress.hard?.sessionId, isCompleted: progress.hard?.isCompleted }
-          });
-        }
+          }
       });
       
       return progressMap;
@@ -326,10 +286,8 @@ const Drill: React.FC = () => {
   // Separate function to reload progress data
   const reloadProgressData = async () => {
     try {
-      console.log('🔄 DRILL: Reloading progress data...');
       const progressData = await loadDrillProgress();
       setDrillProgress(progressData);
-      console.log('🔄 DRILL: Progress data reloaded:', progressData);
       return progressData;
     } catch (error) {
       console.error('🔄 DRILL: Error reloading progress:', error);
@@ -370,7 +328,6 @@ const Drill: React.FC = () => {
           ? Math.round((totalCorrect / totalQuestions) * 100)
           : 0;
 
-        console.log('📊 DRILL: Calculated average score from drill sessions:', calculatedAverageScore, '% (', totalCorrect, '/', totalQuestions, 'from', drillSessions.length, 'completed sessions)');
         setAverageScore(calculatedAverageScore);
       } else {
         setAverageScore(0);
@@ -387,8 +344,6 @@ const Drill: React.FC = () => {
       setError(null);
       
       try {
-        console.log('🔧 DEBUG: Fetching drill modes for product:', selectedProduct);
-        
         // Load drill progress from database
         const progressData = await reloadProgressData();
 
@@ -396,32 +351,18 @@ const Drill: React.FC = () => {
         await calculateAverageScore();
         
         const modes = await fetchDrillModes(selectedProduct);
-        console.log('🔧 DEBUG: Received drill modes:', modes);
-        console.log('🔧 DEBUG: Number of modes:', modes?.length);
-        
         // Detailed logging of the data structure
         if (modes && modes.length > 0) {
           modes.forEach((mode, modeIndex) => {
-            console.log(`🔧 DEBUG: Mode ${modeIndex}:`, {
-              name: mode.name,
-              sections: mode.sections?.length || 0,
-              sectionNames: mode.sections?.map(s => s.name) || []
-            });
-            
             if (mode.sections) {
               mode.sections.forEach((section, sectionIndex) => {
-                console.log(`🔧 DEBUG: Mode "${mode.name}" -> Section ${sectionIndex}:`, {
-                  name: section.name,
-                  questionsCount: section.questions?.length || 0
                 });
-              });
             }
           });
         }
         
         // Check if we have real data from the database
         if (!modes || modes.length === 0) {
-          console.log('🔧 DEBUG: No drill modes found, using fallback message');
           setSkillAreas([]);
           return;
         }
@@ -430,8 +371,6 @@ const Drill: React.FC = () => {
         const skillAreasMap = new Map<string, SkillArea>();
         
         modes.forEach(mode => {
-          console.log('🔧 DEBUG: Processing mode:', mode.name, 'with sections:', mode.sections);
-          
           // Each mode represents a skill area (section_name from database)
           const skillAreaName = mode.name;
           
@@ -455,8 +394,6 @@ const Drill: React.FC = () => {
           mode.sections.forEach(section => {
             const subSkillName = section.name;
             
-            console.log('🔧 DEBUG: Processing sub-skill:', subSkillName, 'in skill area:', skillAreaName);
-            
             // Count actual questions by difficulty level
             const totalQuestions = section.questions.length;
             const easyQuestions = section.questions.filter(q => q.difficulty === 1);
@@ -467,47 +404,52 @@ const Drill: React.FC = () => {
             const mediumTotal = mediumQuestions.length;
             const hardTotal = hardQuestions.length;
             
-            console.log(`🔧 DEBUG: Question distribution for ${subSkillName}:`, {
-              easy: easyTotal,
-              medium: mediumTotal, 
-              hard: hardTotal,
-              total: totalQuestions
-            });
-            
             // Get real progress data from database
             // Check if this is a writing drill to use consistent UUID generation
             const isWritingDrillSection = section.name.toLowerCase().includes('writing') || 
                                         section.name.toLowerCase().includes('written') ||
                                         section.name.toLowerCase().includes('expression');
             
+            // Define subSkillText at proper scope for later use
+            const subSkillText = section.questions[0]?.subSkill || section.name;
+            
             let actualSubSkillId: string;
             if (isWritingDrillSection) {
               // For writing drills, use centralized UUID generation
               actualSubSkillId = getWritingDrillUUID(section.name);
-              console.log(`🔧 DRILL: Writing drill detected - using section name "${section.name}" -> UUID "${actualSubSkillId}"`);
-            } else {
+              } else {
               // For regular drills, use the original logic
-              const subSkillText = section.questions[0]?.subSkill || section.name;
               const firstQuestionWithUUID = section.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
               actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
-              console.log(`🔧 DRILL: Regular drill - subSkillText: "${subSkillText}", UUID: "${actualSubSkillId}"`);
-            }
-            
-            console.log(`🔧 DRILL: Looking for progress with actualSubSkillId: "${actualSubSkillId}" (section.name: "${section.name}")`);
-            console.log(`🔧 DRILL: Available progress keys:`, Object.keys(progressData));
-            console.log(`🔧 DRILL: Progress data for this subSkill:`, progressData[actualSubSkillId]);
+              }
             
             // Also try alternative keys in case there's still a mismatch
             let realProgress = progressData[actualSubSkillId];
             if (!realProgress) {
               // Try with section.id as fallback
               realProgress = progressData[section.id];
-              console.log(`🔧 DRILL: Fallback - trying section.id "${section.id}":`, realProgress);
-            }
+              }
             if (!realProgress) {
               // Try with section.name as fallback
               realProgress = progressData[section.name];
-              console.log(`🔧 DRILL: Fallback - trying section.name "${section.name}":`, realProgress);
+              }
+            if (!realProgress) {
+              // Try generating deterministic UUIDs for different variations of the sub-skill name
+              const variations = [
+                section.name,
+                subSkillText,
+                section.questions[0]?.subSkill || '',
+                section.name.replace(/[^a-zA-Z0-9]/g, ' ').trim(),
+                section.name.toLowerCase(),
+              ].filter(Boolean);
+              
+              for (const variation of variations) {
+                const testUUID = generateDeterministicUUID(variation);
+                if (progressData[testUUID]) {
+                  realProgress = progressData[testUUID];
+                  break;
+                }
+              }
             }
             
             // Default if still no match
@@ -517,17 +459,13 @@ const Drill: React.FC = () => {
                 medium: { completed: 0, total: mediumTotal, bestScore: undefined, correctAnswers: 0, isCompleted: false },
                 hard: { completed: 0, total: hardTotal, bestScore: undefined, correctAnswers: 0, isCompleted: false }
               };
-              console.log(`🔧 DRILL: No progress found, using default:`, realProgress);
-            } else {
-              console.log(`🔧 DRILL: Found existing progress:`, realProgress);
-            }
+              } else {
+              }
             
             // Update totals to match actual question counts while preserving all other properties
             realProgress.easy = { ...realProgress.easy, total: easyTotal };
             realProgress.medium = { ...realProgress.medium, total: mediumTotal };
             realProgress.hard = { ...realProgress.hard, total: hardTotal };
-            
-            console.log(`🔧 DRILL: Progress for ${subSkillName}:`, realProgress);
             
             const subSkill: SubSkill = {
               id: section.id,
@@ -545,16 +483,10 @@ const Drill: React.FC = () => {
             skillArea.totalQuestions += totalQuestions;
             skillArea.completedQuestions += subSkill.completedQuestions;
             
-            console.log('🔧 DEBUG: Added sub-skill:', subSkillName, 'to skill area:', skillAreaName, 'with', totalQuestions, 'questions');
-          });
+            });
         });
         
         const finalSkillAreas = Array.from(skillAreasMap.values());
-        console.log('🔧 DEBUG: Final skill areas:', finalSkillAreas.map(sa => ({
-          name: sa.name,
-          subSkills: sa.subSkills.length,
-          totalQuestions: sa.totalQuestions
-        })));
         setSkillAreas(finalSkillAreas);
       } catch (err) {
         console.error('Error loading drill data:', err);
@@ -571,12 +503,9 @@ const Drill: React.FC = () => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && user) {
-        console.log('🔄 DRILL: Page became visible, refreshing progress data...');
-        
         // Check if there's a refresh flag from completed writing drill
         const refreshFlag = localStorage.getItem('drill_progress_refresh_needed');
         if (refreshFlag === 'true') {
-          console.log('🔄 DRILL-REFRESH: Found refresh flag, forcing progress reload...');
           localStorage.removeItem('drill_progress_refresh_needed');
         }
         
@@ -595,7 +524,6 @@ const Drill: React.FC = () => {
     if (!user) return;
 
     const refreshProgress = async () => {
-      console.log('🔄 DRILL: Periodic progress refresh...');
       await reloadProgressData();
     };
 
@@ -606,7 +534,6 @@ const Drill: React.FC = () => {
     // Refresh periodically when window is visible
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('🔄 DRILL: Page became visible, refreshing progress...');
         refreshProgress();
       }
     };
@@ -617,7 +544,7 @@ const Drill: React.FC = () => {
       if (!document.hidden && import.meta.env.DEV) {
         refreshProgress();
       }
-    }, 5000);
+    }, import.meta.env.DEV ? 5000 : 30000);
     
     return () => {
       window.removeEventListener('focus', handleFocus);
@@ -677,8 +604,6 @@ const Drill: React.FC = () => {
     // Filter questions by actual difficulty level from database
     const availableQuestions = questions.filter(q => q.difficulty === targetDifficulty);
     
-    console.log(`🎯 DRILL: Starting ${difficulty} drill (difficulty=${targetDifficulty}):`, availableQuestions.length, 'questions available');
-    
     if (availableQuestions.length > 0) {
       try {
         // Check if this is a writing/written expression drill FIRST
@@ -689,17 +614,9 @@ const Drill: React.FC = () => {
         if (isWritingDrill) {
           // For writing drills, route directly to TestTaking.tsx without session pre-creation
           // TestTaking.tsx will handle session management just like diagnostic/practice tests
-          console.log(`🎯 DRILL-WRITING: Writing drill detected - routing to TestTaking.tsx`);
-          
           // Check if there's an existing session for this difficulty level
           const difficultyKey = difficulty as 'easy' | 'medium' | 'hard';
           const existingSessionId = selectedSubSkill.progress[difficultyKey]?.sessionId;
-          
-          console.log(`🎯 DRILL-WRITING: Checking for existing session:`, {
-            difficulty: difficultyKey,
-            existingSessionId,
-            progressData: selectedSubSkill.progress[difficultyKey]
-          });
           
           // Use a stable identifier for writing drills - convert to lowercase and replace spaces with hyphens
           const subjectId = selectedSubSkill.name.toLowerCase().replace(/\s+/g, '-');
@@ -708,10 +625,8 @@ const Drill: React.FC = () => {
           // If there's an existing session, include it in the URL to resume instead of creating new
           if (existingSessionId) {
             navigationUrl += `&sessionId=${existingSessionId}`;
-            console.log(`🎯 DRILL-WRITING: Including existing sessionId in URL:`, existingSessionId);
-          }
+            }
           
-          console.log(`🎯 DRILL-WRITING: Navigating to: ${navigationUrl}`);
           navigate(navigationUrl);
           return;
         }
@@ -722,16 +637,7 @@ const Drill: React.FC = () => {
         
         // Use utility function to get or create a proper UUID
         const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
-        console.log('🎯 DRILL: SubSkill UUID for', subSkillText, '→', actualSubSkillId);
-        
         const dbProductType = getDbProductType(selectedProduct);
-        
-        console.log(`🎯 DRILL: Checking for existing session:`, {
-          userId: user.id,
-          subSkillId: actualSubSkillId,
-          difficulty: targetDifficulty,
-          productType: dbProductType
-        });
         
         // Check for existing active session using DrillSessionService
         const existingSession = await DrillSessionService.getActiveSession(
@@ -742,12 +648,9 @@ const Drill: React.FC = () => {
         );
         
         // For non-writing drills, keep the current Drill.tsx experience
-        console.log(`🎯 DRILL-STANDARD: Using standard drill experience for non-writing section`);
         let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
         
         if (existingSession) {
-          console.log(`🎯 DRILL: Found existing session:`, existingSession);
-          
           // Add session ID for resume/review
           navigationUrl += `&sessionId=${existingSession.sessionId}`;
           
@@ -755,15 +658,11 @@ const Drill: React.FC = () => {
           if (existingSession.status === 'completed' || 
               (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
             navigationUrl += '&review=true';
-            console.log(`🎯 DRILL: Session is completed, adding review mode`);
-          } else {
-            console.log(`🎯 DRILL: Session in progress (${existingSession.questionsAnswered}/${existingSession.questionsTotal}), will resume`);
-          }
+            } else {
+            }
         } else {
-          console.log(`🎯 DRILL: No existing session found, will create new one`);
-        }
+          }
         
-        console.log(`🎯 DRILL: Navigating to: ${navigationUrl}`);
         navigate(navigationUrl);
       } catch (error) {
         console.error('🎯 DRILL: Error checking/creating drill session:', error);
@@ -805,15 +704,13 @@ const Drill: React.FC = () => {
            progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId ||
            progress.easy.isCompleted || progress.medium.isCompleted || progress.hard.isCompleted;
     
-    // Debug logging for writing drills
+    // Debug logging for all drills with sessions
     if (progress.easy.sessionId || progress.medium.sessionId || progress.hard.sessionId) {
-      console.log('🔍 DRILL-PROGRESS: hasAnyProgress check:', {
-        hasProgress,
-        easy: { completed: progress.easy.completed, sessionId: progress.easy.sessionId, isCompleted: progress.easy.isCompleted },
-        medium: { completed: progress.medium.completed, sessionId: progress.medium.sessionId, isCompleted: progress.medium.isCompleted },
-        hard: { completed: progress.hard.completed, sessionId: progress.hard.sessionId, isCompleted: progress.hard.isCompleted }
-      });
-    }
+      }
+    
+    // Also debug when hasProgress is false but we might expect it to be true
+    if (!hasProgress && (progress.easy.total > 0 || progress.medium.total > 0 || progress.hard.total > 0)) {
+      }
     
     return hasProgress;
   };
@@ -837,7 +734,6 @@ const Drill: React.FC = () => {
     });
     return recommended.slice(0, 3);
   };
-
 
   if (loading) {
     return (
@@ -926,14 +822,6 @@ const Drill: React.FC = () => {
               const config = getDifficultyConfig(level);
               
               // Debug: Log what data contains for each difficulty level
-              console.log(`🔍 DRILL-CARD: ${selectedSubSkill.name} ${level} data:`, {
-                completed: data.completed,
-                total: data.total,
-                isCompleted: data.isCompleted,
-                bestScore: data.bestScore,
-                sessionId: data.sessionId
-              });
-              
               // Check if this is a writing drill to use Essay labels
               const isWritingDrill = selectedSubSkill.name.toLowerCase().includes('writing') || 
                                    selectedSubSkill.name.toLowerCase().includes('written') ||
@@ -1085,7 +973,6 @@ const Drill: React.FC = () => {
         testType="drill" 
         selectedProduct={selectedProduct} 
         onDataChanged={async () => {
-          console.log('🔄 DRILL: Developer tools data changed, force reloading...');
           await reloadProgressData();
           await calculateAverageScore();
           // Also reload the drill modes to get fresh data

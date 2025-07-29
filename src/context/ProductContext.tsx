@@ -96,45 +96,32 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
   // Safe access control check with fallback
   const checkProductAccess = async (productId: string): Promise<boolean> => {
     if (!user) return false;
-    
+
     const product = testProducts.find(p => p.id === productId);
     if (!product) return false;
 
     try {
       setProductAccess(prev => ({ ...prev, isLoading: true, error: undefined }));
-      
-      console.log(`🔍 Access Control Debug:`, {
-        userId: user.id,
-        productId: productId,
-        dbProductType: product.dbProductType
-      });
-      
+
       // Check if user has access to this product
       const hasAccess = await UserMetadataService.hasProductAccess(user.id, product.dbProductType);
-      
-      console.log(`✅ Access Control Result:`, {
-        productId: productId,
-        hasAccess: hasAccess,
-        message: hasAccess ? 'User has access' : 'User needs to purchase'
-      });
-      
+
       setProductAccess({
         hasAccess,
         isLoading: false,
         error: undefined
       });
-      
+
       return hasAccess;
     } catch (error) {
-      console.warn('Access check failed, denying access for security:', error);
-      
+
       // SECURITY: If access check fails, deny access and show paywall
       setProductAccess({
         hasAccess: false,
         isLoading: false,
         error: 'Access check failed - please purchase to continue'
       });
-      
+
       return false;
     }
   };
@@ -180,4 +167,4 @@ export const useProduct = (): ProductContextType => {
 };
 
 export { testProducts };
-export type { TestProduct }; 
+export type { TestProduct };

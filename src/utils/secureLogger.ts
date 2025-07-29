@@ -28,7 +28,7 @@ function sanitizeLogData(data: LogData | any): any {
   }
 
   const sanitized = { ...data };
-  
+
   // Remove sensitive fields
   const sensitiveFields = [
     'password',
@@ -58,7 +58,7 @@ function sanitizeLogData(data: LogData | any): any {
     if (sanitized.user_id && typeof sanitized.user_id === 'string') {
       sanitized.user_id = sanitized.user_id.substring(0, 8) + '...';
     }
-    
+
     if (sanitized.email && typeof sanitized.email === 'string') {
       const [localPart, domain] = sanitized.email.split('@');
       if (domain) {
@@ -112,13 +112,13 @@ function sanitizeError(error: Error): SanitizedError {
 function formatLogMessage(level: string, message: string, data?: any): string {
   const timestamp = new Date().toISOString();
   const sanitizedData = data ? sanitizeLogData(data) : undefined;
-  
+
   let logEntry = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-  
+
   if (sanitizedData) {
     logEntry += ` ${JSON.stringify(sanitizedData)}`;
   }
-  
+
   return logEntry;
 }
 
@@ -156,7 +156,7 @@ export const secureLogger = {
     const sanitizedError = error instanceof Error 
       ? sanitizeError(error)
       : sanitizeLogData(error);
-    
+
     console.error(formatLogMessage('error', message, sanitizedError));
   },
 
@@ -169,7 +169,7 @@ export const secureLogger = {
       timestamp: new Date().toISOString(),
       ...sanitizeLogData(data)
     };
-    
+
     console.warn(formatLogMessage('security', `Security Event: ${event}`, securityData));
   },
 
@@ -183,7 +183,7 @@ export const secureLogger = {
       unit,
       ...sanitizeLogData(data)
     };
-    
+
     console.info(formatLogMessage('performance', `Performance: ${metric}`, perfData));
   }
 };
@@ -198,7 +198,7 @@ export function createSafeErrorResponse(error: Error | string, statusCode: numbe
   timestamp: string;
 } {
   const timestamp = new Date().toISOString();
-  
+
   if (typeof error === 'string') {
     return {
       error: import.meta.env.PROD ? 'Internal Server Error' : error,
@@ -209,7 +209,7 @@ export function createSafeErrorResponse(error: Error | string, statusCode: numbe
 
   // For Error objects
   const sanitizedError = sanitizeError(error);
-  
+
   return {
     error: import.meta.env.PROD ? 'Internal Server Error' : sanitizedError.message,
     message: import.meta.env.PROD 
@@ -230,7 +230,7 @@ export function withSecureErrorHandling<T extends (...args: any[]) => any>(
   return ((...args: Parameters<T>) => {
     try {
       const result = fn(...args);
-      
+
       // Handle async functions
       if (result instanceof Promise) {
         return result.catch((error: Error) => {
@@ -238,7 +238,7 @@ export function withSecureErrorHandling<T extends (...args: any[]) => any>(
           throw createSafeErrorResponse(error);
         });
       }
-      
+
       return result;
     } catch (error) {
       secureLogger.error(`Error in ${context}`, error as Error);

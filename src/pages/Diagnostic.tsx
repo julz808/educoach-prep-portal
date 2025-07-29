@@ -120,8 +120,6 @@ const DiagnosticTests: React.FC = () => {
   // Load diagnostic data and user progress
   useEffect(() => {
     const loadDiagnosticData = async () => {
-      console.log('🚀 loadDiagnosticData called with:', { selectedProduct, user: user ? { id: user.id, email: user.email } : null });
-      
       setLoading(true);
       setError(null);
       
@@ -155,25 +153,12 @@ const DiagnosticTests: React.FC = () => {
           };
           
           const dbProductType = getDbProductType(selectedProduct);
-          console.log('🔍 DIAGNOSTIC: Query will use productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
-          
           try {
-            console.log('🔍 DIAGNOSTIC: About to call getUserProgress with:', {
-              userId: user.id,
-              productType: dbProductType,
-              testMode: 'diagnostic'
-            });
-            
             const progressData = await SessionService.getUserProgress(
               user.id, 
               dbProductType,
               'diagnostic'
             );
-            
-            console.log('📊 Progress data loaded successfully:', progressData);
-            console.log('📊 Progress data type:', typeof progressData);
-            console.log('📊 Progress data keys:', Object.keys(progressData));
-            console.log('📊 Progress data values:', Object.values(progressData));
             
             setSectionProgress(progressData);
             
@@ -181,8 +166,7 @@ const DiagnosticTests: React.FC = () => {
             try {
               const analyticsData = await AnalyticsService.getDiagnosticResults(user.id, selectedProduct);
               setDiagnosticAnalytics(analyticsData);
-              console.log('📊 Diagnostic analytics loaded:', analyticsData);
-            } catch (analyticsError) {
+              } catch (analyticsError) {
               console.error('❌ Error loading diagnostic analytics:', analyticsError);
               // Don't fail if analytics fails - just use the session-based calculation
             }
@@ -213,8 +197,6 @@ const DiagnosticTests: React.FC = () => {
     const refreshProgress = async () => {
       if (user) {
         try {
-          console.log('🔄 REFRESH: Refreshing progress data...');
-          
           // Use the same product mapping as the main load
           const getDbProductType = (productId: string): string => {
             const productMap: Record<string, string> = {
@@ -229,16 +211,11 @@ const DiagnosticTests: React.FC = () => {
           };
           
           const dbProductType = getDbProductType(selectedProduct);
-          console.log('🔄 REFRESH: Using productType:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
-          
           const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
           setSectionProgress(progressData);
-          console.log('🔄 REFRESH: Progress refreshed with data:', progressData);
-          
           // Log status of each section for debugging
           Object.entries(progressData).forEach(([sectionName, progress]) => {
-            console.log(`🔄 REFRESH: Section "${sectionName}" - Status: ${progress.status}, SessionID: ${progress.sessionId}`);
-          });
+            });
         } catch (error) {
           console.error('Error refreshing progress:', error);
         }
@@ -247,7 +224,6 @@ const DiagnosticTests: React.FC = () => {
 
     // Refresh on window focus
     const handleFocus = () => {
-      console.log('🔄 REFRESH: Window focused, refreshing progress...');
       refreshProgress();
     };
     window.addEventListener('focus', handleFocus);
@@ -257,7 +233,6 @@ const DiagnosticTests: React.FC = () => {
 
   // Add manual refresh function for debugging
   const manualRefresh = async () => {
-    console.log('🔄 MANUAL REFRESH: Starting manual refresh...');
     if (user) {
       try {
         const getDbProductType = (productId: string): string => {
@@ -273,25 +248,19 @@ const DiagnosticTests: React.FC = () => {
         };
         
         const dbProductType = getDbProductType(selectedProduct);
-        console.log('🔄 MANUAL REFRESH: Using productType:', dbProductType);
-        
         const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
         setSectionProgress(progressData);
-        console.log('🔄 MANUAL REFRESH: Fresh progress data:', progressData);
-      } catch (error) {
+        } catch (error) {
         console.error('🔄 MANUAL REFRESH: Error:', error);
       }
     } else {
-      console.log('🔄 MANUAL REFRESH: No user found');
-    }
+      }
   };
 
   // Handle refresh parameter from navigation
   useEffect(() => {
     const refreshParam = searchParams.get('refresh');
     if (refreshParam === 'true' && user) {
-      console.log('🔄 FORCE REFRESH: Detected refresh parameter, forcing progress reload...');
-      
       const forceRefreshProgress = async () => {
         try {
           const getDbProductType = (productId: string): string => {
@@ -307,16 +276,11 @@ const DiagnosticTests: React.FC = () => {
           };
           
           const dbProductType = getDbProductType(selectedProduct);
-          console.log('🔄 FORCE REFRESH: Loading fresh progress data for:', dbProductType);
-          
           const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
           setSectionProgress(progressData);
-          console.log('🔄 FORCE REFRESH: Fresh progress data loaded:', progressData);
-          
           // Clear the refresh parameter from URL
           setSearchParams({});
-          console.log('🔄 FORCE REFRESH: Cleared refresh parameter from URL');
-        } catch (error) {
+          } catch (error) {
           console.error('🔄 FORCE REFRESH: Error loading fresh progress:', error);
         }
       };
@@ -327,13 +291,6 @@ const DiagnosticTests: React.FC = () => {
 
   // Transform diagnostic modes to match our new structure with real progress data
   const transformDiagnosticMode = (mode: TestMode, progressData: Record<string, SectionProgress> = {}): DiagnosticTest => {
-    console.log('🔍 Transform diagnostic mode called with:', {
-      mode: mode.name,
-      sections: mode.sections.map(s => ({ id: s.id, name: s.name })),
-      progressData: Object.keys(progressData),
-      progressDetails: progressData
-    });
-
     const sections: DiagnosticSection[] = mode.sections.map((section) => {
       // Get real progress data for this section with improved matching
       let sectionProgressData = progressData[section.name] || progressData[section.id];
@@ -341,28 +298,13 @@ const DiagnosticTests: React.FC = () => {
       // If no exact match, only try exact ID match - remove partial matching to prevent cross-section contamination
       if (!sectionProgressData) {
         console.log(`❌ No exact progress match found for "${section.name}" (id: ${section.id})`);
-        console.log(`🔍 Available progress keys:`, Object.keys(progressData));
-      }
-      
-      console.log(`🔍 Section "${section.name}" (id: ${section.id}):`, {
-        progressByName: progressData[section.name],
-        progressById: progressData[section.id],
-        finalProgressData: sectionProgressData,
-        availableProgressKeys: Object.keys(progressData)
-      });
+        }
       
       let status: 'not-started' | 'in-progress' | 'completed' = 'not-started';
       let score: number | undefined = undefined;
       
       if (sectionProgressData) {
         status = sectionProgressData.status;
-        console.log(`✅ Found progress for "${section.name}": ${status} (sessionId: ${sectionProgressData.sessionId})`);
-        console.log(`🔍 Progress details:`, {
-          status: sectionProgressData.status,
-          questionsAnswered: sectionProgressData.questionsAnswered,
-          totalQuestions: sectionProgressData.totalQuestions,
-          sessionId: sectionProgressData.sessionId
-        });
         // Calculate score if completed (this would come from actual test results)
         if (status === 'completed' && sectionProgressData.questionsCompleted > 0) {
           // This is a placeholder - in real implementation, score would come from test results
@@ -370,9 +312,7 @@ const DiagnosticTests: React.FC = () => {
         }
       } else {
         console.log(`❌ No progress found for "${section.name}"`);
-        console.log(`🔍 Available progress keys:`, Object.keys(progressData));
-        console.log(`🔍 Full progress data:`, progressData);
-      }
+        }
 
       return {
         id: section.id,
@@ -495,7 +435,6 @@ const DiagnosticTests: React.FC = () => {
     
     if (progressData && progressData.status === 'in-progress' && progressData.sessionId) {
       // Resume existing session - go to instructions first
-      console.log('🔄 Resuming session:', progressData.sessionId);
       navigate(`/test-instructions/diagnostic/${sectionId}/${progressData.sessionId}?sectionName=${encodeURIComponent(sectionName)}`);
     } else {
       // Start new session - go to instructions first
@@ -505,25 +444,17 @@ const DiagnosticTests: React.FC = () => {
   };
 
   const handleViewResults = (sectionId?: string) => {
-    console.log('🔍 handleViewResults called with sectionId:', sectionId);
-    console.log('🔍 Available sectionProgress:', sectionProgress);
-    
     if (sectionId) {
       // View results for specific section
       const section = diagnosticTest?.sections.find(s => s.id === sectionId);
-      console.log('🔍 Found section:', section);
-      
       if (!section) {
         console.log('❌ No section found for id:', sectionId);
         return;
       }
       
       const progressData = sectionProgress[section.name];
-      console.log('🔍 Progress data for section', section.name, ':', progressData);
-      
       if (progressData && progressData.sessionId) {
         // Navigate directly to the test taking page in review mode
-        console.log('📊 Viewing results for section:', section.name, 'sessionId:', progressData.sessionId);
         navigate(`/test/diagnostic/${sectionId}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(section.name)}`);
       } else {
         console.log('❌ No session ID found in progress data');
@@ -542,7 +473,6 @@ const DiagnosticTests: React.FC = () => {
       if (completedSection) {
         const progressData = sectionProgress[completedSection.name];
         if (progressData && progressData.sessionId) {
-          console.log('📊 Viewing results for test:', diagnosticTest.name, 'starting with section:', completedSection.name);
           navigate(`/test/diagnostic/${completedSection.id}/${progressData.sessionId}?review=true&sectionName=${encodeURIComponent(completedSection.name)}`);
         } else {
           console.log('❌ No session ID found for completed section');
@@ -554,8 +484,6 @@ const DiagnosticTests: React.FC = () => {
 
   // Helper function to find completed session from database
   const findCompletedSession = async (sectionName: string, sectionId: string) => {
-    console.log('🔍 Searching for completed session for:', sectionName);
-    
     // Use the same product mapping function
     const getDbProductType = (productId: string): string => {
       const productMap: Record<string, string> = {
@@ -570,8 +498,6 @@ const DiagnosticTests: React.FC = () => {
     };
     
     const dbProductType = getDbProductType(selectedProduct);
-    console.log('🔍 Using dbProductType for session search:', dbProductType, '(from selectedProduct:', selectedProduct, ')');
-    
     try {
       const { data: sessions, error } = await supabase
         .from('user_test_sessions')
@@ -588,7 +514,6 @@ const DiagnosticTests: React.FC = () => {
 
       if (sessions && sessions.length > 0) {
         const sessionId = sessions[0].id;
-        console.log('✅ Found completed session:', sessionId);
         navigate(`/test/diagnostic/${sectionId}/${sessionId}?review=true&sectionName=${encodeURIComponent(sectionName)}`);
       } else {
         console.log('❌ No completed session found in database');
@@ -739,8 +664,6 @@ const DiagnosticTests: React.FC = () => {
 
         if (statesError) throw statesError;
 
-        console.log('✅ DEV: Cleared all diagnostic progress');
-        
         // Refresh the page data
         window.location.reload();
       } catch (error) {
@@ -824,8 +747,7 @@ const DiagnosticTests: React.FC = () => {
 
             if (sessionError) throw sessionError;
             
-            console.log(`✅ DEV: Created mock ${sessionData.status} session for ${section.name}`);
-          }
+            }
         }
         
         // Refresh the page data
@@ -885,8 +807,7 @@ const DiagnosticTests: React.FC = () => {
 
           if (sessionError) throw sessionError;
           
-          console.log(`✅ DEV: Created mock session for ${section.name}`);
-        }
+          }
         
         // Refresh the page data
         setTimeout(() => window.location.reload(), 500);

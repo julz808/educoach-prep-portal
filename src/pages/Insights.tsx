@@ -34,8 +34,6 @@ const getFilterTabsForProduct = (productId: string) => {
   const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
   const sections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
   
-  console.log('🔍 Getting filter tabs for:', productId, '->', productType, 'Sections:', sections);
-  
   // Create filter tabs from actual sections
   const filterTabs = [{ id: 'all', label: 'All Skills' }];
   
@@ -273,8 +271,6 @@ const PerformanceDashboard = () => {
       setDataError(null);
       
       try {
-        console.log('📊 Loading essential data for:', user.id, selectedProduct);
-        
         // Load user profile and overall performance in parallel (fastest queries)
         const [profileResult, overallResult] = await Promise.allSettled([
           supabase.from('user_profiles').select('*').eq('user_id', user.id).single(),
@@ -292,8 +288,6 @@ const PerformanceDashboard = () => {
           ...prev,
           overall
         }));
-        
-        console.log('✅ Essential data loaded, now loading default tab data');
         
         // Load default tab data (diagnostic)
         await loadTabData('diagnostic');
@@ -319,8 +313,6 @@ const PerformanceDashboard = () => {
     setTabLoadingStates(prev => ({ ...prev, [tabName]: true }));
 
     try {
-      console.log(`🚀 Loading data for ${tabName} tab...`);
-      
       let data = null;
       switch (tabName) {
         case 'diagnostic':
@@ -339,11 +331,9 @@ const PerformanceDashboard = () => {
                 current.testNumber > latest.testNumber ? current : latest
               );
               setSelectedPracticeTest(latestCompleted.testNumber);
-              console.log('🎯 Auto-selected latest completed practice test:', latestCompleted.testNumber);
-            } else {
+              } else {
               setSelectedPracticeTest(1);
-              console.log('🎯 No completed tests, defaulting to Test 1');
-            }
+              }
           }
           break;
         case 'drills':
@@ -354,9 +344,7 @@ const PerformanceDashboard = () => {
       
       // Mark tab as loaded
       setLoadedTabs(prev => new Set([...prev, tabName]));
-      console.log(`✅ ${tabName} data loaded successfully`);
-      
-    } catch (error) {
+      } catch (error) {
       console.error(`❌ Error loading ${tabName} data:`, error);
       // Don't show error for individual tab failures
     } finally {
@@ -1214,14 +1202,6 @@ const PerformanceDashboard = () => {
                           ));
                       })()}
                       {(() => {
-                        console.log('🔍 INSIGHTS: Diagnostic data debug:', {
-                          strengthsLength: performanceData.diagnostic?.strengths?.length || 0,
-                          weaknessesLength: performanceData.diagnostic?.weaknesses?.length || 0,
-                          strengths: performanceData.diagnostic?.strengths,
-                          weaknesses: performanceData.diagnostic?.weaknesses,
-                          allDiagnosticData: performanceData.diagnostic
-                        });
-                        
                         if (!performanceData.diagnostic?.allSubSkills?.length) {
                           return (
                             <div className="text-center py-8 text-slate-500">
@@ -1328,19 +1308,13 @@ const PerformanceDashboard = () => {
 
               {(() => {
                 // Debug: log all practice tests to see their structure
-                console.log('🔍 All practice tests:', performanceData.practice?.tests);
-                console.log('🔍 Looking for test number:', selectedPracticeTest);
-                
                 // First try to find completed test, then fall back to any test with that number
                 let selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest && t.status === 'completed');
                 
                 if (!selectedTest) {
                   // If no completed test found, try to find any test with that number
                   selectedTest = performanceData.practice?.tests?.find(t => t.testNumber === selectedPracticeTest);
-                  console.log('🔍 Fallback: found test with any status:', selectedTest);
-                }
-                
-                console.log('🔍 Final selected test:', selectedTest);
+                  }
                 
                 if (!selectedTest) {
                   return (
@@ -1361,18 +1335,6 @@ const PerformanceDashboard = () => {
                 const questionsCorrect = selectedTest.questionsCorrect || 0;
                 const overallScore = selectedTest.score || 0;
                 const overallAccuracy = selectedTest.overallAccuracy || 0;
-                
-                console.log('🔍 Selected test details:', {
-                  testNumber: selectedTest.testNumber,
-                  score: selectedTest.score,
-                  totalQuestions,
-                  questionsAttempted,
-                  questionsCorrect,
-                  overallScore,
-                  overallAccuracy,
-                  hasRealData: selectedTest.totalQuestions ? 'Yes' : 'No',
-                  rawTest: selectedTest
-                });
                 
                 return (
                   <div className="space-y-8">
@@ -1792,7 +1754,6 @@ const PerformanceDashboard = () => {
             </div>
           )}
 
-
           {/* Drills Tab */}
           {activeTab === 'drills' && (
             <div className="space-y-8">
@@ -1842,43 +1803,35 @@ const PerformanceDashboard = () => {
                               const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
                               
                               if (hasMaxPoints) {
-                                console.log(`🔍 ACCURACY-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
                                 if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
                                   totalNumerator += subSkill.difficulty1Correct || 0;
                                   totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
                                 }
                                 if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
                                   totalNumerator += subSkill.difficulty2Correct || 0;
                                   totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
                                 }
                                 if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
                                   totalNumerator += subSkill.difficulty3Correct || 0;
                                   totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
                                 }
                               } else {
                                 // For regular skills, count each difficulty level with questions
                                 if (subSkill.difficulty1Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
                                   totalNumerator += subSkill.difficulty1Correct || 0;
                                   totalDenominator += subSkill.difficulty1Questions || 0;
                                 }
                                 if (subSkill.difficulty2Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
                                   totalNumerator += subSkill.difficulty2Correct || 0;
                                   totalDenominator += subSkill.difficulty2Questions || 0;
                                 }
                                 if (subSkill.difficulty3Questions > 0) {
-                                  console.log(`🔍 ACCURACY-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
                                   totalNumerator += subSkill.difficulty3Correct || 0;
                                   totalDenominator += subSkill.difficulty3Questions || 0;
                                 }
                               }
                             });
                             
-                            console.log(`🔍 ACCURACY-CALC: Final totals: ${totalNumerator}/${totalDenominator}`);
                             const accuracy = totalDenominator > 0 ? Math.round((totalNumerator / totalDenominator) * 100) : 0;
                             return accuracy >= 80 ? 'text-green-600' : accuracy >= 60 ? 'text-orange-600' : 'text-red-600';
                           })()
@@ -2003,10 +1956,8 @@ const PerformanceDashboard = () => {
                               if ((subSkill as any).isGroupedWriting) {
                                 // For writing skills, sum up all attempted essays
                                 const essays = (subSkill as any).essays || {};
-                                console.log(`🔍 TOTAL-CALC: Processing writing skill ${subSkill.subSkillName}:`, essays);
                                 Object.values(essays).forEach((essay: any) => {
                                   if (essay.attempted) {
-                                    console.log(`🔍 TOTAL-CALC: Adding essay: ${essay.correct}/${essay.maxPoints}`);
                                     totalNumerator += essay.correct || 0;
                                     totalDenominator += essay.maxPoints || 0;
                                   }
@@ -2016,36 +1967,29 @@ const PerformanceDashboard = () => {
                                 const hasMaxPoints = (subSkill as any).difficulty1MaxPoints || (subSkill as any).difficulty2MaxPoints || (subSkill as any).difficulty3MaxPoints;
                                 
                                 if (hasMaxPoints) {
-                                  console.log(`🔍 TOTAL-CALC: Adding writing skill ${subSkill.subSkillName} with maxPoints`);
                                   if (subSkill.difficulty1Questions > 0 && (subSkill as any).difficulty1MaxPoints > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${(subSkill as any).difficulty1MaxPoints}`);
                                     totalNumerator += subSkill.difficulty1Correct || 0;
                                     totalDenominator += (subSkill as any).difficulty1MaxPoints || 0;
                                   }
                                   if (subSkill.difficulty2Questions > 0 && (subSkill as any).difficulty2MaxPoints > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${(subSkill as any).difficulty2MaxPoints}`);
                                     totalNumerator += subSkill.difficulty2Correct || 0;
                                     totalDenominator += (subSkill as any).difficulty2MaxPoints || 0;
                                   }
                                   if (subSkill.difficulty3Questions > 0 && (subSkill as any).difficulty3MaxPoints > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${(subSkill as any).difficulty3MaxPoints}`);
                                     totalNumerator += subSkill.difficulty3Correct || 0;
                                     totalDenominator += (subSkill as any).difficulty3MaxPoints || 0;
                                   }
                                 } else {
                                   // For regular skills, count each difficulty level with questions
                                   if (subSkill.difficulty1Questions > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Easy: ${subSkill.difficulty1Correct}/${subSkill.difficulty1Questions}`);
                                     totalNumerator += subSkill.difficulty1Correct || 0;
                                     totalDenominator += subSkill.difficulty1Questions || 0;
                                   }
                                   if (subSkill.difficulty2Questions > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Medium: ${subSkill.difficulty2Correct}/${subSkill.difficulty2Questions}`);
                                     totalNumerator += subSkill.difficulty2Correct || 0;
                                     totalDenominator += subSkill.difficulty2Questions || 0;
                                   }
                                   if (subSkill.difficulty3Questions > 0) {
-                                    console.log(`🔍 TOTAL-CALC: Adding non-writing ${subSkill.subSkillName} Hard: ${subSkill.difficulty3Correct}/${subSkill.difficulty3Questions}`);
                                     totalNumerator += subSkill.difficulty3Correct || 0;
                                     totalDenominator += subSkill.difficulty3Questions || 0;
                                   }
@@ -2053,7 +1997,6 @@ const PerformanceDashboard = () => {
                               }
                             });
                             
-                            console.log(`🔍 TOTAL-CALC: Final totals: ${totalNumerator}/${totalDenominator}`);
                             return `${totalNumerator}/${totalDenominator}`;
                           })()}
                         </div>
@@ -2182,18 +2125,7 @@ const PerformanceDashboard = () => {
                             
                             // Debug: Log essay scores for writing drills
                             if (isWritingSkill) {
-                              console.log(`🔍 INSIGHT-ESSAY: ${baseName} Essay ${essayNumber}:`, {
-                                correct,
-                                maxPoints,
-                                accuracy,
-                                difficulty1Correct: subSkill.difficulty1Correct,
-                                difficulty2Correct: subSkill.difficulty2Correct,
-                                difficulty3Correct: subSkill.difficulty3Correct,
-                                difficulty1MaxPoints: (subSkill as any).difficulty1MaxPoints,
-                                difficulty2MaxPoints: (subSkill as any).difficulty2MaxPoints,
-                                difficulty3MaxPoints: (subSkill as any).difficulty3MaxPoints
-                              });
-                            }
+                              }
                             
                             grouped.essays[essayNumber] = {
                               correct,
@@ -2232,24 +2164,7 @@ const PerformanceDashboard = () => {
                         return finalSubSkills.map((subSkill, index) => {
                           // Debug: Log each sub-skill data to see what properties it has
                           if ((subSkill as any).isWritingDrill) {
-                            console.log(`🔍 INSIGHT-DRILL: Writing sub-skill "${subSkill.subSkillName}" data:`, {
-                              isWritingDrill: (subSkill as any).isWritingDrill,
-                              accuracy: subSkill.accuracy,
-                              questionsCompleted: subSkill.questionsCompleted,
-                              difficulty1Correct: subSkill.difficulty1Correct,
-                              difficulty1MaxPoints: (subSkill as any).difficulty1MaxPoints,
-                              difficulty1Questions: subSkill.difficulty1Questions,
-                              difficulty1Accuracy: subSkill.difficulty1Accuracy,
-                              difficulty2Correct: subSkill.difficulty2Correct,
-                              difficulty2MaxPoints: (subSkill as any).difficulty2MaxPoints,
-                              difficulty2Questions: subSkill.difficulty2Questions,
-                              difficulty2Accuracy: subSkill.difficulty2Accuracy,
-                              difficulty3Correct: subSkill.difficulty3Correct,
-                              difficulty3MaxPoints: (subSkill as any).difficulty3MaxPoints,
-                              difficulty3Questions: subSkill.difficulty3Questions,
-                              difficulty3Accuracy: subSkill.difficulty3Accuracy
-                            });
-                          }
+                            }
                           
                           return (
                             <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
