@@ -37,8 +37,6 @@ import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 
 // Map course slugs to Stripe product IDs
 const COURSE_TO_STRIPE_PRODUCT_MAP: { [key: string]: string } = {
