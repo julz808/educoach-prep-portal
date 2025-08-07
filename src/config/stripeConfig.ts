@@ -22,13 +22,13 @@ export const STRIPE_PRODUCTS: Record<string, StripeProductConfig> = {
     name: 'Year 7 NAPLAN',
     dbProductType: 'Year 7 NAPLAN'
   },
-  'edutest-year-7': {
+  'edutest-scholarship': {
     productId: import.meta.env.VITE_STRIPE_EDUTEST_PRODUCT_ID || '',
     priceId: import.meta.env.VITE_STRIPE_EDUTEST_PRICE_ID || '',
     name: 'EduTest Scholarship (Year 7 Entry)',
     dbProductType: 'EduTest Scholarship (Year 7 Entry)'
   },
-  'acer-year-7': {
+  'acer-scholarship': {
     productId: import.meta.env.VITE_STRIPE_ACER_PRODUCT_ID || '',
     priceId: import.meta.env.VITE_STRIPE_ACER_PRICE_ID || '',
     name: 'ACER Scholarship (Year 7 Entry)',

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { RegistrationSuccessModal } from "@/components/RegistrationSuccessModal";
+import { redirectToCheckout } from "@/services/stripeService";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -32,6 +33,38 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  
+  // Check URL params for signup mode
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    if (mode === 'signup') {
+      setActiveTab('register');
+    }
+  }, []);
+
+  // Function to handle pending purchase after successful authentication
+  const handlePendingPurchase = async () => {
+    const pendingPurchase = localStorage.getItem('pendingPurchase');
+    if (pendingPurchase) {
+      localStorage.removeItem('pendingPurchase');
+      toast.success('Account created successfully! Redirecting to checkout...');
+      
+      // Small delay to ensure the user sees the success message
+      setTimeout(async () => {
+        try {
+          await redirectToCheckout(pendingPurchase);
+        } catch (error) {
+          console.error('Error redirecting to checkout:', error);
+          toast.error('Error redirecting to checkout. Please try purchasing again.');
+          navigate(`/course/${pendingPurchase}`);
+        }
+      }, 1500);
+      
+      return true;
+    }
+    return false;
+  };
 
   // Handle success modal close
   const handleSuccessModalClose = () => {
@@ -77,7 +110,12 @@ const Auth = () => {
       }
       
       toast.success("Successfully signed in!");
-      navigate("/dashboard");
+      
+      // Check for pending purchase
+      const hasPendingPurchase = await handlePendingPurchase();
+      if (!hasPendingPurchase) {
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast.error(error.message || "Error signing in");
     } finally {
@@ -182,9 +220,14 @@ const Auth = () => {
         console.log('Registration successful:', registrationResult);
       }
       
-      // Store the email for the modal and show success modal
-      setRegisteredEmail(email);
-      setShowSuccessModal(true);
+      // Check for pending purchase first
+      const hasPendingPurchase = await handlePendingPurchase();
+      
+      if (!hasPendingPurchase) {
+        // Store the email for the modal and show success modal
+        setRegisteredEmail(email);
+        setShowSuccessModal(true);
+      }
       
       // Clear form fields
       setEmail("");

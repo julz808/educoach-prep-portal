@@ -37,16 +37,7 @@ import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
-
-// Map course slugs to Stripe Payment Links
-const COURSE_TO_PAYMENT_LINK_MAP: { [key: string]: string } = {
-  'year-5-naplan': 'https://buy.stripe.com/fZueVc2DTbfsdUKaOT2sM05',
-  'year-7-naplan': 'https://buy.stripe.com/7sYcN4fqF5V8g2S6yD2sM04',
-  'edutest-scholarship': 'https://buy.stripe.com/28E4gybap6ZcdUKf592sM03',
-  'acer-scholarship': 'https://buy.stripe.com/00w00iguJcjw17Y2in2sM02',
-  'nsw-selective': 'https://buy.stripe.com/8x2aEWfqFerE03U8GL2sM01',
-  'vic-selective': 'https://buy.stripe.com/14A4gy4M16Zc9Eu9KP2sM00'
-};
+import { supabase } from '@/integrations/supabase/client';
 
 // Test section descriptions mapping - focused on the test itself, not platform features
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
@@ -224,24 +215,39 @@ const CourseDetail = () => {
       return;
     }
 
-    const paymentLink = COURSE_TO_PAYMENT_LINK_MAP[course.slug];
-    
-    if (!paymentLink || paymentLink.includes('YOUR_PAYMENT_LINK_HERE')) {
+    try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // Store intended purchase in localStorage
+        localStorage.setItem('pendingPurchase', course.slug);
+        
+        toast({
+          title: "Sign up required",
+          description: "Please create an account to continue with your purchase.",
+        });
+        
+        // Redirect to signup page
+        navigate('/auth?mode=signup');
+        return;
+      }
+
+      // User is authenticated, proceed with checkout
       toast({
-        title: "Error", 
-        description: "Payment link not configured. Please contact support.",
+        title: "Redirecting to checkout...",
+        description: "You'll be redirected to our secure payment page.",
+      });
+
+      await redirectToCheckout(course.slug);
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive"
       });
-      return;
     }
-
-    toast({
-      title: "Redirecting to checkout...",
-      description: "You'll be redirected to our secure payment page.",
-    });
-
-    // Direct redirect to Stripe Payment Link
-    window.location.href = paymentLink;
   };
 
   if (!course) {
