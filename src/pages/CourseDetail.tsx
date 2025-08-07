@@ -219,23 +219,6 @@ const CourseDetail = () => {
       return;
     }
 
-    // Check if user is authenticated
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      // Store the course slug in localStorage so we can redirect back after signup
-      localStorage.setItem('pendingPurchaseCourse', course.slug);
-      
-      toast({
-        title: "Sign up required",
-        description: "Please create an account to continue with your purchase.",
-      });
-      
-      // Redirect to signup page
-      navigate('/signup');
-      return;
-    }
-
     const stripeProductId = COURSE_TO_STRIPE_PRODUCT_MAP[course.slug];
     
     if (!stripeProductId) {
@@ -252,7 +235,7 @@ const CourseDetail = () => {
       description: "You'll be redirected to our secure payment page.",
     });
 
-    // Use the existing Stripe service to redirect to checkout
+    // Use the existing Stripe service to redirect to checkout (supports guest checkout)
     await redirectToCheckout(stripeProductId);
   };
 

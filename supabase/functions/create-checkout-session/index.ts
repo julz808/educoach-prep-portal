@@ -52,9 +52,9 @@ serve(async (req) => {
       productId
     });
 
-    if (!priceId || !productId || !userId || !userEmail) {
+    if (!priceId || !productId) {
       return new Response(
-        JSON.stringify({ error: 'Missing required parameters' }),
+        JSON.stringify({ error: 'Missing required parameters: priceId and productId are required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -71,10 +71,9 @@ serve(async (req) => {
       userEmail: userEmail?.substring(0, 10) + '...'
     });
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: any = {
       mode: 'payment',
       payment_method_types: ['card'],
-      customer_email: userEmail,
       line_items: [
         {
           price: priceId,
@@ -84,7 +83,7 @@ serve(async (req) => {
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        userId: userId,
+        userId: userId || 'guest',
         productId: productId,
         source: 'educourse_platform'
       },
@@ -96,17 +95,26 @@ serve(async (req) => {
         enabled: false, // Set to true if you want to collect ABN/tax numbers
       },
       allow_promotion_codes: true, // Allow discount codes
-      invoice_creation: {
-        enabled: true,
-        invoice_data: {
-          description: `EduCourse - ${productId}`,
-          metadata: {
-            userId: userId,
-            productId: productId,
-          },
+    };
+
+    // Only add customer_email if userEmail is provided
+    if (userEmail) {
+      sessionConfig.customer_email = userEmail;
+    }
+
+    // Add invoice creation to session config
+    sessionConfig.invoice_creation = {
+      enabled: true,
+      invoice_data: {
+        description: `EduCourse - ${productId}`,
+        metadata: {
+          userId: userId || 'guest',
+          productId: productId,
         },
       },
-    })
+    };
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log('Created checkout session:', session.id, 'for user:', userId, 'product:', productId)
 
