@@ -242,7 +242,7 @@ const CourseDetail = () => {
       title: "Skill Drills",
       description: "Targeted practice exercises to strengthen specific sub-skills and concepts",
       icon: <Target className="h-5 w-5" />,
-      screenshot: "/images/skill drills.png"
+      screenshot: "/images/writing feedback 3.png"
     },
     {
       id: "practice",
