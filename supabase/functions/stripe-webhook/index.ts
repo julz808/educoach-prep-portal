@@ -143,12 +143,53 @@ serve(async (req) => {
         paymentStatus: session.payment_status
       });
 
-      if (!userId) {
-        console.error('❌ Missing userId in session metadata');
-        return new Response('Missing userId in metadata', { 
-          status: 400,
-          headers: corsHeaders 
+      // Check if this is a guest checkout
+      const isGuestCheckout = !userId || userId === 'guest';
+      let finalUserId = userId;
+
+      if (isGuestCheckout) {
+        console.log('🔍 Guest checkout detected, creating account for:', userEmail);
+        
+        if (!userEmail) {
+          console.error('❌ Missing email for guest checkout');
+          return new Response('Missing email for guest checkout', { 
+            status: 400,
+            headers: corsHeaders 
+          });
+        }
+
+        // Create user account via Supabase Auth Admin API
+        const { data: authUser, error: createUserError } = await supabase.auth.admin.createUser({
+          email: userEmail,
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            created_via: 'stripe_purchase',
+            stripe_session_id: session.id,
+            product_purchased: productId
+          }
         });
+
+        if (createUserError) {
+          console.error('❌ Error creating user:', createUserError);
+          return new Response('Error creating user account', { 
+            status: 500,
+            headers: corsHeaders 
+          });
+        }
+
+        if (!authUser.user) {
+          console.error('❌ No user returned from createUser');
+          return new Response('Failed to create user account', { 
+            status: 500,
+            headers: corsHeaders 
+          });
+        }
+
+        finalUserId = authUser.user.id;
+        console.log('✅ User account created:', finalUserId);
+
+        // Send welcome email (placeholder for now)
+        console.log('📧 Would send welcome email to:', userEmail);
       }
 
       // Get the line items to determine what was purchased
@@ -181,7 +222,7 @@ serve(async (req) => {
           const { data: existingAccess, error: checkError } = await supabase
             .from('user_products')
             .select('id')
-            .eq('user_id', userId)
+            .eq('user_id', finalUserId)
             .eq('product_type', dbProductType)
             .maybeSingle();
 
@@ -198,7 +239,7 @@ serve(async (req) => {
           const { data, error } = await supabase
             .from('user_products')
             .insert({
-              user_id: userId,
+              user_id: finalUserId,
               product_type: dbProductType,
               is_active: true,
               purchased_at: new Date().toISOString(),
@@ -217,10 +258,11 @@ serve(async (req) => {
           }
 
           console.log('✅ Product access granted successfully:', {
-            userId,
+            userId: finalUserId,
             productType: dbProductType,
             sessionId: session.id,
-            amount: session.amount_total
+            amount: session.amount_total,
+            wasGuestCheckout: isGuestCheckout
           });
         }
       }

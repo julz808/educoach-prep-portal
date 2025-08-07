@@ -1,133 +1,168 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
-import { useProduct } from '@/context/ProductContext';
-import { Badge } from '@/components/ui/badge';
+import { CheckCircle, ArrowRight, Loader2, Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const PurchaseSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { allProducts } = useProduct();
   const [isLoading, setIsLoading] = useState(true);
-  
-  const productId = searchParams.get('product');
-  const sessionId = searchParams.get('session_id');
-  
-  const product = allProducts.find(p => p.id === productId);
+  const [hasAccount, setHasAccount] = useState(false);
+
+  const product = searchParams.get('product');
 
   useEffect(() => {
-    // Simulate checking payment status
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    const checkUserStatus = async () => {
+      try {
+        // Check if user is already logged in
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // User is logged in, redirect to dashboard
+          setHasAccount(true);
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 2000);
+        } else {
+          // Check if account was created but user isn't logged in
+          // This happens in guest checkout flow
+          setHasAccount(false);
+          
+          // Get the purchased course from localStorage if available
+          const purchasedCourse = localStorage.getItem('purchasedCourse');
+          if (purchasedCourse) {
+            localStorage.removeItem('purchasedCourse');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user status:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    checkUserStatus();
+  }, [navigate]);
 
-  const handleContinue = () => {
-    if (productId) {
-      // Navigate to the purchased product
-      navigate(`/dashboard?product=${productId}`);
-    } else {
-      // Navigate to dashboard
-      navigate('/dashboard');
+  const handleSetupPassword = () => {
+    // Store the product info and redirect to auth
+    if (product) {
+      localStorage.setItem('setupProduct', product);
     }
+    navigate('/auth?mode=setup');
+  };
+
+  const handleGoToDashboard = () => {
+    navigate('/dashboard');
+  };
+
+  const getProductName = (productSlug: string | null) => {
+    const productNames: Record<string, string> = {
+      'year-5-naplan': 'Year 5 NAPLAN',
+      'year-7-naplan': 'Year 7 NAPLAN', 
+      'edutest-scholarship': 'EduTest Scholarship',
+      'acer-scholarship': 'ACER Scholarship',
+      'nsw-selective': 'NSW Selective Entry',
+      'vic-selective': 'VIC Selective Entry'
+    };
+    
+    return productNames[productSlug || ''] || 'Your Test Prep Course';
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-edu-light-blue flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="pt-6">
-            <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-edu-teal" />
-            <h2 className="text-xl font-semibold text-edu-navy mb-2">
-              Processing your purchase...
-            </h2>
-            <p className="text-edu-navy/70">
-              Please wait while we confirm your payment.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6F7F5] to-white">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#4ECDC4]" />
+          <p className="text-gray-600">Processing your purchase...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-edu-light-blue flex items-center justify-center p-4">
-      <Card className="w-full max-w-md text-center shadow-xl">
-        <CardHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6F7F5] to-white p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-edu-navy">
-            Purchase Successful!
+          <CardTitle className="text-2xl text-[#2C3E50]">
+            Purchase Successful! 🎉
           </CardTitle>
+          <CardDescription className="text-[#6B7280]">
+            Thank you for purchasing {getProductName(product)}
+          </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
-          <div>
-            <p className="text-edu-navy/70 mb-4">
-              Thank you for your purchase! You now have full access to:
-            </p>
-            
-            {product && (
-              <div className="bg-edu-light-blue/50 rounded-lg p-4 mb-4">
-                <h3 className="font-semibold text-edu-navy mb-2">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-edu-navy/70 mb-3">
-                  {product.description}
+          {hasAccount ? (
+            // User already has an account and is logged in
+            <>
+              <div className="text-center space-y-4">
+                <p className="text-[#6B7280]">
+                  You're all set! Redirecting you to your dashboard where you can access your course.
                 </p>
-                <Badge className="bg-green-100 text-green-800 border-green-200">
-                  Full Access Granted
-                </Badge>
+                <div className="flex items-center justify-center space-x-2 text-[#4ECDC4]">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Taking you to your dashboard...</span>
+                </div>
               </div>
-            )}
-          </div>
+              
+              <Button 
+                onClick={handleGoToDashboard}
+                className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
+              >
+                Go to Dashboard
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            // New user - account created but needs to set password
+            <>
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2 text-[#6366F1]">
+                  <Mail className="h-5 w-5" />
+                  <span className="font-medium">Check Your Email</span>
+                </div>
+                
+                <p className="text-[#6B7280]">
+                  We've created your account and you should receive a welcome email shortly with instructions to set up your password.
+                </p>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Next steps:</strong>
+                    <br />1. Check your email for the welcome message
+                    <br />2. Click the setup link to create your password  
+                    <br />3. Access your course materials immediately
+                  </p>
+                </div>
+              </div>
 
-          <div className="text-left space-y-2">
-            <h4 className="font-semibold text-edu-navy">What's included:</h4>
-            <ul className="text-sm text-edu-navy/80 space-y-1">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Comprehensive diagnostic test
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Personalised skill drills for targeted practice
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                5 full-length practice tests
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Detailed performance insights and analytics
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Unlimited access
-              </li>
-            </ul>
-          </div>
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleSetupPassword}
+                  className="w-full bg-[#6366F1] hover:bg-[#6366F1]/90 text-white"
+                >
+                  Set Up Password Now
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                
+                <p className="text-xs text-center text-[#6B7280]">
+                  Didn't receive an email? Check your spam folder or set up your password above.
+                </p>
+              </div>
+            </>
+          )}
 
-          <div className="border-t border-edu-navy/20 pt-4">
-            <p className="text-xs text-edu-navy/50 mb-4">
-              A receipt has been sent to your email address.
+          <div className="pt-4 border-t border-gray-200">
+            <p className="text-xs text-center text-[#9CA3AF]">
+              Questions? Contact us at support@educourse.com.au
             </p>
-            
-            <Button 
-              onClick={handleContinue}
-              className="w-full bg-edu-teal hover:bg-edu-teal/90 text-white font-semibold"
-              size="lg"
-            >
-              Start Learning
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
           </div>
         </CardContent>
       </Card>

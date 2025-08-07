@@ -40,30 +40,25 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       return { error: 'Product configuration not found.' };
     }
 
-    // Get current user - required for checkout
+    // Get current user (optional for guest checkout)
     const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      console.error('❌ No authenticated user found');
-      return { error: 'Please sign in to continue with your purchase.' };
-    }
 
     // Create checkout session via Edge Function
     console.log('🔍 Invoking create-checkout-session with:', {
       priceId: productConfig.priceId,
       productId,
-      userId: user.id,
-      userEmail: user.email ? user.email.substring(0, 10) + '...' : '',
-      hasUser: true,
-      userSessionValid: !!user.aud
+      userId: user?.id || 'guest',
+      userEmail: user?.email ? user.email.substring(0, 10) + '...' : 'guest',
+      hasUser: !!user,
+      isGuestCheckout: !user
     });
 
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
       body: {
         priceId: productConfig.priceId,
         productId: productId,
-        userId: user.id,
-        userEmail: user.email || '',
+        userId: user?.id || 'guest',
+        userEmail: user?.email || '',
         successUrl: `${window.location.origin}/purchase-success?product=${productId}`,
         cancelUrl: `${window.location.origin}${window.location.pathname}`
       }

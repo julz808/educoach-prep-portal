@@ -34,12 +34,14 @@ const Auth = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   
-  // Check URL params for signup mode
+  // Check URL params for signup/setup mode
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
     if (mode === 'signup') {
       setActiveTab('register');
+    } else if (mode === 'setup') {
+      setActiveTab('setup');
     }
   }, []);
 
@@ -64,6 +66,54 @@ const Auth = () => {
       return true;
     }
     return false;
+  };
+
+  const handlePasswordSetup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    // Validate password length
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Try to sign in with email and the new password
+      // First, let's try updating the password for the existing user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (signInError) {
+        // If sign in fails, try resetting password
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        
+        if (resetError) throw resetError;
+        
+        toast.success("Password reset link sent to your email!");
+        return;
+      }
+      
+      toast.success("Password set successfully!");
+      navigate("/dashboard");
+      
+    } catch (error: any) {
+      console.error('Password setup error:', error);
+      toast.error(error.message || "Error setting up password");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle success modal close
@@ -278,9 +328,18 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+          <TabsList className={`grid w-full ${
+            activeTab === 'setup' ? 'grid-cols-1' : 'grid-cols-2'
+          }`}>
+            {activeTab !== 'setup' && (
+              <>
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="register">Register</TabsTrigger>
+              </>
+            )}
+            {activeTab === 'setup' && (
+              <TabsTrigger value="setup">Set Up Password</TabsTrigger>
+            )}
           </TabsList>
           
           <TabsContent value="login">
@@ -553,6 +612,82 @@ const Auth = () => {
                   ) : (
                     <>
                       Create Account
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="setup">
+            <form onSubmit={handlePasswordSetup}>
+              <CardContent className="space-y-4 pt-4">
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-800">
+                    <strong>Account Created!</strong> Now set up your password to access your course materials.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email-setup">Your Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email-setup"
+                      type="email"
+                      placeholder="Enter your email address"
+                      className="pl-8"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password-setup">Create Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password-setup"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-8"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword-setup">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword-setup"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-8"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Setting Up...
+                    </>
+                  ) : (
+                    <>
+                      Complete Setup
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </>
                   )}

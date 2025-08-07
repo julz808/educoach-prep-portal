@@ -37,7 +37,6 @@ import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
-import { supabase } from '@/integrations/supabase/client';
 
 // Test section descriptions mapping - focused on the test itself, not platform features
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
@@ -216,29 +215,15 @@ const CourseDetail = () => {
     }
 
     try {
-      // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        // Store intended purchase in localStorage
-        localStorage.setItem('pendingPurchase', course.slug);
-        
-        toast({
-          title: "Sign up required",
-          description: "Please create an account to continue with your purchase.",
-        });
-        
-        // Redirect to signup page
-        navigate('/auth?mode=signup');
-        return;
-      }
-
-      // User is authenticated, proceed with checkout
+      // Direct to checkout - no authentication required
       toast({
         title: "Redirecting to checkout...",
         description: "You'll be redirected to our secure payment page.",
       });
 
+      // Store the course being purchased for post-payment setup
+      localStorage.setItem('purchasedCourse', course.slug);
+      
       await redirectToCheckout(course.slug);
     } catch (error) {
       console.error('Purchase error:', error);
