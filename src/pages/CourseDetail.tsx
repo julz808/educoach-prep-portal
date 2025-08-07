@@ -242,7 +242,7 @@ const CourseDetail = () => {
       title: "Skill Drills",
       description: "Targeted practice exercises to strengthen specific sub-skills and concepts",
       icon: <Target className="h-5 w-5" />,
-      screenshot: "/images/writing feedback 3.png"
+      screenshot: "/images/skill drills.png"
     },
     {
       id: "practice",
@@ -710,17 +710,14 @@ const CourseDetail = () => {
                         transition={{ duration: 0.3 }}
                         className="aspect-video bg-gray-50 flex items-center justify-center"
                       >
-                        {/* Placeholder for screenshots */}
-                        <div className="text-center p-8">
-                          <div className="w-20 h-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
-                            {howItWorksData.find(f => f.id === activeFeature)?.icon}
-                          </div>
-                          <p className="text-[#6B7280] text-sm">
-                            {howItWorksData.find(f => f.id === activeFeature)?.title} Screenshot
-                          </p>
-                          <p className="text-xs text-[#9CA3AF] mt-2">
-                            Platform interface coming soon
-                          </p>
+                        {/* Actual screenshots */}
+                        <div className="w-full h-full">
+                          <img 
+                            src={howItWorksData.find(f => f.id === activeFeature)?.screenshot} 
+                            alt={`${howItWorksData.find(f => f.id === activeFeature)?.title} Interface`}
+                            className="w-full h-full object-contain"
+                            loading="lazy"
+                          />
                         </div>
                       </motion.div>
                     </AnimatePresence>
