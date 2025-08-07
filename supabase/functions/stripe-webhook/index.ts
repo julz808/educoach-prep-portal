@@ -194,7 +194,7 @@ serve(async (req) => {
             type: 'recovery',
             email: userEmail,
             options: {
-              redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('/rest/v1', '')}/auth/callback?next=${encodeURIComponent('/dashboard')}`
+              redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('/rest/v1', '')}/auth/callback?next=${encodeURIComponent(`/purchase-success?product=${productId}&email=${encodeURIComponent(userEmail)}`)}`
             }
           });
           

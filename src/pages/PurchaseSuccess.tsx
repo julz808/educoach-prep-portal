@@ -52,7 +52,18 @@ const PurchaseSuccess: React.FC = () => {
     if (product) {
       localStorage.setItem('setupProduct', product);
     }
-    navigate('/auth?mode=setup');
+    
+    // Try to get email from URL parameters (passed from webhook redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+    
+    if (email) {
+      // Store email for the register flow and pass it via URL
+      localStorage.setItem('purchaseEmail', email);
+      navigate(`/auth?mode=register&email=${encodeURIComponent(email)}`);
+    } else {
+      navigate('/auth?mode=register');
+    }
   };
 
   const handleGoToDashboard = () => {
@@ -145,8 +156,8 @@ const PurchaseSuccess: React.FC = () => {
                     <div className="flex items-start space-x-4">
                       <div className="w-8 h-8 bg-[#6366F1] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
                       <div className="text-left">
-                        <p className="font-semibold text-[#2C3E50]">Set up your password</p>
-                        <p className="text-sm text-[#6B7280]">Click the button below to create your secure password</p>
+                        <p className="font-semibold text-[#2C3E50]">Complete your account setup</p>
+                        <p className="text-sm text-[#6B7280]">Fill in your details and create your secure password</p>
                       </div>
                     </div>
                     
@@ -174,7 +185,7 @@ const PurchaseSuccess: React.FC = () => {
                     size="lg"
                     className="w-full bg-gradient-to-r from-[#6366F1] to-[#4ECDC4] hover:from-[#5b5ef1] hover:to-[#45c4bc] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    Set Up Password & Get Started
+                    Complete Account Setup & Get Started
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   

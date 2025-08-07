@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, User, ArrowRight, School, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, School, GraduationCap, AlertCircle, Loader2, CheckCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
@@ -34,14 +34,38 @@ const Auth = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   
-  // Check URL params for signup/setup mode
+  // Check URL params for signup/setup/register mode and pre-fill email
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
-    if (mode === 'signup') {
+    const emailParam = urlParams.get('email');
+    
+    if (mode === 'signup' || mode === 'register') {
       setActiveTab('register');
+      
+      // Pre-fill email if coming from purchase flow
+      if (emailParam) {
+        setEmail(decodeURIComponent(emailParam));
+      } else {
+        // Check localStorage for email from purchase flow
+        const purchaseEmail = localStorage.getItem('purchaseEmail');
+        if (purchaseEmail) {
+          setEmail(purchaseEmail);
+        }
+      }
     } else if (mode === 'setup') {
       setActiveTab('setup');
+      
+      // Try to get email from URL param first, then from localStorage
+      if (emailParam) {
+        setEmail(decodeURIComponent(emailParam));
+      } else {
+        // Check localStorage for email from purchase flow
+        const purchaseEmail = localStorage.getItem('purchaseEmail');
+        if (purchaseEmail) {
+          setEmail(purchaseEmail);
+        }
+      }
     }
   }, []);
 
@@ -329,36 +353,50 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-edu-light-blue p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">EduCourse</CardTitle>
-          <CardDescription className="text-center">
-            Sign in to access your education portal
-          </CardDescription>
-        </CardHeader>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${
-            activeTab === 'setup' ? 'grid-cols-1' : 'grid-cols-2'
-          }`}>
-            {activeTab !== 'setup' && (
-              <>
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </>
-            )}
-            {activeTab === 'setup' && (
-              <TabsTrigger value="setup">Set Up Password</TabsTrigger>
-            )}
-          </TabsList>
+    <div className="min-h-screen bg-gradient-to-br from-[#E6F7F5] via-[#F8F9FA] to-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mx-auto -mb-8">
+            <Link to="/" className="cursor-pointer hover:opacity-80 transition-opacity duration-200">
+              <img 
+                src="/images/educourse-logo v2.png" 
+                alt="EduCourse Logo" 
+                className="w-60 h-60 object-contain"
+              />
+            </Link>
+          </div>
+          <h1 className="text-3xl font-bold text-[#2C3E50] mb-2">Welcome to EduCourse</h1>
+          <p className="text-[#6B7280]">Your gateway to academic success</p>
+        </div>
+
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl text-center text-[#2C3E50]">Get Started</CardTitle>
+          </CardHeader>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-[#F1F5F9] rounded-xl p-1">
+              <TabsTrigger 
+                value="login" 
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-[#2C3E50] data-[state=active]:shadow-sm transition-all duration-200"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger 
+                value="register"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-[#2C3E50] data-[state=active]:shadow-sm transition-all duration-200"
+              >
+                Register
+              </TabsTrigger>
+            </TabsList>
           
           <TabsContent value="login">
             {showResetPassword ? (
               <form onSubmit={handleResetPassword}>
                 <CardContent className="space-y-4 pt-4">
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
+                    <Alert className="bg-blue-50 border-blue-200">
+                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-800">
                       Enter your email address and we'll send you instructions to reset your password.
                     </AlertDescription>
                   </Alert>
@@ -379,8 +417,19 @@ const Auth = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Sending..." : "Send Reset Instructions"}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#45c4bc] hover:to-[#5b5ef1] text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Reset Instructions"
+                    )}
                   </Button>
                   <Button
                     type="button"
@@ -427,14 +476,27 @@ const Auth = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Signing In..." : "Sign In"}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#45c4bc] hover:to-[#5b5ef1] text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing In...
+                      </>
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
-                    className="w-full"
+                    className="w-full text-[#6B7280] hover:text-[#4ECDC4] hover:bg-[#4ECDC4]/10 transition-all duration-200"
                     onClick={() => setShowResetPassword(true)}
                   >
                     Forgot Password?
@@ -447,14 +509,9 @@ const Auth = () => {
           <TabsContent value="register">
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4 pt-4">
-                <Alert className="bg-blue-50 border-blue-200">
-                  <AlertCircle className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-800">
-                    <strong>Important:</strong> Use the same email address for registration and product purchases to ensure automatic access to your courses.
-                  </AlertDescription>
-                </Alert>
                 <div className="space-y-2">
-                  <Label htmlFor="email-register">Email (linked to product)</Label>
+                  <Label htmlFor="email-register">Email</Label>
+                  <p className="text-xs text-[#6B7280] mb-2 font-bold italic">Use same email address used to purchase product</p>
                   <div className="relative">
                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -469,37 +526,37 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="studentFirstName">Student First Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="studentFirstName"
-                      type="text"
-                      placeholder="John"
-                      className="pl-8"
-                      value={studentFirstName}
-                      onChange={(e) => setStudentFirstName(e.target.value)}
-                      required
-                    />
+                  <Label>Student Name</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="studentFirstName"
+                        type="text"
+                        placeholder="First Name"
+                        className="pl-8"
+                        value={studentFirstName}
+                        onChange={(e) => setStudentFirstName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="studentLastName"
+                        type="text"
+                        placeholder="Last Name"
+                        className="pl-8"
+                        value={studentLastName}
+                        onChange={(e) => setStudentLastName(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="studentLastName">Student Last Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="studentLastName"
-                      type="text"
-                      placeholder="Doe"
-                      className="pl-8"
-                      value={studentLastName}
-                      onChange={(e) => setStudentLastName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="parentEmail">Parent Email (can be same as above)</Label>
+                  <Label htmlFor="parentEmail">Parent Email</Label>
+                  <p className="text-xs text-[#6B7280] font-bold italic">Can be same email as above</p>
                   <div className="relative">
                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -514,71 +571,69 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="parentFirstName">Parent First Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="parentFirstName"
-                      type="text"
-                      placeholder="Jane"
-                      className="pl-8"
-                      value={parentFirstName}
-                      onChange={(e) => setParentFirstName(e.target.value)}
-                      required
-                    />
+                  <Label>Parent Name</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="parentFirstName"
+                        type="text"
+                        placeholder="First Name"
+                        className="pl-8"
+                        value={parentFirstName}
+                        onChange={(e) => setParentFirstName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="parentLastName"
+                        type="text"
+                        placeholder="Last Name"
+                        className="pl-8"
+                        value={parentLastName}
+                        onChange={(e) => setParentLastName(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="parentLastName">Parent Last Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="parentLastName"
-                      type="text"
-                      placeholder="Doe"
-                      className="pl-8"
-                      value={parentLastName}
-                      onChange={(e) => setParentLastName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="schoolName">School Name</Label>
-                  <div className="relative">
-                    <School className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="schoolName"
-                      type="text"
-                      placeholder="Your School"
-                      className="pl-8"
-                      value={schoolName}
-                      onChange={(e) => setSchoolName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="yearLevel">Year Level</Label>
-                  <div className="relative">
-                    <GraduationCap className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Select
-                      value={yearLevel}
-                      onValueChange={setYearLevel}
-                      required
-                    >
-                      <SelectTrigger className="pl-8">
-                        <SelectValue placeholder="Select year level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">Year 5</SelectItem>
-                        <SelectItem value="6">Year 6</SelectItem>
-                        <SelectItem value="7">Year 7</SelectItem>
-                        <SelectItem value="8">Year 8</SelectItem>
-                        <SelectItem value="9">Year 9</SelectItem>
-                        <SelectItem value="10">Year 10</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <Label>School & Year Level</Label>
+                  <div className="grid grid-cols-5 gap-3">
+                    <div className="relative col-span-3">
+                      <School className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="schoolName"
+                        type="text"
+                        placeholder="School Name"
+                        className="pl-8"
+                        value={schoolName}
+                        onChange={(e) => setSchoolName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="relative col-span-2">
+                      <GraduationCap className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Select
+                        value={yearLevel}
+                        onValueChange={setYearLevel}
+                        required
+                      >
+                        <SelectTrigger className="pl-8 text-muted-foreground">
+                          <SelectValue placeholder="Year Level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="5">Year 5</SelectItem>
+                          <SelectItem value="6">Year 6</SelectItem>
+                          <SelectItem value="7">Year 7</SelectItem>
+                          <SelectItem value="8">Year 8</SelectItem>
+                          <SelectItem value="9">Year 9</SelectItem>
+                          <SelectItem value="10">Year 10</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -613,7 +668,11 @@ const Auth = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-[#6366F1] to-[#4ECDC4] hover:from-[#5b5ef1] hover:to-[#45c4bc] text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -633,12 +692,17 @@ const Auth = () => {
           <TabsContent value="setup">
             <form onSubmit={handlePasswordSetup}>
               <CardContent className="space-y-4 pt-4">
-                <Alert className="bg-green-50 border-green-200">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">
-                    <strong>Account Created!</strong> Now set up your password to access your course materials.
-                  </AlertDescription>
-                </Alert>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-green-800">Account Created Successfully!</h3>
+                      <p className="text-sm text-green-700">Now set up your password to access your course materials.</p>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="email-setup">Your Email</Label>
@@ -689,7 +753,11 @@ const Auth = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -705,8 +773,16 @@ const Auth = () => {
               </CardFooter>
             </form>
           </TabsContent>
-        </Tabs>
-      </Card>
+          </Tabs>
+        </Card>
+        
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-[#9CA3AF]">
+            Need help? <a href="mailto:support@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">Contact Support</a>
+          </p>
+        </div>
+      </div>
 
       {/* Registration Success Modal */}
       <RegistrationSuccessModal

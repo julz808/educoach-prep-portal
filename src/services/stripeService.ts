@@ -65,6 +65,13 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
         cancelUrl: `${window.location.origin}${window.location.pathname}`
       }
     });
+    
+    // Store email for guest checkout flow
+    if (!user && productId) {
+      // For guest checkout, we'll need to capture email during checkout
+      // Email will be available after successful payment
+      localStorage.setItem('checkoutProduct', productId);
+    }
 
     console.log('🔍 Edge function response:', { 
       data, 

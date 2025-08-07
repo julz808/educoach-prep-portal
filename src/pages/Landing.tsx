@@ -330,7 +330,7 @@ const Landing = () => {
                         <Link
                           key={course.id}
                           to={`/course/${course.slug}`}
-                          className="block px-4 py-2 text-sm text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                          className="block px-4 py-2 text-base font-semibold text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
                         >
                           {course.title}
                         </Link>
@@ -376,7 +376,7 @@ const Landing = () => {
                     <Link
                       key={course.id}
                       to={`/course/${course.slug}`}
-                      className="block px-4 py-2 text-sm text-[#6B7280] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                      className="block px-4 py-2 text-base font-semibold text-[#6B7280] hover:bg-[#E6F7F5] rounded-lg transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {course.title}
