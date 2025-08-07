@@ -38,14 +38,14 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
 
-// Map course slugs to Stripe product IDs
-const COURSE_TO_STRIPE_PRODUCT_MAP: { [key: string]: string } = {
-  'year-5-naplan': 'year-5-naplan',
-  'year-7-naplan': 'year-7-naplan',
-  'edutest-scholarship': 'edutest-year-7',
-  'acer-scholarship': 'acer-year-7',
-  'nsw-selective': 'nsw-selective',
-  'vic-selective': 'vic-selective'
+// Map course slugs to Stripe Payment Links
+const COURSE_TO_PAYMENT_LINK_MAP: { [key: string]: string } = {
+  'year-5-naplan': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
+  'year-7-naplan': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
+  'edutest-scholarship': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
+  'acer-scholarship': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
+  'nsw-selective': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
+  'vic-selective': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE' // Replace with actual payment link
 };
 
 // Test section descriptions mapping - focused on the test itself, not platform features
@@ -224,12 +224,12 @@ const CourseDetail = () => {
       return;
     }
 
-    const stripeProductId = COURSE_TO_STRIPE_PRODUCT_MAP[course.slug];
+    const paymentLink = COURSE_TO_PAYMENT_LINK_MAP[course.slug];
     
-    if (!stripeProductId) {
+    if (!paymentLink || paymentLink.includes('YOUR_PAYMENT_LINK_HERE')) {
       toast({
         title: "Error", 
-        description: "Product configuration not found. Please contact support.",
+        description: "Payment link not configured. Please contact support.",
         variant: "destructive"
       });
       return;
@@ -240,17 +240,8 @@ const CourseDetail = () => {
       description: "You'll be redirected to our secure payment page.",
     });
 
-    // Use the existing Stripe service to redirect to checkout (supports guest checkout)
-    try {
-      await redirectToCheckout(stripeProductId);
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast({
-        title: "Checkout Error",
-        description: "There was an issue starting the checkout process. Please try again.",
-        variant: "destructive"
-      });
-    }
+    // Direct redirect to Stripe Payment Link
+    window.location.href = paymentLink;
   };
 
   if (!course) {
