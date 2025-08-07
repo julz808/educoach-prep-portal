@@ -338,12 +338,6 @@ const Landing = () => {
                     </div>
                   </div>
                 </div>
-                <Link 
-                  to="/insights" 
-                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold"
-                >
-                  Insights
-                </Link>
                 
                 {/* Login Button */}
                 <Button
@@ -389,13 +383,6 @@ const Landing = () => {
                     </Link>
                   ))}
                 </div>
-                <Link 
-                  to="/insights" 
-                  className="block text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Insights
-                </Link>
                 <Button
                   asChild
                   className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
@@ -1162,23 +1149,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Mailing List Placeholder Section */}
-      <section className="py-12 md:py-16 bg-[#4ECDC4]">
-        <div className="container mx-auto px-4">
-          <div className="text-center scroll-animate">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-              Stay Updated on Your Child's Test Prep Journey
-            </h2>
-            <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 px-4">
-              Get expert tips, practice questions, and exam updates delivered to your inbox
-            </p>
-            {/* Typeform mailing list embed - to be added later */}
-            <div className="max-w-md mx-auto bg-white/20 rounded-lg md:rounded-xl p-6 md:p-8">
-              <p className="text-white text-sm md:text-base">Typeform mailing list integration - to be implemented</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer Section */}
       <footer className="bg-[#2C3E50] text-white py-12 md:py-16">
@@ -1192,17 +1162,23 @@ const Landing = () => {
             <Button 
               size="lg" 
               className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
-              asChild
+              onClick={() => {
+                const productsSection = document.getElementById('products');
+                if (productsSection) {
+                  productsSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }
+              }}
             >
-              <Link to="/auth">
-                Get Started Today
-                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-              </Link>
+              Get Started Today
+              <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </div>
 
           {/* Footer Links */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             <div className="text-center sm:text-left">
               <h3 className="text-xl md:text-2xl font-bold text-[#4ECDC4] mb-3 md:mb-4">EduCourse</h3>
               <p className="text-gray-300 text-sm md:text-base">
@@ -1210,20 +1186,9 @@ const Landing = () => {
               </p>
             </div>
             <div className="text-center sm:text-left">
-              <h4 className="font-semibold mb-3 md:mb-4">Quick Links</h4>
-              <div className="space-y-2">
-                <Link to="/insights" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors text-sm md:text-base">
-                  Insights
-                </Link>
-                <Link to="/auth" className="block text-gray-300 hover:text-[#4ECDC4] transition-colors text-sm md:text-base">
-                  Sign Up
-                </Link>
-              </div>
-            </div>
-            <div className="text-center sm:text-left">
               <h4 className="font-semibold mb-3 md:mb-4">Products</h4>
               <div className="space-y-2">
-                {courses.slice(0, 3).map((course) => (
+                {courses.map((course) => (
                   <Link
                     key={course.id}
                     to={`/course/${course.slug}`}
@@ -1237,8 +1202,7 @@ const Landing = () => {
             <div className="text-center sm:text-left">
               <h4 className="font-semibold mb-3 md:mb-4">Contact</h4>
               <div className="space-y-2 text-gray-300 text-sm md:text-base">
-                <p>support@educourse.com.au</p>
-                <p>1800 EDU COURSE</p>
+                <p>learning@educourse.com.au</p>
               </div>
             </div>
           </div>
