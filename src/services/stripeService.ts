@@ -60,7 +60,7 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
         userId: user?.id || null,
         userEmail: user?.email || null,
         successUrl: `${window.location.origin}/purchase-success?product=${productId}`,
-        cancelUrl: `${window.location.origin}/course/${productId}`
+        cancelUrl: `${window.location.origin}${window.location.pathname}`
       }
     });
 

@@ -241,7 +241,16 @@ const CourseDetail = () => {
     });
 
     // Use the existing Stripe service to redirect to checkout (supports guest checkout)
-    await redirectToCheckout(stripeProductId);
+    try {
+      await redirectToCheckout(stripeProductId);
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Checkout Error",
+        description: "There was an issue starting the checkout process. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!course) {

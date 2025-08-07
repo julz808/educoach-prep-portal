@@ -68,7 +68,7 @@ serve(async (req) => {
       priceId,
       productId,
       userId,
-      userEmail: userEmail?.substring(0, 10) + '...'
+      userEmail: userEmail ? userEmail.substring(0, 10) + '...' : 'guest'
     });
 
     const sessionConfig: any = {
@@ -114,7 +114,11 @@ serve(async (req) => {
       },
     };
 
+    console.log('🔍 Final session config:', JSON.stringify(sessionConfig, null, 2));
+    
     const session = await stripe.checkout.sessions.create(sessionConfig);
+    
+    console.log('✅ Session created successfully:', session.id);
 
     console.log('Created checkout session:', session.id, 'for user:', userId, 'product:', productId)
 
