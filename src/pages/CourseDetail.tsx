@@ -294,7 +294,7 @@ const CourseDetail = () => {
                         <Link
                           key={c.id}
                           to={`/course/${c.slug}`}
-                          className="block px-4 py-2 text-sm text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                          className="block px-4 py-2 text-base font-semibold text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
                         >
                           {c.title}
                         </Link>
@@ -340,7 +340,7 @@ const CourseDetail = () => {
                     <Link
                       key={c.id}
                       to={`/course/${c.slug}`}
-                      className="block px-4 py-2 text-sm text-[#6B7280] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                      className="block px-4 py-2 text-base font-semibold text-[#6B7280] hover:bg-[#E6F7F5] rounded-lg transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {c.title}
