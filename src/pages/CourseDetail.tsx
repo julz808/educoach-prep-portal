@@ -37,6 +37,8 @@ import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 // Map course slugs to Stripe product IDs
 const COURSE_TO_STRIPE_PRODUCT_MAP: { [key: string]: string } = {
@@ -214,6 +216,23 @@ const CourseDetail = () => {
         description: "Course not found. Please refresh the page and try again.",
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      // Store the course slug in localStorage so we can redirect back after signup
+      localStorage.setItem('pendingPurchaseCourse', course.slug);
+      
+      toast({
+        title: "Sign up required",
+        description: "Please create an account to continue with your purchase.",
+      });
+      
+      // Redirect to signup page
+      navigate('/signup');
       return;
     }
 
