@@ -22,8 +22,8 @@ export const courses: Course[] = [
   {
     id: 'acer-scholarship',
     title: 'ACER Scholarship',
-    shortDescription: 'Prepare for ACER\'s Cooperative Scholarship Test (Levels P, 1, 2). Includes reading, mathematics, writing prompts, and high-order reasoning.',
-    fullDescription: 'Our ACER Scholarship Exam preparation course gives students the competitive edge needed to excel in this challenging assessment. Covering all test components with specialized practice materials, we help students develop the advanced skills required for success.',
+    shortDescription: 'Prepare for ACER\'s Scholarship Test (Year 7 Entry). Includes reading, mathematics, writing prompts, and high-order reasoning.',
+    fullDescription: 'Our ACER Scholarship Exam preparation course gives students the competitive edge needed to excel in this challenging assessment. Covering all test components with specialised practice materials, we help students develop the advanced skills required for success.',
     price: 199,
     target: 'Students in Year 5–9 applying for private school scholarships',
     skills: [
@@ -74,7 +74,7 @@ export const courses: Course[] = [
     id: 'year-5-naplan',
     title: 'Year 5 NAPLAN',
     shortDescription: 'Build foundational skills in reading, writing, language conventions, and numeracy. Practice real-style adaptive questions and timed tests.',
-    fullDescription: 'Our comprehensive Year 5 NAPLAN preparation course provides students with the essential skills and confidence needed to excel in their NAPLAN tests. Through adaptive learning technology and personalized practice, students will master key concepts while building test-taking strategies.',
+    fullDescription: 'Our comprehensive Year 5 NAPLAN preparation course provides students with the essential skills and confidence needed to excel in their NAPLAN tests. Through adaptive learning technology and personalised practice, students will master key concepts while building test-taking strategies.',
     price: 199,
     target: 'Year 5 students (or Year 4 preparing early)',
     skills: [
@@ -125,7 +125,7 @@ export const faqs = [
   },
   {
     question: "How do the diagnostic tests work?",
-    answer: "Our diagnostic tests assess your current knowledge and skills, then generate a personalized study plan focusing on areas where you need the most improvement."
+    answer: "Our diagnostic tests assess your current knowledge and skills, then generate a personalised study plan focusing on areas where you need the most improvement."
   },
   {
     question: "Do you provide feedback on practice essays?",

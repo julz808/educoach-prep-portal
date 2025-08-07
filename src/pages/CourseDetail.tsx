@@ -47,11 +47,11 @@ const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = 
     "Numeracy Calculator": "This section focuses on more complex calculations, multi-step problems, and mathematical applications that benefit from technological support."
   },
   "Year 7 NAPLAN": {
-    "Writing": "Students write a narrative or persuasive text in response to a stimulus. The assessment focuses on sophisticated vocabulary, complex sentence structures, and advanced organizational skills appropriate for Year 7 level.",
+    "Writing": "Students write a narrative or persuasive text in response to a stimulus. The assessment focuses on sophisticated vocabulary, complex sentence structures, and advanced organisational skills appropriate for Year 7 level.",
     "Reading": "This section tests advanced comprehension skills including analysis, inference, and critical evaluation across diverse text types. Students must demonstrate deeper understanding and interpretation abilities.",
     "Language Conventions": "This section covers advanced spelling patterns, complex grammatical structures, sophisticated punctuation usage, and nuanced language mechanics appropriate for Year 7 level.",
     "Numeracy No Calculator": "This section requires mental calculation strategies, algebraic thinking, geometric reasoning, and advanced number sense without technological assistance.",
-    "Numeracy Calculator": "This section emphasizes complex problem-solving, statistical analysis, advanced measurement applications, and mathematical modeling with calculator support."
+    "Numeracy Calculator": "This section emphasises complex problem-solving, statistical analysis, advanced measurement applications, and mathematical modelling with calculator support."
   },
   "ACER Scholarship": {
     "Written Expression": "Students complete a writing task demonstrating their ability to express ideas clearly and persuasively under time pressure. The task requires sophisticated vocabulary, logical argument structure, and mature writing techniques.",
@@ -59,14 +59,14 @@ const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = 
     "Humanities": "This section tests reading comprehension, source analysis, historical interpretation, and critical thinking skills across humanities subjects through various question formats."
   },
   "EduTest Scholarship": {
-    "Reading Comprehension": "This fast-paced section tests rapid comprehension, inference skills, and the ability to synthesize information quickly through various text-based questions.",
+    "Reading Comprehension": "This fast-paced section tests rapid comprehension, inference skills, and the ability to synthesise information quickly through various text-based questions.",
     "Verbal Reasoning": "This section tests analogical reasoning, vocabulary knowledge, word relationships, and logical verbal connections. Students must demonstrate sophisticated language processing skills.",
     "Numerical Reasoning": "This section focuses on number patterns, mathematical sequences, proportional reasoning, and logical problem-solving with numbers, without requiring advanced mathematical knowledge.",
     "Mathematics": "This section covers both curriculum mathematics and extension problems. Topics span arithmetic, algebra, geometry, measurement, statistics, and applied mathematics.",
     "Written Expression": "Students complete writing tasks including both creative and analytical components. This section tests the ability to write effectively under time constraints while demonstrating sophisticated language use."
   },
   "NSW Selective Entry": {
-    "Reading": "This test emphasizes advanced comprehension skills, inference, textual analysis, and critical evaluation across various text types appropriate for selective school entry.",
+    "Reading": "This test emphasises advanced comprehension skills, inference, textual analysis, and critical evaluation across various text types appropriate for selective school entry.",
     "Mathematical Reasoning": "This section tests advanced problem-solving, pattern recognition, mathematical logic, and reasoning skills that extend beyond standard Year 6 curriculum expectations.",
     "Thinking Skills": "This section focuses on abstract reasoning, logical sequences, pattern identification, and systematic problem-solving across verbal, numerical, and spatial domains.",
     "Writing": "Students write a persuasive text demonstrating sophisticated argument construction, evidence integration, advanced vocabulary, and mature writing techniques appropriate for selective school entry."
@@ -402,7 +402,9 @@ const CourseDetail = () => {
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
                 {[
-                  `Designed for ${course.target}`,
+                  course.title === 'ACER Scholarship' || course.title === 'EduTest Scholarship' 
+                    ? 'Designed for Students in Year 5/6 applying for Year 7 Entry'
+                    : `Designed for ${course.target}`,
                   'Expert-crafted questions aligned to test format',
                   'Instant feedback with detailed explanations'
                 ].map((point, index) => (
@@ -672,12 +674,12 @@ const CourseDetail = () => {
                           {feature.icon}
                         </div>
                         <div className="flex-1">
-                          <h3 className={`text-lg font-semibold mb-2 transition-colors ${
+                          <h3 className={`text-xl font-semibold mb-2 transition-colors ${
                             activeFeature === feature.id ? 'text-[#2C3E50]' : 'text-[#6B7280]'
                           }`}>
                             {feature.title}
                           </h3>
-                          <p className={`text-sm transition-colors ${
+                          <p className={`text-base transition-colors ${
                             activeFeature === feature.id ? 'text-[#6B7280]' : 'text-[#9CA3AF]'
                           }`}>
                             {feature.description}
@@ -792,8 +794,8 @@ const CourseDetail = () => {
                   <CheckCircle className="h-6 w-6 text-[#22C55E] mt-1" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">{feature.title}</h3>
-                  <p className="text-sm text-[#6B7280] leading-relaxed">{feature.description}</p>
+                  <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">{feature.title}</h3>
+                  <p className="text-base text-[#6B7280] leading-relaxed">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -893,11 +895,6 @@ const CourseDetail = () => {
                     {/* Step Number */}
                     <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white rounded-full font-bold text-lg group-hover:scale-110 transition-transform duration-300">
                       {step.step}
-                    </div>
-                    
-                    {/* Icon */}
-                    <div className="flex justify-center mb-4 text-[#6366F1] group-hover:text-[#4ECDC4] transition-colors duration-300">
-                      {step.icon}
                     </div>
                     
                     {/* Content */}
