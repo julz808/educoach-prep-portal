@@ -83,29 +83,39 @@ const Auth = () => {
       return;
     }
     
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      // Try to sign in with email and the new password
-      // First, let's try updating the password for the existing user
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // Try to sign in with the email and password to see if account exists
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (signInError) {
-        // If sign in fails, try resetting password
+        // Account exists but password is wrong, or account doesn't exist yet
+        // Send magic link for password reset/setup
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         });
         
-        if (resetError) throw resetError;
+        if (resetError) {
+          console.error('Reset error:', resetError);
+          toast.error("Error sending setup link. Please contact support.");
+          return;
+        }
         
-        toast.success("Password reset link sent to your email!");
+        toast.success("Setup link sent to your email! Check your inbox.");
         return;
       }
       
-      toast.success("Password set successfully!");
+      // Sign in successful
+      toast.success("Welcome! Redirecting to your dashboard...");
       navigate("/dashboard");
       
     } catch (error: any) {

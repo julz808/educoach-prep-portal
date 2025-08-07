@@ -84,88 +84,123 @@ const PurchaseSuccess: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6F7F5] to-white p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600" />
-          </div>
-          <CardTitle className="text-2xl text-[#2C3E50]">
-            Purchase Successful! 🎉
-          </CardTitle>
-          <CardDescription className="text-[#6B7280]">
-            Thank you for purchasing {getProductName(product)}
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          {hasAccount ? (
-            // User already has an account and is logged in
-            <>
-              <div className="text-center space-y-4">
-                <p className="text-[#6B7280]">
-                  You're all set! Redirecting you to your dashboard where you can access your course.
-                </p>
-                <div className="flex items-center justify-center space-x-2 text-[#4ECDC4]">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Taking you to your dashboard...</span>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={handleGoToDashboard}
-                className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
-              >
-                Go to Dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </>
-          ) : (
-            // New user - account created but needs to set password
-            <>
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center space-x-2 text-[#6366F1]">
-                  <Mail className="h-5 w-5" />
-                  <span className="font-medium">Check Your Email</span>
-                </div>
-                
-                <p className="text-[#6B7280]">
-                  We've created your account and you should receive a welcome email shortly with instructions to set up your password.
-                </p>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Next steps:</strong>
-                    <br />1. Check your email for the welcome message
-                    <br />2. Click the setup link to create your password  
-                    <br />3. Access your course materials immediately
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleSetupPassword}
-                  className="w-full bg-[#6366F1] hover:bg-[#6366F1]/90 text-white"
-                >
-                  Set Up Password Now
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                
-                <p className="text-xs text-center text-[#6B7280]">
-                  Didn't receive an email? Check your spam folder or set up your password above.
-                </p>
-              </div>
-            </>
-          )}
-
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-xs text-center text-[#9CA3AF]">
-              Questions? Contact us at support@educourse.com.au
+    <div className="min-h-screen bg-gradient-to-br from-[#E6F7F5] via-[#F8F9FA] to-white flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <Card className="shadow-2xl border-0 overflow-hidden">
+          {/* Success Header */}
+          <div className="bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] p-8 text-center text-white">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
+            <p className="text-lg text-white/90">
+              Welcome to {getProductName(product)}
             </p>
           </div>
-        </CardContent>
-      </Card>
+
+          <CardContent className="p-8 space-y-6">
+            {hasAccount ? (
+              // Existing user flow
+              <>
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-[#4ECDC4]/10 rounded-full flex items-center justify-center mx-auto">
+                    <ArrowRight className="h-8 w-8 text-[#4ECDC4]" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-[#2C3E50]">You're all set!</h2>
+                  <p className="text-[#6B7280] leading-relaxed">
+                    Taking you to your dashboard where you can access your course materials immediately.
+                  </p>
+                  <div className="flex items-center justify-center space-x-2 text-[#4ECDC4]">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm font-medium">Redirecting to dashboard...</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={handleGoToDashboard}
+                  size="lg"
+                  className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </>
+            ) : (
+              // New user flow
+              <>
+                <div className="text-center space-y-6">
+                  <div className="w-16 h-16 bg-[#6366F1]/10 rounded-full flex items-center justify-center mx-auto">
+                    <Mail className="h-8 w-8 text-[#6366F1]" />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h2 className="text-xl font-semibold text-[#2C3E50]">Account Created Successfully!</h2>
+                    <p className="text-[#6B7280] leading-relaxed">
+                      Your account has been created automatically. Follow these simple steps to get started:
+                    </p>
+                  </div>
+                  
+                  {/* Steps */}
+                  <div className="bg-gradient-to-br from-[#6366F1]/5 to-[#4ECDC4]/5 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-[#6366F1] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                      <div className="text-left">
+                        <p className="font-semibold text-[#2C3E50]">Set up your password</p>
+                        <p className="text-sm text-[#6B7280]">Click the button below to create your secure password</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                      <div className="text-left">
+                        <p className="font-semibold text-[#2C3E50]">Access your course</p>
+                        <p className="text-sm text-[#6B7280]">Start with the diagnostic test and targeted practice</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-[#FF6B6B] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                      <div className="text-left">
+                        <p className="font-semibold text-[#2C3E50]">Track your progress</p>
+                        <p className="text-sm text-[#6B7280]">Monitor improvements with detailed analytics</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Button 
+                    onClick={handleSetupPassword}
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-[#6366F1] to-[#4ECDC4] hover:from-[#5b5ef1] hover:to-[#45c4bc] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Set Up Password & Get Started
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                  
+                  <div className="text-center">
+                    <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                      A welcome email has been sent to your inbox with your login details.<br/>
+                      Check your spam folder if you don't see it within a few minutes.
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Footer */}
+            <div className="pt-6 border-t border-gray-100 text-center">
+              <div className="flex items-center justify-center space-x-4 text-xs text-[#9CA3AF]">
+                <span>🔒 Secure Payment</span>
+                <span>•</span>
+                <span>📧 support@educourse.com.au</span>
+                <span>•</span>
+                <span>💬 Live Chat Support</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

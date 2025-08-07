@@ -32,7 +32,9 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       productId,
       productConfig,
       priceId: productConfig?.priceId,
-      hasConfig: !!productConfig
+      hasConfig: !!productConfig,
+      priceIdLength: productConfig?.priceId?.length,
+      envVarName: `VITE_STRIPE_${productId.toUpperCase().replace('-', '_')}_PRICE_ID`
     });
     
     if (!productConfig || !productConfig.priceId) {

@@ -50,10 +50,12 @@ serve(async (req) => {
       hasUserEmail: !!userEmail,
       priceId,
       productId,
-      userId,
-      userEmail,
-      successUrl,
-      cancelUrl
+      userId: userId === 'guest' ? 'guest' : 'authenticated',
+      userEmail: userEmail ? userEmail.substring(0, 10) + '...' : 'none',
+      successUrl: successUrl?.substring(0, 50) + '...',
+      cancelUrl: cancelUrl?.substring(0, 50) + '...',
+      priceIdLength: priceId?.length,
+      productIdLength: productId?.length
     });
 
     if (!priceId || !productId) {
@@ -86,6 +88,7 @@ serve(async (req) => {
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      allow_promotion_codes: true, // Enable promo/coupon codes
       metadata: {
         userId: userId || 'guest',
         productId: productId,

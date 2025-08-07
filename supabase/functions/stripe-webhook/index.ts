@@ -188,8 +188,24 @@ serve(async (req) => {
         finalUserId = authUser.user.id;
         console.log('✅ User account created:', finalUserId);
 
-        // Send welcome email (placeholder for now)
-        console.log('📧 Would send welcome email to:', userEmail);
+        // Send password setup email via Supabase auth
+        try {
+          const { error: emailError } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: userEmail,
+            options: {
+              redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('/rest/v1', '')}/auth/callback?next=${encodeURIComponent('/dashboard')}`
+            }
+          });
+          
+          if (emailError) {
+            console.error('❌ Error sending setup email:', emailError);
+          } else {
+            console.log('✅ Password setup email sent to:', userEmail);
+          }
+        } catch (emailSendError) {
+          console.error('❌ Email send error:', emailSendError);
+        }
       }
 
       // Get the line items to determine what was purchased
