@@ -157,7 +157,12 @@ const CourseDetail = () => {
   const [activeFeature, setActiveFeature] = useState<string>("diagnostic");
 
   useEffect(() => {
+    console.log('CourseDetail: Looking for slug:', slug);
+    console.log('CourseDetail: Available courses:', courses.map(c => c.slug));
+    
     const foundCourse = courses.find(c => c.slug === slug);
+    console.log('CourseDetail: Found course:', foundCourse?.title || 'NOT FOUND');
+    
     if (foundCourse) {
       setCourse(foundCourse);
       document.title = `${foundCourse.title} | EduCourse`;
@@ -170,6 +175,8 @@ const CourseDetail = () => {
       if (firstSection) {
         setActiveTestSection(firstSection);
       }
+    } else {
+      console.error('CourseDetail: Course not found for slug:', slug);
     }
   }, [slug]);
 
@@ -239,10 +246,14 @@ const CourseDetail = () => {
 
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4ECDC4] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading course details...</p>
+          <p className="text-gray-600 mb-2">Loading course details...</p>
+          <p className="text-sm text-gray-500">Slug: {slug}</p>
+          <p className="text-xs text-gray-400 mt-4">
+            Available courses: {courses.map(c => c.slug).join(', ')}
+          </p>
         </div>
       </div>
     );
