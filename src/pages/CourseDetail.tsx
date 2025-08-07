@@ -40,12 +40,12 @@ import { redirectToCheckout } from '@/services/stripeService';
 
 // Map course slugs to Stripe Payment Links
 const COURSE_TO_PAYMENT_LINK_MAP: { [key: string]: string } = {
-  'year-5-naplan': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
-  'year-7-naplan': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
-  'edutest-scholarship': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
-  'acer-scholarship': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
-  'nsw-selective': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE', // Replace with actual payment link
-  'vic-selective': 'https://buy.stripe.com/YOUR_PAYMENT_LINK_HERE' // Replace with actual payment link
+  'year-5-naplan': 'https://buy.stripe.com/fZueVc2DTbfsdUKaOT2sM05',
+  'year-7-naplan': 'https://buy.stripe.com/7sYcN4fqF5V8g2S6yD2sM04',
+  'edutest-scholarship': 'https://buy.stripe.com/28E4gybap6ZcdUKf592sM03',
+  'acer-scholarship': 'https://buy.stripe.com/00w00iguJcjw17Y2in2sM02',
+  'nsw-selective': 'https://buy.stripe.com/8x2aEWfqFerE03U8GL2sM01',
+  'vic-selective': 'https://buy.stripe.com/14A4gy4M16Zc9Eu9KP2sM00'
 };
 
 // Test section descriptions mapping - focused on the test itself, not platform features
