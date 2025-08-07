@@ -430,7 +430,7 @@ const CourseDetail = () => {
               >
                 <Button 
                   size="lg" 
-                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group"
+                  className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group"
                   onClick={handlePurchase}
                 >
                   Purchase for $199
@@ -920,7 +920,7 @@ const CourseDetail = () => {
             </p>
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#6366F1] hover:to-[#4ECDC4] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
               onClick={handlePurchase}
             >
               Get Started Today
@@ -985,7 +985,7 @@ const CourseDetail = () => {
             </p>
             <Button 
               size="lg" 
-              className="bg-white text-[#6366F1] hover:bg-gray-100 px-8 py-4 text-lg"
+              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg"
               onClick={handlePurchase}
             >
               Get Started for $199
