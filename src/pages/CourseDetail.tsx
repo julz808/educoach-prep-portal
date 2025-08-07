@@ -40,43 +40,43 @@ import Lenis from 'lenis';
 // Test section descriptions mapping - focused on the test itself, not platform features
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
   "Year 5 NAPLAN": {
-    "Writing": "The Year 5 NAPLAN Writing test requires students to write a narrative or persuasive piece in response to a given prompt. Students have 42 minutes to plan, write, edit and proofread their response, demonstrating their ability to structure ideas coherently and use appropriate language features.",
-    "Reading": "The Year 5 NAPLAN Reading test consists of 40 multiple-choice questions based on approximately 8 passages of around 150 words each. Students must demonstrate comprehension skills across fiction, non-fiction, and mixed text types within a 50-minute timeframe.",
-    "Language Conventions": "This 45-minute test contains 40 multiple-choice questions focusing on spelling, grammar, and punctuation. Students must demonstrate their understanding of standard Australian English conventions including parts of speech, sentence structure, and orthographic patterns.",
-    "Numeracy No Calculator": "Students complete 25 multiple-choice questions in 25 minutes without calculator assistance. This section tests mental mathematics, number sense, basic operations, and fundamental mathematical reasoning skills.",
-    "Numeracy Calculator": "The calculator-permitted section includes 25 multiple-choice questions to be completed in 25 minutes. This section focuses on more complex calculations, multi-step problems, and mathematical applications that benefit from technological support."
+    "Writing": "Students write a narrative or persuasive piece in response to a given prompt, demonstrating their ability to structure ideas coherently and use appropriate language features for their year level.",
+    "Reading": "This section tests comprehension skills across fiction, non-fiction, and mixed text types. Students must demonstrate understanding, analysis, and interpretation of various written materials.",
+    "Language Conventions": "This test focuses on spelling, grammar, and punctuation. Students must demonstrate their understanding of standard Australian English conventions including parts of speech, sentence structure, and orthographic patterns.",
+    "Numeracy No Calculator": "This section tests mental mathematics, number sense, basic operations, and fundamental mathematical reasoning skills without calculator assistance.",
+    "Numeracy Calculator": "This section focuses on more complex calculations, multi-step problems, and mathematical applications that benefit from technological support."
   },
   "Year 7 NAPLAN": {
-    "Writing": "Year 7 students write a narrative or persuasive text in response to a stimulus, with 42 minutes allocated for planning, writing, and editing. The assessment focuses on sophisticated vocabulary, complex sentence structures, and advanced organizational skills.",
-    "Reading": "This section presents 50 multiple-choice questions based on approximately 8 passages of around 200 words each. Students have 65 minutes to demonstrate advanced comprehension skills including analysis, inference, and critical evaluation across diverse text types.",
-    "Language Conventions": "Students answer 45 multiple-choice questions in 45 minutes, covering advanced spelling patterns, complex grammatical structures, sophisticated punctuation usage, and nuanced language mechanics appropriate for Year 7 level.",
-    "Numeracy No Calculator": "This 30-minute section contains 30 multiple-choice questions requiring mental calculation strategies, algebraic thinking, geometric reasoning, and advanced number sense without technological assistance.",
-    "Numeracy Calculator": "Students complete 35 multiple-choice questions in 35 minutes using calculator support. This section emphasizes complex problem-solving, statistical analysis, advanced measurement applications, and mathematical modeling."
+    "Writing": "Students write a narrative or persuasive text in response to a stimulus. The assessment focuses on sophisticated vocabulary, complex sentence structures, and advanced organizational skills appropriate for Year 7 level.",
+    "Reading": "This section tests advanced comprehension skills including analysis, inference, and critical evaluation across diverse text types. Students must demonstrate deeper understanding and interpretation abilities.",
+    "Language Conventions": "This section covers advanced spelling patterns, complex grammatical structures, sophisticated punctuation usage, and nuanced language mechanics appropriate for Year 7 level.",
+    "Numeracy No Calculator": "This section requires mental calculation strategies, algebraic thinking, geometric reasoning, and advanced number sense without technological assistance.",
+    "Numeracy Calculator": "This section emphasizes complex problem-solving, statistical analysis, advanced measurement applications, and mathematical modeling with calculator support."
   },
   "ACER Scholarship": {
-    "Written Expression": "Students complete one writing task in 25 minutes, demonstrating their ability to express ideas clearly and persuasively under time pressure. The task requires sophisticated vocabulary, logical argument structure, and mature writing techniques.",
-    "Mathematics": "This 47-minute section contains 35 multiple-choice questions covering advanced mathematical concepts including algebra, geometry, statistics, and problem-solving. Questions require higher-order thinking and mathematical reasoning beyond standard curriculum level.",
-    "Humanities": "Students answer 35 multiple-choice questions in 47 minutes based on approximately 4 passages of 350 words each. This section tests reading comprehension, source analysis, historical interpretation, and critical thinking skills across humanities subjects."
+    "Written Expression": "Students complete a writing task demonstrating their ability to express ideas clearly and persuasively under time pressure. The task requires sophisticated vocabulary, logical argument structure, and mature writing techniques.",
+    "Mathematics": "This section covers advanced mathematical concepts including algebra, geometry, statistics, and problem-solving. Questions require higher-order thinking and mathematical reasoning beyond standard curriculum level.",
+    "Humanities": "This section tests reading comprehension, source analysis, historical interpretation, and critical thinking skills across humanities subjects through various question formats."
   },
   "EduTest Scholarship": {
-    "Reading Comprehension": "Students complete 50 multiple-choice questions in 30 minutes based on 5 passages of approximately 200 words each. This fast-paced section tests rapid comprehension, inference skills, and the ability to synthesize information quickly.",
-    "Verbal Reasoning": "This 30-minute section contains 60 multiple-choice questions testing analogical reasoning, vocabulary knowledge, word relationships, and logical verbal connections. Students must demonstrate sophisticated language processing skills.",
-    "Numerical Reasoning": "Students solve 50 multiple-choice questions in 30 minutes focusing on number patterns, mathematical sequences, proportional reasoning, and logical problem-solving with numbers, without requiring advanced mathematical knowledge.",
-    "Mathematics": "This section includes 60 multiple-choice questions to be completed in 30 minutes, covering both curriculum mathematics and extension problems. Topics span arithmetic, algebra, geometry, measurement, statistics, and applied mathematics.",
-    "Written Expression": "Students complete 2 writing tasks in 30 minutes, typically including both creative and analytical components. This section tests the ability to write effectively under significant time constraints while demonstrating sophisticated language use."
+    "Reading Comprehension": "This fast-paced section tests rapid comprehension, inference skills, and the ability to synthesize information quickly through various text-based questions.",
+    "Verbal Reasoning": "This section tests analogical reasoning, vocabulary knowledge, word relationships, and logical verbal connections. Students must demonstrate sophisticated language processing skills.",
+    "Numerical Reasoning": "This section focuses on number patterns, mathematical sequences, proportional reasoning, and logical problem-solving with numbers, without requiring advanced mathematical knowledge.",
+    "Mathematics": "This section covers both curriculum mathematics and extension problems. Topics span arithmetic, algebra, geometry, measurement, statistics, and applied mathematics.",
+    "Written Expression": "Students complete writing tasks including both creative and analytical components. This section tests the ability to write effectively under time constraints while demonstrating sophisticated language use."
   },
   "NSW Selective Entry": {
-    "Reading": "Students answer 30 multiple-choice questions in 40 minutes based on 6 passages of approximately 250 words each. The test emphasizes advanced comprehension skills, inference, textual analysis, and critical evaluation across various text types.",
-    "Mathematical Reasoning": "This 40-minute section contains 35 multiple-choice questions testing advanced problem-solving, pattern recognition, mathematical logic, and reasoning skills that extend beyond standard Year 6 curriculum expectations.",
-    "Thinking Skills": "Students complete 40 multiple-choice questions in 40 minutes, focusing on abstract reasoning, logical sequences, pattern identification, and systematic problem-solving across verbal, numerical, and spatial domains.",
-    "Writing": "Students write a persuasive text in 30 minutes, demonstrating sophisticated argument construction, evidence integration, advanced vocabulary, and mature writing techniques appropriate for selective school entry."
+    "Reading": "This test emphasizes advanced comprehension skills, inference, textual analysis, and critical evaluation across various text types appropriate for selective school entry.",
+    "Mathematical Reasoning": "This section tests advanced problem-solving, pattern recognition, mathematical logic, and reasoning skills that extend beyond standard Year 6 curriculum expectations.",
+    "Thinking Skills": "This section focuses on abstract reasoning, logical sequences, pattern identification, and systematic problem-solving across verbal, numerical, and spatial domains.",
+    "Writing": "Students write a persuasive text demonstrating sophisticated argument construction, evidence integration, advanced vocabulary, and mature writing techniques appropriate for selective school entry."
   },
   "VIC Selective Entry": {
-    "Reading Reasoning": "This 35-minute section includes 50 multiple-choice questions based on 5 passages of approximately 300 words each. Students must demonstrate critical analysis, textual comparison, author analysis, and sophisticated literary interpretation skills.",
-    "Mathematics Reasoning": "Students complete 60 multiple-choice questions in 30 minutes, covering advanced mathematical concepts, problem-solving methods, mathematical logic, and abstract thinking well beyond standard Year 8 curriculum.",
-    "General Ability - Verbal": "This 30-minute section contains 60 multiple-choice questions testing verbal analogies, word relationships, linguistic patterns, and vocabulary reasoning at an advanced level.",
-    "General Ability - Quantitative": "Students solve 50 multiple-choice questions in 30 minutes focusing on numerical patterns, quantitative relationships, data interpretation, and abstract mathematical reasoning.",
-    "Writing": "Students complete 2 writing tasks in 40 minutes - typically creative narrative and analytical response. This dual-task format tests versatility, time management, and sophisticated expression across different writing modes."
+    "Reading Reasoning": "This section tests critical analysis, textual comparison, author analysis, and sophisticated literary interpretation skills required for selective school entry.",
+    "Mathematics Reasoning": "This section covers advanced mathematical concepts, problem-solving methods, mathematical logic, and abstract thinking well beyond standard Year 8 curriculum.",
+    "General Ability - Verbal": "This section tests verbal analogies, word relationships, linguistic patterns, and vocabulary reasoning at an advanced level suitable for selective entry.",
+    "General Ability - Quantitative": "This section focuses on numerical patterns, quantitative relationships, data interpretation, and abstract mathematical reasoning skills.",
+    "Writing": "Students complete multiple writing tasks including creative narrative and analytical response. This format tests versatility, time management, and sophisticated expression across different writing modes."
   }
 };
 
@@ -563,9 +563,27 @@ const CourseDetail = () => {
                       <h3 className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-2">
                         {activeTestSection}
                       </h3>
-                      <p className="text-[#6B7280]">
+                      <p className="text-[#6B7280] mb-4">
                         {sectionDescriptions[activeTestSection] || "Master key concepts and strategies for this section"}
                       </p>
+                      
+                      {/* Test Details - moved above Sub-skills */}
+                      <div className="flex items-center space-x-6 mb-2">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="h-4 w-4 text-[#6366F1]" />
+                          <span className="text-sm font-medium text-[#2C3E50]">
+                            {(testSections[activeTestSection] as any)?.questions || 0} {
+                              ((testSections[activeTestSection] as any)?.questions || 0) === 1 ? 'question' : 'questions'
+                            }
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 text-[#6366F1]" />
+                          <span className="text-sm font-medium text-[#2C3E50]">
+                            {(testSections[activeTestSection] as any)?.time || 0} minutes
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -597,24 +615,6 @@ const CourseDetail = () => {
                           ));
                         }
                       })()}
-                    </div>
-                  </div>
-
-                  {/* Test Details */}
-                  <div className="flex items-center justify-between p-4 bg-[#F8F9FA] rounded-lg">
-                    <div className="flex items-center space-x-2">
-                      <FileText className="h-5 w-5 text-[#6366F1]" />
-                      <span className="text-sm font-medium text-[#2C3E50]">
-                        {(testSections[activeTestSection] as any)?.questions || 0} {
-                          ((testSections[activeTestSection] as any)?.questions || 0) === 1 ? 'question' : 'questions'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-5 w-5 text-[#6366F1]" />
-                      <span className="text-sm font-medium text-[#2C3E50]">
-                        {(testSections[activeTestSection] as any)?.time || 0} minutes
-                      </span>
                     </div>
                   </div>
                 </motion.div>
