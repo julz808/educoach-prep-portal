@@ -744,7 +744,7 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              Features
+              What's Included in Our Package
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
               Everything you need to prepare for success
@@ -755,7 +755,7 @@ const CourseDetail = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
-                title: `${totalQuestions}+ Questions`,
+                title: "500+ Questions",
                 description: "Comprehensive question bank covering all test sections and difficulty levels"
               },
               {
@@ -771,7 +771,7 @@ const CourseDetail = () => {
                 description: "Targeted exercises focusing on specific areas identified by diagnostic results"
               },
               {
-                title: "Best-in-Class Performance Analytics",
+                title: "Detailed Analytics",
                 description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
               },
               {
