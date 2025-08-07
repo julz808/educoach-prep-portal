@@ -56,9 +56,9 @@ serve(async (req) => {
       cancelUrl
     });
 
-    if (!priceId || !productId) {
+    if (!priceId || !productId || !userId || !userEmail) {
       return new Response(
-        JSON.stringify({ error: 'Missing required parameters: priceId and productId are required' }),
+        JSON.stringify({ error: 'Missing required parameters: priceId, productId, userId and userEmail are required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -87,16 +87,14 @@ serve(async (req) => {
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        userId: userId || 'guest',
+        userId: userId,
         productId: productId,
         source: 'educourse_platform'
       }
     };
 
-    // Only add customer_email if userEmail is provided, not empty, and not 'guest'
-    if (userEmail && userEmail.trim() !== '' && userEmail !== 'guest') {
-      sessionConfig.customer_email = userEmail;
-    }
+    // Always add customer_email for authenticated users
+    sessionConfig.customer_email = userEmail;
 
     console.log('🔍 Final session config:', JSON.stringify(sessionConfig, null, 2));
     
