@@ -36,6 +36,17 @@ import { Course } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
+import { redirectToCheckout } from '@/services/stripeService';
+
+// Map course slugs to Stripe product IDs
+const COURSE_TO_STRIPE_PRODUCT_MAP: { [key: string]: string } = {
+  'year-5-naplan': 'year-5-naplan',
+  'year-7-naplan': 'year-7-naplan',
+  'edutest-scholarship': 'edutest-year-7',
+  'acer-scholarship': 'acer-year-7',
+  'nsw-selective': 'nsw-selective',
+  'vic-selective': 'vic-selective'
+};
 
 // Test section descriptions mapping - focused on the test itself, not platform features
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
@@ -196,12 +207,34 @@ const CourseDetail = () => {
     };
   }, []);
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
+    if (!course?.slug) {
+      toast({
+        title: "Error",
+        description: "Course not found. Please refresh the page and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const stripeProductId = COURSE_TO_STRIPE_PRODUCT_MAP[course.slug];
+    
+    if (!stripeProductId) {
+      toast({
+        title: "Error", 
+        description: "Product configuration not found. Please contact support.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Redirecting to checkout...",
       description: "You'll be redirected to our secure payment page.",
     });
-    // In production, this would redirect to Stripe or payment processor
+
+    // Use the existing Stripe service to redirect to checkout
+    await redirectToCheckout(stripeProductId);
   };
 
   if (!course) {
