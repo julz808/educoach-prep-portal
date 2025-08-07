@@ -83,35 +83,66 @@ async function handlePracticeOrDiagnosticPassageAssignment(
   context: QuestionContext,
   config: any
 ): Promise<PassageAssignment> {
-  // Check if we already have passages for this test mode and difficulty
-  const existingPassages = await getExistingPassagesForTest(
+  // Import TEST_STRUCTURES to check desired passage count
+  const { TEST_STRUCTURES } = await import('../../data/curriculumData');
+  const testStructure = TEST_STRUCTURES[context.testType as keyof typeof TEST_STRUCTURES];
+  const sectionStructure = testStructure?.[context.sectionName as keyof typeof testStructure];
+  const desiredPassageCount = sectionStructure?.passages || 0;
+  
+  // Get ALL existing passages for this test mode (not just by difficulty)
+  const allPassagesForMode = await getExistingPassagesForTestMode(
     context.testType,
     context.sectionName,
-    context.testMode,
-    context.difficulty
+    context.testMode
   );
   
   // Calculate how many questions should be assigned to each passage
   const questionsPerPassage = config.questionsPerPassage;
   
-  // Find a passage that needs more questions
-  for (const passage of existingPassages) {
-    const questionsFromThisPassage = await getQuestionCountForPassage(passage.id);
+  // Check if we've reached the desired passage count
+  if (allPassagesForMode.length >= desiredPassageCount && desiredPassageCount > 0) {
+    // We have enough passages! Find one that needs more questions
+    console.log(`   🎯 Test mode ${context.testMode} has ${allPassagesForMode.length}/${desiredPassageCount} passages. Using existing.`);
     
-    if (questionsFromThisPassage < questionsPerPassage) {
-      return {
-        passageId: passage.id,
-        shouldGeneratePassage: false,
-        passageDifficulty: context.difficulty,
-        wordCount: passage.word_count,
-        questionsFromThisPassage: questionsFromThisPassage + 1,
-        isSharedPassage: true
-      };
+    // Sort passages by question count (ascending) to fill the least populated first
+    const passagesWithCounts = await Promise.all(
+      allPassagesForMode.map(async (passage) => ({
+        passage,
+        questionCount: await getQuestionCountForPassage(passage.id)
+      }))
+    );
+    
+    passagesWithCounts.sort((a, b) => a.questionCount - b.questionCount);
+    
+    // Find the first passage that can accommodate more questions
+    for (const { passage, questionCount } of passagesWithCounts) {
+      if (questionCount < questionsPerPassage) {
+        console.log(`   📖 Assigning to existing passage ${passage.id} (${questionCount}/${questionsPerPassage} questions)`);
+        return {
+          passageId: passage.id,
+          shouldGeneratePassage: false,
+          passageDifficulty: passage.difficulty,
+          wordCount: passage.word_count,
+          questionsFromThisPassage: questionCount + 1,
+          isSharedPassage: true
+        };
+      }
     }
+    
+    // All passages are full - this shouldn't happen if gap analysis is correct
+    console.warn(`   ⚠️  All ${allPassagesForMode.length} passages are full for ${context.testMode}`);
+    return {
+      passageId: null,
+      shouldGeneratePassage: false,
+      passageDifficulty: context.difficulty,
+      wordCount: 0,
+      questionsFromThisPassage: 0,
+      isSharedPassage: false
+    };
   }
   
-  // If no existing passage can accommodate more questions, create a new one
-  // Don't generate fake IDs - let the passage creation process handle UUID generation
+  // We haven't reached the desired passage count, so create a new one
+  console.log(`   📝 Creating new passage for ${context.testMode} (${allPassagesForMode.length}/${desiredPassageCount})`);
   
   return {
     passageId: null, // Will be assigned when passage is actually created
@@ -121,6 +152,49 @@ async function handlePracticeOrDiagnosticPassageAssignment(
     questionsFromThisPassage: 1,
     isSharedPassage: true
   };
+}
+
+/**
+ * Get existing passages for a specific test mode
+ */
+async function getExistingPassagesForTestMode(
+  testType: string,
+  sectionName: string,
+  testMode: string
+): Promise<any[]> {
+  // First get all questions for this test mode to find which passages are used
+  const { data: questions, error: questionsError } = await supabase
+    .from('questions')
+    .select('passage_id')
+    .eq('test_type', testType)
+    .eq('section_name', sectionName)
+    .eq('test_mode', testMode)
+    .not('passage_id', 'is', null);
+  
+  if (questionsError) {
+    console.error('Error fetching questions for test mode:', questionsError);
+    return [];
+  }
+  
+  // Get unique passage IDs
+  const passageIds = [...new Set(questions?.map(q => q.passage_id) || [])];
+  
+  if (passageIds.length === 0) {
+    return [];
+  }
+  
+  // Fetch passage details
+  const { data: passages, error: passagesError } = await supabase
+    .from('passages')
+    .select('id, difficulty, word_count')
+    .in('id', passageIds);
+  
+  if (passagesError) {
+    console.error('Error fetching passages:', passagesError);
+    return [];
+  }
+  
+  return passages || [];
 }
 
 /**

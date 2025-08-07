@@ -121,7 +121,8 @@ async function generateDrillPassage(
     testMode: context.testMode,
     wordCount: 120, // Mini-passages for drills
     difficulty: context.difficulty,
-    passageType: 'informational' as const,
+    // Let the passage generation system determine the appropriate type
+    // based on topic cycling and test requirements (narrative/informational/persuasive)
     generationContext: context.generationContext,
     isMiniPassage: true,
     subSkill: context.subSkill
@@ -216,7 +217,8 @@ async function getSharedPassage(
     testMode: context.testMode,
     wordCount: config.words_per_passage,
     difficulty: context.difficulty,
-    passageType: 'informational' as const,
+    // Let the passage generation system determine the appropriate type
+    // based on topic cycling and test requirements (narrative/informational/persuasive)
     generationContext: context.generationContext,
     isMiniPassage: false,
     subSkill: context.subSkill

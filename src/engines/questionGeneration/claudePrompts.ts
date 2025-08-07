@@ -34,6 +34,7 @@ interface SingleQuestionRequest {
   generateVisual: boolean;
   generationContext: GenerationContext;
   passageContent?: string;
+  existingQuestions?: any[];
 }
 
 interface PassageGenerationRequest {
@@ -507,7 +508,7 @@ function getRandomizationDirective(seed: number, questionIndex: number): string 
 /**
  * Generates topic guidance for drill questions to ensure diversity
  */
-async function generateTopicGuidanceForDrill(subSkill: string, yearLevel: number): Promise<string> {
+async function generateTopicGuidanceForDrill(subSkill: string, yearLevel: number, testProduct?: string, testMode?: string): Promise<string> {
   try {
     // Initialize topic cycling manager
     await initializeDifficultyModifiers();
@@ -516,8 +517,8 @@ async function generateTopicGuidanceForDrill(subSkill: string, yearLevel: number
       return 'No topic guidance available - generate diverse content naturally.';
     }
     
-    // Get next topic for this sub-skill
-    const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(subSkill, yearLevel);
+    // Get next topic for this sub-skill with test context
+    const { topic, textType } = await topicCyclingManager.getNextTopicForSubSkill(subSkill, yearLevel, testProduct, testMode);
     
     return `
 🎯 MANDATORY TOPIC GUIDANCE FOR DRILL MINI-PASSAGE:
@@ -659,7 +660,8 @@ export async function buildQuestionPrompt(request: SingleQuestionRequest): Promi
     difficulty,
     passageContent,
     generateVisual,
-    generationContext
+    generationContext,
+    existingQuestions
   } = request;
 
   const yearLevel = getYearLevel(testType);
@@ -727,11 +729,31 @@ This question must reference the following passage. Students will have read this
 PASSAGE CONTENT:
 ${passageContent}
 
+${existingQuestions && existingQuestions.length > 0 ? `
+🚨 CRITICAL - AVOID DUPLICATES: ${existingQuestions.length} questions already exist for this passage!
+
+EXISTING QUESTIONS FOR THIS PASSAGE (DO NOT DUPLICATE):
+${existingQuestions.map((q, i) => `
+${i + 1}. Question: ${q.question_text}
+   ${q.answer_options ? `Options: ${q.answer_options.join(', ')}` : ''}
+   Correct Answer: ${q.correct_answer || 'Extended response'}
+   Sub-skill: ${q.sub_skill}
+`).join('\n')}
+
+YOU MUST:
+- Create a COMPLETELY DIFFERENT question that tests a different aspect of the passage
+- Avoid similar question structures or phrasings to the above
+- Focus on different characters, events, details, or themes from the passage
+- Use different question types (e.g., if existing questions ask "What...", try "Why...", "How...", "Which...", etc.)
+- Target different parts of the passage that haven't been covered
+` : ''}
+
 PASSAGE-BASED QUESTION REQUIREMENTS:
 - Question must specifically reference content from the passage
 - Cannot be answered without reading the passage
 - Test the specific sub-skill in relation to the passage content
 - Reference specific details, characters, events, or information from the passage
+${existingQuestions && existingQuestions.length > 0 ? '- MUST be completely different from all existing questions above' : ''}
 ` : ''}
 
 ANSWER OPTIONS & DISTRACTOR GENERATION (Multiple Choice Only):

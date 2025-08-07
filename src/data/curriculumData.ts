@@ -202,6 +202,66 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     }
+  },
+  "Year 9 NAPLAN": {
+    "Writing": {
+      "questions": 1, 
+      "time": 42, 
+      "format": "Written Response",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Reading": {
+      "questions": 55, 
+      "time": 65, 
+      "format": "Multiple Choice",
+      "passages": 10,
+      "words_per_passage": 250
+    },
+    "Language Conventions": {
+      "questions": 50, 
+      "time": 45, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Numeracy No Calculator": {
+      "questions": 32, 
+      "time": 32, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Numeracy Calculator": {
+      "questions": 40, 
+      "time": 40, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    }
+  },
+  "CogAT": {
+    "Verbal Battery": {
+      "questions": 65, 
+      "time": 30, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Quantitative Battery": {
+      "questions": 60, 
+      "time": 30, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Nonverbal Battery": {
+      "questions": 65, 
+      "time": 30, 
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    }
   }
 } as const;
 

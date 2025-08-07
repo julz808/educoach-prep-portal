@@ -6,7 +6,7 @@
  */
 
 import { buildQuestionPrompt, callClaudeAPIWithRetry, parseClaudeResponse } from './claudePrompts';
-import { storeQuestion, storePassage } from './supabaseStorage';
+import { storeQuestion, storePassage, fetchQuestionsForPassage } from './supabaseStorage';
 import { generatePassage, generateMiniPassage } from './passageGeneration';
 import { getTestSectionConfig } from './curriculumBasedConfiguration';
 import { getPassageAssignmentForQuestion } from './curriculumBasedPassageSharing';
@@ -192,7 +192,8 @@ export class CurriculumBasedGenerator {
           testMode: this.options.testMode,
           wordCount: gap.wordCount,
           difficulty: passageDifficulty,
-          passageType: 'informational' as const,
+          // Let the passage generation system determine the appropriate type
+          // based on topic cycling and test requirements (narrative/informational/persuasive)
           generationContext: this.generationContext,
           isMiniPassage: gap.wordCount <= 150,
           subSkill: this.subSkills[0] || 'DEFAULT'
@@ -298,7 +299,8 @@ export class CurriculumBasedGenerator {
           testMode: context.testMode,
           wordCount: passageAssignment.wordCount,
           difficulty: passageAssignment.passageDifficulty,
-          passageType: 'informational' as const,
+          // Let the passage generation system determine the appropriate type
+          // based on topic cycling and test requirements (narrative/informational/persuasive)
           generationContext: this.generationContext,
           isMiniPassage: passageAssignment.wordCount <= 150,
           subSkill: context.subSkill
@@ -326,6 +328,7 @@ export class CurriculumBasedGenerator {
       // For ALL test modes: fetch passage content from database
       // NEW: All passages are now stored in the database (including drill mini-passages)
       let passageContent: string | undefined = undefined;
+      let existingQuestions: any[] = [];
       
       if (actualPassageId) {
         // Fetch passage content from database for ALL test modes
@@ -342,6 +345,12 @@ export class CurriculumBasedGenerator {
         
         passageContent = passage?.content;
         console.log(`   📖 Using passage content (${passageContent?.length || 0} chars) for question generation`);
+        
+        // Fetch existing questions for this passage to avoid duplicates
+        existingQuestions = await fetchQuestionsForPassage(actualPassageId);
+        if (existingQuestions.length > 0) {
+          console.log(`   📊 Found ${existingQuestions.length} existing questions for this passage`);
+        }
       }
       
       // Build question prompt
@@ -353,7 +362,8 @@ export class CurriculumBasedGenerator {
         responseType: this.config.isWritingSection ? 'extended_response' : 'multiple_choice',
         generateVisual: false,
         generationContext: this.generationContext,
-        passageContent: passageContent
+        passageContent: passageContent,
+        existingQuestions: existingQuestions
       });
       
       // Call Claude API

@@ -295,51 +295,9 @@ async function analyzeTestModeGapsWithQuota(
   const questionsNeeded = quota - currentCount;
   console.log(`   📝 Need ${questionsNeeded} questions for ${testMode}`);
   
-  // For sections that require passages, calculate passage needs
-  // NEW: ALL reading passages are now stored in the passages table (including drills)
+  // Generate question gaps FIRST (before calculating passage needs)
   const config = getTestSectionConfig(testType, sectionName);
-  if (config.requiresPassages) {
-    if (testMode === 'drill') {
-      // DRILLS: 1:1 ratio with mini-passages, distributed across difficulties
-      // Questions per difficulty level varies by section type (1 for writing, 10 for others)
-      const questionsPerDifficulty = config.drillTestConfig.questionsPerDifficulty;
-      
-      for (let difficulty = 1; difficulty <= 3; difficulty++) {
-        for (let i = 0; i < questionsPerDifficulty; i++) {
-          passageGaps.push({
-            testMode,
-            difficulty: difficulty as 1 | 2 | 3,
-            wordCount: 120, // Mini-passage word count for drills
-            questionsExpected: 1, // 1:1 ratio for drills
-            questionsActual: 0,
-            isSharedPassage: false,
-            passageIndex: (difficulty - 1) * questionsPerDifficulty + i + 1
-          });
-        }
-      }
-    } else {
-      // PRACTICE/DIAGNOSTIC: Multiple questions per passage
-      const questionsPerPassage = config.questionsPerPassage;
-      const passagesNeeded = Math.ceil(questionsNeeded / questionsPerPassage);
-      
-      // Generate passage gaps without pre-generating IDs
-      for (let i = 0; i < passagesNeeded; i++) {
-        const difficulty = ((i % 3) + 1) as 1 | 2 | 3; // Distribute across difficulties
-        
-        passageGaps.push({
-          testMode,
-          difficulty,
-          wordCount: config.wordsPerPassage,
-          questionsExpected: Math.min(questionsPerPassage, questionsNeeded - (i * questionsPerPassage)),
-          questionsActual: 0,
-          isSharedPassage: true,
-          passageIndex: i + 1
-        });
-      }
-    }
-  }
   
-  // Generate question gaps distributed across sub-skills
   if (testMode === 'drill') {
     // For drills: Check existing questions by sub-skill and difficulty before creating gaps
     for (const subSkill of subSkills) {
@@ -382,6 +340,88 @@ async function analyzeTestModeGapsWithQuota(
       }
     }
   }
+  
+  // NOW calculate passage needs based on question gaps
+  if (config.requiresPassages) {
+    if (testMode === 'drill') {
+      // DRILLS: 1:1 ratio with mini-passages, distributed across difficulties
+      // For drills, we always need new passages for new questions
+      
+      // Only create passage gaps for questions we actually need
+      let passageIndexCounter = 0;
+      for (const gap of questionGaps) {
+        if (gap.testMode === testMode && gap.needsPassage) {
+          for (let i = 0; i < gap.questionsNeeded; i++) {
+            passageGaps.push({
+              testMode,
+              difficulty: gap.difficulty,
+              wordCount: 120, // Mini-passage word count for drills
+              questionsExpected: 1, // 1:1 ratio for drills
+              questionsActual: 0,
+              isSharedPassage: false,
+              passageIndex: ++passageIndexCounter
+            });
+          }
+        }
+      }
+    } else {
+      // PRACTICE/DIAGNOSTIC: Multiple questions per passage
+      // SMART LOGIC: Check if we've reached desired passage count first
+      const testStructure = TEST_STRUCTURES[testType as keyof typeof TEST_STRUCTURES];
+      const sectionStructure = testStructure?.[sectionName as keyof typeof testStructure];
+      const desiredPassageCount = sectionStructure?.passages || 0;
+      
+      // Get existing passages for this specific test mode
+      const existingPassagesForMode = await getExistingPassagesForTestMode(testType, sectionName, testMode);
+      const currentPassageCount = existingPassagesForMode.length;
+      
+      console.log(`   📚 Passages: ${currentPassageCount}/${desiredPassageCount} for ${testMode}`);
+      
+      if (currentPassageCount >= desiredPassageCount && desiredPassageCount > 0) {
+        // We have enough passages! Don't create new ones
+        console.log(`   ✅ Passage quota reached for ${testMode}. Will use existing passages.`);
+        
+        // Find existing passages that need more questions
+        for (const passage of existingPassagesForMode) {
+          const questionsInPassage = existingQuestions.filter(q => q.passage_id === passage.id).length;
+          const questionsNeededForPassage = Math.min(
+            config.questionsPerPassage - questionsInPassage,
+            questionsNeeded - questionGaps.reduce((sum, gap) => sum + gap.questionsNeeded, 0)
+          );
+          
+          if (questionsNeededForPassage > 0) {
+            console.log(`   📖 Passage ${passage.id} has ${questionsInPassage}/${config.questionsPerPassage} questions`);
+            // Don't add to passageGaps - we're using existing passages
+            // The question gaps will be handled separately with passageId assignments
+          }
+        }
+      } else {
+        // We need more passages
+        const passagesStillNeeded = Math.min(
+          Math.ceil(questionsNeeded / config.questionsPerPassage),
+          desiredPassageCount - currentPassageCount
+        );
+        
+        console.log(`   📝 Need ${passagesStillNeeded} more passages for ${testMode}`);
+        
+        for (let i = 0; i < passagesStillNeeded; i++) {
+          const difficulty = ((i % 3) + 1) as 1 | 2 | 3; // Distribute across difficulties
+          
+          passageGaps.push({
+            testMode,
+            difficulty,
+            wordCount: config.wordsPerPassage,
+            questionsExpected: Math.min(config.questionsPerPassage, questionsNeeded - (i * config.questionsPerPassage)),
+            questionsActual: 0,
+            isSharedPassage: true,
+            passageIndex: currentPassageCount + i + 1
+          });
+        }
+      }
+    }
+  }
+  
+  // Question gaps have already been generated above - no need to duplicate
   
   return { passageGaps, questionGaps };
 }
@@ -501,6 +541,49 @@ async function getExistingPassages(
   
   if (error) {
     console.error('Error fetching existing passages:', error);
+    return [];
+  }
+  
+  return passages || [];
+}
+
+/**
+ * Get existing passages for a specific test mode
+ */
+async function getExistingPassagesForTestMode(
+  testType: string,
+  sectionName: string,
+  testMode: string
+): Promise<any[]> {
+  // First get all questions for this test mode to find which passages are used
+  const { data: questions, error: questionsError } = await supabase
+    .from('questions')
+    .select('passage_id')
+    .eq('test_type', testType)
+    .eq('section_name', sectionName)
+    .eq('test_mode', testMode)
+    .not('passage_id', 'is', null);
+  
+  if (questionsError) {
+    console.error('Error fetching questions for test mode:', questionsError);
+    return [];
+  }
+  
+  // Get unique passage IDs
+  const passageIds = [...new Set(questions?.map(q => q.passage_id) || [])];
+  
+  if (passageIds.length === 0) {
+    return [];
+  }
+  
+  // Fetch passage details
+  const { data: passages, error: passagesError } = await supabase
+    .from('passages')
+    .select('id, difficulty, word_count')
+    .in('id', passageIds);
+  
+  if (passagesError) {
+    console.error('Error fetching passages:', passagesError);
     return [];
   }
   

@@ -93,6 +93,29 @@ function getYearLevelFromTestType(testType: string): number {
 }
 
 /**
+ * Fetch existing questions for a specific passage
+ */
+export async function fetchQuestionsForPassage(passageId: string): Promise<GeneratedQuestion[]> {
+  try {
+    const { data: questions, error } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('passage_id', passageId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error(`Error fetching questions for passage ${passageId}:`, error);
+      return [];
+    }
+
+    return questions || [];
+  } catch (error) {
+    console.error(`Failed to fetch questions for passage ${passageId}:`, error);
+    return [];
+  }
+}
+
+/**
  * Helper function to calculate max_points based on sub_skill and test_type
  * Based on migration: 20240622000001_populate_max_points.sql
  */

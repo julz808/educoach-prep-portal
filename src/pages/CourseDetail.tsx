@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   CheckCircle, 
@@ -173,6 +173,7 @@ const CourseDetail = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
   // Initialize Lenis smooth scrolling
   useEffect(() => {
     const lenis = new Lenis({
@@ -218,9 +219,13 @@ const CourseDetail = () => {
   const testSections = TEST_STRUCTURES[testKey as keyof typeof TEST_STRUCTURES] || {};
   const sectionDescriptions = TEST_SECTION_DESCRIPTIONS[course.title] || {};
 
-  // Calculate total questions
+  // Calculate total questions and total time
   const totalQuestions = Object.values(testSections).reduce((sum, section: any) => {
     return sum + (section.questions || 0);
+  }, 0);
+  
+  const totalTime = Object.values(testSections).reduce((sum, section: any) => {
+    return sum + (section.time || 0);
   }, 0);
 
   // How it Works data (renamed from Features)
@@ -600,15 +605,15 @@ const CourseDetail = () => {
                     <div className="flex items-center space-x-2">
                       <FileText className="h-5 w-5 text-[#6366F1]" />
                       <span className="text-sm font-medium text-[#2C3E50]">
-                        {(testSections[activeTestSection] as any).questions} {
-                          (testSections[activeTestSection] as any).questions === 1 ? 'question' : 'questions'
+                        {(testSections[activeTestSection] as any)?.questions || 0} {
+                          ((testSections[activeTestSection] as any)?.questions || 0) === 1 ? 'question' : 'questions'
                         }
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Clock className="h-5 w-5 text-[#6366F1]" />
                       <span className="text-sm font-medium text-[#2C3E50]">
-                        {(testSections[activeTestSection] as any).time} minutes
+                        {(testSections[activeTestSection] as any)?.time || 0} minutes
                       </span>
                     </div>
                   </div>
@@ -630,7 +635,7 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              How it Works
+              Our Learning Platform
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
               Our proven approach to test preparation success
@@ -728,7 +733,7 @@ const CourseDetail = () => {
         </div>
       </section>
 
-      {/* What's Included in Our Package Section - Scrollable Card Layout */}
+      {/* Features Section - 6 features with green ticks in 3x2 grid */}
       <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div 
@@ -739,173 +744,193 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              What's Included in Our Package
+              Features
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
               Everything you need to prepare for success
             </p>
           </motion.div>
 
-          {/* Scrollable Card Layout */}
-          <div className="relative">
-            <div className="flex gap-6 overflow-x-auto pb-4 scroll-smooth">
-              {[
-                {
-                  icon: <Target className="h-8 w-8" />,
-                  title: "Comprehensive Diagnostic Test",
-                  description: "Identify strengths and weaknesses with our detailed initial assessment that adapts to your performance and provides personalized learning pathways"
-                },
-                {
-                  icon: <FileText className="h-8 w-8" />,
-                  title: "5 Full-Length Practice Tests",
-                  description: "Simulate real test conditions with timed practice exams that mirror the actual test format, timing, and difficulty level"
-                },
-                {
-                  icon: <BookOpen className="h-8 w-8" />,
-                  title: "Sub-skill Level Practice",
-                  description: "Targeted exercises that strengthen specific areas identified by your diagnostic results, focusing on individual competencies"
-                },
-                {
-                  icon: <PenTool className="h-8 w-8" />,
-                  title: "AI-Powered Writing Practice",
-                  description: "Get instant, detailed feedback on your writing with suggestions for improvement in structure, vocabulary, and style"
-                },
-                {
-                  icon: <Zap className="h-8 w-8" />,
-                  title: "Detailed Answer Explanations",
-                  description: "Learn from every question with comprehensive explanations for both correct and incorrect answers, including step-by-step solutions"
-                }
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-80 bg-white rounded-2xl border-2 border-gray-100 hover:border-[#4ECDC4] transition-all duration-300 p-6 shadow-lg hover:shadow-xl"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl flex items-center justify-center text-white mb-4">
-                    {item.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-3">{item.title}</h3>
-                    <p className="text-sm text-[#6B7280] leading-relaxed">{item.description}</p>
-                  </div>
+          {/* 3x2 Grid of Features */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                title: `${totalQuestions}+ Questions`,
+                description: "Comprehensive question bank covering all test sections and difficulty levels"
+              },
+              {
+                title: "5 Full-Length Tests",
+                description: "Complete practice exams that simulate real test conditions and timing"
+              },
+              {
+                title: "AI-Powered Writing Practice",
+                description: "Instant feedback on your writing with detailed suggestions for improvement"
+              },
+              {
+                title: "Sub-skill Level Practice",
+                description: "Targeted exercises focusing on specific areas identified by diagnostic results"
+              },
+              {
+                title: "Best-in-Class Performance Analytics",
+                description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
+              },
+              {
+                title: "Unlimited Access",
+                description: "No time limits - access your course materials anytime, anywhere, on any device"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-start space-x-4"
+              >
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-[#22C55E] mt-1" />
                 </div>
-              ))}
-            </div>
-            
-            {/* Scroll indicator */}
-            <div className="flex justify-center mt-6 space-x-2">
-              {[0, 1, 2, 3, 4].map((_, index) => (
-                <div key={index} className="w-2 h-2 rounded-full bg-gray-300"></div>
-              ))}
-            </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">{feature.title}</h3>
+                  <p className="text-sm text-[#6B7280] leading-relaxed">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Performance Analytics Dashboard Section - Same as Landing Page */}
-      <section className="py-16 md:py-20 bg-[#F8F9FA]">
+      {/* How it Works Section - Sleek Step Design */}
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16 scroll-animate">
-            <motion.h2 
-              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              Best-in-Class Performance & Progress Insights
-            </motion.h2>
-            <motion.p 
-              className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              See exactly how your child is performing - not just overall, but at the sub-skill level
-            </motion.p>
-          </div>
+          {/* Section Header */}
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-6">
+              How it Works
+            </h2>
+            <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
+              Five simple steps to exam success
+            </p>
+          </motion.div>
 
-          {/* Mobile: Stacked Layout, Desktop: Side-by-side */}
-          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 items-center">
-            {/* Features - Top on mobile, left on desktop */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <div className="space-y-6 md:space-y-8">
-                {/* Progress Tracking */}
-                <motion.div 
-                  className="flex items-start gap-3 md:gap-4"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
+          {/* Steps Grid */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4">
+              {[
+                {
+                  step: 1,
+                  title: "Purchase",
+                  description: "Choose your test package",
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68-1.68M7 13l2.32 2.32M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                    </svg>
+                  )
+                },
+                {
+                  step: 2,
+                  title: "Access",
+                  description: "Get instant platform access",
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  )
+                },
+                {
+                  step: 3,
+                  title: "Diagnose",
+                  description: "Take your first practice test",
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                  )
+                },
+                {
+                  step: 4,
+                  title: "Practice",
+                  description: "Focus on targeted drills",
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  )
+                },
+                {
+                  step: 5,
+                  title: "Progress",
+                  description: "Track improvement over time",
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  )
+                }
+              ].map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
+                  className="relative text-center group"
                 >
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Progress Tracking</h3>
-                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Visual dashboards showing improvement over time with actionable insights</p>
+                  {/* Connecting Line (hidden on mobile) */}
+                  {index < 4 && (
+                    <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#4ECDC4] to-transparent z-0" />
+                  )}
+                  
+                  {/* Step Card */}
+                  <div className="relative bg-white p-8 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-[#4ECDC4]/30 z-10">
+                    {/* Step Number */}
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white rounded-full font-bold text-lg group-hover:scale-110 transition-transform duration-300">
+                      {step.step}
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className="flex justify-center mb-4 text-[#6366F1] group-hover:text-[#4ECDC4] transition-colors duration-300">
+                      {step.icon}
+                    </div>
+                    
+                    {/* Content */}
+                    <h3 className="text-xl font-semibold text-[#2C3E50] mb-3 group-hover:text-[#6366F1] transition-colors duration-300">
+                      {step.title}
+                    </h3>
+                    <p className="text-[#6B7280] leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
                 </motion.div>
-
-                {/* Sub-Skill Analytics */}
-                <motion.div 
-                  className="flex items-start gap-3 md:gap-4"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Sub-Skill Analytics</h3>
-                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Performance tracking beyond test sections - see progress in specific question types</p>
-                  </div>
-                </motion.div>
-
-                {/* Instant Feedback */}
-                <motion.div 
-                  className="flex items-start gap-3 md:gap-4"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <Zap className="h-5 w-5 md:h-6 md:w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold text-[#2C3E50] mb-2">Instant Feedback</h3>
-                    <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">Detailed explanations for every question with improvement suggestions</p>
-                  </div>
-                </motion.div>
-              </div>
+              ))}
             </div>
-
-            {/* GIF Demo - Top on mobile, right on desktop */}
-            <motion.div 
-              className="lg:col-span-2 order-1 lg:order-2"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-xl md:rounded-2xl p-4 md:p-6">
-                <div className="bg-white rounded-lg md:rounded-xl shadow-2xl overflow-hidden">
-                  <div className="aspect-video flex items-center justify-center">
-                    <img 
-                      src="/images/CleanShot 2025-07-28 at 19.48.04.gif" 
-                      alt="Platform Analytics Demo"
-                      className="w-full h-full object-contain"
-                      loading="eager"
-                      style={{ imageRendering: 'crisp-edges' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            className="text-center mt-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-lg text-[#6B7280] mb-6">
+              Ready to help your child succeed?
+            </p>
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#6366F1] hover:to-[#4ECDC4] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+              onClick={handlePurchase}
+            >
+              Get Started Today
+            </Button>
+          </motion.div>
         </div>
       </section>
 

@@ -28,7 +28,7 @@ interface PassageGenerationRequest {
   testMode: string;
   wordCount: number;
   difficulty: number;
-  passageType: PassageType;
+  passageType?: PassageType; // Made optional - will be determined automatically if not provided
   generationContext: GenerationContext;
   isMiniPassage?: boolean;
   subSkill?: string;
@@ -423,7 +423,7 @@ function validatePassageContent(passage: GeneratedPassage, request: PassageGener
   }
   
   // Check passage type consistency
-  if (passage.content) {
+  if (passage.content && request.passageType) {
     const contentLower = passage.content.toLowerCase();
     
     if (request.passageType === 'narrative') {
@@ -463,9 +463,11 @@ export async function generateMiniPassage(request: PassageGenerationRequest): Pr
       
       // Get next topic using sequential cycling based on sub-skill compatibility
       const yearLevel = getYearLevel(request.testType);
-      const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(
+      const { topic, textType } = await topicCyclingManager.getNextTopicForSubSkill(
         request.subSkill || 'DEFAULT',
-        yearLevel
+        yearLevel,
+        request.testType,
+        request.testMode
       );
       
       console.log(`📚 Sequential topic selected for ${textType} mini passage: ${topic}`);
@@ -601,9 +603,11 @@ export async function generatePassage(request: PassageGenerationRequest): Promis
       );
       
       // Get next topic using sequential cycling based on sub-skill compatibility
-      const { topic, textType } = topicCyclingManager.getNextTopicForSubSkill(
+      const { topic, textType } = await topicCyclingManager.getNextTopicForSubSkill(
         request.subSkill || 'DEFAULT',
-        yearLevel
+        yearLevel,
+        request.testType,
+        request.testMode
       );
       
       console.log(`📚 Sequential topic selected for ${textType} passage: ${topic}`);

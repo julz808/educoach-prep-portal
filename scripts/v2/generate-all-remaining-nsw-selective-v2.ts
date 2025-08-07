@@ -10,8 +10,8 @@
  */
 
 import * as dotenv from 'dotenv';
-import { generateQuestionsForSection } from '../src/engines/questionGeneration/curriculumBasedGeneration';
-import { getTestSections } from '../src/engines/questionGeneration/curriculumBasedConfiguration';
+import { generateQuestionsForSection } from '../../src/engines/questionGeneration/curriculumBasedGeneration';
+import { getTestSections } from '../../src/engines/questionGeneration/curriculumBasedConfiguration';
 
 dotenv.config();
 

@@ -157,7 +157,7 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
     // Execute all question queries and passages query in parallel
     const [questionResults, passagesResult] = await Promise.all([
       Promise.all(questionQueries),
-      supabase.from('passages').select('*')
+      supabase.from('passages').select('*').limit(2000) // Increased limit to handle all passages
     ]);
     
     // Combine all question results
