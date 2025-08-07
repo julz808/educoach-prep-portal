@@ -364,7 +364,7 @@ const CourseDetail = () => {
       </nav>
 
       {/* Hero Section with Split Design */}
-      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
+      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-gradient-to-b from-[#FFE8E8] to-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Content */}
