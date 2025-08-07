@@ -801,7 +801,7 @@ const CourseDetail = () => {
       </section>
 
       {/* How it Works Section - Sleek Step Design */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
           {/* Section Header */}
           <motion.div 
