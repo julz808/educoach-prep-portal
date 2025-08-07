@@ -48,7 +48,7 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       priceId: productConfig.priceId,
       productId,
       userId: user?.id || 'guest',
-      userEmail: user?.email?.substring(0, 10) + '...' || 'guest',
+      userEmail: user?.email ? user.email.substring(0, 10) + '...' : 'guest',
       hasUser: !!user,
       userSessionValid: !!user?.aud
     });
@@ -57,8 +57,8 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       body: {
         priceId: productConfig.priceId,
         productId: productId,
-        userId: user?.id || null,
-        userEmail: user?.email || null,
+        userId: user?.id || 'guest',
+        userEmail: user?.email || '',
         successUrl: `${window.location.origin}/purchase-success?product=${productId}`,
         cancelUrl: `${window.location.origin}${window.location.pathname}`
       }

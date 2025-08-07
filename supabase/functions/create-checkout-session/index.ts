@@ -49,7 +49,11 @@ serve(async (req) => {
       hasUserId: !!userId,
       hasUserEmail: !!userEmail,
       priceId,
-      productId
+      productId,
+      userId,
+      userEmail,
+      successUrl,
+      cancelUrl
     });
 
     if (!priceId || !productId) {
@@ -97,8 +101,8 @@ serve(async (req) => {
       allow_promotion_codes: true, // Allow discount codes
     };
 
-    // Only add customer_email if userEmail is provided
-    if (userEmail) {
+    // Only add customer_email if userEmail is provided and not empty
+    if (userEmail && userEmail.trim() !== '') {
       sessionConfig.customer_email = userEmail;
     }
 
