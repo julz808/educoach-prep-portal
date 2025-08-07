@@ -90,33 +90,13 @@ serve(async (req) => {
         userId: userId || 'guest',
         productId: productId,
         source: 'educourse_platform'
-      },
-      billing_address_collection: 'required',
-      shipping_address_collection: {
-        allowed_countries: ['AU'], // Restrict to Australia
-      },
-      tax_id_collection: {
-        enabled: false, // Set to true if you want to collect ABN/tax numbers
-      },
-      allow_promotion_codes: true, // Allow discount codes
+      }
     };
 
-    // Only add customer_email if userEmail is provided and not empty
-    if (userEmail && userEmail.trim() !== '') {
+    // Only add customer_email if userEmail is provided, not empty, and not 'guest'
+    if (userEmail && userEmail.trim() !== '' && userEmail !== 'guest') {
       sessionConfig.customer_email = userEmail;
     }
-
-    // Add invoice creation to session config
-    sessionConfig.invoice_creation = {
-      enabled: true,
-      invoice_data: {
-        description: `EduCourse - ${productId}`,
-        metadata: {
-          userId: userId || 'guest',
-          productId: productId,
-        },
-      },
-    };
 
     console.log('🔍 Final session config:', JSON.stringify(sessionConfig, null, 2));
     
