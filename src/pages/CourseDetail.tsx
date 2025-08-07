@@ -381,7 +381,8 @@ const CourseDetail = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  {course.title} <span className="text-[#4ECDC4]">Test Prep</span>
+                  {course.title}<br />
+                  <span className="text-[#4ECDC4]">Test Prep</span>
                 </motion.h1>
                 <motion.p 
                   className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
@@ -744,7 +745,7 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              What's Included in Our Package
+              What's Included
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
               Everything you need to prepare for success
@@ -775,8 +776,8 @@ const CourseDetail = () => {
                 description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
               },
               {
-                title: "Unlimited Access",
-                description: "No time limits - access your course materials anytime, anywhere, on any device"
+                title: "Practice anywhere",
+                description: "Tablet and desktop friendly platform - practice at home, school, or anywhere with internet access"
               }
             ].map((feature, index) => (
               <motion.div
@@ -878,7 +879,7 @@ const CourseDetail = () => {
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
                   viewport={{ once: true }}
                   className="relative text-center group"
                 >
