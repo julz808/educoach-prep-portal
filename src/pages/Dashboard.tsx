@@ -17,6 +17,7 @@ import { QuestionInterface } from '@/components/QuestionInterface';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
 import { PaywallComponent } from '@/components/PaywallComponent';
+import AccessDebugger from '@/components/AccessDebugger';
 import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { 
   fetchQuestionsFromSupabase, 
@@ -110,10 +111,14 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  // Debug component - REMOVE IN PRODUCTION
+  const showDebugger = process.env.NODE_ENV === 'development';
+  
   // Check if paywall should be shown
   if (isPaywallUIEnabled() && !hasAccessToCurrentProduct && currentProduct) {
     return (
-      <div className="min-h-screen bg-edu-light-blue">
+      <div className="min-h-screen bg-edu-light-blue space-y-4 p-4">
+        {showDebugger && <AccessDebugger />}
         <PaywallComponent 
           product={currentProduct} 
           className="min-h-screen"
@@ -190,6 +195,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* Debug Component - REMOVE IN PRODUCTION */}
+      {showDebugger && <AccessDebugger />}
+      
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
 
