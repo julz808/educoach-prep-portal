@@ -11,26 +11,26 @@ export interface StripeProductConfig {
 // Map of internal product IDs to Stripe configuration
 export const STRIPE_PRODUCTS: Record<string, StripeProductConfig> = {
   'year-5-naplan': {
-    productId: import.meta.env.VITE_STRIPE_YEAR5_NAPLAN_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_YEAR5_NAPLAN_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_YEAR_5_NAPLAN_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_YEAR_5_NAPLAN_PRICE_ID || '',
     name: 'Year 5 NAPLAN',
     dbProductType: 'Year 5 NAPLAN'
   },
   'year-7-naplan': {
-    productId: import.meta.env.VITE_STRIPE_YEAR7_NAPLAN_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_YEAR7_NAPLAN_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_YEAR_7_NAPLAN_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_YEAR_7_NAPLAN_PRICE_ID || '',
     name: 'Year 7 NAPLAN',
     dbProductType: 'Year 7 NAPLAN'
   },
   'edutest-scholarship': {
-    productId: import.meta.env.VITE_STRIPE_EDUTEST_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_EDUTEST_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_EDUTEST_SCHOLARSHIP_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_EDUTEST_SCHOLARSHIP_PRICE_ID || '',
     name: 'EduTest Scholarship (Year 7 Entry)',
     dbProductType: 'EduTest Scholarship (Year 7 Entry)'
   },
   'acer-scholarship': {
-    productId: import.meta.env.VITE_STRIPE_ACER_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_ACER_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_ACER_SCHOLARSHIP_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_ACER_SCHOLARSHIP_PRICE_ID || '',
     name: 'ACER Scholarship (Year 7 Entry)',
     dbProductType: 'ACER Scholarship (Year 7 Entry)'
   },

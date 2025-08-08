@@ -89,8 +89,10 @@ const AnimatedText = ({ text, className = "", delay = 0 }: { text: string, class
 };
 
 const Landing = () => {
+  console.log('🏠 Landing page component loaded');
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
+  console.log('🔍 Landing auth state:', { user: !!user, isLoading });
   const [scrollY, setScrollY] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -116,12 +118,15 @@ const Landing = () => {
     setTimeout(() => setIsTransitioning(false), 600);
   };
 
-  // Redirect to dashboard if already logged in
+  // NOTE: Removed auto-redirect for logged-in users
+  // Users can access marketing homepage even when authenticated
   useEffect(() => {
-    if (user && !isLoading) {
-      navigate('/dashboard');
-    }
-  }, [user, isLoading, navigate]);
+    console.log('🔄 Landing page loaded:', { 
+      hasUser: !!user, 
+      isLoading, 
+      userEmail: user?.email?.substring(0, 10) + '...' || 'none'
+    });
+  }, [user, isLoading]);
 
   // Scroll effect for parallax and nav transparency
   useEffect(() => {

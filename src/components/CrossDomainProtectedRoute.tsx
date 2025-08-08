@@ -16,8 +16,14 @@ const CrossDomainProtectedRoute = () => {
     const currentUrl = window.location.href;
     const returnUrl = encodeURIComponent(currentUrl.replace('?subdomain=learning', '').replace('&subdomain=learning', ''));
     
+    // Check if we're in dual server development mode
+    const isLearningPort = window.location.port === '3001';
+    const authUrl = isLearningPort 
+      ? `http://localhost:3000/auth?returnUrl=${returnUrl}`
+      : `/auth?returnUrl=${returnUrl}`;
+    
     // Redirect to marketing site auth with return URL
-    window.location.href = `/auth?returnUrl=${returnUrl}`;
+    window.location.href = authUrl;
     return null;
   }
 

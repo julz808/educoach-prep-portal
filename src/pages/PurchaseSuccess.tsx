@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { redirectToLearningPlatform } from '@/utils/subdomain';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight, Loader2, Mail } from 'lucide-react';
@@ -25,7 +24,7 @@ const PurchaseSuccess: React.FC = () => {
           // User is logged in, redirect to dashboard
           setHasAccount(true);
           setTimeout(() => {
-            redirectToLearningPlatform('/dashboard');
+            navigate('/dashboard');
           }, 2000);
         } else {
           // Check if account was created but user isn't logged in
@@ -68,7 +67,7 @@ const PurchaseSuccess: React.FC = () => {
   };
 
   const handleGoToDashboard = () => {
-    redirectToLearningPlatform('/dashboard');
+    navigate('/dashboard');
   };
 
   const getProductName = (productSlug: string | null) => {

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { redirectToLearningPlatform } from "@/utils/subdomain";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,7 +140,7 @@ const Auth = () => {
       
       // Sign in successful
       toast.success("Welcome! Redirecting to your dashboard...");
-      redirectToLearningPlatform("/dashboard");
+      navigate("/dashboard");
       
     } catch (error: any) {
       console.error('Password setup error:', error);
@@ -194,12 +193,91 @@ const Auth = () => {
         toast.warning('Please verify your email address to access all features.');
       }
       
-      toast.success("Successfully signed in!");
+      // Handle pending registration data (for users who just confirmed email)
+      const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
+      let registrationCompleted = false;
+      
+      if (pendingRegistrationData && data.user) {
+        try {
+          const regData = JSON.parse(pendingRegistrationData);
+          if (regData.userId === data.user.id) {
+            console.log('Completing registration for confirmed user:', data.user.id);
+            
+            // Create user profile now that email is confirmed
+            const { data: registrationResult, error: registrationError } = await supabase
+              .rpc('register_new_user', {
+                p_user_id: regData.userId,
+                p_email: regData.email,
+                p_student_first_name: regData.studentFirstName,
+                p_student_last_name: regData.studentLastName,
+                p_parent_first_name: regData.parentFirstName,
+                p_parent_last_name: regData.parentLastName,
+                p_parent_email: regData.parentEmail,
+                p_school_name: regData.schoolName,
+                p_year_level: regData.yearLevel
+              });
+
+            if (registrationError) {
+              console.error('Registration completion error:', registrationError);
+              toast.error('Error completing registration. Please contact support.');
+            } else if (registrationResult && registrationResult.success) {
+              console.log('Registration completed successfully:', registrationResult);
+              localStorage.removeItem('pendingRegistrationData');
+              registrationCompleted = true;
+              toast.success('Registration completed! Welcome to EduCourse!');
+            } else {
+              console.error('Registration failed:', registrationResult);
+              toast.error('Registration failed. Please contact support.');
+            }
+          }
+        } catch (error) {
+          console.error('Error processing pending registration:', error);
+          localStorage.removeItem('pendingRegistrationData'); // Clean up invalid data
+        }
+      }
+      
+      // Check for and process any pending purchases for this user
+      try {
+        console.log('Checking for pending purchases for user:', data.user.email);
+        const { data: pendingPurchases, error: pendingError } = await supabase
+          .rpc('get_user_pending_purchases');
+        
+        if (pendingError) {
+          console.error('Error fetching pending purchases:', pendingError);
+        } else if (pendingPurchases && pendingPurchases.length > 0) {
+          console.log('Found pending purchases:', pendingPurchases.length);
+          
+          // Process each pending purchase
+          for (const purchase of pendingPurchases) {
+            console.log('Processing pending purchase:', purchase.stripe_session_id);
+            
+            const { data: processResult, error: processError } = await supabase
+              .rpc('process_pending_purchase', {
+                p_stripe_session_id: purchase.stripe_session_id
+              });
+            
+            if (processError) {
+              console.error('Error processing pending purchase:', processError);
+            } else if (processResult && processResult.success) {
+              console.log('Successfully processed purchase:', processResult);
+              toast.success(`Access granted to ${processResult.product_type}!`);
+            } else {
+              console.error('Failed to process purchase:', processResult);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking pending purchases:', error);
+      }
+      
+      if (!registrationCompleted) {
+        toast.success("Successfully signed in!");
+      }
       
       // Check for pending purchase
       const hasPendingPurchase = await handlePendingPurchase();
       if (!hasPendingPurchase) {
-        redirectToLearningPlatform("/dashboard");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast.error(error.message || "Error signing in");
@@ -241,77 +319,36 @@ const Auth = () => {
       if (authError) throw authError;
       
       if (authData.user) {
-        // Wait for auth session to be established and user to be created in database
-        // This ensures the user exists in auth.users table before creating profile
-        let retryCount = 0;
-        const maxRetries = 15; // Increased retry limit
-        let userExists = false;
+        // Since email confirmation is required, the user exists in auth.users 
+        // but no session will be created until they confirm their email
+        console.log('User created, awaiting email confirmation:', authData.user.id);
         
-        while (!userExists && retryCount < maxRetries) {
-          try {
-            // Check if session is established
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session && session.user.id === authData.user.id) {
-              // Session exists, but we also need to verify the user is in the database
-              // Try a simple auth check to ensure the user record is fully created
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user && user.id === authData.user.id) {
-                userExists = true;
-                break;
-              }
-            }
-            
-            // Progressive delay - start with 500ms, increase to 2000ms
-            const delay = Math.min(500 + (retryCount * 100), 2000);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            retryCount++;
-          } catch (sessionError) {
-            console.log('Session/user check failed, retrying...', sessionError);
-            const delay = Math.min(1000 + (retryCount * 200), 3000);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            retryCount++;
-          }
-        }
+        // For email confirmation flow, we DON'T create user profile yet
+        // The profile will be created when they confirm email and first sign in
         
-        if (!userExists) {
-          throw new Error('User account creation timed out. Please try again.');
-        }
+        // Store registration data in localStorage for after email confirmation
+        const registrationData = {
+          userId: authData.user.id,
+          email: email,
+          studentFirstName,
+          studentLastName,
+          parentFirstName,
+          parentLastName,
+          parentEmail,
+          schoolName,
+          yearLevel: parseInt(yearLevel)
+        };
         
-        // Additional safety delay to ensure database replication
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Use the new unified registration function
-        const { data: registrationResult, error: registrationError } = await supabase
-          .rpc('register_new_user', {
-            p_user_id: authData.user.id,
-            p_email: email,
-            p_student_first_name: studentFirstName,
-            p_student_last_name: studentLastName,
-            p_parent_first_name: parentFirstName,
-            p_parent_last_name: parentLastName,
-            p_parent_email: parentEmail,
-            p_school_name: schoolName,
-            p_year_level: parseInt(yearLevel)
-          });
-
-        if (registrationError) {
-          console.error('Registration function error:', registrationError);
-          throw new Error(`Failed to complete registration: ${registrationError.message}`);
-        }
-
-        // Check if the function returned an error
-        if (registrationResult && !registrationResult.success) {
-          console.error('Registration failed:', registrationResult);
-          throw new Error(`Registration failed: ${registrationResult.error || 'Unknown error'}`);
-        }
-
-        console.log('Registration successful:', registrationResult);
+        localStorage.setItem('pendingRegistrationData', JSON.stringify(registrationData));
       }
       
       // Check for pending purchase first
       const hasPendingPurchase = await handlePendingPurchase();
       
       if (!hasPendingPurchase) {
+        // Show success message for email confirmation
+        toast.success("Account created! Please check your email to confirm your account before signing in.");
+        
         // Store the email for the modal and show success modal
         setRegisteredEmail(email);
         setShowSuccessModal(true);

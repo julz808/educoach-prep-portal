@@ -59,15 +59,39 @@ export const redirectToLearningPlatform = (path: string = '/dashboard') => {
   if (isProduction) {
     window.location.href = `${learning}${path}`;
   } else {
-    // In development, append path to the URL with subdomain parameter
-    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-    window.location.href = `http://localhost:${window.location.port || '3000'}/${cleanPath}?subdomain=learning`;
+    // Check if we're in dual server development mode
+    const currentPort = window.location.port;
+    const isMarketingPort = currentPort === '3000';
+    
+    if (isMarketingPort) {
+      // Redirect from marketing site (port 3000) to learning platform (port 3001)
+      window.location.href = `http://localhost:3001${path}`;
+    } else {
+      // Fallback to subdomain parameter approach
+      const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+      window.location.href = `http://localhost:${currentPort || '3000'}/${cleanPath}?subdomain=learning`;
+    }
   }
 };
 
 export const redirectToMarketingSite = (path: string = '/') => {
-  const { marketing } = getDomainConfig();
-  window.location.href = `${marketing}${path}`;
+  const { marketing, isProduction } = getDomainConfig();
+  
+  if (isProduction) {
+    window.location.href = `${marketing}${path}`;
+  } else {
+    // Check if we're in dual server development mode
+    const currentPort = window.location.port;
+    const isLearningPort = currentPort === '3001';
+    
+    if (isLearningPort) {
+      // Redirect from learning platform (port 3001) to marketing site (port 3000)
+      window.location.href = `http://localhost:3000${path}`;
+    } else {
+      // Already on marketing site or fallback
+      window.location.href = `${marketing}${path}`;
+    }
+  }
 };
 
 // Development helpers

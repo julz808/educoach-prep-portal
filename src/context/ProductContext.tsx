@@ -32,14 +32,14 @@ const testProducts: TestProduct[] = [
     dbProductType: 'Year 7 NAPLAN'
   },
   { 
-    id: 'acer-year-7', 
+    id: 'acer-scholarship', 
     name: 'ACER Year 7 Entry', 
     shortName: 'ACER Y7', 
     description: 'ACER Year 7 Entry Test',
     dbProductType: 'ACER Scholarship (Year 7 Entry)'
   },
   { 
-    id: 'edutest-year-7', 
+    id: 'edutest-scholarship', 
     name: 'EduTest Year 7 Entry', 
     shortName: 'EduTest Y7', 
     description: 'EduTest Year 7 Entry',

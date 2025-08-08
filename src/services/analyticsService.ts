@@ -5,8 +5,8 @@ import { TEST_STRUCTURES } from '@/data/curriculumData';
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
   'year-5-naplan': 'Year 5 NAPLAN',
   'year-7-naplan': 'Year 7 NAPLAN',
-  'acer-year-7': 'ACER Scholarship (Year 7 Entry)',
-  'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+  'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
+  'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
   'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
 };

@@ -10,6 +10,7 @@ import Auth from '@/pages/Auth';
 import PurchaseSuccess from '@/pages/PurchaseSuccess';
 import AuthCallback from '@/pages/AuthCallback';
 import NotFound from '@/pages/NotFound';
+import DashboardRedirect from '@/components/DashboardRedirect';
 
 export const MarketingRoutes = () => {
   return (
@@ -26,6 +27,9 @@ export const MarketingRoutes = () => {
       
       {/* Purchase Flow */}
       <Route path="/purchase-success" element={<PurchaseSuccess />} />
+      
+      {/* Dashboard Redirect - Handle /dashboard requests on marketing site */}
+      <Route path="/dashboard" element={<DashboardRedirect />} />
       
       {/* Catch All */}
       <Route path="*" element={<NotFound />} />

@@ -24,7 +24,7 @@ const AuthCallback = () => {
             // Redirect to password reset page
             navigate('/auth/reset-password');
           } else {
-            // Regular sign in/up
+            // Regular sign in/up - redirect to dashboard
             toast.success('Successfully authenticated!');
             navigate('/dashboard');
           }

@@ -61,8 +61,8 @@ export interface OrganizedTestData {
 const TEST_TYPE_MAPPING: Record<string, string> = {
   'Year 5 NAPLAN': 'year-5-naplan',
   'Year 7 NAPLAN': 'year-7-naplan',
-  'ACER Scholarship (Year 7 Entry)': 'acer-year-7',
-  'EduTest Scholarship (Year 7 Entry)': 'edutest-year-7',
+  'ACER Scholarship (Year 7 Entry)': 'acer-scholarship',
+  'EduTest Scholarship (Year 7 Entry)': 'edutest-scholarship',
   'VIC Selective Entry (Year 9 Entry)': 'vic-selective',
   'NSW Selective Entry (Year 7 Entry)': 'nsw-selective',
 };
