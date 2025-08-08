@@ -278,7 +278,7 @@ const Auth = () => {
         }
         
         // Additional safety delay to ensure database replication
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // Use the new unified registration function
         const { data: registrationResult, error: registrationError } = await supabase
