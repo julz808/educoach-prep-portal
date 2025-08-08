@@ -83,6 +83,13 @@ export const AccessDebugger: React.FC = () => {
     window.location.reload();
   };
 
+  const switchToVicSelective = () => {
+    console.log('🔄 Manually switching to VIC Selective');
+    // This should trigger the ProductContext to switch products
+    localStorage.setItem('selectedProduct', 'vic-selective');
+    window.location.reload();
+  };
+
   return (
     <Card className="border-orange-200 bg-orange-50">
       <CardHeader>
@@ -105,6 +112,13 @@ export const AccessDebugger: React.FC = () => {
             variant="outline"
           >
             Refresh Context
+          </Button>
+          <Button 
+            onClick={switchToVicSelective}
+            variant="default"
+            className="bg-green-600 hover:bg-green-700"
+          >
+            Switch to VIC Selective
           </Button>
         </div>
 

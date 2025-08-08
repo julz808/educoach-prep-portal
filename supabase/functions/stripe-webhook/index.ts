@@ -7,6 +7,53 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
+// Helper function to grant product access
+async function grantProductAccess(supabase: any, userId: string, dbProductType: string, session: any) {
+  // Check if user already has access
+  const { data: existingAccess, error: checkError } = await supabase
+    .from('user_products')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('product_type', dbProductType)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error('❌ Error checking existing access:', checkError);
+    throw checkError;
+  }
+
+  if (existingAccess) {
+    console.log('✅ User already has access to this product:', dbProductType);
+    return;
+  }
+
+  // Grant access to the product
+  const { data, error } = await supabase
+    .from('user_products')
+    .insert({
+      user_id: userId,
+      product_type: dbProductType,
+      is_active: true,
+      purchased_at: new Date().toISOString(),
+      stripe_session_id: session.id,
+      stripe_customer_id: session.customer,
+      amount_paid: session.amount_total || 0,
+      currency: session.currency || 'aud'
+    });
+
+  if (error) {
+    console.error('❌ Failed to grant product access:', error);
+    throw new Error(`Failed to grant access: ${error.message}`);
+  }
+
+  console.log('✅ Product access granted successfully:', {
+    userId,
+    productType: dbProductType,
+    sessionId: session.id,
+    amount: session.amount_total
+  });
+}
+
 // Stripe product ID to database product type mapping
 const STRIPE_PRODUCT_TO_DB_TYPE: Record<string, string> = {
   // Current live product IDs
@@ -24,6 +71,16 @@ const STRIPE_PRODUCT_TO_DB_TYPE: Record<string, string> = {
   'prod_ShnYQIQbQp0qzx': 'ACER Scholarship (Year 7 Entry)',
   'prod_ShnNTdv0tv1ikx': 'NSW Selective Entry (Year 7 Entry)',
   'prod_ShnKBAkGwieDH0': 'VIC Selective Entry (Year 9 Entry)'
+};
+
+// Fallback mapping for metadata productId to database type
+const METADATA_TO_DB_TYPE: Record<string, string> = {
+  'year-5-naplan': 'Year 5 NAPLAN',
+  'year-7-naplan': 'Year 7 NAPLAN',
+  'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
+  'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
+  'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
+  'vic-selective': 'VIC Selective Entry (Year 9 Entry)'
 };
 
 serve(async (req) => {
@@ -256,22 +313,29 @@ serve(async (req) => {
       }
 
       // Get the line items to determine what was purchased
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-        expand: ['data.price.product']
-      });
+      let lineItems;
+      try {
+        lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+          expand: ['data.price.product']
+        });
+        console.log('📦 Processing', lineItems.data.length, 'line items');
+      } catch (error) {
+        console.error('❌ Error fetching line items:', error);
+        lineItems = { data: [] };
+      }
 
-      console.log('📦 Processing', lineItems.data.length, 'line items');
+      let processedAnyItems = false;
 
-      // Process each purchased item
+      // Process each purchased item from line items
       for (const item of lineItems.data) {
         if (item.price?.product && typeof item.price.product === 'object') {
           const stripeProductId = item.price.product.id;
           const dbProductType = STRIPE_PRODUCT_TO_DB_TYPE[stripeProductId];
           
-          console.log('🔍 Processing product:', {
+          console.log('🔍 Processing product from line items:', {
             stripeProductId,
             dbProductType,
-            userId,
+            userId: finalUserId,
             userEmail: userEmail?.substring(0, 10) + '...'
           });
 
@@ -281,54 +345,35 @@ serve(async (req) => {
             continue;
           }
 
-          // Check if user already has access
-          const { data: existingAccess, error: checkError } = await supabase
-            .from('user_products')
-            .select('id')
-            .eq('user_id', finalUserId)
-            .eq('product_type', dbProductType)
-            .maybeSingle();
-
-          if (checkError) {
-            console.error('❌ Error checking existing access:', checkError);
-          }
-
-          if (existingAccess) {
-            console.log('✅ User already has access to this product:', dbProductType);
-            continue;
-          }
-
-          // Grant access to the product
-          const { data, error } = await supabase
-            .from('user_products')
-            .insert({
-              user_id: finalUserId,
-              product_type: dbProductType,
-              is_active: true,
-              purchased_at: new Date().toISOString(),
-              stripe_session_id: session.id,
-              stripe_customer_id: session.customer,
-              amount_paid: session.amount_total || 0,
-              currency: session.currency || 'aud'
-            });
-
-          if (error) {
-            console.error('❌ Failed to grant product access:', error);
-            return new Response(`Failed to grant access: ${error.message}`, { 
-              status: 500,
-              headers: corsHeaders 
-            });
-          }
-
-          console.log('✅ Product access granted successfully:', {
-            userId: finalUserId,
-            productType: dbProductType,
-            sessionId: session.id,
-            amount: session.amount_total,
-            wasGuestCheckout: isGuestCheckout
-          });
+          await grantProductAccess(supabase, finalUserId, dbProductType, session);
+          processedAnyItems = true;
         }
       }
+
+      // Fallback: If no line items processed, try using metadata
+      if (!processedAnyItems && productId) {
+        const dbProductType = METADATA_TO_DB_TYPE[productId];
+        
+        console.log('🔄 Fallback: Processing product from metadata:', {
+          metadataProductId: productId,
+          dbProductType,
+          userId: finalUserId,
+          userEmail: userEmail?.substring(0, 10) + '...'
+        });
+
+        if (dbProductType) {
+          await grantProductAccess(supabase, finalUserId, dbProductType, session);
+          processedAnyItems = true;
+        } else {
+          console.error('❌ Unknown metadata product ID:', productId);
+          console.log('Available metadata mappings:', Object.keys(METADATA_TO_DB_TYPE));
+        }
+      }
+
+      if (!processedAnyItems) {
+        console.error('❌ No products processed for session:', session.id);
+      }
+
     } else {
       console.log('ℹ️ Unhandled event type:', event.type);
     }

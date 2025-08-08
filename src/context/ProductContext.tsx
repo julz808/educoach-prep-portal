@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { UserMetadataService } from '@/services/userMetadataService';
+import { useProductAutoSelection } from '@/hooks/useProductAutoSelection';
 
 interface TestProduct {
   id: string;
@@ -92,6 +93,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
   });
 
   const currentProduct = testProducts.find(product => product.id === selectedProduct);
+
+  // Auto-select user's purchased product if they don't have access to current selection
+  useProductAutoSelection(selectedProduct, setSelectedProduct);
 
   // Safe access control check with fallback
   const checkProductAccess = async (productId: string): Promise<boolean> => {

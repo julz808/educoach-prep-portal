@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Browser Auth</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Browser Auth</h1>
+    <div>
+        <button onclick="signIn()">Sign In</button>
+        <button onclick="checkAccess()">Check Access</button>
+        <button onclick="signOut()">Sign Out</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        const { createClient } = supabase;
+        
+        const supabaseUrl = 'https://mcxxiunseawojmojikvb.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jeHhpdW5zZWF3b2ptb2ppa3ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNDEwODUsImV4cCI6MjA2MzcxNzA4NX0.TNpEFgSITMB1ZBIfhQkmkpgudf5bfxH3vVqJPgHPLjY';
+        
+        const client = createClient(supabaseUrl, supabaseKey);
+        
+        function log(message) {
+            document.getElementById('output').innerHTML += '<p>' + message + '</p>';
+        }
+        
+        async function signIn() {
+            log('Signing in...');
+            try {
+                const { data, error } = await client.auth.signInWithPassword({
+                    email: 'juliansunou@gmail.com',
+                    password: 'testpassword123'
+                });
+                
+                if (error) {
+                    log('❌ Sign in error: ' + error.message);
+                } else {
+                    log('✅ Sign in successful. User ID: ' + data.user.id);
+                }
+            } catch (e) {
+                log('❌ Exception: ' + e.message);
+            }
+        }
+        
+        async function checkAccess() {
+            log('Checking access...');
+            try {
+                // Get current user
+                const { data: { user }, error: userError } = await client.auth.getUser();
+                if (userError || !user) {
+                    log('❌ Not authenticated: ' + (userError?.message || 'No user'));
+                    return;
+                }
+                
+                log('✅ Authenticated as: ' + user.email);
+                
+                // Check product access
+                const { data: products, error: accessError } = await client
+                    .from('user_products')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('is_active', true);
+                
+                if (accessError) {
+                    log('❌ Access check error: ' + accessError.message);
+                } else {
+                    log('✅ Found ' + products.length + ' products:');
+                    products.forEach(product => {
+                        log('  - ' + product.product_type);
+                    });
+                }
+                
+                // Test specific VIC Selective access
+                const { data: vicAccess, error: vicError } = await client
+                    .from('user_products')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('product_type', 'VIC Selective Entry (Year 9 Entry)')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (vicError && vicError.code !== 'PGRST116') {
+                    log('❌ VIC access check error: ' + vicError.message);
+                } else {
+                    const hasAccess = !!vicAccess;
+                    log('✅ VIC Selective access: ' + hasAccess);
+                }
+                
+            } catch (e) {
+                log('❌ Exception: ' + e.message);
+            }
+        }
+        
+        async function signOut() {
+            log('Signing out...');
+            await client.auth.signOut();
+            log('✅ Signed out');
+        }
+    </script>
+</body>
+</html>
