@@ -9,28 +9,37 @@ const corsHeaders = {
 
 // Helper function to grant product access
 async function grantProductAccess(supabase: any, userId: string, dbProductType: string, session: any) {
-  // Check if user already has access
-  const { data: existingAccess, error: checkError } = await supabase
-    .from('user_products')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('product_type', dbProductType)
-    .maybeSingle();
+  console.log('🔍 grantProductAccess called:', {
+    userId: userId?.substring(0, 8) + '...',
+    dbProductType,
+    sessionId: session.id
+  });
 
-  if (checkError) {
-    console.error('❌ Error checking existing access:', checkError);
-    throw checkError;
-  }
+  try {
+    // Check if user already has access
+    console.log('📋 Checking existing access...');
+    const { data: existingAccess, error: checkError } = await supabase
+      .from('user_products')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('product_type', dbProductType)
+      .maybeSingle();
 
-  if (existingAccess) {
-    console.log('✅ User already has access to this product:', dbProductType);
-    return;
-  }
+    if (checkError) {
+      console.error('❌ Error checking existing access:', checkError);
+      console.error('Check error details:', JSON.stringify(checkError, null, 2));
+      throw new Error(`Failed to check existing access: ${checkError.message}`);
+    }
 
-  // Grant access to the product
-  const { data, error } = await supabase
-    .from('user_products')
-    .insert({
+    if (existingAccess) {
+      console.log('✅ User already has access to this product:', dbProductType);
+      console.log('   Existing access ID:', existingAccess.id);
+      return { success: true, existing: true };
+    }
+
+    // Grant access to the product
+    console.log('📝 Inserting new product access record...');
+    const insertData = {
       user_id: userId,
       product_type: dbProductType,
       is_active: true,
@@ -39,19 +48,63 @@ async function grantProductAccess(supabase: any, userId: string, dbProductType: 
       stripe_customer_id: session.customer,
       amount_paid: session.amount_total || 0,
       currency: session.currency || 'aud'
+    };
+    
+    console.log('   Insert data:', JSON.stringify(insertData, null, 2));
+    
+    const { data: insertResult, error: insertError } = await supabase
+      .from('user_products')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('❌ Failed to grant product access:', insertError);
+      console.error('Insert error details:', JSON.stringify(insertError, null, 2));
+      throw new Error(`Failed to grant access: ${insertError.message}`);
+    }
+
+    if (!insertResult) {
+      console.error('❌ Insert returned no data');
+      throw new Error('Insert returned no data - possible silent failure');
+    }
+
+    console.log('✅ Product access granted successfully:', {
+      insertId: insertResult.id,
+      userId,
+      productType: dbProductType,
+      sessionId: session.id,
+      amount: session.amount_total
     });
-
-  if (error) {
-    console.error('❌ Failed to grant product access:', error);
-    throw new Error(`Failed to grant access: ${error.message}`);
+    
+    // Double-check the insert worked by querying back
+    console.log('🔍 Verifying insert...');
+    const { data: verifyData, error: verifyError } = await supabase
+      .from('user_products')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('product_type', dbProductType)
+      .eq('is_active', true)
+      .maybeSingle();
+      
+    if (verifyError) {
+      console.error('❌ Verification failed:', verifyError);
+      throw new Error(`Insert verification failed: ${verifyError.message}`);
+    }
+    
+    if (!verifyData) {
+      console.error('❌ Verification: No record found after insert');
+      throw new Error('Insert verification failed: No record found after insert');
+    }
+    
+    console.log('✅ Insert verified successfully:', verifyData.id);
+    return { success: true, existing: false, recordId: insertResult.id };
+    
+  } catch (error: any) {
+    console.error('❌ Exception in grantProductAccess:', error);
+    console.error('Exception stack:', error.stack);
+    throw error;
   }
-
-  console.log('✅ Product access granted successfully:', {
-    userId,
-    productType: dbProductType,
-    sessionId: session.id,
-    amount: session.amount_total
-  });
 }
 
 // Stripe product ID to database product type mapping
@@ -345,8 +398,28 @@ serve(async (req) => {
             continue;
           }
 
-          await grantProductAccess(supabase, finalUserId, dbProductType, session);
-          processedAnyItems = true;
+          try {
+            const result = await grantProductAccess(supabase, finalUserId, dbProductType, session);
+            console.log('✅ Line item product access granted:', result);
+            processedAnyItems = true;
+          } catch (grantError: any) {
+            console.error('❌ Failed to grant line item product access:', grantError);
+            return new Response(
+              JSON.stringify({ 
+                error: 'Failed to grant product access',
+                details: grantError.message,
+                productType: dbProductType,
+                sessionId: session.id
+              }),
+              {
+                headers: { 
+                  ...corsHeaders,
+                  'Content-Type': 'application/json'
+                },
+                status: 500,
+              }
+            );
+          }
         }
       }
 
@@ -362,8 +435,28 @@ serve(async (req) => {
         });
 
         if (dbProductType) {
-          await grantProductAccess(supabase, finalUserId, dbProductType, session);
-          processedAnyItems = true;
+          try {
+            const result = await grantProductAccess(supabase, finalUserId, dbProductType, session);
+            console.log('✅ Fallback product access granted:', result);
+            processedAnyItems = true;
+          } catch (grantError: any) {
+            console.error('❌ Failed to grant fallback product access:', grantError);
+            return new Response(
+              JSON.stringify({ 
+                error: 'Failed to grant fallback product access',
+                details: grantError.message,
+                productType: dbProductType,
+                sessionId: session.id
+              }),
+              {
+                headers: { 
+                  ...corsHeaders,
+                  'Content-Type': 'application/json'
+                },
+                status: 500,
+              }
+            );
+          }
         } else {
           console.error('❌ Unknown metadata product ID:', productId);
           console.log('Available metadata mappings:', Object.keys(METADATA_TO_DB_TYPE));
@@ -372,6 +465,21 @@ serve(async (req) => {
 
       if (!processedAnyItems) {
         console.error('❌ No products processed for session:', session.id);
+        return new Response(
+          JSON.stringify({ 
+            error: 'No products processed',
+            details: 'Neither line items nor metadata contained valid product information',
+            sessionId: session.id,
+            metadata: session.metadata
+          }),
+          {
+            headers: { 
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            },
+            status: 400,
+          }
+        );
       }
 
     } else {

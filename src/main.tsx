@@ -11,6 +11,4 @@ if (root) {
       <App />
     </React.StrictMode>
   );
-} else {
-
 }
