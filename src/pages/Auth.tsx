@@ -244,7 +244,7 @@ const Auth = () => {
         // Wait for auth session to be established and user to be created in database
         // This ensures the user exists in auth.users table before creating profile
         let retryCount = 0;
-        const maxRetries = 10;
+        const maxRetries = 15; // Increased retry limit
         let userExists = false;
         
         while (!userExists && retryCount < maxRetries) {
@@ -261,21 +261,24 @@ const Auth = () => {
               }
             }
             
-            // Wait 1 second before retrying (longer delay for database propagation)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Progressive delay - start with 500ms, increase to 2000ms
+            const delay = Math.min(500 + (retryCount * 100), 2000);
+            await new Promise(resolve => setTimeout(resolve, delay));
             retryCount++;
           } catch (sessionError) {
             console.log('Session/user check failed, retrying...', sessionError);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const delay = Math.min(1000 + (retryCount * 200), 3000);
+            await new Promise(resolve => setTimeout(resolve, delay));
             retryCount++;
           }
         }
         
-        // Remove the strict user existence check since we'll handle verification via email
-        // The user account is created but may not be fully activated until email verification
+        if (!userExists) {
+          throw new Error('User account creation timed out. Please try again.');
+        }
         
         // Additional safety delay to ensure database replication
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Use the new unified registration function
         const { data: registrationResult, error: registrationError } = await supabase
