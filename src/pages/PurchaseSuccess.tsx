@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { redirectToLearningPlatform } from '@/utils/subdomain';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight, Loader2, Mail } from 'lucide-react';
@@ -24,7 +25,7 @@ const PurchaseSuccess: React.FC = () => {
           // User is logged in, redirect to dashboard
           setHasAccount(true);
           setTimeout(() => {
-            navigate('/dashboard');
+            redirectToLearningPlatform('/dashboard');
           }, 2000);
         } else {
           // Check if account was created but user isn't logged in
@@ -67,7 +68,7 @@ const PurchaseSuccess: React.FC = () => {
   };
 
   const handleGoToDashboard = () => {
-    navigate('/dashboard');
+    redirectToLearningPlatform('/dashboard');
   };
 
   const getProductName = (productSlug: string | null) => {
@@ -147,35 +148,8 @@ const PurchaseSuccess: React.FC = () => {
                   <div className="space-y-3">
                     <h2 className="text-xl font-semibold text-[#2C3E50]">Account Created Successfully!</h2>
                     <p className="text-[#6B7280] leading-relaxed">
-                      Your account has been created automatically. Follow these simple steps to get started:
+                      Complete your account setup and then access your learning product immediately!
                     </p>
-                  </div>
-                  
-                  {/* Steps */}
-                  <div className="bg-gradient-to-br from-[#6366F1]/5 to-[#4ECDC4]/5 rounded-2xl p-6 space-y-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-[#6366F1] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
-                      <div className="text-left">
-                        <p className="font-semibold text-[#2C3E50]">Complete your account setup</p>
-                        <p className="text-sm text-[#6B7280]">Fill in your details and create your secure password</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
-                      <div className="text-left">
-                        <p className="font-semibold text-[#2C3E50]">Access your course</p>
-                        <p className="text-sm text-[#6B7280]">Start with the diagnostic test and targeted practice</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-[#FF6B6B] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
-                      <div className="text-left">
-                        <p className="font-semibold text-[#2C3E50]">Track your progress</p>
-                        <p className="text-sm text-[#6B7280]">Monitor improvements with detailed analytics</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -189,26 +163,10 @@ const PurchaseSuccess: React.FC = () => {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   
-                  <div className="text-center">
-                    <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                      A welcome email has been sent to your inbox with your login details.<br/>
-                      Check your spam folder if you don't see it within a few minutes.
-                    </p>
-                  </div>
                 </div>
               </>
             )}
 
-            {/* Footer */}
-            <div className="pt-6 border-t border-gray-100 text-center">
-              <div className="flex items-center justify-center space-x-4 text-xs text-[#9CA3AF]">
-                <span>🔒 Secure Payment</span>
-                <span>•</span>
-                <span>📧 support@educourse.com.au</span>
-                <span>•</span>
-                <span>💬 Live Chat Support</span>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

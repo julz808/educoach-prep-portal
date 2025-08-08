@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { redirectToLearningPlatform } from "@/utils/subdomain";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,7 +141,7 @@ const Auth = () => {
       
       // Sign in successful
       toast.success("Welcome! Redirecting to your dashboard...");
-      navigate("/dashboard");
+      redirectToLearningPlatform("/dashboard");
       
     } catch (error: any) {
       console.error('Password setup error:', error);
@@ -198,7 +199,7 @@ const Auth = () => {
       // Check for pending purchase
       const hasPendingPurchase = await handlePendingPurchase();
       if (!hasPendingPurchase) {
-        navigate("/dashboard");
+        redirectToLearningPlatform("/dashboard");
       }
     } catch (error: any) {
       toast.error(error.message || "Error signing in");

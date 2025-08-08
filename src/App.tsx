@@ -3,37 +3,22 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
-import Diagnostic from "./pages/Diagnostic";
-import Drill from "./pages/Drill";
-import PracticeTests from "./pages/PracticeTests";
-import Insights from "./pages/Insights";
-import TestTaking from "./pages/TestTaking";
-import TestInstructionsPage from "./pages/TestInstructionsPage";
-import NotFound from "./pages/NotFound";
-import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
-import CourseDetail from "./pages/CourseDetail";
-import EduTestGenerator from "./pages/EduTestGenerator";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { BrowserRouter } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import { TestTypeProvider } from "./context/TestTypeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProductProvider } from "./context/ProductContext";
 import { TutorialProvider } from "./components/Tutorial";
-import AuthCallback from '@/pages/AuthCallback';
-import ResetPassword from '@/pages/ResetPassword';
-import Profile from '@/pages/Profile';
-import PurchaseSuccess from '@/pages/PurchaseSuccess';
-import StripeTest from '@/pages/StripeTest';
-import AccessDebug from '@/pages/AccessDebug';
+import { MarketingRoutes } from "@/routes/MarketingRoutes";
+import { LearningRoutes } from "@/routes/LearningRoutes";
+import { isLearningPlatform } from "@/utils/subdomain";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
 const App = () => {
+  const isLearning = isLearningPlatform();
+  
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -43,42 +28,11 @@ const App = () => {
               <TestTypeProvider>
                 <ProductProvider>
                   <TutorialProvider>
+                    <BrowserRouter>
+                      {isLearning ? <LearningRoutes /> : <MarketingRoutes />}
+                    </BrowserRouter>
                     <Toaster />
                     <Sonner />
-                  <BrowserRouter>
-                    <Routes>
-                      <Route path="/" element={<Landing />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/course/:slug" element={<CourseDetail />} />
-                      <Route path="/edutest-generator" element={<EduTestGenerator />} />
-                      <Route path="/auth/callback" element={<AuthCallback />} />
-                      <Route path="/auth/reset-password" element={<ResetPassword />} />
-                      <Route path="/purchase-success" element={<PurchaseSuccess />} />
-                      <Route path="/stripe-test" element={<StripeTest />} />
-                      <Route path="/access-debug" element={<AccessDebug />} />
-                      <Route element={<ProtectedRoute />}>
-                        {/* Test instruction routes (outside of Layout) */}
-                        <Route path="/test-instructions/:testType/:subjectId" element={<TestInstructionsPage />} />
-                        <Route path="/test-instructions/:testType/:subjectId/:sessionId" element={<TestInstructionsPage />} />
-                        
-                        {/* Test-taking routes (outside of Layout) */}
-                        <Route path="/test/:testType/:subjectId" element={<TestTaking />} />
-                        <Route path="/test/:testType/:subjectId/:sectionId" element={<TestTaking />} />
-                        <Route path="/test/:testType/:subjectId/:sectionId/:sessionId" element={<TestTaking />} />
-                        
-                        {/* Dashboard routes (inside Layout) */}
-                        <Route path="/dashboard" element={<Layout />}>
-                          <Route index element={<Dashboard />} />
-                          <Route path="diagnostic" element={<Diagnostic />} />
-                          <Route path="drill" element={<Drill />} />
-                          <Route path="practice-tests" element={<PracticeTests />} />
-                          <Route path="insights" element={<Insights />} />
-                        </Route>
-                        <Route path="/profile" element={<Profile />} />
-                      </Route>
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </BrowserRouter>
                   </TutorialProvider>
                 </ProductProvider>
               </TestTypeProvider>

@@ -18,8 +18,8 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="mx-auto w-16 h-16 bg-[#4ECDC4]/20 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-10 h-10 text-[#4ECDC4]" />
           </div>
           <DialogTitle className="text-2xl font-bold text-center">
             Check Your Email!
@@ -27,14 +27,14 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
         </DialogHeader>
         
         <div className="space-y-4 pt-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-[#4ECDC4]/10 border border-[#4ECDC4]/30 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <Mail className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Mail className="w-5 h-5 text-[#4ECDC4] mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm text-blue-900 font-medium">
+                <p className="text-sm text-[#2C3E50] font-medium">
                   We've sent a verification email to:
                 </p>
-                <p className="text-sm text-blue-800 font-semibold mt-1">
+                <p className="text-sm text-[#2C3E50] font-semibold mt-1">
                   {email}
                 </p>
               </div>
@@ -45,15 +45,15 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
             <h3 className="font-semibold text-lg">Next Steps:</h3>
             <ol className="space-y-2">
               <li className="flex items-start">
-                <span className="flex-shrink-0 w-6 h-6 bg-edu-teal text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                   1
                 </span>
                 <span className="text-sm">
-                  Open your email inbox and look for an email from <strong>EduCourse</strong>
+                  Check your email for an email from <strong>EduCourse / Supabase</strong>
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="flex-shrink-0 w-6 h-6 bg-edu-teal text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                   2
                 </span>
                 <span className="text-sm">
@@ -61,7 +61,7 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="flex-shrink-0 w-6 h-6 bg-edu-teal text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                   3
                 </span>
                 <span className="text-sm">
@@ -71,8 +71,8 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
             </ol>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <p className="text-xs text-amber-800">
+          <div className="bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 rounded-lg p-3">
+            <p className="text-xs text-[#2C3E50]">
               <strong>Can't find the email?</strong> Check your spam folder or wait a few minutes. 
               The email should arrive within 5 minutes.
             </p>
@@ -80,7 +80,7 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
 
           <Button 
             onClick={onClose} 
-            className="w-full bg-edu-teal hover:bg-edu-teal/90"
+            className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90"
           >
             Got it, I'll check my email
             <ArrowRight className="ml-2 h-4 w-4" />

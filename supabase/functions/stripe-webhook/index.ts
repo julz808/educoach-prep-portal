@@ -69,20 +69,67 @@ serve(async (req) => {
       });
     }
 
-    // Initialize Stripe
-    const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2023-08-16',
-    });
-
     // Get raw body for signature verification
     const body = await req.text();
     console.log('📝 Webhook body length:', body.length);
+
+    // Initialize Stripe after getting the body to avoid sync crypto issues
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2023-08-16',
+      httpClient: Stripe.createFetchHttpClient(),
+    });
     
-    // Verify webhook signature
+    // Verify webhook signature with async handling
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      console.log('✅ Webhook signature verified:', event.type, event.id);
+      // Use manual signature verification to avoid SubtleCryptoProvider issues
+      const elements = signature.split(',');
+      const signatureElements: { [key: string]: string } = {};
+      
+      elements.forEach(element => {
+        const [key, value] = element.split('=');
+        signatureElements[key] = value;
+      });
+
+      const timestamp = signatureElements.t;
+      const signatures = [signatureElements.v1, signatureElements.v0].filter(Boolean);
+      
+      if (!timestamp || signatures.length === 0) {
+        throw new Error('Unable to extract timestamp and signatures from header');
+      }
+
+      // Create the payload for verification
+      const payload = timestamp + '.' + body;
+      
+      // Use crypto.subtle for HMAC verification in Deno
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(webhookSecret);
+      const messageData = encoder.encode(payload);
+      
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      
+      const signature_bytes = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+      const signature_hex = Array.from(new Uint8Array(signature_bytes))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      // Verify signature matches
+      const isValid = signatures.some(sig => sig === signature_hex);
+      
+      if (!isValid) {
+        throw new Error('Signature verification failed');
+      }
+      
+      // Parse the event manually since signature is verified
+      event = JSON.parse(body) as Stripe.Event;
+      console.log('✅ Webhook signature verified manually:', event.type, event.id);
+      
     } catch (err: any) {
       console.error('❌ Webhook signature verification failed:', err.message);
       return new Response(`Webhook signature verification failed: ${err.message}`, { 
