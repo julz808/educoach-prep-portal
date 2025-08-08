@@ -94,6 +94,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
 
   const currentProduct = testProducts.find(product => product.id === selectedProduct);
 
+  // Persist to localStorage whenever selection changes
+  const setSelectedProduct = (productId: string) => {
+    setSelectedProductState(productId);
+    localStorage.setItem('selectedProduct', productId);
+  };
+
   // Auto-select user's purchased product if they don't have access to current selection
   useProductAutoSelection(selectedProduct, setSelectedProduct);
 
@@ -136,12 +142,6 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
       checkProductAccess(selectedProduct);
     }
   }, [selectedProduct, user, currentProduct]);
-
-  // Persist to localStorage whenever selection changes
-  const setSelectedProduct = (productId: string) => {
-    setSelectedProductState(productId);
-    localStorage.setItem('selectedProduct', productId);
-  };
 
   const hasAccessToCurrentProduct = productAccess.hasAccess;
 

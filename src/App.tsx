@@ -19,7 +19,6 @@ import TestTaking from "./pages/TestTaking";
 import TestInstructionsPage from "./pages/TestInstructionsPage";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
-import TestLanding from "./pages/TestLanding";
 import Auth from "./pages/Auth";
 import CourseDetail from "./pages/CourseDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
