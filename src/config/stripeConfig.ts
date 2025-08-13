@@ -23,14 +23,14 @@ export const STRIPE_PRODUCTS: Record<string, StripeProductConfig> = {
     dbProductType: 'Year 7 NAPLAN'
   },
   'edutest-scholarship': {
-    productId: import.meta.env.VITE_STRIPE_EDUTEST_SCHOLARSHIP_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_EDUTEST_SCHOLARSHIP_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_EDUTEST_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_EDUTEST_PRICE_ID || '',
     name: 'EduTest Scholarship (Year 7 Entry)',
     dbProductType: 'EduTest Scholarship (Year 7 Entry)'
   },
   'acer-scholarship': {
-    productId: import.meta.env.VITE_STRIPE_ACER_SCHOLARSHIP_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_ACER_SCHOLARSHIP_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_ACER_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_ACER_PRICE_ID || '',
     name: 'ACER Scholarship (Year 7 Entry)',
     dbProductType: 'ACER Scholarship (Year 7 Entry)'
   },
