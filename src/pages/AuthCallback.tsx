@@ -24,6 +24,40 @@ const AuthCallback = () => {
             // Redirect to password reset page
             navigate('/auth/reset-password');
           } else {
+            // Check for and process any pending purchases for this user
+            try {
+              console.log('Checking for pending purchases for user:', session.user.email);
+              const { data: pendingPurchases, error: pendingError } = await supabase
+                .rpc('get_user_pending_purchases');
+              
+              if (pendingError) {
+                console.error('Error fetching pending purchases:', pendingError);
+              } else if (pendingPurchases && pendingPurchases.length > 0) {
+                console.log('Found pending purchases:', pendingPurchases.length);
+                
+                // Process each pending purchase
+                for (const purchase of pendingPurchases) {
+                  console.log('Processing pending purchase:', purchase.stripe_session_id);
+                  
+                  const { data: processResult, error: processError } = await supabase
+                    .rpc('process_pending_purchase', {
+                      p_stripe_session_id: purchase.stripe_session_id
+                    });
+                  
+                  if (processError) {
+                    console.error('Error processing pending purchase:', processError);
+                  } else if (processResult && processResult.success) {
+                    console.log('Successfully processed purchase:', processResult);
+                    toast.success(`Access granted to ${processResult.product_type}!`);
+                  } else {
+                    console.error('Failed to process purchase:', processResult);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error checking pending purchases:', error);
+            }
+            
             // Regular sign in/up - redirect to dashboard
             toast.success('Successfully authenticated!');
             navigate('/dashboard');
