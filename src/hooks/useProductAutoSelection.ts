@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { UserMetadataService } from '@/services/userMetadataService';
 
@@ -16,10 +16,17 @@ export const useProductAutoSelection = (
   setSelectedProduct: (productId: string) => void
 ) => {
   const { user } = useAuth();
+  const hasRunAutoSelection = useRef(false);
 
   useEffect(() => {
     const autoSelectUserProduct = async () => {
       if (!user) return;
+
+      // Only run auto-selection once per session, not on every product change
+      if (hasRunAutoSelection.current) {
+        console.log('🔄 Auto-selection already completed this session, skipping');
+        return;
+      }
 
       try {
         // Get user's purchased products
@@ -27,6 +34,7 @@ export const useProductAutoSelection = (
         
         if (userProducts.length === 0) {
           console.log('🔍 No products found for user, keeping default selection');
+          hasRunAutoSelection.current = true;
           return;
         }
 
@@ -37,15 +45,16 @@ export const useProductAutoSelection = (
 
         if (hasCurrentProduct) {
           console.log('✅ User has access to currently selected product:', selectedProduct);
+          hasRunAutoSelection.current = true;
           return;
         }
 
-        // Auto-select the first product the user has access to
+        // Auto-select the first product the user has access to (only on initial load)
         const firstUserProduct = userProducts[0];
         const productId = PRODUCT_TYPE_TO_ID[firstUserProduct.product_type];
         
         if (productId && productId !== selectedProduct) {
-          console.log(`🔄 Auto-selecting user's purchased product:`, {
+          console.log(`🔄 Auto-selecting user's purchased product (initial load):`, {
             from: selectedProduct,
             to: productId,
             productType: firstUserProduct.product_type
@@ -53,9 +62,13 @@ export const useProductAutoSelection = (
           
           setSelectedProduct(productId);
         }
+
+        // Mark that we've completed auto-selection
+        hasRunAutoSelection.current = true;
         
       } catch (error) {
         console.error('❌ Error in product auto-selection:', error);
+        hasRunAutoSelection.current = true;
       }
     };
 
@@ -63,5 +76,5 @@ export const useProductAutoSelection = (
     const timer = setTimeout(autoSelectUserProduct, 1000);
     return () => clearTimeout(timer);
     
-  }, [user, selectedProduct, setSelectedProduct]);
+  }, [user]); // Remove selectedProduct and setSelectedProduct from dependencies
 };
