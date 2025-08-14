@@ -11,14 +11,14 @@ export interface StripeProductConfig {
 // Map of internal product IDs to Stripe configuration
 export const STRIPE_PRODUCTS: Record<string, StripeProductConfig> = {
   'year-5-naplan': {
-    productId: import.meta.env.VITE_STRIPE_YEAR_5_NAPLAN_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_YEAR_5_NAPLAN_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_YEAR5_NAPLAN_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_YEAR5_NAPLAN_PRICE_ID || '',
     name: 'Year 5 NAPLAN',
     dbProductType: 'Year 5 NAPLAN'
   },
   'year-7-naplan': {
-    productId: import.meta.env.VITE_STRIPE_YEAR_7_NAPLAN_PRODUCT_ID || '',
-    priceId: import.meta.env.VITE_STRIPE_YEAR_7_NAPLAN_PRICE_ID || '',
+    productId: import.meta.env.VITE_STRIPE_YEAR7_NAPLAN_PRODUCT_ID || '',
+    priceId: import.meta.env.VITE_STRIPE_YEAR7_NAPLAN_PRICE_ID || '',
     name: 'Year 7 NAPLAN',
     dbProductType: 'Year 7 NAPLAN'
   },
