@@ -13,16 +13,13 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 interface UserProfile {
-  id: string;
   user_id: string;
-  display_name: string | null;
   student_first_name: string;
   student_last_name: string;
   parent_first_name: string;
   parent_last_name: string;
   school_name: string;
   year_level: number;
-  timezone: string;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -72,7 +69,6 @@ const Profile = () => {
             student_last_name: profileData.student_last_name || '',
             parent_first_name: profileData.parent_first_name || '',
             parent_last_name: profileData.parent_last_name || '',
-            parent_email: profileData.parent_email || '',
             school_name: profileData.school_name || '',
             year_level: profileData.year_level?.toString() || '',
           });
@@ -104,15 +100,9 @@ const Profile = () => {
         parent_last_name: formData.parent_last_name,
         school_name: formData.school_name,
         year_level: parseInt(formData.year_level),
-        display_name: `${formData.student_first_name} ${formData.student_last_name}`,
-        timezone: 'Australia/Sydney',
-        updated_at: new Date().toISOString(),
       };
 
-      // Add parent_email if it has a value
-      if (formData.parent_email) {
-        (updateData as any).parent_email = formData.parent_email;
-      }
+      // Note: parent_email field removed as it's not in database schema
 
       console.log('Saving profile with data:', updateData);
 
@@ -271,16 +261,6 @@ const Profile = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, parent_last_name: e.target.value }))}
                     placeholder="Enter parent's last name"
                     required
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="parent_email">Parent/Guardian Email</Label>
-                  <Input
-                    id="parent_email"
-                    type="email"
-                    value={formData.parent_email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, parent_email: e.target.value }))}
-                    placeholder="Enter parent's email address"
                   />
                 </div>
               </div>

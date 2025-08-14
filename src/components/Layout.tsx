@@ -117,11 +117,12 @@ const Layout: React.FC = () => {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('user_id', user.id)
-          .single();
+          .eq('user_id', user.id);
 
-        if (!error && data) {
-          setUserProfile(data);
+        if (!error && data && data.length > 0) {
+          setUserProfile(data[0]);
+        } else {
+          console.log('No user profile found in Layout');
         }
       } catch (err) {
         console.error('Error fetching user profile:', err);
