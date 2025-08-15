@@ -8,7 +8,7 @@ export const courses: Course[] = [
     shortDescription: 'Covers all 5 sections of the EduTest exam: Verbal Reasoning, Numerical Reasoning, Reading, Mathematics, and Written Expression.',
     fullDescription: 'Our comprehensive EduTest Scholarship preparation program is designed specifically for the unique format and requirements of EduTest examinations. With focused practice and strategic guidance, students will build confidence and competence across all test sections.',
     price: 199,
-    target: 'Students applying to independent schools (Years 5–9)',
+    target: 'Students applying to independent schools (Year 9 entry)',
     skills: [
       'Verbal reasoning and vocabulary',
       'Numerical reasoning and problem solving',

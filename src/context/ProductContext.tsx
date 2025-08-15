@@ -41,9 +41,9 @@ const testProducts: TestProduct[] = [
   },
   { 
     id: 'edutest-scholarship', 
-    name: 'EduTest Year 7 Entry', 
-    shortName: 'EduTest Y7', 
-    description: 'EduTest Year 7 Entry',
+    name: 'EduTest Year 9 Entry', 
+    shortName: 'EduTest Y9', 
+    description: 'EduTest Year 9 Entry',
     dbProductType: 'EduTest Scholarship (Year 7 Entry)'
   },
   { 
