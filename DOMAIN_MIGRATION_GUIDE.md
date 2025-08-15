@@ -51,18 +51,24 @@ This guide will help you point your existing GoDaddy domain (educourse.com.au) t
 1. Also add: `www.educourse.com.au`
 2. This ensures both versions work
 
-### 2.4 Vercel Will Show You Required DNS Records
-Vercel will display something like:
+### 2.4 Vercel DNS Records for Your Domain
+Based on your Vercel configuration, here are your exact DNS records:
+
+**For educourse.com.au (root domain):**
 ```
 Type: A
 Name: @
-Value: 76.76.21.21
+Value: 216.198.79.1
+```
 
+**For www.educourse.com.au:**
+```
 Type: CNAME
 Name: www
-Value: cname.vercel-dns.com
+Value: 4f87934f3e412790.vercel-dns-017.com
 ```
-**IMPORTANT**: Copy these values - you'll need them for GoDaddy!
+
+**IMPORTANT**: Use these exact values for your GoDaddy configuration!
 
 ---
 
@@ -76,12 +82,18 @@ Value: cname.vercel-dns.com
 ### 3.2 Remove Conflicting Records
 **⚠️ CAUTION**: This will take your current site offline!
 
-1. **Delete or modify existing A records** pointing to your WordPress hosting
-2. **Delete or modify existing CNAME records** for www if they exist
-3. **Keep these records** (don't delete):
-   - MX records (for email)
-   - TXT records (for email verification, SPF, etc.)
-   - Any email-related CNAME records
+Based on your current GoDaddy DNS setup, **DELETE these specific records**:
+- **A Record**: `@` → `162.159.137.9` ❌ DELETE
+- **A Record**: `@` → `162.159.138.9` ❌ DELETE  
+- **CNAME**: `www` → `educourse.elementor.cloud` ❌ DELETE
+- **CNAME**: `learn` → `julian-s-site-12e8.thinkific.com` ❌ DELETE
+
+**KEEP these records** (don't delete):
+- All **MX records** (for email delivery)
+- All **TXT records** (for Google verification and SPF)
+- **NS records** (nameservers)
+- **SOA record** (required DNS record)
+- **CNAME**: `_domainconnect` (domain management service)
 
 ### 3.3 Add Vercel DNS Records
 
@@ -90,7 +102,7 @@ Value: cname.vercel-dns.com
 2. Set:
    - **Type**: A
    - **Name**: @ (or leave blank)
-   - **Value**: 76.76.21.21 (Vercel's IP)
+   - **Value**: 216.198.79.1
    - **TTL**: 600 seconds (or lowest available)
 
 #### For www Subdomain:
@@ -98,7 +110,7 @@ Value: cname.vercel-dns.com
 2. Set:
    - **Type**: CNAME
    - **Name**: www
-   - **Value**: cname.vercel-dns.com
+   - **Value**: 4f87934f3e412790.vercel-dns-017.com
    - **TTL**: 600 seconds (or lowest available)
 
 ### 3.4 Save All Changes
@@ -158,7 +170,8 @@ If you need to redirect old WordPress URLs, create a `vercel.json` file:
 ### 6.1 DNS Propagation Check
 1. Use: https://dnschecker.org
 2. Enter `educourse.com.au`
-3. Check if it points to Vercel's IP globally
+3. Check if it points to `216.198.79.1` globally
+4. Check if `www.educourse.com.au` points to `4f87934f3e412790.vercel-dns-017.com`
 
 ### 6.2 Test Your Site
 Once DNS propagates:
