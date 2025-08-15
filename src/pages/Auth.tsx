@@ -408,7 +408,7 @@ const Auth = () => {
             </Link>
           </div>
           <h1 className="text-3xl font-bold text-[#2C3E50] mb-2">Welcome to EduCourse</h1>
-          <p className="text-[#6B7280]">Your gateway to academic success</p>
+          <p className="text-[#6B7280]">Australia's leading test preparation platform</p>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
