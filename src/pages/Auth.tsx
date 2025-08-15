@@ -820,7 +820,7 @@ const Auth = () => {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sm text-[#9CA3AF]">
-            Need help? <a href="mailto:support@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">Contact Support</a>
+            Need help? Contact <a href="mailto:learning@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">learning@educourse.com.au</a>
           </p>
         </div>
       </div>

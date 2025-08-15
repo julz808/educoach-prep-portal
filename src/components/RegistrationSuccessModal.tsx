@@ -85,6 +85,12 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
             Got it, I'll check my email
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
+
+          <div className="text-center pt-4 border-t">
+            <p className="text-xs text-[#9CA3AF]">
+              Need help? Contact <a href="mailto:learning@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">learning@educourse.com.au</a>
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

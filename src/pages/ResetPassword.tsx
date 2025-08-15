@@ -44,54 +44,63 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-edu-light-blue p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Reset Password</CardTitle>
-          <CardDescription className="text-center">
-            Enter your new password below
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleResetPassword}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-8"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+      <div className="w-full max-w-md">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Reset Password</CardTitle>
+            <CardDescription className="text-center">
+              Enter your new password below
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleResetPassword}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-8"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-8"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-8"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Resetting..." : "Reset Password"}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Resetting..." : "Reset Password"}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+        
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-[#9CA3AF]">
+            Need help? Contact <a href="mailto:learning@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">learning@educourse.com.au</a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -78,17 +78,26 @@ const AuthCallback = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-edu-light-blue p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Processing...</CardTitle>
-          <CardDescription className="text-center">
-            Please wait while we complete your authentication
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </CardContent>
-      </Card>
+      <div className="w-full max-w-md">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Processing...</CardTitle>
+            <CardDescription className="text-center">
+              Please wait while we complete your authentication
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </CardContent>
+        </Card>
+        
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-[#9CA3AF]">
+            Need help? Contact <a href="mailto:learning@educourse.com.au" className="text-[#4ECDC4] hover:text-[#45c4bc] transition-colors">learning@educourse.com.au</a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
