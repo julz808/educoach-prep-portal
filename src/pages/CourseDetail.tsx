@@ -284,7 +284,7 @@ const CourseDetail = () => {
       title: "Practice Tests",
       description: "Full-length timed tests that simulate real exam conditions",
       icon: <FileText className="h-5 w-5" />,
-      screenshot: "/images/test taking maths 2.png"
+      screenshot: "/images/test taking maths.png"
     },
     {
       id: "analytics",
@@ -505,7 +505,7 @@ const CourseDetail = () => {
                   transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
                   <img 
-                    src="/images/dashboard view 2.png" 
+                    src="/images/dashboard view.png" 
                     alt="EduCourse Dashboard" 
                     className="w-full h-full object-contain"
                     loading="eager"
@@ -520,7 +520,7 @@ const CourseDetail = () => {
                   transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
                 >
                   <img 
-                    src="/images/reading simulation 2.png" 
+                    src="/images/reading simulation.png" 
                     alt="Reading Simulation" 
                     className="w-full h-full object-contain"
                     loading="eager"

@@ -514,7 +514,7 @@ const Landing = () => {
                   transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
                   <img 
-                    src="/images/dashboard view 2.png" 
+                    src="/images/dashboard view.png" 
                     alt="EduCourse Dashboard" 
                     className="w-full h-full object-contain"
                     loading="eager"
@@ -529,7 +529,7 @@ const Landing = () => {
                   transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
                 >
                   <img 
-                    src="/images/reading simulation 2.png" 
+                    src="/images/reading simulation.png" 
                     alt="Reading Simulation" 
                     className="w-full h-full object-contain"
                     loading="eager"
