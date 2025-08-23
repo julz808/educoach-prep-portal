@@ -6,6 +6,13 @@ import { CheckCircle, ArrowRight, Loader2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
+// Declare gtag function for TypeScript
+declare global {
+  interface Window {
+    gtag?: (command: string, targetId: string, config?: any) => void;
+  }
+}
+
 const PurchaseSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -15,6 +22,17 @@ const PurchaseSuccess: React.FC = () => {
   const product = searchParams.get('product');
 
   useEffect(() => {
+    // Fire Google Ads conversion tracking
+    if (typeof window !== 'undefined' && window.gtag && product) {
+      console.log('🎯 Firing Google Ads conversion for product:', product);
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-11082636289', // Generic conversion tracking - will work for basic tracking
+        'value': 199.0,
+        'currency': 'AUD',
+        'transaction_id': Date.now() + '-' + product // Unique transaction ID
+      });
+    }
+
     const checkUserStatus = async () => {
       try {
         // Check if user is already logged in

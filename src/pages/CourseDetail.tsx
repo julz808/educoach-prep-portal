@@ -440,7 +440,7 @@ const CourseDetail = () => {
                   course.title === 'ACER Scholarship' 
                     ? 'Designed for Students in Year 5/6 applying for Year 7 Entry'
                     : course.title === 'EduTest Scholarship'
-                    ? 'Designed for Students in Year 7/8 applying for Year 9 Entry'
+                    ? 'Designed for Students in Year 5/6 applying for Year 7 Entry'
                     : `Designed for ${course.target}`,
                   'Expert-crafted questions aligned to test format',
                   'Instant feedback with detailed explanations'
