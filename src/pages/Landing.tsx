@@ -853,7 +853,7 @@ const Landing = () => {
                 title: 'Simulate the Real Test',
                 description: 'Take full-length practice tests that perfectly simulate the real exam environment. Track improvement with detailed analytics.',
                 icon: <FileText className="h-8 w-8 md:h-12 md:w-12" />,
-                image: 'test taking maths 2.png'
+                image: 'test taking maths.png'
               }
             ].map((step, index) => (
               <motion.div 
