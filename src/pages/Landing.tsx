@@ -29,7 +29,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Activity
+  Activity,
+  FileText
 } from 'lucide-react';
 
 // Animated Text Component for letter-by-letter reveals
