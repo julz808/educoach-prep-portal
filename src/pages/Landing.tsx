@@ -648,7 +648,7 @@ const Landing = () => {
                       </div>
                       
                       <div className="space-y-2 mb-6">
-                        {['500+ practice questions', 'Detailed performance analytics', 'Sub-skill level insights'].map((feature, idx) => (
+                        {['1000+ practice questions', 'Detailed performance analytics', 'Sub-skill level insights'].map((feature, idx) => (
                           <div key={idx} className="flex items-center text-sm text-[#6B7280]">
                             <CheckCircle className="h-4 w-4 text-[#4ECDC4] mr-2 flex-shrink-0" />
                             <span>{feature}</span>
@@ -843,7 +843,7 @@ const Landing = () => {
                 step: '02',
                 prefix: 'Skill Drills:',
                 title: 'Targeted Skill Building',
-                description: 'Access 500+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
+                description: 'Access 1000+ questions designed to strengthen specific sub-skills. Our platform identifies exactly what your child needs to practice most.',
                 icon: <Target className="h-8 w-8 md:h-12 md:w-12" />,
                 image: 'writing feedback 3.png'
               },

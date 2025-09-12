@@ -792,7 +792,7 @@ const CourseDetail = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
-                title: "500+ Questions",
+                title: "1000+ Questions",
                 description: "Comprehensive question bank covering all test sections and difficulty levels"
               },
               {
