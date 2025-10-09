@@ -33,6 +33,23 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/learn/:path*",
+      "destination": "/dashboard/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/courses/:slug",
+      "destination": "/course/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/courses",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

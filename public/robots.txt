@@ -1,14 +1,18 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# EduCourse - robots.txt
+# Allow all beneficial bots to crawl public pages
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /test/
+Disallow: /test-instructions/
+
+# Sitemap location
+Sitemap: https://educourse.com.au/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1

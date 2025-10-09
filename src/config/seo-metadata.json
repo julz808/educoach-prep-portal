@@ -1,0 +1,58 @@
+{
+  "/": {
+    "title": "EduCourse - Australia's Premier Test Preparation Platform | NAPLAN, Selective Entry & Scholarship Exams",
+    "description": "Australia's #1 test prep platform for NAPLAN, Selective Entry & Scholarship exams. 1000+ practice questions, detailed analytics, sub-skill tracking. Trusted by 1000+ families. $199 per test package.",
+    "keywords": "NAPLAN preparation, selective entry test prep, scholarship exam prep, EduTest, ACER, NSW selective, VIC selective, Year 5 NAPLAN, Year 7 NAPLAN, test preparation Australia, competitive entrance exams",
+    "ogImage": "/images/og-home.png",
+    "canonical": "https://educourse.com.au"
+  },
+  "/course/vic-selective-entry": {
+    "title": "VIC Selective Entry Test Prep (Year 9) | 1000+ Practice Questions | EduCourse",
+    "description": "Prepare for Victoria Selective Entry (Year 9) exam with expert-designed practice tests, detailed analytics & sub-skill tracking. Reading, Maths, General Ability & Writing. $199 comprehensive package.",
+    "keywords": "VIC selective entry, year 9 selective test, Victoria selective schools, Melbourne selective entry, selective entry exam prep, VIC selective entry practice, year 9 entrance exam",
+    "ogImage": "/images/og-vic-selective.png",
+    "canonical": "https://educourse.com.au/course/vic-selective-entry"
+  },
+  "/course/nsw-selective-entry": {
+    "title": "NSW Selective Entry Test Prep (Year 7) | 1000+ Practice Questions | EduCourse",
+    "description": "Ace the NSW Selective High School placement test with expert practice materials. Reading, Mathematical Reasoning, Thinking Skills & Writing. Detailed performance analytics. $199 complete prep package.",
+    "keywords": "NSW selective entry, year 7 selective test, NSW selective high schools, Sydney selective schools, selective entry test prep, NSW selective placement test, year 7 entrance exam",
+    "ogImage": "/images/og-nsw-selective.png",
+    "canonical": "https://educourse.com.au/course/nsw-selective-entry"
+  },
+  "/course/acer-scholarship": {
+    "title": "ACER Scholarship Test Prep (Year 7 Entry) | Practice Tests & Analytics | EduCourse",
+    "description": "Prepare for ACER Scholarship exams with 1000+ expert-designed questions. Written Expression, Mathematics & Humanities practice. Detailed analytics & sub-skill tracking. $199 comprehensive package.",
+    "keywords": "ACER scholarship, ACER test prep, scholarship exam preparation, year 7 scholarship, ACER practice test, scholarship entrance exam, private school scholarship",
+    "ogImage": "/images/og-acer.png",
+    "canonical": "https://educourse.com.au/course/acer-scholarship"
+  },
+  "/course/edutest-scholarship": {
+    "title": "EduTest Scholarship Exam Prep (Year 7 Entry) | 1000+ Questions | EduCourse",
+    "description": "Master the EduTest Scholarship exam with comprehensive practice materials. Reading, Verbal Reasoning, Numerical Reasoning, Maths & Writing. Detailed analytics. $199 complete prep package.",
+    "keywords": "EduTest scholarship, EduTest practice, scholarship test prep, year 7 scholarship exam, EduTest questions, scholarship entrance test, private school entrance",
+    "ogImage": "/images/og-edutest.png",
+    "canonical": "https://educourse.com.au/course/edutest-scholarship"
+  },
+  "/course/year-5-naplan": {
+    "title": "Year 5 NAPLAN Test Prep | 1000+ Practice Questions & Analytics | EduCourse",
+    "description": "Prepare for Year 5 NAPLAN with expert practice tests. Writing, Reading, Language Conventions & Numeracy. Build foundational skills with detailed feedback. $199 comprehensive preparation package.",
+    "keywords": "Year 5 NAPLAN, NAPLAN practice, year 5 test prep, NAPLAN preparation, primary school NAPLAN, NAPLAN writing, NAPLAN numeracy, year 5 practice tests",
+    "ogImage": "/images/og-year5-naplan.png",
+    "canonical": "https://educourse.com.au/course/year-5-naplan"
+  },
+  "/course/year-7-naplan": {
+    "title": "Year 7 NAPLAN Test Prep | 1000+ Practice Questions & Analytics | EduCourse",
+    "description": "Excel in Year 7 NAPLAN with advanced practice materials. Writing, Reading, Language Conventions & Numeracy. Detailed analytics & sub-skill tracking. $199 complete preparation package.",
+    "keywords": "Year 7 NAPLAN, NAPLAN practice, year 7 test prep, NAPLAN preparation, secondary NAPLAN, advanced NAPLAN practice, year 7 practice tests, high school NAPLAN",
+    "ogImage": "/images/og-year7-naplan.png",
+    "canonical": "https://educourse.com.au/course/year-7-naplan"
+  },
+  "/auth": {
+    "title": "Login | EduCourse Test Preparation Platform",
+    "description": "Login to your EduCourse account to access test preparation materials, practice tests, and performance analytics.",
+    "keywords": "EduCourse login, test prep login, student login",
+    "ogImage": "/images/og-home.png",
+    "canonical": "https://educourse.com.au/auth"
+  }
+}

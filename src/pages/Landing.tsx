@@ -7,6 +7,8 @@ import { courses } from '@/data/courses';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import Lenis from 'lenis';
+import { SEOHead } from '@/components/SEOHead';
+import { useSEOMetadata } from '@/hooks/useSEOMetadata';
 import { 
   ChevronDown, 
   User, 
@@ -93,6 +95,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   console.log('🔍 Landing auth state:', { user: !!user, isLoading });
+  const seoMetadata = useSEOMetadata('/');
   const [scrollY, setScrollY] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -302,9 +305,11 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation Bar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+    <>
+      <SEOHead metadata={seoMetadata} />
+      <div className="min-h-screen bg-white">
+        {/* Navigation Bar */}
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
           ? 'bg-white/95 backdrop-blur-sm shadow-sm' 
           : 'bg-transparent'
@@ -1217,7 +1222,8 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
