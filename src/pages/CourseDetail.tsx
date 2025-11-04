@@ -37,6 +37,10 @@ import { toast } from '@/components/ui/use-toast';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
+import { SEOHead } from '@/components/SEOHead';
+import { CourseSchema } from '@/components/CourseSchema';
+import { FAQSchema } from '@/components/FAQSchema';
+import { useSEOMetadata } from '@/hooks/useSEOMetadata';
 
 // Test section descriptions mapping - focused on the test itself, not platform features
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
@@ -145,6 +149,9 @@ const CourseDetail = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestSection, setActiveTestSection] = useState<string>("");
   const [activeFeature, setActiveFeature] = useState<string>("diagnostic");
+
+  // Get SEO metadata for this course
+  const seoMetadata = useSEOMetadata(`/course/${slug}`);
 
   useEffect(() => {
     console.log('CourseDetail: Looking for slug:', slug);
@@ -296,7 +303,16 @@ const CourseDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <SEOHead metadata={seoMetadata} />
+      {course && <CourseSchema course={course} />}
+      {course && faqs.length > 0 && (
+        <FAQSchema
+          faqs={faqs}
+          pageUrl={`https://educourse.com.au/course/${slug}`}
+        />
+      )}
+      <div className="min-h-screen bg-white">
       {/* Navigation Bar - Same as Landing page */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
@@ -1035,6 +1051,7 @@ const CourseDetail = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

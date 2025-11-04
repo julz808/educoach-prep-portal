@@ -1,9 +1,41 @@
 # EduCourse SEO Strategy & Implementation Plan
 
-**Document Version:** 1.0
-**Date:** October 2025
+**Document Version:** 1.1
+**Last Updated:** November 4, 2025
 **Owner:** Julian
-**Status:** Active Implementation
+**Status:** Phase 1 - 75% Complete (BLOCKED by build error)
+
+---
+
+## 🚨 CURRENT STATUS UPDATE (Nov 4, 2025)
+
+### Critical Issue Identified
+**BUILD FAILING** - `react-helmet-async` dependency missing, blocking entire per-page SEO system from working in production.
+
+### Quick Status Summary
+- **Current SEO Health:** 5.5/10 ⚠️ (down from estimated 6.5)
+- **Phase 1 Completion:** 75% (blocked by build error)
+- **Phases 2-5:** Not started
+- **Blog Status:** Not implemented
+- **Image Optimization:** Not done (20MB of unoptimized PNGs)
+- **Google Search Console:** Not set up
+
+### What's Working
+✅ 301 Redirects configured
+✅ Dynamic sitemap generator working
+✅ Robots.txt optimized
+✅ SEO metadata JSON well-structured
+✅ Google Analytics installed
+
+### What's Broken/Missing
+🔴 SEO metadata system not deployed (build error)
+🔴 Google Search Console not set up
+🔴 Images not optimized (20MB total)
+🔴 No blog exists
+🔴 No enhanced schema markup
+🔴 No backlinks strategy implemented
+
+**👉 See SEO_AUDIT_REPORT.md for complete audit and action plan**
 
 ---
 
@@ -11,8 +43,7 @@
 
 This document outlines the complete SEO strategy for EduCourse.com.au, including technical optimizations, content strategy, and implementation phases. Our goal is to improve organic search rankings, increase traffic by 40-60%, and reduce dependency on paid advertising.
 
-**Current SEO Health:** 6.5/10
-**Target SEO Health:** 9/10 (within 3 months)
+**Target SEO Health:** 9/10 (within 3 months after fixes deployed)
 
 ---
 
@@ -148,11 +179,12 @@ This document outlines the complete SEO strategy for EduCourse.com.au, including
 
 ---
 
-## PHASE 1: Stop the Bleeding (IMMEDIATE - 2 hours)
+## PHASE 1: Stop the Bleeding - 75% COMPLETE ⚠️
 
-**Timeline:** TODAY
-**Priority:** CRITICAL
+**Timeline:** IMMEDIATE (Complete today)
+**Priority:** CRITICAL 🔴
 **Owner:** Claude + Julian
+**Status:** BLOCKED - Build error preventing deployment
 
 ### Task 1.1: Implement 301 Redirects
 
@@ -248,12 +280,25 @@ Crawl-delay: 1
 
 ### Phase 1 Success Criteria
 
-- [ ] All 301 redirects working (test with old URLs)
-- [ ] Robots.txt updated and verified
-- [ ] Dynamic sitemap generating at build
-- [ ] All 6 product pages have unique meta tags
-- [ ] No 404 errors in Google Search Console
-- [ ] Core Web Vitals remain green
+- [x] All 301 redirects working (test with old URLs) ✅
+- [x] Robots.txt updated and verified ✅
+- [x] Dynamic sitemap generating at build ✅
+- [ ] All 6 product pages have unique meta tags ❌ **BLOCKED - Build failing**
+- [ ] No 404 errors in Google Search Console ❌ **GSC not set up**
+- [ ] Core Web Vitals remain green ⚠️ **Need to test - images likely hurting**
+
+### Phase 1 Blocking Issues (Fix First)
+
+1. **🔴 CRITICAL: Install react-helmet-async**
+   ```bash
+   npm install react-helmet-async
+   ```
+   Then wrap App in `<HelmetProvider>` in main.tsx
+
+2. **🔴 CRITICAL: Set up Google Search Console**
+   - Add verification meta tag to index.html
+   - Submit sitemap.xml
+   - Request indexing for all pages
 
 **Expected Impact:**
 - 20-30% reduction in bounce rate from search
@@ -887,28 +932,67 @@ export function SEOHead({ metadata, canonical }) {
 
 ---
 
-## ✅ Next Steps - Action Items
+## ✅ UPDATED ACTION PLAN (Nov 4, 2025)
 
-### Immediate (This Week)
-1. [ ] Review and approve this SEO strategy
-2. [ ] Proceed with Phase 1 implementation
-3. [ ] Set up Google Search Console (if not done)
-4. [ ] Verify GA4 is tracking properly
+### 🔴 IMMEDIATE - Fix Critical Issues (TODAY)
 
-### Week 1
-1. [ ] Complete Phase 1 (Stop the Bleeding)
-2. [ ] Start Phase 2 (Foundation Strengthening)
-3. [ ] Begin keyword research for product pages
+**Claude's Tasks (2 hours):**
+1. [ ] Install `react-helmet-async` package
+2. [ ] Wrap App in `<HelmetProvider>` in main.tsx
+3. [ ] Verify SEOHead component is used in CourseDetail.tsx
+4. [ ] Test build locally
+5. [ ] Deploy and verify unique meta tags on all product pages
 
-### Week 2
-1. [ ] Complete Phase 2
-2. [ ] Start Phase 3 (Blog Setup)
-3. [ ] Write first blog post draft
+**Julian's Tasks (1 hour):**
+1. [ ] Set up Google Search Console at search.google.com/search-console
+2. [ ] Add verification meta tag to index.html (Claude can help)
+3. [ ] Verify ownership in GSC
+4. [ ] Submit sitemap.xml to GSC
 
-### Week 3-4
-1. [ ] Complete Phase 3
-2. [ ] Publish 2-4 blog posts
-3. [ ] Start monitoring Search Console data
+---
+
+### 🟡 HIGH PRIORITY - This Week (Week 1)
+
+**Claude's Tasks (6 hours):**
+1. [ ] Optimize all images (convert to WebP, compress)
+2. [ ] Add enhanced schema markup to product pages
+3. [ ] Implement lazy loading for images
+4. [ ] Set up Sanity.io blog (following SANITY_SETUP.md)
+5. [ ] Create `/blog` listing and detail pages
+6. [ ] Deploy and verify all changes
+
+**Julian's Tasks (3 hours):**
+1. [ ] Create 7 OG images (1200x630px) in Canva
+2. [ ] Monitor Google Search Console for errors
+3. [ ] Check PageSpeed Insights scores
+4. [ ] Write first blog post draft (1200-1500 words)
+
+---
+
+### 🟢 MEDIUM PRIORITY - This Month (Weeks 2-4)
+
+**Claude's Tasks:**
+1. [ ] Create NSW and VIC hub pages
+2. [ ] Enhance internal linking structure
+3. [ ] Add breadcrumbs
+4. [ ] Create FAQ page with schema
+5. [ ] Add review schema to testimonials
+
+**Julian's Tasks:**
+1. [ ] Write 2-4 blog posts
+2. [ ] Create backlink outreach list
+3. [ ] Reach out to 5-10 sites for backlinks
+4. [ ] Monitor weekly SEO metrics
+
+---
+
+### 📊 ONGOING - Monthly Optimization
+
+1. [ ] Publish 1-2 blog posts per week
+2. [ ] Monitor Google Search Console weekly
+3. [ ] Track keyword rankings
+4. [ ] Build 2-3 backlinks per month
+5. [ ] Optimize underperforming pages
 
 ---
 
