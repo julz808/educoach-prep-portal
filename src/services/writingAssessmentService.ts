@@ -217,9 +217,32 @@ export class WritingAssessmentService {
           if ('message' in response.error) {
             console.error('❌ Error message:', response.error.message);
           }
-          if ('context' in response.error) {
-            console.error('❌ Error context:', response.error.context);
+
+          // Try to read the response body from the context
+          if ('context' in response.error && response.error.context instanceof Response) {
+            console.log('🔍 Attempting to read error response body...');
+            try {
+              const errorBody = await response.error.context.clone().json();
+              console.error('❌ Edge Function error body:', errorBody);
+              console.error('❌ Error details:', {
+                message: errorBody.message,
+                type: errorBody.type,
+                stack: errorBody.stack,
+                context: errorBody.context
+              });
+            } catch (bodyError) {
+              console.error('❌ Could not parse error response body:', bodyError);
+              try {
+                const errorText = await response.error.context.clone().text();
+                console.error('❌ Error response text:', errorText);
+              } catch (textError) {
+                console.error('❌ Could not read error response at all:', textError);
+              }
+            }
+          } else if ('context' in response.error) {
+            console.error('❌ Error context (not a Response):', response.error.context);
           }
+
           if ('stack' in response.error) {
             console.error('❌ Error stack:', response.error.stack);
           }
