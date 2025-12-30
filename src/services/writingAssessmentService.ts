@@ -210,6 +210,20 @@ export class WritingAssessmentService {
 
         console.error('❌ Supabase Edge Function failed with error:', response.error);
         console.error('❌ Full error details:', JSON.stringify(response.error, null, 2));
+
+        // Try to extract more details from the error
+        if (response.error && typeof response.error === 'object') {
+          console.error('❌ Error properties:', Object.keys(response.error));
+          if ('message' in response.error) {
+            console.error('❌ Error message:', response.error.message);
+          }
+          if ('context' in response.error) {
+            console.error('❌ Error context:', response.error.context);
+          }
+          if ('stack' in response.error) {
+            console.error('❌ Error stack:', response.error.stack);
+          }
+        }
       } else {
         console.warn('⚠️ No user session - skipping Edge Function');
       }
@@ -217,8 +231,14 @@ export class WritingAssessmentService {
       console.error('❌ Supabase Edge Function exception:', edgeError);
       console.error('❌ Exception details:', {
         message: edgeError.message,
-        stack: edgeError.stack
+        stack: edgeError.stack,
+        name: edgeError.name
       });
+
+      // Try to extract response body if available
+      if (edgeError.context) {
+        console.error('❌ Exception context:', edgeError.context);
+      }
     }
     
     // Option 2: Local proxy server fallback

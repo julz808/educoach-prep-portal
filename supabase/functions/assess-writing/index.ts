@@ -246,12 +246,27 @@ REQUIRED JSON RESPONSE:
 
   } catch (error) {
     console.error('❌ Error in writing assessment:', error)
-    
+    console.error('❌ Error type:', error.constructor.name)
+    console.error('❌ Error message:', error.message)
+    console.error('❌ Error stack:', error.stack)
+
+    // Return detailed error information for debugging
+    const errorResponse = {
+      error: 'Assessment failed',
+      message: error.message || 'Unknown error',
+      type: error.constructor?.name || 'Error',
+      stack: error.stack || 'No stack trace',
+      // Include helpful context
+      context: {
+        hasClaudeKey: !!Deno.env.get('CLAUDE_API_KEY'),
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    console.error('❌ Sending error response:', errorResponse)
+
     return new Response(
-      JSON.stringify({ 
-        error: 'Assessment failed', 
-        message: error.message 
-      }),
+      JSON.stringify(errorResponse),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
