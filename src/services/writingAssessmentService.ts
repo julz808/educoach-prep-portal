@@ -155,8 +155,17 @@ export class WritingAssessmentService {
     try {
       // Option 1: Supabase Edge Function
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔐 Session check:', session ? 'User authenticated' : 'No session');
+
       if (session) {
         console.log('🔄 Attempting Supabase Edge Function...');
+        console.log('📤 Sending to Edge Function:', {
+          userResponseLength: userResponse.length,
+          rubricName: rubric.genre,
+          rubricTotalMarks: rubric.totalMarks,
+          yearLevel
+        });
+
         const response = await supabase.functions.invoke('assess-writing', {
           body: {
             userResponse,
@@ -165,14 +174,21 @@ export class WritingAssessmentService {
             yearLevel
           }
         });
-        
+
+        console.log('📥 Edge Function raw response:', {
+          hasError: !!response.error,
+          hasData: !!response.data,
+          error: response.error,
+          dataKeys: response.data ? Object.keys(response.data) : []
+        });
+
         if (!response.error && response.data) {
           console.log('✅ Supabase Edge Function successful');
           console.log('📋 Edge Function Response:', response.data);
-          
+
           // Edge Function returns the correct format directly - no transformation needed
           const assessment = response.data;
-          
+
           // Ensure processingMetadata exists
           if (!assessment.processingMetadata) {
             assessment.processingMetadata = {
@@ -182,20 +198,27 @@ export class WritingAssessmentService {
               responseTokens: undefined
             };
           }
-          
+
           console.log('✅ Assessment processed:', {
             totalScore: assessment.totalScore,
             maxScore: assessment.maxPossibleScore,
             percentage: assessment.percentageScore
           });
-          
+
           return assessment as AssessmentResult;
         }
-        
-        console.warn('⚠️ Supabase Edge Function failed:', response.error);
+
+        console.error('❌ Supabase Edge Function failed with error:', response.error);
+        console.error('❌ Full error details:', JSON.stringify(response.error, null, 2));
+      } else {
+        console.warn('⚠️ No user session - skipping Edge Function');
       }
     } catch (edgeError) {
-      console.warn('⚠️ Supabase Edge Function error:', edgeError);
+      console.error('❌ Supabase Edge Function exception:', edgeError);
+      console.error('❌ Exception details:', {
+        message: edgeError.message,
+        stack: edgeError.stack
+      });
     }
     
     // Option 2: Local proxy server fallback

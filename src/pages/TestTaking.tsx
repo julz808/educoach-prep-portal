@@ -239,16 +239,25 @@ const TestTaking: React.FC = () => {
 
       if (isReadingSection) {
         console.log('📖 READING: Organizing questions by passage for', sectionName);
+        console.log('📖 READING: Total questions before grouping:', organizedQuestions.length);
+
+        // Log each question's passageId for debugging
+        organizedQuestions.forEach((q, idx) => {
+          console.log(`📖 Q${idx + 1}: passageId=${q.passageId?.substring(0, 8) || 'NONE'}, text="${q.text.substring(0, 50)}..."`);
+        });
 
         // Group questions by passage_id (UUID), keeping non-passage questions at the end
         const questionsWithPassage = organizedQuestions.filter(q => q.passageId);
         const questionsWithoutPassage = organizedQuestions.filter(q => !q.passageId);
 
+        console.log('📖 READING: Questions WITH passageId:', questionsWithPassage.length);
+        console.log('📖 READING: Questions WITHOUT passageId:', questionsWithoutPassage.length);
+
         // Group by passage_id, preserving order of first appearance
         const passageGroups = new Map<string, typeof organizedQuestions>();
         const passageOrder: string[] = []; // Track order passages first appear
 
-        questionsWithPassage.forEach(q => {
+        questionsWithPassage.forEach((q, idx) => {
           const passageKey = q.passageId!; // Use passage UUID as the key
           if (!passageGroups.has(passageKey)) {
             passageGroups.set(passageKey, []);
@@ -263,9 +272,15 @@ const TestTaking: React.FC = () => {
           ...questionsWithoutPassage
         ];
 
-        console.log('📖 READING: Organized into', passageGroups.size, 'passage groups with', questionsWithoutPassage.length, 'non-passage questions');
+        console.log('📖 READING: Organized into', passageGroups.size, 'passage groups');
         passageGroups.forEach((questions, passageId) => {
-          console.log(`   - Passage ${passageId.substring(0, 8)}: ${questions.length} questions`);
+          console.log(`   - Passage ${passageId.substring(0, 8)}...: ${questions.length} questions (indices: ${questions.map((_, i) => organizedQuestions.indexOf(_) + 1).join(', ')})`);
+        });
+
+        // Log final order
+        console.log('📖 READING: Final question order:');
+        organizedQuestions.forEach((q, idx) => {
+          console.log(`   ${idx + 1}. passageId=${q.passageId?.substring(0, 8) || 'NONE'}`);
         });
       }
       
