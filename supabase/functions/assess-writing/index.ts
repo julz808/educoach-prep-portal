@@ -152,9 +152,9 @@ REQUIRED JSON RESPONSE:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20240620',
-        max_tokens: 2000,
-        temperature: 0.1,
+        model: 'claude-3-opus-20240229',
+        max_tokens: 4096,
+        temperature: 0.3,
         messages: [{
           role: 'user',
           content: prompt
