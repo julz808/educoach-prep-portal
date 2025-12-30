@@ -25,11 +25,28 @@ const PurchaseSuccess: React.FC = () => {
     // Fire Google Ads conversion tracking
     if (typeof window !== 'undefined' && window.gtag && product) {
       console.log('🎯 Firing Google Ads conversion for product:', product);
+
+      const transactionId = Date.now() + '-' + product;
+
+      // Fire Purchase Success conversion with product details
       window.gtag('event', 'conversion', {
-        'send_to': 'AW-11082636289', // Generic conversion tracking - will work for basic tracking
+        'send_to': 'AW-11082636289/I_1RCLmY6osbEIG4zqQp', // Purchase Success conversion
         'value': 199.0,
         'currency': 'AUD',
-        'transaction_id': Date.now() + '-' + product // Unique transaction ID
+        'transaction_id': transactionId,
+        'items': [{
+          'id': product,
+          'name': getProductName(product),
+          'category': 'Test Prep',
+          'price': 199.0,
+          'quantity': 1
+        }]
+      });
+
+      console.log('✅ Conversion tracked:', {
+        transactionId,
+        product,
+        productName: getProductName(product)
       });
     }
 
