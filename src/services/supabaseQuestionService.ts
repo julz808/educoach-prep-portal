@@ -20,6 +20,7 @@ export interface OrganizedQuestion {
   visualData?: any;
   visualSvg?: string;
   visualUrl?: string;
+  passageId?: string; // Passage UUID for grouping questions
   passageContent?: string;
   maxPoints: number; // Maximum points for this question
 }
@@ -112,7 +113,7 @@ function findCorrectAnswerIndex(answerOptions: any, correctAnswer: string): numb
 function transformQuestion(question: Question, passage?: Passage): OrganizedQuestion {
   const options = parseAnswerOptions(question.answer_options);
   const correctAnswerIndex = findCorrectAnswerIndex(question.answer_options, question.correct_answer || '');
-  
+
   return {
     id: question.id,
     text: question.question_text,
@@ -128,6 +129,7 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
     visualData: question.visual_data,
     visualSvg: question.visual_svg || undefined,
     visualUrl: question.visual_url || undefined,
+    passageId: question.passage_id || undefined, // Include passage UUID for proper grouping
     passageContent: passage?.content,
     maxPoints: question.max_points || 1, // Use max_points from database, default to 1 for backward compatibility
   };

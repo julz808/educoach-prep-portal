@@ -233,34 +233,40 @@ const TestTaking: React.FC = () => {
       
       // For reading sections, organize questions by passage to keep related questions together
       let organizedQuestions = foundSection.questions;
-      const isReadingSection = sectionName.toLowerCase().includes('reading') || 
-                               sectionName.toLowerCase().includes('comprehension');
-      
+      const isReadingSection = sectionName.toLowerCase().includes('reading') ||
+                               sectionName.toLowerCase().includes('comprehension') ||
+                               sectionName.toLowerCase().includes('humanities');
+
       if (isReadingSection) {
         console.log('📖 READING: Organizing questions by passage for', sectionName);
-        
-        // Group questions by passage_id, keeping non-passage questions at the end
-        const questionsWithPassage = organizedQuestions.filter(q => q.passageContent);
-        const questionsWithoutPassage = organizedQuestions.filter(q => !q.passageContent);
-        
-        // Sort questions with passages by some identifier to group them
+
+        // Group questions by passage_id (UUID), keeping non-passage questions at the end
+        const questionsWithPassage = organizedQuestions.filter(q => q.passageId);
+        const questionsWithoutPassage = organizedQuestions.filter(q => !q.passageId);
+
+        // Group by passage_id, preserving order of first appearance
         const passageGroups = new Map<string, typeof organizedQuestions>();
+        const passageOrder: string[] = []; // Track order passages first appear
+
         questionsWithPassage.forEach(q => {
-          // Use passage content as grouping key (in real app, you'd use passage_id)
-          const passageKey = q.passageContent?.substring(0, 50) || 'unknown';
+          const passageKey = q.passageId!; // Use passage UUID as the key
           if (!passageGroups.has(passageKey)) {
             passageGroups.set(passageKey, []);
+            passageOrder.push(passageKey); // Record order of first appearance
           }
           passageGroups.get(passageKey)!.push(q);
         });
-        
-        // Reorganize: all questions from passage 1, then passage 2, etc., then non-passage questions
+
+        // Reorganize: all questions from each passage in order, then non-passage questions
         organizedQuestions = [
-          ...Array.from(passageGroups.values()).flat(),
+          ...passageOrder.flatMap(passageId => passageGroups.get(passageId)!),
           ...questionsWithoutPassage
         ];
-        
+
         console.log('📖 READING: Organized into', passageGroups.size, 'passage groups with', questionsWithoutPassage.length, 'non-passage questions');
+        passageGroups.forEach((questions, passageId) => {
+          console.log(`   - Passage ${passageId.substring(0, 8)}: ${questions.length} questions`);
+        });
       }
       
       return organizedQuestions.map((q, index) => ({
@@ -272,6 +278,7 @@ const TestTaking: React.FC = () => {
         topic: q.topic || 'General',
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
+        passageId: q.passageId, // Include passage ID for proper grouping
         passageContent: q.passageContent || '',
         format: questionFormat,
         maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
@@ -371,6 +378,7 @@ const TestTaking: React.FC = () => {
         topic: q.topic || 'General',
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
+        passageId: q.passageId, // Include passage ID for proper grouping
         passageContent: q.passageContent || '',
         format: questionFormat,
         maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1

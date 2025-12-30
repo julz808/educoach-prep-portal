@@ -44,7 +44,9 @@ const getDbProductType = (productId: string): string => {
     'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
     'year-5-naplan': 'Year 5 NAPLAN',
     'year-7-naplan': 'Year 7 NAPLAN',
+    'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
     'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+    'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
     'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
   };
   console.log('🗺️ DRILL: Mapping productId:', productId, 'to dbProductType:', productMap[productId] || productId);
