@@ -192,7 +192,7 @@ export class WritingAssessmentService {
           // Ensure processingMetadata exists
           if (!assessment.processingMetadata) {
             assessment.processingMetadata = {
-              modelVersion: 'claude-3-5-sonnet-20241022',
+              modelVersion: 'claude-3-5-sonnet-20240620',
               processingTimeMs: 0,
               promptTokens: undefined,
               responseTokens: undefined
