@@ -604,7 +604,7 @@ const Landing = () => {
       {/* Test Products Section */}
       <section id="products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <motion.h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4"
               initial={{ opacity: 0, y: 20 }}
@@ -617,8 +617,8 @@ const Landing = () => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            {/* Product Buttons Grid - 3 columns, 2 rows */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+            {/* Product Buttons Grid - Simple text buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-16">
               {courses.map((course, index) => (
                 <motion.div
                   key={course.id}
@@ -630,91 +630,85 @@ const Landing = () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="w-full h-auto py-6 px-5 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all group"
+                    className="w-full py-3 px-4 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all font-semibold text-base"
                   >
                     <Link to={`/course/${course.slug}`}>
-                      <div className="flex flex-col items-center text-center space-y-3 w-full">
-                        <div className="w-14 h-14 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <BookOpen className="h-7 w-7 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-base mb-1">{course.title}</div>
-                          <div className="text-lg font-semibold">$199</div>
-                        </div>
-                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                      </div>
+                      {course.title}
                     </Link>
                   </Button>
                 </motion.div>
               ))}
             </div>
 
-            {/* What's Included - Full Width Below */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <div className="bg-gradient-to-br from-[#F8F9FA] to-white rounded-2xl p-6 md:p-10 border-2 border-gray-100">
-                <div className="text-center mb-10">
-                  <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
-                    What's Included
-                  </h3>
-                  <p className="text-base md:text-lg text-[#6B7280]">
-                    Everything you need to prepare for success
-                  </p>
-                </div>
+            {/* What's Included - No box, integrated */}
+            <div className="text-center mb-8">
+              <motion.h3
+                className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                What's Included
+              </motion.h3>
+              <motion.p
+                className="text-base md:text-lg text-[#6B7280]"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                viewport={{ once: true }}
+              >
+                Everything you need to prepare for success
+              </motion.p>
+            </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[
-                    {
-                      title: "1000+ Questions",
-                      description: "Comprehensive question bank covering all test sections and difficulty levels"
-                    },
-                    {
-                      title: "5 Full-Length Tests",
-                      description: "Complete practice exams that simulate real test conditions and timing"
-                    },
-                    {
-                      title: "AI-Powered Writing Practice",
-                      description: "Instant feedback on your writing with detailed suggestions for improvement"
-                    },
-                    {
-                      title: "Sub-skill Level Practice",
-                      description: "Targeted exercises focusing on specific areas identified by diagnostic results"
-                    },
-                    {
-                      title: "Detailed Analytics",
-                      description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
-                    },
-                    {
-                      title: "Practice anywhere",
-                      description: "Tablet and desktop friendly platform - practice at home, school, or anywhere with internet access"
-                    }
-                  ].map((feature, index) => (
-                    <motion.div
-                      key={index}
-                      className="flex items-start space-x-3"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="text-lg font-semibold text-[#2C3E50] mb-1">
-                          {feature.title}
-                        </h4>
-                        <p className="text-sm text-[#6B7280] leading-relaxed">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "1000+ Questions",
+                  description: "Comprehensive question bank covering all test sections and difficulty levels"
+                },
+                {
+                  title: "5 Full-Length Tests",
+                  description: "Complete practice exams that simulate real test conditions and timing"
+                },
+                {
+                  title: "AI-Powered Writing Practice",
+                  description: "Instant feedback on your writing with detailed suggestions for improvement"
+                },
+                {
+                  title: "Sub-skill Level Practice",
+                  description: "Targeted exercises focusing on specific areas identified by diagnostic results"
+                },
+                {
+                  title: "Detailed Analytics",
+                  description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
+                },
+                {
+                  title: "Practice anywhere",
+                  description: "Tablet and desktop friendly platform - practice at home, school, or anywhere with internet access"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  className="flex items-start space-x-3"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-lg font-semibold text-[#2C3E50] mb-1">
+                      {feature.title}
+                    </h4>
+                    <p className="text-sm text-[#6B7280] leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
