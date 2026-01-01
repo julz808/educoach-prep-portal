@@ -617,8 +617,8 @@ const Landing = () => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            {/* Product Buttons Grid - Simple text buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-16">
+            {/* Product Buttons Grid - Taller with brand colors */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
               {courses.map((course, index) => (
                 <motion.div
                   key={course.id}
@@ -629,8 +629,7 @@ const Landing = () => {
                 >
                   <Button
                     asChild
-                    variant="outline"
-                    className="w-full py-3 px-4 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all font-semibold text-base"
+                    className="w-full py-6 px-5 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] hover:from-[#45beb5] hover:to-[#5b5ef1] text-white transition-all font-bold text-lg shadow-md hover:shadow-lg"
                   >
                     <Link to={`/course/${course.slug}`}>
                       {course.title}
@@ -640,28 +639,7 @@ const Landing = () => {
               ))}
             </div>
 
-            {/* What's Included - No box, integrated */}
-            <div className="text-center mb-8">
-              <motion.h3
-                className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                viewport={{ once: true }}
-              >
-                What's Included
-              </motion.h3>
-              <motion.p
-                className="text-base md:text-lg text-[#6B7280]"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                viewport={{ once: true }}
-              >
-                Everything you need to prepare for success
-              </motion.p>
-            </div>
-
+            {/* Features directly below - no headings */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
