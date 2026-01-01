@@ -486,10 +486,7 @@ const Landing = () => {
                       }
                     }}
                   >
-                    <div className="flex flex-col items-center">
-                      <span>Get Started - Risk Free</span>
-                      <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
-                    </div>
+                    Find Your Test
                     <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                   <Button
@@ -519,15 +516,15 @@ const Landing = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>7-Day Money-Back Guarantee</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
                     <span>Instant Access</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
                     <span>Works on All Devices</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                    <span>No Setup Required</span>
                   </div>
                 </motion.div>
               </motion.div>
@@ -608,19 +605,36 @@ const Landing = () => {
       <section id="products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16 scroll-animate">
-            <AnimatedText 
+            <AnimatedText
               text="Choose Your Test Preparation Package"
-              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center px-2"
+              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-6 justify-center px-2"
             />
-            <motion.p 
-              className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto px-4"
+            <motion.div
+              className="flex flex-wrap items-center justify-center gap-6 md:gap-8 max-w-4xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
               viewport={{ once: true }}
             >
-              Each package includes diagnostic tests, targeted drills, and full-length practice exams
-            </motion.p>
+              <div className="flex items-center space-x-2 text-[#2C3E50]">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-base md:text-lg font-medium">Diagnostic Tests</span>
+              </div>
+              <div className="flex items-center space-x-2 text-[#2C3E50]">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
+                  <Target className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-base md:text-lg font-medium">Targeted Drills</span>
+              </div>
+              <div className="flex items-center space-x-2 text-[#2C3E50]">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-base md:text-lg font-medium">Full-Length Practice Exams</span>
+              </div>
+            </motion.div>
           </div>
 
           {/* Mobile: Horizontal Scrollable, Tablet+: Grid/Carousel */}
@@ -653,14 +667,13 @@ const Landing = () => {
                       <div className="mt-auto">
                         <div className="text-center mb-4">
                           <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
-                          <p className="text-xs text-[#4ECDC4] mt-1">7-Day Money-Back Guarantee</p>
                         </div>
                         <Button
                           asChild
                           className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
                         >
                           <Link to={`/course/${course.slug}`}>
-                            Get Started - Risk Free
+                            Get Started
                             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -709,14 +722,13 @@ const Landing = () => {
                     <div className="mt-auto">
                       <div className="text-center mb-4">
                         <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
-                        <p className="text-xs text-[#4ECDC4] mt-1">7-Day Money-Back Guarantee</p>
                       </div>
                       <Button
                         asChild
                         className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
                       >
                         <Link to={`/course/${course.slug}`}>
-                          Get Started - Risk Free
+                          Get Started
                           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                       </Button>
@@ -829,11 +841,10 @@ const Landing = () => {
                               asChild
                             >
                               <Link to={`/course/${course.slug}`}>
-                                Get Started - Risk Free
+                                Get Started
                                 <ArrowRight className="ml-2 h-4 w-4" />
                               </Link>
                             </Button>
-                            <p className="text-xs text-center text-[#4ECDC4] mt-2">7-Day Money-Back Guarantee</p>
                           </div>
                         </CardContent>
                       </Card>
@@ -1307,13 +1318,14 @@ const Landing = () => {
                   }
                 }}
               >
-                <div className="flex flex-col items-center">
-                  <span>Start Risk-Free Today</span>
-                  <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
-                </div>
+                Get Started Today
                 <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               </Button>
               <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm text-gray-300">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                  <span>7-Day Money-Back Guarantee</span>
+                </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
                   <span>Instant Access</span>
@@ -1321,10 +1333,6 @@ const Landing = () => {
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
                   <span>Works on All Devices</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                  <span>Cancel Anytime</span>
                 </div>
               </div>
             </div>
