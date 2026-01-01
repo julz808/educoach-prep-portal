@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { courses } from '@/data/courses';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { courses, faqs } from '@/data/courses';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import Lenis from 'lenis';
@@ -421,21 +422,24 @@ const Landing = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <div className="space-y-6 md:space-y-8">
-                <motion.h1 
+                <motion.h1
                   className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  We're here to help you <span className="text-[#4ECDC4] underline">ace</span> your next test!
+                  See <span className="text-[#4ECDC4]">Exactly</span> Which Skills Your Child Needs to Improve
+                  <span className="block text-2xl sm:text-3xl lg:text-4xl text-[#6B7280] font-normal mt-2">
+                    (Beyond Just "Maths" or "Reading")
+                  </span>
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
-                  Australia's leading test preparation platform for <span className="font-bold">scholarship</span>, <span className="font-bold">selective entry</span> and <span className="font-bold">NAPLAN</span> tests
+                  Most test prep stops at overall scores. EduCourse tracks performance in <span className="font-bold text-[#6366F1]">50+ sub-skills</span> so you know precisely what to practice for <span className="font-bold">NAPLAN</span>, <span className="font-bold">selective entry</span>, and <span className="font-bold">scholarship</span> tests.
                 </motion.p>
               </div>
 
@@ -465,28 +469,70 @@ const Landing = () => {
               </motion.div>
 
               {/* CTA */}
-              <motion.div 
-                className="flex justify-center lg:justify-start pt-4"
+              <motion.div
+                className="space-y-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 2.5 }}
               >
-                <Button 
-                  size="lg" 
-                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group w-full sm:w-auto"
-                  onClick={() => {
-                    const methodologySection = document.getElementById('methodology');
-                    if (methodologySection) {
-                      methodologySection.scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                      });
-                    }
-                  }}
+                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                  <Button
+                    size="lg"
+                    className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group w-full sm:w-auto"
+                    onClick={() => {
+                      const productsSection = document.getElementById('products');
+                      if (productsSection) {
+                        productsSection.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start'
+                        });
+                      }
+                    }}
+                  >
+                    <div className="flex flex-col items-center">
+                      <span>Get Started - Risk Free</span>
+                      <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
+                    </div>
+                    <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
+                    onClick={() => {
+                      const methodologySection = document.getElementById('methodology');
+                      if (methodologySection) {
+                        methodologySection.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start'
+                        });
+                      }
+                    }}
+                  >
+                    See how it works
+                  </Button>
+                </div>
+
+                {/* Trust Signals */}
+                <motion.div
+                  className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 text-sm text-[#6B7280]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 2.7 }}
                 >
-                  See how it works
-                  <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>Instant Access</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>Works on All Devices</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>No Setup Required</span>
+                  </div>
+                </motion.div>
               </motion.div>
             </motion.div>
 
@@ -610,13 +656,14 @@ const Landing = () => {
                       <div className="mt-auto">
                         <div className="text-center mb-4">
                           <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
+                          <p className="text-xs text-[#4ECDC4] mt-1">7-Day Money-Back Guarantee</p>
                         </div>
-                        <Button 
-                          asChild 
+                        <Button
+                          asChild
                           className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
                         >
                           <Link to={`/course/${course.slug}`}>
-                            Start Preparation
+                            Get Started - Risk Free
                             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -665,13 +712,14 @@ const Landing = () => {
                     <div className="mt-auto">
                       <div className="text-center mb-4">
                         <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
+                        <p className="text-xs text-[#4ECDC4] mt-1">7-Day Money-Back Guarantee</p>
                       </div>
-                      <Button 
-                        asChild 
+                      <Button
+                        asChild
                         className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
                       >
                         <Link to={`/course/${course.slug}`}>
-                          Start Preparation
+                          Get Started - Risk Free
                           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                       </Button>
@@ -779,15 +827,16 @@ const Landing = () => {
 
                           {/* CTA - Fixed position at bottom */}
                           <div className="mt-auto">
-                            <Button 
+                            <Button
                               className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
                               asChild
                             >
                               <Link to={`/course/${course.slug}`}>
-                                See what's included
+                                Get Started - Risk Free
                                 <ArrowRight className="ml-2 h-4 w-4" />
                               </Link>
                             </Button>
+                            <p className="text-xs text-center text-[#4ECDC4] mt-2">7-Day Money-Back Guarantee</p>
                           </div>
                         </CardContent>
                       </Card>
@@ -1159,6 +1208,84 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-16 md:py-20 bg-[#F8F9FA]">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
+              Everything you need to know about EduCourse test preparation
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <Accordion type="single" collapsible className="w-full bg-white rounded-xl shadow-sm">
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-0 px-6">
+                  <AccordionTrigger className="text-lg font-medium text-[#2C3E50] hover:text-[#4ECDC4] transition-colors py-6 text-left">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-[#6B7280] pb-6 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+
+          {/* CTA after FAQ */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-lg text-[#6B7280] mb-6">
+              Still have questions? We're here to help!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white"
+                asChild
+              >
+                <a href="mailto:learning@educourse.com.au">Contact Us</a>
+              </Button>
+              <Button
+                size="lg"
+                className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white"
+                onClick={() => {
+                  const productsSection = document.getElementById('products');
+                  if (productsSection) {
+                    productsSection.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }
+                }}
+              >
+                Get Started - Risk Free
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Footer Section */}
       <footer className="bg-[#2C3E50] text-white py-12 md:py-16">
@@ -1169,22 +1296,41 @@ const Landing = () => {
             <p className="text-lg md:text-xl text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
               Join 1000+ families who trust EduCourse for test preparation
             </p>
-            <Button 
-              size="lg" 
-              className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
-              onClick={() => {
-                const productsSection = document.getElementById('products');
-                if (productsSection) {
-                  productsSection.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }
-              }}
-            >
-              Get Started Today
-              <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-            </Button>
+            <div className="flex flex-col items-center space-y-4">
+              <Button
+                size="lg"
+                className="bg-[#FF6B6B] hover:bg-[#E55A5A] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
+                onClick={() => {
+                  const productsSection = document.getElementById('products');
+                  if (productsSection) {
+                    productsSection.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }
+                }}
+              >
+                <div className="flex flex-col items-center">
+                  <span>Start Risk-Free Today</span>
+                  <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
+                </div>
+                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+              </Button>
+              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm text-gray-300">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                  <span>Instant Access</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                  <span>Works on All Devices</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                  <span>Cancel Anytime</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Footer Links */}

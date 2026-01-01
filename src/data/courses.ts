@@ -109,26 +109,34 @@ export const courses: Course[] = [
 export const faqs = [
   {
     question: "How long do I have access to the course?",
-    answer: "You have unlimited access from the date of purchase."
+    answer: "You have 12 months of unlimited access from the date of purchase. This gives you plenty of time to prepare at your own pace, practice multiple times, and track your progress leading up to your test date."
   },
   {
     question: "Are the practice tests similar to the real exams?",
-    answer: "Yes, our practice tests are designed to closely mimic the format, difficulty level, and timing of the actual exams."
+    answer: "Yes! Our practice tests are carefully designed to closely mimic the format, difficulty level, timing, and question types of the actual exams. All questions are created by experienced teachers familiar with test formats and aligned to official test structures."
   },
   {
     question: "Can I use this course on multiple devices?",
-    answer: "Yes, you can access your course on any device with a web browser - computers, tablets, and smartphones."
+    answer: "Yes, you can access your course on any device with internet and a web browser - desktop computers, laptops, tablets (including iPad), and even smartphones. Your progress syncs automatically across all devices."
+  },
+  {
+    question: "What happens after I purchase?",
+    answer: "You'll receive immediate access! After completing your purchase, you'll get an email with login instructions within minutes. You can start with the diagnostic test right away to identify your strengths and areas for improvement."
   },
   {
     question: "Do you offer refunds if I'm not satisfied?",
-    answer: "Yes, we offer a 7-day money-back guarantee if you're not completely satisfied with your purchase."
+    answer: "Yes! We offer a 7-day money-back guarantee. If you're not completely satisfied with your purchase for any reason, simply contact us within 7 days for a full refund - no questions asked."
   },
   {
     question: "How do the diagnostic tests work?",
-    answer: "Our diagnostic tests assess your current knowledge and skills, then generate a personalised study plan focusing on areas where you need the most improvement."
+    answer: "Our diagnostic tests assess your child's current knowledge and skills across all test sections and sub-skills. After completion, you'll receive a detailed breakdown showing strengths and gaps, along with personalized recommendations for which areas to practice most."
   },
   {
-    question: "Do you provide feedback on practice essays?",
-    answer: "Yes, our AI-powered system provides detailed feedback on structure, content, language use, and areas for improvement on all written responses."
+    question: "Do you provide feedback on writing tasks?",
+    answer: "Yes! Our AI-powered system provides instant, detailed feedback on all writing responses - including structure, content quality, grammar, vocabulary usage, and specific suggestions for improvement. It's like having a personal writing tutor available 24/7."
+  },
+  {
+    question: "Can siblings share one account?",
+    answer: "Each purchase is designed for one student to ensure accurate progress tracking and personalized analytics. If you have multiple children preparing for tests, please contact us at learning@educourse.com.au for family discount options."
   }
 ];

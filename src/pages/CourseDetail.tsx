@@ -475,20 +475,46 @@ const CourseDetail = () => {
               </motion.div>
 
               {/* CTA */}
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
+              <motion.div
+                className="space-y-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1.2 }}
               >
-                <Button 
-                  size="lg" 
-                  className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group"
-                  onClick={handlePurchase}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                  <Button
+                    size="lg"
+                    className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group"
+                    onClick={handlePurchase}
+                  >
+                    <div className="flex flex-col items-center">
+                      <span>Start Improving Today - $199</span>
+                      <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
+                    </div>
+                    <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </div>
+
+                {/* Trust Signals */}
+                <motion.div
+                  className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 text-sm text-[#6B7280]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 1.4 }}
                 >
-                  Purchase for $199
-                  <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>Instant Access</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>12 Months Access</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
+                    <span>Works on All Devices</span>
+                  </div>
+                </motion.div>
               </motion.div>
             </motion.div>
 
@@ -971,12 +997,15 @@ const CourseDetail = () => {
             <p className="text-lg text-[#6B7280] mb-6">
               Ready to help your child succeed?
             </p>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
               onClick={handlePurchase}
             >
-              Get Started Today
+              <div className="flex flex-col items-center">
+                <span>Start Risk-Free Today</span>
+                <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee • $199</span>
+              </div>
             </Button>
           </motion.div>
         </div>
@@ -1023,7 +1052,7 @@ const CourseDetail = () => {
       {/* Final CTA Section */}
       <section className="py-16 md:py-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1]">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1034,19 +1063,33 @@ const CourseDetail = () => {
               Ready to Start Your Test Prep Journey?
             </h2>
             <p className="text-lg md:text-xl text-white/90 mb-8">
-              Join thousands of students who've achieved their goals with EduCourse
+              Join 1,000+ families who trust EduCourse for test preparation
             </p>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg"
               onClick={handlePurchase}
             >
-              Get Started for $199
+              <div className="flex flex-col items-center">
+                <span>Start Risk-Free Today - $199</span>
+                <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
+              </div>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="mt-6 text-sm text-white/80">
-              7-day money-back guarantee • Instant access • Works on all devices
-            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-white/90">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>Instant access</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>12 months access</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>Works on all devices</span>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
