@@ -604,274 +604,126 @@ const Landing = () => {
       {/* Test Products Section */}
       <section id="products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16 scroll-animate">
-            <AnimatedText
-              text="Choose Your Test Preparation Package"
-              className="text-xl sm:text-2xl md:text-4xl font-bold text-[#2C3E50] mb-6 justify-center px-2"
-            />
-            <motion.div
-              className="flex flex-wrap items-center justify-center gap-6 md:gap-8 max-w-4xl mx-auto"
+          <div className="text-center mb-12 md:mb-16">
+            <motion.h2
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="flex items-center space-x-2 text-[#2C3E50]">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-white" />
+              Find Your Test Preparation Package
+            </motion.h2>
+          </div>
+
+          {/* Split Layout: Products on Left, Features on Right */}
+          <div className="grid lg:grid-cols-4 gap-8 lg:gap-12 max-w-7xl mx-auto">
+            {/* Left Side: Product Buttons (1/4 width) */}
+            <motion.div
+              className="lg:col-span-1 space-y-3"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              {courses.map((course, index) => (
+                <motion.div
+                  key={course.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start text-left h-auto py-4 px-4 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all group"
+                  >
+                    <Link to={`/course/${course.slug}`}>
+                      <div className="flex items-center space-x-3 w-full">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                          <BookOpen className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-base truncate">{course.title}</div>
+                          <div className="text-sm opacity-70 mt-0.5">$199</div>
+                        </div>
+                        <ArrowRight className="h-4 w-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
+                  </Button>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Right Side: What's Included (3/4 width) */}
+            <motion.div
+              className="lg:col-span-3"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="bg-gradient-to-br from-[#F8F9FA] to-white rounded-2xl p-6 md:p-8 border-2 border-gray-100">
+                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
+                  What's Included
+                </h3>
+                <p className="text-base md:text-lg text-[#6B7280] mb-8">
+                  Everything you need to prepare for success
+                </p>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {[
+                    {
+                      title: "1000+ Questions",
+                      description: "Comprehensive question bank covering all test sections and difficulty levels"
+                    },
+                    {
+                      title: "5 Full-Length Tests",
+                      description: "Complete practice exams that simulate real test conditions and timing"
+                    },
+                    {
+                      title: "AI-Powered Writing Practice",
+                      description: "Instant feedback on your writing with detailed suggestions for improvement"
+                    },
+                    {
+                      title: "Sub-skill Level Practice",
+                      description: "Targeted exercises focusing on specific areas identified by diagnostic results"
+                    },
+                    {
+                      title: "Detailed Analytics",
+                      description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
+                    },
+                    {
+                      title: "Practice anywhere",
+                      description: "Tablet and desktop friendly platform - practice at home, school, or anywhere with internet access"
+                    }
+                  ].map((feature, index) => (
+                    <motion.div
+                      key={index}
+                      className="flex items-start space-x-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-lg font-semibold text-[#2C3E50] mb-1">
+                          {feature.title}
+                        </h4>
+                        <p className="text-sm text-[#6B7280] leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <span className="text-base md:text-lg font-medium">Diagnostic Tests</span>
-              </div>
-              <div className="flex items-center space-x-2 text-[#2C3E50]">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
-                  <Target className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-base md:text-lg font-medium">Targeted Drills</span>
-              </div>
-              <div className="flex items-center space-x-2 text-[#2C3E50]">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-base md:text-lg font-medium">Full-Length Practice Exams</span>
               </div>
             </motion.div>
           </div>
-
-          {/* Mobile: Horizontal Scrollable, Tablet+: Grid/Carousel */}
-          <div className="block sm:hidden">
-            {/* Mobile Horizontal Scroll Layout */}
-            <div className="overflow-x-auto pb-4">
-              <div className="flex space-x-4 px-4" style={{ width: 'max-content' }}>
-                {courses.map((course) => (
-                  <Card key={course.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col w-72 flex-shrink-0">
-                    <CardHeader className="text-center pb-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-3">
-                        <BookOpen className="h-6 w-6 text-white" />
-                      </div>
-                      <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col h-full pt-0">
-                      <div className="text-center flex-grow">
-                        <div className="text-sm text-[#6B7280] mb-6">
-                          {course.title === "Year 5 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                          {course.title === "Year 7 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                          {course.title === "Year 9 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                          {course.title === "ACER Scholarship" && "Written Expression, Mathematics, Humanities"}
-                          {course.title === "EduTest Scholarship" && "Reading, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression"}
-                          {course.title === "NSW Selective Entry" && "Reading, Mathematical Reasoning, Thinking Skills, Writing"}
-                          {course.title === "VIC Selective Entry" && "Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing"}
-                          {course.title === "CogAT" && "Verbal Battery, Quantitative Battery, Nonverbal Battery"}
-                        </div>
-                      </div>
-                      
-                      <div className="mt-auto">
-                        <div className="text-center mb-4">
-                          <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
-                        </div>
-                        <Button
-                          asChild
-                          className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
-                        >
-                          <Link to={`/course/${course.slug}`}>
-                            Get Started
-                            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Tablet: Simple Grid */}
-          <div className="hidden sm:block md:hidden">
-            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
-              {courses.map((course) => (
-                <Card key={course.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full">
-                  <CardHeader className="text-center pb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-3">
-                      <BookOpen className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className="text-lg text-[#2C3E50]">{course.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col h-full pt-0">
-                    <div className="text-center flex-grow">
-                      <div className="text-sm text-[#6B7280] mb-4">
-                        {course.title === "Year 5 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                        {course.title === "Year 7 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                        {course.title === "Year 9 NAPLAN" && "Writing, Reading, Language Conventions, Numeracy"}
-                        {course.title === "ACER Scholarship" && "Written Expression, Mathematics, Humanities"}
-                        {course.title === "EduTest Scholarship" && "Reading, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression"}
-                        {course.title === "NSW Selective Entry" && "Reading, Mathematical Reasoning, Thinking Skills, Writing"}
-                        {course.title === "VIC Selective Entry" && "Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing"}
-                        {course.title === "CogAT" && "Verbal Battery, Quantitative Battery, Nonverbal Battery"}
-                      </div>
-                      
-                      <div className="space-y-2 mb-6">
-                        {['1000+ practice questions', 'Detailed performance analytics', 'Sub-skill level insights'].map((feature, idx) => (
-                          <div key={idx} className="flex items-center text-sm text-[#6B7280]">
-                            <CheckCircle className="h-4 w-4 text-[#4ECDC4] mr-2 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="mt-auto">
-                      <div className="text-center mb-4">
-                        <span className="text-2xl font-bold text-[#3B4F6B]">$199</span>
-                      </div>
-                      <Button
-                        asChild
-                        className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group"
-                      >
-                        <Link to={`/course/${course.slug}`}>
-                          Get Started
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop: Carousel */}
-          <div className="hidden md:block relative max-w-7xl mx-auto">
-            {/* Left Arrow */}
-            <button
-              onClick={() => handleSlideChange('prev')}
-              disabled={isTransitioning}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
-            >
-              <ChevronLeft className="h-6 w-6 text-[#2C3E50]" />
-            </button>
-
-            {/* Right Arrow */}
-            <button
-              onClick={() => handleSlideChange('next')}
-              disabled={isTransitioning}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-200 hover:scale-110 disabled:opacity-50"
-            >
-              <ChevronRight className="h-6 w-6 text-[#2C3E50]" />
-            </button>
-
-            {/* Carousel Track */}
-            <div className="overflow-hidden px-20 py-8">
-              <div className="relative h-[450px] flex items-center justify-center">
-                {/* Show 3 cards: previous, current, next */}
-                <AnimatePresence mode="popLayout">
-                  {[-1, 0, 1].map((offset) => {
-                    const slideIndex = (currentSlide + offset + courses.length) % courses.length;
-                    const course = courses[slideIndex];
-                    const isCenter = offset === 0;
-                    
-                    return (
-                      <motion.div
-                        key={`${slideIndex}-${currentSlide}-${offset}`}
-                        className="absolute w-96"
-                        initial={{ 
-                          x: offset * 420,
-                          scale: isCenter ? 1.1 : 0.9,
-                          opacity: isCenter ? 1 : 0.7
-                        }}
-                        animate={{
-                          x: offset * 420,
-                          scale: isCenter ? 1.1 : 0.9,
-                          opacity: isCenter ? 1 : 0.7,
-                          zIndex: isCenter ? 20 : 10
-                        }}
-                        exit={{
-                          x: offset * 420,
-                          scale: 0.8,
-                          opacity: 0
-                        }}
-                        transition={{
-                          x: { type: "spring", stiffness: 300, damping: 30 },
-                          scale: { duration: 0.3 },
-                          opacity: { duration: 0.3 }
-                        }}
-                      >
-                      <Card className={`group hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4ECDC4] flex flex-col h-full ${
-                        isCenter ? 'border-[#4ECDC4] shadow-2xl' : ''
-                      }`}>
-                        <CardHeader className="text-center">
-                          <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookOpen className="h-8 w-8 text-white" />
-                          </div>
-                          <CardTitle className="text-xl text-[#2C3E50]">{course.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col h-full">
-                          {/* Test Features - Fixed height container */}
-                          <div className="text-center flex-grow">
-                            <div className="text-sm text-[#6B7280] min-h-[60px] flex items-center justify-center">
-                              {course.title === "Year 5 NAPLAN" && (
-                                <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
-                              )}
-                              {course.title === "Year 7 NAPLAN" && (
-                                <div>Writing, Reading, Language Conventions, Numeracy No Calculator, Numeracy Calculator</div>
-                              )}
-                              {course.title === "ACER Scholarship" && (
-                                <div>Written Expression, Mathematics, Humanities</div>
-                              )}
-                              {course.title === "EduTest Scholarship" && (
-                                <div>Reading Comprehension, Verbal Reasoning, Numerical Reasoning, Mathematics, Written Expression</div>
-                              )}
-                              {course.title === "NSW Selective Entry" && (
-                                <div>Reading, Mathematical Reasoning, Thinking Skills, Writing</div>
-                              )}
-                              {course.title === "VIC Selective Entry" && (
-                                <div>Reading Reasoning, Mathematics Reasoning, General Ability - Verbal, General Ability - Quantitative, Writing</div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Price - Fixed position */}
-                          <div className="text-center py-4">
-                            <span className="text-lg font-bold text-[#3B4F6B]">${course.price}</span>
-                          </div>
-
-                          {/* CTA - Fixed position at bottom */}
-                          <div className="mt-auto">
-                            <Button
-                              className="w-full bg-[#6366F1] hover:bg-[#5B5BD6] text-white group-hover:scale-105 transition-transform"
-                              asChild
-                            >
-                              <Link to={`/course/${course.slug}`}>
-                                Get Started
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                              </Link>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-            </div>
-            
-            {/* Slide Indicators */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {courses.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSlideChange(index)}
-                  disabled={isTransitioning}
-                  className={`w-3 h-3 rounded-full transition-colors disabled:opacity-50 ${
-                    index === currentSlide ? 'bg-[#4ECDC4]' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
         </div>
       </section>
-
       {/* Methodology Section */}
       <section id="methodology" className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
