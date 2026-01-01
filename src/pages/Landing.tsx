@@ -428,10 +428,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  See <span className="text-[#4ECDC4]">Exactly</span> Which Skills Your Child Needs to Improve
-                  <span className="block text-2xl sm:text-3xl lg:text-4xl text-[#6B7280] font-normal mt-2">
-                    (Beyond Just "Maths" or "Reading")
-                  </span>
+                  Don't Leave Your Child's Test Preparation to <span className="text-[#4ECDC4]">Chance</span>
                 </motion.h1>
                 <motion.p
                   className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
@@ -439,7 +436,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
-                  Most test prep stops at overall scores. EduCourse tracks performance in <span className="font-bold text-[#6366F1]">50+ sub-skills</span> so you know precisely what to practice for <span className="font-bold">NAPLAN</span>, <span className="font-bold">selective entry</span>, and <span className="font-bold">scholarship</span> tests.
+                  Give your child the edge they need with Australia's most comprehensive test prep platform for <span className="font-bold">NAPLAN</span>, <span className="font-bold">selective entry</span>, and <span className="font-bold">scholarship</span> exams. Track performance in <span className="font-bold text-[#6366F1]">50+ sub-skills</span>, not just overall scores.
                 </motion.p>
               </div>
 
