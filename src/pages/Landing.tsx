@@ -604,7 +604,7 @@ const Landing = () => {
       {/* Test Products Section */}
       <section id="products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16">
+          <div className="text-center mb-12">
             <motion.h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4"
               initial={{ opacity: 0, y: 20 }}
@@ -616,63 +616,57 @@ const Landing = () => {
             </motion.h2>
           </div>
 
-          {/* Split Layout: Products on Left, Features on Right */}
-          <div className="grid lg:grid-cols-4 gap-8 lg:gap-12 max-w-7xl mx-auto">
-            {/* Left Side: Product Buttons (1/4 width) */}
-            <motion.div
-              className="lg:col-span-1 space-y-3"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+          <div className="max-w-6xl mx-auto">
+            {/* Product Buttons Grid - 3 columns, 2 rows */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
               {courses.map((course, index) => (
                 <motion.div
                   key={course.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
                   <Button
                     asChild
                     variant="outline"
-                    className="w-full justify-start text-left h-auto py-4 px-4 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all group"
+                    className="w-full h-auto py-6 px-5 border-2 hover:border-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-all group"
                   >
                     <Link to={`/course/${course.slug}`}>
-                      <div className="flex items-center space-x-3 w-full">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                          <BookOpen className="h-5 w-5 text-white" />
+                      <div className="flex flex-col items-center text-center space-y-3 w-full">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <BookOpen className="h-7 w-7 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-base truncate">{course.title}</div>
-                          <div className="text-sm opacity-70 mt-0.5">$199</div>
+                        <div>
+                          <div className="font-bold text-base mb-1">{course.title}</div>
+                          <div className="text-lg font-semibold">$199</div>
                         </div>
-                        <ArrowRight className="h-4 w-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </Link>
                   </Button>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
 
-            {/* Right Side: What's Included (3/4 width) */}
+            {/* What's Included - Full Width Below */}
             <motion.div
-              className="lg:col-span-3"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              <div className="bg-gradient-to-br from-[#F8F9FA] to-white rounded-2xl p-6 md:p-8 border-2 border-gray-100">
-                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
-                  What's Included
-                </h3>
-                <p className="text-base md:text-lg text-[#6B7280] mb-8">
-                  Everything you need to prepare for success
-                </p>
+              <div className="bg-gradient-to-br from-[#F8F9FA] to-white rounded-2xl p-6 md:p-10 border-2 border-gray-100">
+                <div className="text-center mb-10">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
+                    What's Included
+                  </h3>
+                  <p className="text-base md:text-lg text-[#6B7280]">
+                    Everything you need to prepare for success
+                  </p>
+                </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[
                     {
                       title: "1000+ Questions",
@@ -704,7 +698,7 @@ const Landing = () => {
                       className="flex items-start space-x-3"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                      transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
                       viewport={{ once: true }}
                     >
                       <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-0.5" />
