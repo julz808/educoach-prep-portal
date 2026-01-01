@@ -629,7 +629,7 @@ const Landing = () => {
                 >
                   <Button
                     asChild
-                    className="w-full py-6 px-5 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] hover:from-[#45beb5] hover:to-[#5b5ef1] text-white transition-all font-bold text-lg shadow-md hover:shadow-lg"
+                    className="w-full py-8 px-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] hover:from-[#45beb5] hover:to-[#5b5ef1] text-white transition-all font-bold text-lg shadow-md hover:shadow-lg"
                   >
                     <Link to={`/course/${course.slug}`}>
                       {course.title}
@@ -694,8 +694,8 @@ const Landing = () => {
       <section id="methodology" className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16 scroll-animate">
-            <AnimatedText 
-              text="Confidently Prepare at Home in 3 Steps"
+            <AnimatedText
+              text="How Our Test Prep Platform Works"
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 justify-center"
             />
             <motion.p 
