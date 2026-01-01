@@ -428,7 +428,7 @@ const Landing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  Australia's Leading Test Preparation <span className="text-[#4ECDC4]">Platform</span>
+                  Australia's Leading Test Preparation Platform
                 </motion.h1>
                 <motion.p
                   className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
@@ -467,66 +467,43 @@ const Landing = () => {
 
               {/* CTA */}
               <motion.div
-                className="space-y-4"
+                className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 2.5 }}
               >
-                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-                  <Button
-                    size="lg"
-                    className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group w-full sm:w-auto"
-                    onClick={() => {
-                      const productsSection = document.getElementById('products');
-                      if (productsSection) {
-                        productsSection.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start'
-                        });
-                      }
-                    }}
-                  >
-                    Find Your Test
-                    <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
-                    onClick={() => {
-                      const methodologySection = document.getElementById('methodology');
-                      if (methodologySection) {
-                        methodologySection.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start'
-                        });
-                      }
-                    }}
-                  >
-                    See how it works
-                  </Button>
-                </div>
-
-                {/* Trust Signals */}
-                <motion.div
-                  className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 text-sm text-[#6B7280]"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 2.7 }}
+                <Button
+                  size="lg"
+                  className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group w-full sm:w-auto"
+                  onClick={() => {
+                    const productsSection = document.getElementById('products');
+                    if (productsSection) {
+                      productsSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }
+                  }}
                 >
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                    <span>7-Day Money-Back Guarantee</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                    <span>Instant Access</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                    <span>Works on All Devices</span>
-                  </div>
-                </motion.div>
+                  Find Your Test
+                  <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg w-full sm:w-auto"
+                  onClick={() => {
+                    const methodologySection = document.getElementById('methodology');
+                    if (methodologySection) {
+                      methodologySection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }
+                  }}
+                >
+                  See how it works
+                </Button>
               </motion.div>
             </motion.div>
 
