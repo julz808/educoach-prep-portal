@@ -20,16 +20,17 @@ const PurchaseSuccess: React.FC = () => {
   const [hasAccount, setHasAccount] = useState(false);
 
   const product = searchParams.get('product');
+  const customerEmail = searchParams.get('email');
 
   useEffect(() => {
-    // Fire Google Ads conversion tracking
+    // Fire Google Ads conversion tracking with enhanced conversion data
     if (typeof window !== 'undefined' && window.gtag && product) {
       console.log('🎯 Firing Google Ads conversion for product:', product);
 
       const transactionId = Date.now() + '-' + product;
 
-      // Fire Purchase Success conversion with product details
-      window.gtag('event', 'conversion', {
+      // Prepare enhanced conversion data
+      const conversionData: any = {
         'send_to': 'AW-11082636289/I_1RCLmY6osbEIG4zqQp', // Purchase Success conversion
         'value': 199.0,
         'currency': 'AUD',
@@ -41,12 +42,27 @@ const PurchaseSuccess: React.FC = () => {
           'price': 199.0,
           'quantity': 1
         }]
-      });
+      };
+
+      // Add enhanced conversion data (user email) for better tracking accuracy
+      // This is required for Google Ads Enhanced Conversions
+      if (customerEmail) {
+        conversionData.user_data = {
+          email_address: customerEmail
+        };
+        console.log('✅ Enhanced conversion data included with email');
+      } else {
+        console.warn('⚠️ No customer email available for enhanced conversion');
+      }
+
+      // Fire Purchase Success conversion with enhanced data
+      window.gtag('event', 'conversion', conversionData);
 
       console.log('✅ Conversion tracked:', {
         transactionId,
         product,
-        productName: getProductName(product)
+        productName: getProductName(product),
+        hasEnhancedData: !!customerEmail
       });
     }
 
