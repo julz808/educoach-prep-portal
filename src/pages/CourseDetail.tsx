@@ -1,16 +1,14 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { 
-  CheckCircle, 
-  BookOpen, 
-  FileText, 
-  Target, 
-  BarChart3, 
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import {
+  CheckCircle,
+  BookOpen,
+  FileText,
+  Target,
+  BarChart3,
   TrendingUp,
   ArrowRight,
   Clock,
-  Users,
-  Award,
   Zap,
   ChevronDown,
   Menu,
@@ -20,21 +18,25 @@ import {
   PenTool,
   Calculator,
   Brain,
-  Search,
   Globe,
   Activity,
-  Lightbulb,
   ChartBar,
-  Eye
+  Eye,
+  Star,
+  Shield,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { courses, faqs } from '@/data/courses';
+import { getTestimonialsForTest } from '@/data/testimonials';
+import { getHeroContent, getDifferentiators } from '@/data/productContent';
+import { getSchoolLogosForTest, allSchoolLogos } from '@/data/schoolLogos';
 import { TEST_STRUCTURES, SECTION_TO_SUB_SKILLS, UNIFIED_SUB_SKILLS } from '@/data/curriculumData';
 import { Course } from '@/types';
 import { toast } from '@/components/ui/use-toast';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
 import { SEOHead } from '@/components/SEOHead';
@@ -42,7 +44,7 @@ import { CourseSchema } from '@/components/CourseSchema';
 import { FAQSchema } from '@/components/FAQSchema';
 import { useSEOMetadata } from '@/hooks/useSEOMetadata';
 
-// Test section descriptions mapping - focused on the test itself, not platform features
+// Test section descriptions mapping
 const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = {
   "Year 5 NAPLAN": {
     "Writing": "Students write a narrative or persuasive piece in response to a given prompt, demonstrating their ability to structure ideas coherently and use appropriate language features for their year level.",
@@ -89,17 +91,16 @@ const TEST_SECTION_DESCRIPTIONS: { [key: string]: { [key: string]: string } } = 
 const getSubSkillsForSection = (testStructureKey: string, sectionName: string): string[] => {
   const sectionKey = `${testStructureKey} - ${sectionName}`;
   const subSkills = SECTION_TO_SUB_SKILLS[sectionKey as keyof typeof SECTION_TO_SUB_SKILLS];
-  
+
   if (!subSkills || subSkills.length === 0) {
-    // Fallback to generic sub-skills if none found
     return [
       "Critical thinking and analysis",
-      "Problem-solving strategies", 
+      "Problem-solving strategies",
       "Time management skills",
       "Test-taking techniques"
     ];
   }
-  
+
   return subSkills.map(skill => {
     const skillDescription = UNIFIED_SUB_SKILLS[skill as keyof typeof UNIFIED_SUB_SKILLS];
     return skillDescription?.description || skill;
@@ -142,29 +143,29 @@ const getTestStructureKey = (courseTitle: string): string => {
 
 const CourseDetail = () => {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const [course, setCourse] = useState<Course | undefined>(undefined);
-  const [scrollY, setScrollY] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestSection, setActiveTestSection] = useState<string>("");
   const [activeFeature, setActiveFeature] = useState<string>("diagnostic");
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   // Get SEO metadata for this course
   const seoMetadata = useSEOMetadata(`/course/${slug}`);
 
+  // Get test-specific content
+  const heroContent = slug ? getHeroContent(slug) : null;
+  const testimonials = slug ? getTestimonialsForTest(slug) : [];
+  const differentiators = slug ? getDifferentiators(slug) : [];
+
   useEffect(() => {
-    console.log('CourseDetail: Looking for slug:', slug);
-    console.log('CourseDetail: Available courses:', courses.map(c => c.slug));
-    
     const foundCourse = courses.find(c => c.slug === slug);
-    console.log('CourseDetail: Found course:', foundCourse?.title || 'NOT FOUND');
-    
+
     if (foundCourse) {
       setCourse(foundCourse);
       document.title = `${foundCourse.title} | EduCourse`;
       window.scrollTo(0, 0);
-      
+
       // Set first test section as active
       const testKey = getTestStructureKey(foundCourse.title);
       const testSections = TEST_STRUCTURES[testKey as keyof typeof TEST_STRUCTURES] || {};
@@ -172,22 +173,17 @@ const CourseDetail = () => {
       if (firstSection) {
         setActiveTestSection(firstSection);
       }
-    } else {
-      console.error('CourseDetail: Course not found for slug:', slug);
     }
   }, [slug]);
 
   // Scroll effect for nav transparency
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
-      setIsScrolled(currentScrollY > 50);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
 
   // Initialize Lenis smooth scrolling
   useEffect(() => {
@@ -211,6 +207,16 @@ const CourseDetail = () => {
     };
   }, []);
 
+  // Testimonials rotation
+  useEffect(() => {
+    if (testimonials.length > 0) {
+      const timer = setInterval(() => {
+        setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+      }, 6000);
+      return () => clearInterval(timer);
+    }
+  }, [testimonials]);
+
   const handlePurchase = async () => {
     if (!course?.slug) {
       toast({
@@ -222,15 +228,12 @@ const CourseDetail = () => {
     }
 
     try {
-      // Direct to checkout - no authentication required
       toast({
         title: "Redirecting to checkout...",
         description: "You'll be redirected to our secure payment page.",
       });
 
-      // Store the course being purchased for post-payment setup
       localStorage.setItem('purchasedCourse', course.slug);
-      
       await redirectToCheckout(course.slug);
     } catch (error) {
       console.error('Purchase error:', error);
@@ -242,16 +245,12 @@ const CourseDetail = () => {
     }
   };
 
-  if (!course) {
+  if (!course || !heroContent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4ECDC4] mx-auto mb-4"></div>
-          <p className="text-gray-600 mb-2">Loading course details...</p>
-          <p className="text-sm text-gray-500">Slug: {slug}</p>
-          <p className="text-xs text-gray-400 mt-4">
-            Available courses: {courses.map(c => c.slug).join(', ')}
-          </p>
+          <p className="text-gray-600">Loading course details...</p>
         </div>
       </div>
     );
@@ -261,42 +260,33 @@ const CourseDetail = () => {
   const testSections = TEST_STRUCTURES[testKey as keyof typeof TEST_STRUCTURES] || {};
   const sectionDescriptions = TEST_SECTION_DESCRIPTIONS[course.title] || {};
 
-  // Calculate total questions and total time
-  const totalQuestions = Object.values(testSections).reduce((sum, section: any) => {
-    return sum + (section.questions || 0);
-  }, 0);
-  
-  const totalTime = Object.values(testSections).reduce((sum, section: any) => {
-    return sum + (section.time || 0);
-  }, 0);
-
-  // How it Works data (renamed from Features)
+  // How it Works data
   const howItWorksData = [
     {
       id: "diagnostic",
-      title: "Diagnostic",
+      title: "Diagnostic Test",
       description: "Comprehensive initial assessment to identify strengths and areas for improvement",
       icon: <Activity className="h-5 w-5" />,
       screenshot: "/images/diagnostic home 3.png"
     },
     {
       id: "drills",
-      title: "Skill Drills",
-      description: "Targeted practice exercises to strengthen specific sub-skills and concepts",
+      title: "Targeted Drills",
+      description: "Focused practice exercises to strengthen specific sub-skills identified by diagnostic",
       icon: <Target className="h-5 w-5" />,
       screenshot: "/images/writing feedback 3.png"
     },
     {
       id: "practice",
       title: "Practice Tests",
-      description: "Full-length timed tests that simulate real exam conditions",
+      description: "Full-length timed tests that perfectly simulate real exam conditions",
       icon: <FileText className="h-5 w-5" />,
       screenshot: "/images/test taking maths.png"
     },
     {
       id: "analytics",
       title: "Performance Analytics",
-      description: "Detailed insights and progress tracking at the sub-skill level",
+      description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards",
       icon: <ChartBar className="h-5 w-5" />,
       screenshot: "/images/insights 5.png"
     }
@@ -313,26 +303,23 @@ const CourseDetail = () => {
         />
       )}
       <div className="min-h-screen bg-white">
-      {/* Navigation Bar - Same as Landing page */}
+      {/* Navigation Bar */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm' 
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-sm shadow-sm'
           : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4 h-16">
           <div className="flex items-center justify-between h-full">
-            {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img 
-                src="/images/educourse-logo v2.png" 
-                alt="EduCourse" 
+              <img
+                src="/images/educourse-logo v2.png"
+                alt="EduCourse"
                 className="h-[140px] md:h-52"
               />
             </Link>
 
-            {/* Right Side Menu Items */}
             <div className="flex items-center space-x-6">
-              {/* Desktop Menu */}
               <div className="hidden md:flex items-center space-x-6">
                 <div className="relative group">
                   <button className="flex items-center space-x-1 text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold">
@@ -353,8 +340,16 @@ const CourseDetail = () => {
                     </div>
                   </div>
                 </div>
-                
-                {/* Login Button */}
+
+                <a
+                  href="https://insights.educourse.com.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold"
+                >
+                  Insights
+                </a>
+
                 <Button
                   variant="outline"
                   asChild
@@ -367,7 +362,6 @@ const CourseDetail = () => {
                 </Button>
               </div>
 
-              {/* Mobile Menu Button */}
               <div className="md:hidden">
                 <Button
                   variant="ghost"
@@ -381,7 +375,6 @@ const CourseDetail = () => {
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t">
               <div className="p-4 space-y-4">
@@ -398,6 +391,15 @@ const CourseDetail = () => {
                     </Link>
                   ))}
                 </div>
+                <a
+                  href="https://insights.educourse.com.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2 text-base font-semibold text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Insights
+                </a>
                 <Button
                   asChild
                   className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
@@ -414,94 +416,93 @@ const CourseDetail = () => {
         </div>
       </nav>
 
-      {/* Hero Section with Split Design */}
-      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-gradient-to-b from-[#FFE8E8] to-white relative overflow-hidden">
+      {/* SECTION 1: Hero Section - Test-Specific */}
+      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-gradient-to-b from-[#E6F7F5] to-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Content */}
-            <motion.div 
+            <motion.div
               className="space-y-8 md:space-y-10 text-center lg:text-left"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
+              {/* Trust Badge */}
+              <motion.div
+                className="inline-block"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <div className="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm border border-[#4ECDC4]/20">
+                  <Shield className="h-4 w-4 text-[#4ECDC4]" />
+                  <span className="text-sm font-medium text-[#3B4F6B]">{heroContent.socialProofStat}</span>
+                </div>
+              </motion.div>
+
               <div className="space-y-6 md:space-y-8">
-                <motion.h1 
+                <motion.h1
                   className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  {course.title}<br />
-                  <span className="text-[#4ECDC4]">Test Prep</span>
+                  {heroContent.headline}
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   className="text-lg sm:text-xl text-[#4B5563] leading-relaxed max-w-lg mx-auto lg:mx-0"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  {course.shortDescription}
+                  {heroContent.subheadline}
                 </motion.p>
               </div>
 
-              {/* Key Points */}
-              <motion.div 
+              {/* Benefit Bullets */}
+              <motion.div
                 className="space-y-3 md:space-y-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                {[
-                  course.title === 'ACER Scholarship' 
-                    ? 'Designed for Students in Year 5/6 applying for Year 7 Entry'
-                    : course.title === 'EduTest Scholarship'
-                    ? 'Designed for Students in Year 5/6 applying for Year 7 Entry'
-                    : `Designed for ${course.target}`,
-                  'Expert-crafted questions aligned to test format',
-                  'Instant feedback with detailed explanations'
-                ].map((point, index) => (
-                  <motion.div 
-                    key={index} 
+                {heroContent.bullets.map((bullet, index) => (
+                  <motion.div
+                    key={index}
                     className="flex items-start lg:items-center space-x-3 text-left"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                    transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                   >
                     <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-[#4ECDC4] flex-shrink-0 mt-0.5 lg:mt-0" />
-                    <span className="text-base md:text-lg text-[#3B4F6B] leading-relaxed">{point}</span>
+                    <span className="text-base md:text-lg text-[#3B4F6B] leading-relaxed">{bullet}</span>
                   </motion.div>
                 ))}
               </motion.div>
 
               {/* CTA */}
               <motion.div
-                className="space-y-4"
+                className="space-y-4 pt-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
+                transition={{ duration: 0.6, delay: 1.0 }}
               >
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                  <Button
-                    size="lg"
-                    className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg group"
-                    onClick={handlePurchase}
-                  >
-                    <div className="flex flex-col items-center">
-                      <span>Start Improving Today - $199</span>
-                      <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
-                    </div>
-                    <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
+                <Button
+                  size="lg"
+                  className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-6 md:px-8 py-6 md:py-7 text-base md:text-lg group w-full sm:w-auto shadow-xl hover:shadow-2xl transition-all"
+                  onClick={handlePurchase}
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold">Start Improving Today - $199</span>
+                    <span className="text-xs font-normal opacity-90 flex items-center">
+                      <Shield className="h-3 w-3 mr-1" />
+                      7-Day Money-Back Guarantee
+                    </span>
+                  </div>
+                  <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
 
                 {/* Trust Signals */}
-                <motion.div
-                  className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 text-sm text-[#6B7280]"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 1.4 }}
-                >
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 text-sm text-[#6B7280]">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
                     <span>Instant Access</span>
@@ -512,73 +513,68 @@ const CourseDetail = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-[#4ECDC4]" />
-                    <span>Works on All Devices</span>
+                    <span>All Devices</span>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
             </motion.div>
 
-            {/* Hero Images - Same style as landing page */}
+            {/* Hero Images */}
             <div className="relative h-[300px] sm:h-[400px] lg:h-[500px] mt-8 lg:mt-0">
-              {/* Mobile: Single centered image */}
               <div className="block lg:hidden">
-                <motion.div 
+                <motion.div
                   className="w-full max-w-sm mx-auto h-[280px] bg-white rounded-xl shadow-2xl overflow-hidden"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 >
-                  <img 
-                    src="/images/insights 5.png" 
-                    alt="Performance Analytics" 
+                  <img
+                    src="/images/insights 5.png"
+                    alt="Performance Analytics"
                     className="w-full h-full object-contain"
                     loading="eager"
                   />
                 </motion.div>
               </div>
-              
-              {/* Desktop: Overlapping Screenshots */}
+
               <div className="hidden lg:block">
-                {/* Background Screenshot */}
-                <motion.div 
+                <motion.div
                   className="absolute top-0 right-0 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 z-10"
                   initial={{ opacity: 0, y: 50, rotate: 10 }}
                   animate={{ opacity: 1, y: 0, rotate: 3 }}
                   transition={{ duration: 0.8, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
-                  <img 
-                    src="/images/dashboard view.png" 
-                    alt="EduCourse Dashboard" 
+                  <img
+                    src="/images/dashboard view.png"
+                    alt="EduCourse Dashboard"
                     className="w-full h-full object-contain"
                     loading="eager"
                   />
                 </motion.div>
-                
-                {/* Middle Screenshot */}
-                <motion.div 
+
+                <motion.div
                   className="absolute top-16 left-8 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 z-20"
                   initial={{ opacity: 0, y: 50, rotate: -10 }}
                   animate={{ opacity: 1, y: 0, rotate: -2 }}
                   transition={{ duration: 0.8, delay: 0.8, type: "spring", stiffness: 100 }}
                 >
-                  <img 
-                    src="/images/reading simulation.png" 
-                    alt="Reading Simulation" 
+                  <img
+                    src="/images/reading simulation.png"
+                    alt="Reading Simulation"
                     className="w-full h-full object-contain"
                     loading="eager"
                   />
                 </motion.div>
-                
-                {/* Front Screenshot */}
-                <motion.div 
+
+                <motion.div
                   className="absolute top-48 right-12 w-[400px] h-[240px] bg-white rounded-xl shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 z-30"
                   initial={{ opacity: 0, y: 50, rotate: 8 }}
                   animate={{ opacity: 1, y: 0, rotate: 1 }}
                   transition={{ duration: 0.8, delay: 1.1, type: "spring", stiffness: 100 }}
                 >
-                  <img 
-                    src="/images/insights 5.png" 
-                    alt="Performance Analytics" 
+                  <img
+                    src="/images/insights 5.png"
+                    alt="Performance Analytics"
                     className="w-full h-full object-contain"
                     loading="eager"
                   />
@@ -589,10 +585,10 @@ const CourseDetail = () => {
         </div>
       </section>
 
-      {/* About the Test Section - Tabbed Design */}
+      {/* SECTION 2: Social Proof - Test-Specific Testimonials */}
       <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -600,116 +596,103 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              About the {course.title} Test
+              What Parents Are Saying About {course.title} Prep
             </h2>
-            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
-              Understand exactly what's tested in each section of the {course.title} examination
+            <p className="text-lg md:text-xl text-[#6B7280]">
+              Real results from real families who used EduCourse
             </p>
           </motion.div>
 
-          {/* Tabs Navigation */}
           <div className="max-w-5xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-2 mb-8 border-b border-gray-200">
-              {Object.keys(testSections).map((sectionName) => (
+            <div className="relative bg-white rounded-2xl shadow-xl p-6 md:p-10 border-2 border-[#E6F7F5]">
+              <div className="text-center space-y-6">
+                <div className="flex justify-center space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-6 w-6 md:h-7 md:w-7 fill-[#FF6B6B] text-[#FF6B6B]" />
+                  ))}
+                </div>
+                <AnimatePresence mode="wait">
+                  <motion.blockquote
+                    key={activeTestimonial}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-lg md:text-xl text-[#2C3E50] leading-relaxed px-4"
+                  >
+                    "{testimonials[activeTestimonial]?.quote}"
+                  </motion.blockquote>
+                </AnimatePresence>
+                <div className="space-y-1">
+                  <p className="font-bold text-[#2C3E50] text-lg">{testimonials[activeTestimonial]?.name}</p>
+                  <p className="text-[#6B7280]">{testimonials[activeTestimonial]?.details}</p>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-center items-center space-x-4 mt-8">
                 <button
-                  key={sectionName}
-                  onClick={() => setActiveTestSection(sectionName)}
-                  className={`px-4 py-3 text-sm md:text-base font-medium transition-all duration-200 border-b-2 -mb-[1px] ${
-                    activeTestSection === sectionName
-                      ? 'text-[#6366F1] border-[#6366F1]'
-                      : 'text-[#6B7280] border-transparent hover:text-[#4ECDC4]'
-                  }`}
+                  onClick={() => setActiveTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
+                  className="p-2 rounded-full hover:bg-[#E6F7F5] transition-colors"
+                  aria-label="Previous testimonial"
                 >
-                  {sectionName}
+                  <ChevronLeft className="h-5 w-5 text-[#4ECDC4]" />
                 </button>
-              ))}
-            </div>
-
-            {/* Tab Content */}
-            <AnimatePresence mode="wait">
-              {activeTestSection && (
-                <motion.div
-                  key={activeTestSection}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white rounded-xl border-2 border-gray-100 p-6 md:p-8"
+                <div className="flex space-x-2">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveTestimonial(index)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                        index === activeTestimonial ? 'bg-[#4ECDC4] w-8' : 'bg-gray-300'
+                      }`}
+                      aria-label={`Go to testimonial ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => setActiveTestimonial((prev) => (prev + 1) % testimonials.length)}
+                  className="p-2 rounded-full hover:bg-[#E6F7F5] transition-colors"
+                  aria-label="Next testimonial"
                 >
-                  {/* Section Header */}
-                  <div className="flex items-start space-x-4 mb-6">
-                    <div className="w-14 h-14 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
-                      {SECTION_ICONS[activeTestSection] || <BookOpen className="h-7 w-7" />}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-2">
-                        {activeTestSection}
-                      </h3>
-                      <p className="text-[#6B7280] mb-4">
-                        {sectionDescriptions[activeTestSection] || "Master key concepts and strategies for this section"}
-                      </p>
-                      
-                      {/* Test Details - moved above Sub-skills */}
-                      <div className="flex items-center space-x-6 mb-2">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="h-4 w-4 text-[#6366F1]" />
-                          <span className="text-sm font-medium text-[#2C3E50]">
-                            {(testSections[activeTestSection] as any)?.questions || 0} {
-                              ((testSections[activeTestSection] as any)?.questions || 0) === 1 ? 'question' : 'questions'
-                            }
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="h-4 w-4 text-[#6366F1]" />
-                          <span className="text-sm font-medium text-[#2C3E50]">
-                            {(testSections[activeTestSection] as any)?.time || 0} minutes
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Sub-skills */}
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-[#2C3E50] mb-4">Sub-skills Tested:</h4>
-                    <div className="grid md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2">
-                      {(() => {
-                        try {
-                          const skills = getSubSkillsForSection(testKey, activeTestSection);
-                          return skills.map((skill, index) => (
-                            <div key={index} className="flex items-start space-x-2">
-                              <CheckCircle className="h-4 w-4 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
-                              <span className="text-sm text-[#6B7280] leading-relaxed">{skill}</span>
-                            </div>
-                          ));
-                        } catch (error) {
-                          console.error('Error getting sub-skills:', error);
-                          return [
-                            "Critical thinking and analysis",
-                            "Problem-solving strategies", 
-                            "Time management skills",
-                            "Test-taking techniques"
-                          ].map((skill, index) => (
-                            <div key={index} className="flex items-start space-x-2">
-                              <CheckCircle className="h-4 w-4 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
-                              <span className="text-sm text-[#6B7280] leading-relaxed">{skill}</span>
-                            </div>
-                          ));
-                        }
-                      })()}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <ChevronRight className="h-5 w-5 text-[#4ECDC4]" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* CTA after Testimonials */}
+        <motion.div
+          className="container mx-auto px-4 mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-center max-w-2xl mx-auto">
+            <p className="text-lg text-[#6B7280] mb-6">
+              Ready to join these successful families?
+            </p>
+            <Button
+              size="lg"
+              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 md:px-10 py-6 md:py-7 text-base md:text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+              onClick={handlePurchase}
+            >
+              <div className="flex flex-col items-start mr-3">
+                <span className="font-bold">Start Your Preparation Today - $199</span>
+                <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee • Instant Access</span>
+              </div>
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </motion.div>
       </section>
 
-      {/* How it Works Section (renamed from Our Features) */}
+      {/* SECTION 3: Why EduCourse? - Test-Specific Differentiation */}
       <section className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -717,10 +700,179 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              Our Learning Platform
+              Why Choose EduCourse for {course.title}?
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
-              Our proven approach to test preparation success
+              Not all test prep is created equal. Here's what makes us different.
+            </p>
+          </motion.div>
+
+          <div className="max-w-5xl mx-auto space-y-6">
+            {differentiators.map((diff, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl p-6 md:p-8 shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#4ECDC4]"
+              >
+                <h3 className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-3">
+                  {diff.title}
+                </h3>
+                <p className="text-base md:text-lg text-[#4B5563] mb-3 leading-relaxed">
+                  {diff.description}
+                </p>
+                <div className="flex items-start space-x-2 bg-[#E6F7F5] p-4 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                  <p className="text-sm md:text-base text-[#3B4F6B] italic">
+                    {diff.comparison}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Comparison CTA */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-block bg-white px-8 py-6 rounded-xl shadow-lg mb-8">
+              <p className="text-lg font-semibold text-[#2C3E50] mb-2">
+                EduCourse: $199 | Private Tutoring: $800-1,500+
+              </p>
+              <p className="text-[#6B7280]">
+                More practice, better analytics, unlimited feedback - at a fraction of the cost
+              </p>
+            </div>
+
+            {/* CTA after Why EduCourse */}
+            <div className="max-w-3xl mx-auto">
+              <p className="text-lg text-[#3B4F6B] mb-6 font-medium">
+                See the difference for yourself - risk-free for 7 days
+              </p>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#45B8AF] hover:to-[#5B5BD6] text-white px-8 md:px-10 py-6 md:py-7 text-base md:text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                onClick={handlePurchase}
+              >
+                <div className="flex items-center">
+                  <div className="flex flex-col items-start mr-3">
+                    <span className="font-bold">Get Started Now - Only $199</span>
+                    <span className="text-xs font-normal opacity-95 flex items-center">
+                      <Shield className="h-3 w-3 mr-1" />
+                      100% Money-Back Guarantee
+                    </span>
+                  </div>
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </div>
+              </Button>
+              <p className="text-sm text-[#6B7280] mt-4">
+                Join {heroContent.socialProofStat.replace('Join ', '').toLowerCase()}
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* SECTION 4: What's Included - Enhanced */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+              Everything You Need for Success
+            </h2>
+            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
+              Comprehensive preparation that covers every aspect of the {course.title} test
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                title: "1000+ Practice Questions",
+                description: "Expert-crafted questions calibrated to match the exact difficulty and format of the real test - 3x more practice than leading competitors"
+              },
+              {
+                title: "5 Full-Length Practice Tests",
+                description: "Complete timed exams that perfectly replicate the real test experience. Students report feeling 'like I'd already done this before' on exam day"
+              },
+              {
+                title: "Unlimited AI Writing Feedback",
+                description: "Get instant, detailed feedback on every writing task - worth $500+ in tutor fees. Improve structure, vocabulary, and persuasive power in seconds, not days"
+              },
+              {
+                title: "Sub-Skill Level Analytics",
+                description: "Laser-focused insights showing performance across 50+ sub-skills. No wasted time on what's already mastered - rapid improvement where it matters most"
+              },
+              {
+                title: "Visual Progress Dashboards",
+                description: "Track improvement week by week with detailed charts and graphs. See exactly where your child stands vs test requirements and watch percentile gains in real-time"
+              },
+              {
+                title: "Multi-Device Access",
+                description: "Practice at their pace, on their schedule. Works perfectly on iPad, laptop, or desktop - progress syncs automatically across all devices"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-start space-x-4 bg-[#F8F9FA] p-6 rounded-xl hover:shadow-lg transition-all duration-300"
+              >
+                <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold text-[#2C3E50] mb-2">{feature.title}</h3>
+                  <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Outcome Stat */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-block bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] text-white px-8 py-4 rounded-full shadow-lg">
+              <p className="text-lg font-semibold">
+                Average improvement: 20+ percentile points in 8-12 weeks
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* SECTION 5: How Platform Works - Methodology */}
+      <section className="py-16 md:py-20 bg-[#F8F9FA]">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+              Our Proven Learning Platform
+            </h2>
+            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
+              From diagnostic to mastery - see exactly how our platform works
             </p>
           </motion.div>
 
@@ -738,22 +890,22 @@ const CourseDetail = () => {
                   >
                     <button
                       onClick={() => setActiveFeature(feature.id)}
-                      className={`w-full text-left p-4 md:p-6 rounded-xl transition-all duration-300 ${
+                      className={`w-full text-left p-6 rounded-xl transition-all duration-300 ${
                         activeFeature === feature.id
-                          ? 'bg-white shadow-lg border-2 border-[#6366F1]'
-                          : 'bg-white/50 hover:bg-white border-2 border-transparent'
+                          ? 'bg-white shadow-xl border-2 border-[#6366F1]'
+                          : 'bg-white/50 hover:bg-white border-2 border-transparent hover:shadow-lg'
                       }`}
                     >
                       <div className="flex items-start space-x-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                           activeFeature === feature.id
-                            ? 'bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white'
+                            ? 'bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white scale-110'
                             : 'bg-gray-100 text-[#6B7280]'
                         }`}>
                           {feature.icon}
                         </div>
                         <div className="flex-1">
-                          <h3 className={`text-xl font-semibold mb-2 transition-colors ${
+                          <h3 className={`text-xl font-bold mb-2 transition-colors ${
                             activeFeature === feature.id ? 'text-[#2C3E50]' : 'text-[#6B7280]'
                           }`}>
                             {feature.title}
@@ -789,33 +941,123 @@ const CourseDetail = () => {
                         transition={{ duration: 0.3 }}
                         className="aspect-video bg-gray-50 flex items-center justify-center"
                       >
-                        {/* Actual screenshots */}
-                        <div className="w-full h-full">
-                          <img 
-                            src={howItWorksData.find(f => f.id === activeFeature)?.screenshot} 
-                            alt={`${howItWorksData.find(f => f.id === activeFeature)?.title} Interface`}
-                            className="w-full h-full object-contain"
-                            loading="lazy"
-                          />
-                        </div>
+                        <img
+                          src={howItWorksData.find(f => f.id === activeFeature)?.screenshot}
+                          alt={`${howItWorksData.find(f => f.id === activeFeature)?.title} Interface`}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
                       </motion.div>
                     </AnimatePresence>
                   </div>
                 </div>
-
-                {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#4ECDC4]/10 rounded-full blur-2xl"></div>
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-[#6366F1]/10 rounded-full blur-2xl"></div>
               </motion.div>
             </div>
+
+            {/* Platform Demo GIF */}
+            <motion.div
+              className="mt-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
+                  See Your Child's Progress in Real-Time
+                </h3>
+                <p className="text-lg text-[#6B7280]">
+                  Track improvement across 50+ sub-skills with visual dashboards
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-2xl p-6 max-w-4xl mx-auto">
+                <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+                  <div className="aspect-video flex items-center justify-center">
+                    <img
+                      src="/images/CleanShot 2025-07-28 at 19.48.04.gif"
+                      alt="Platform Analytics Demo"
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                      style={{ imageRendering: 'crisp-edges' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Section - 6 features with green ticks in 3x2 grid */}
+      {/* SECTION 6: School Logos & Outcomes */}
       <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+              Students Using EduCourse Are Attending These Schools
+            </h2>
+            <p className="text-lg md:text-xl text-[#6B7280]">
+              Join families whose children gained entry to Australia's top schools
+            </p>
+          </motion.div>
+
+          {/* School Logos Carousel */}
+          <div className="relative overflow-hidden mb-12">
+            <motion.div
+              className="flex items-center space-x-8"
+              animate={{
+                x: [0, -allSchoolLogos.length * 140]
+              }}
+              transition={{
+                duration: 70,
+                ease: "linear",
+                repeat: Infinity
+              }}
+            >
+              {[...allSchoolLogos, ...allSchoolLogos].map((school, index) => (
+                <div
+                  key={`${school.name}-${index}`}
+                  className="flex-shrink-0 w-[120px] h-[60px] md:w-[150px] md:h-[80px] flex items-center justify-center"
+                >
+                  <img
+                    src={school.logo}
+                    alt={`${school.name} logo`}
+                    className="max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Outcome Stat */}
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-block bg-[#F8F9FA] px-10 py-6 rounded-2xl border-2 border-[#4ECDC4]/20">
+              <p className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-2">
+                92% of EduCourse families would recommend us
+              </p>
+              <p className="text-[#6B7280]">
+                Based on post-purchase surveys from 500+ families
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* SECTION 7: Test Details - About the Test (Moved Down) */}
+      <section className="py-16 md:py-20 bg-[#F8F9FA]">
+        <div className="container mx-auto px-4">
+          <motion.div
             className="text-center mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -823,67 +1065,94 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              What's Included
+              Understanding the {course.title} Test
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
-              Everything you need to prepare for success
+              Detailed breakdown of test sections, timing, and sub-skills assessed
             </p>
           </motion.div>
 
-          {/* 3x2 Grid of Features */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                title: "1000+ Questions",
-                description: "Comprehensive question bank covering all test sections and difficulty levels"
-              },
-              {
-                title: "5 Full-Length Tests",
-                description: "Complete practice exams that simulate real test conditions and timing"
-              },
-              {
-                title: "AI-Powered Writing Practice",
-                description: "Instant feedback on your writing with detailed suggestions for improvement"
-              },
-              {
-                title: "Sub-skill Level Practice",
-                description: "Targeted exercises focusing on specific areas identified by diagnostic results"
-              },
-              {
-                title: "Detailed Analytics",
-                description: "Detailed insights and progress tracking at the sub-skill level with visual dashboards"
-              },
-              {
-                title: "Practice anywhere",
-                description: "Tablet and desktop friendly platform - practice at home, school, or anywhere with internet access"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex items-start space-x-4"
-              >
-                <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-[#22C55E] mt-1" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">{feature.title}</h3>
-                  <p className="text-base text-[#6B7280] leading-relaxed">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
+          {/* Tabs Navigation */}
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-2 mb-8 border-b border-gray-200">
+              {Object.keys(testSections).map((sectionName) => (
+                <button
+                  key={sectionName}
+                  onClick={() => setActiveTestSection(sectionName)}
+                  className={`px-4 py-3 text-sm md:text-base font-medium transition-all duration-200 border-b-2 -mb-[1px] ${
+                    activeTestSection === sectionName
+                      ? 'text-[#6366F1] border-[#6366F1]'
+                      : 'text-[#6B7280] border-transparent hover:text-[#4ECDC4]'
+                  }`}
+                >
+                  {sectionName}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <AnimatePresence mode="wait">
+              {activeTestSection && (
+                <motion.div
+                  key={activeTestSection}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-xl border-2 border-gray-100 p-6 md:p-8 shadow-lg"
+                >
+                  <div className="flex items-start space-x-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                      {SECTION_ICONS[activeTestSection] || <BookOpen className="h-7 w-7" />}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-2">
+                        {activeTestSection}
+                      </h3>
+                      <p className="text-[#6B7280] mb-4 leading-relaxed">
+                        {sectionDescriptions[activeTestSection] || "Master key concepts and strategies for this section"}
+                      </p>
+
+                      <div className="flex items-center space-x-6 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="h-4 w-4 text-[#6366F1]" />
+                          <span className="text-sm font-medium text-[#2C3E50]">
+                            {(testSections[activeTestSection] as any)?.questions || 0} questions
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 text-[#6366F1]" />
+                          <span className="text-sm font-medium text-[#2C3E50]">
+                            {(testSections[activeTestSection] as any)?.time || 0} minutes
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-skills */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[#2C3E50] mb-4">Sub-skills We Practice:</h4>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {getSubSkillsForSection(testKey, activeTestSection).map((skill, index) => (
+                        <div key={index} className="flex items-start space-x-2">
+                          <CheckCircle className="h-4 w-4 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-[#6B7280] leading-relaxed">{skill}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </section>
 
-      {/* How it Works Section - Sleek Step Design */}
-      <section className="py-16 md:py-20 bg-[#F8F9FA]">
+      {/* SECTION 8: How It Works - 5 Steps */}
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          {/* Section Header */}
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -891,89 +1160,59 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-6">
-              How it Works
+              Getting Started Is Simple
             </h2>
             <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-              Five simple steps to exam success
+              Five easy steps from purchase to improvement
             </p>
           </motion.div>
 
-          {/* Steps Grid */}
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4">
               {[
                 {
                   step: 1,
                   title: "Purchase",
-                  description: "Choose your test package",
-                  icon: (
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68-1.68M7 13l2.32 2.32M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                    </svg>
-                  )
+                  description: "Choose your test package and complete secure checkout"
                 },
                 {
                   step: 2,
                   title: "Access",
-                  description: "Get instant platform access",
-                  icon: (
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  )
+                  description: "Get instant login credentials via email within minutes"
                 },
                 {
                   step: 3,
                   title: "Diagnose",
-                  description: "Take your first practice test",
-                  icon: (
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                    </svg>
-                  )
+                  description: "Take diagnostic test to identify strengths and gaps"
                 },
                 {
                   step: 4,
                   title: "Practice",
-                  description: "Focus on targeted drills",
-                  icon: (
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  )
+                  description: "Complete targeted drills personalized to diagnostic results"
                 },
                 {
                   step: 5,
-                  title: "Progress",
-                  description: "Track improvement over time",
-                  icon: (
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  )
+                  title: "Improve",
+                  description: "Track progress weekly and watch percentile scores rise"
                 }
               ].map((step, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
                   className="relative text-center group"
                 >
-                  {/* Connecting Line (hidden on mobile) */}
                   {index < 4 && (
                     <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#4ECDC4] to-transparent z-0" />
                   )}
-                  
-                  {/* Step Card */}
-                  <div className="relative bg-white p-8 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-[#4ECDC4]/30 z-10">
-                    {/* Step Number */}
+
+                  <div className="relative bg-white p-8 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 border-2 border-transparent group-hover:border-[#4ECDC4]/30 z-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white rounded-full font-bold text-lg group-hover:scale-110 transition-transform duration-300">
                       {step.step}
                     </div>
-                    
-                    {/* Content */}
+
                     <h3 className="text-xl font-semibold text-[#2C3E50] mb-3 group-hover:text-[#6366F1] transition-colors duration-300">
                       {step.title}
                     </h3>
@@ -986,35 +1225,32 @@ const CourseDetail = () => {
             </div>
           </div>
 
-          {/* Bottom CTA */}
           <motion.div
-            className="text-center mt-16"
+            className="text-center mt-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
             viewport={{ once: true }}
           >
             <p className="text-lg text-[#6B7280] mb-6">
-              Ready to help your child succeed?
+              Most families see measurable improvement within 3-4 weeks of starting
             </p>
             <Button
               size="lg"
-              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+              className="bg-[#6366F1] hover:bg-[#5B5BD6] text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
               onClick={handlePurchase}
             >
-              <div className="flex flex-col items-center">
-                <span>Start Risk-Free Today</span>
-                <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee • $199</span>
-              </div>
+              Start Your Journey Today - $199
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 md:py-20 bg-white">
+      {/* SECTION 9: FAQ */}
+      <section className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1022,74 +1258,147 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              Frequently Asked Questions
+              Questions? We've Got Answers
             </h2>
+            <p className="text-lg md:text-xl text-[#6B7280]">
+              Everything you need to know about EduCourse test preparation
+            </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="max-w-3xl mx-auto"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full bg-white rounded-xl shadow-sm">
               {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200">
-                  <AccordionTrigger className="text-lg font-medium text-[#2C3E50] hover:text-[#4ECDC4] transition-colors py-6">
+                <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-0 px-6">
+                  <AccordionTrigger className="text-lg font-medium text-[#2C3E50] hover:text-[#4ECDC4] transition-colors py-6 text-left">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-[#6B7280] pb-6">
+                  <AccordionContent className="text-[#6B7280] pb-6 leading-relaxed">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
           </motion.div>
+
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-lg text-[#6B7280] mb-6">
+              Still have questions? We're here to help!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white"
+                asChild
+              >
+                <a href="mailto:learning@educourse.com.au">Contact Us</a>
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1]">
-        <div className="container mx-auto px-4">
+      {/* SECTION 10: Final CTA */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center max-w-3xl mx-auto"
+            className="text-center max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
+            {/* Urgency Message */}
+            <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-8">
+              <Clock className="h-5 w-5 text-white" />
+              <p className="text-white font-medium">
+                Most families start preparation 8-12 weeks before the test date
+              </p>
+            </div>
+
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
-              Ready to Start Your Test Prep Journey?
+              Ready to Help Your Child Succeed?
             </h2>
-            <p className="text-lg md:text-xl text-white/90 mb-8">
-              Join 1,000+ families who trust EduCourse for test preparation
+            <p className="text-lg md:text-xl text-white/95 mb-8 leading-relaxed">
+              Join {heroContent.socialProofStat.replace('Join ', '').toLowerCase()} who've seen an average 20+ percentile improvement with EduCourse
             </p>
-            <Button
-              size="lg"
-              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-4 text-lg"
-              onClick={handlePurchase}
-            >
-              <div className="flex flex-col items-center">
-                <span>Start Risk-Free Today - $199</span>
-                <span className="text-xs font-normal opacity-90">7-Day Money-Back Guarantee</span>
-              </div>
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-white/90">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4" />
-                <span>Instant access</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4" />
-                <span>12 months access</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4" />
-                <span>Works on all devices</span>
+
+            {/* Guarantee Badge */}
+            <div className="inline-flex items-center justify-center w-32 h-32 bg-white rounded-full mb-8 shadow-2xl">
+              <div className="text-center">
+                <Shield className="h-12 w-12 text-[#4ECDC4] mx-auto mb-1" />
+                <p className="text-xs font-bold text-[#2C3E50]">7-Day</p>
+                <p className="text-xs font-bold text-[#2C3E50]">Guarantee</p>
               </div>
             </div>
+
+            <Button
+              size="lg"
+              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-10 py-7 text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105"
+              onClick={handlePurchase}
+            >
+              <div className="flex flex-col items-start mr-3">
+                <span className="font-bold text-xl">Start Risk-Free Today - $199</span>
+                <span className="text-sm font-normal opacity-95">7-Day Money-Back Guarantee • Instant Access</span>
+              </div>
+              <ArrowRight className="h-6 w-6" />
+            </Button>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/95">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>Instant access to all content</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>12 months unlimited practice</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>Works on all devices</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Shield className="h-5 w-5" />
+                <span>100% money-back guarantee</span>
+              </div>
+            </div>
+
+            {/* Final Social Proof */}
+            <motion.div
+              className="mt-12 bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex justify-center space-x-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-white text-white" />
+                ))}
+              </div>
+              <p className="text-white italic leading-relaxed">
+                "Best decision we made for our child's test preparation. The platform is comprehensive, the feedback is instant, and the results speak for themselves."
+              </p>
+              <p className="text-white/80 text-sm mt-3">- Verified EduCourse Parent</p>
+            </motion.div>
           </motion.div>
         </div>
       </section>
