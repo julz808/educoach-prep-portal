@@ -349,7 +349,16 @@ const Landing = () => {
                     </div>
                   </div>
                 </div>
-                
+
+                <a
+                  href="https://insights.educourse.com.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#3B4F6B] hover:text-[#4ECDC4] transition-colors font-semibold"
+                >
+                  Insights
+                </a>
+
                 {/* Login Button */}
                 <Button
                   variant="outline"
@@ -394,6 +403,15 @@ const Landing = () => {
                     </Link>
                   ))}
                 </div>
+                <a
+                  href="https://insights.educourse.com.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2 text-base font-semibold text-[#3B4F6B] hover:bg-[#E6F7F5] rounded-lg transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Insights
+                </a>
                 <Button
                   asChild
                   className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white"
