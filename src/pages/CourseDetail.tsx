@@ -25,13 +25,14 @@ import {
   Star,
   Shield,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { courses, faqs } from '@/data/courses';
 import { getTestimonialsForTest } from '@/data/testimonials';
-import { getHeroContent, getDifferentiators } from '@/data/productContent';
+import { getHeroContent } from '@/data/productContent';
 import { getSchoolLogosForTest, allSchoolLogos } from '@/data/schoolLogos';
 import { TEST_STRUCTURES, SECTION_TO_SUB_SKILLS, UNIFIED_SUB_SKILLS } from '@/data/curriculumData';
 import { Course } from '@/types';
@@ -156,7 +157,6 @@ const CourseDetail = () => {
   // Get test-specific content
   const heroContent = slug ? getHeroContent(slug) : null;
   const testimonials = slug ? getTestimonialsForTest(slug) : [];
-  const differentiators = slug ? getDifferentiators(slug) : [];
 
   useEffect(() => {
     const foundCourse = courses.find(c => c.slug === slug);
@@ -689,7 +689,7 @@ const CourseDetail = () => {
         </motion.div>
       </section>
 
-      {/* SECTION 3: Why EduCourse? - Test-Specific Differentiation */}
+      {/* SECTION 3: Why Choose EduCourse? - Comparison Table */}
       <section className="py-16 md:py-20 bg-[#F8F9FA]">
         <div className="container mx-auto px-4">
           <motion.div
@@ -700,40 +700,142 @@ const CourseDetail = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              Why Choose EduCourse for {course.title}?
+              Why Choose EduCourse?
             </h2>
             <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
-              Not all test prep is created equal. Here's what makes us different.
+              Compare us to traditional test prep options
             </p>
           </motion.div>
 
-          <div className="max-w-5xl mx-auto space-y-6">
-            {differentiators.map((diff, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-xl p-6 md:p-8 shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-[#4ECDC4]"
-              >
-                <h3 className="text-xl md:text-2xl font-bold text-[#2C3E50] mb-3">
-                  {diff.title}
-                </h3>
-                <p className="text-base md:text-lg text-[#4B5563] mb-3 leading-relaxed">
-                  {diff.description}
-                </p>
-                <div className="flex items-start space-x-2 bg-[#E6F7F5] p-4 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
-                  <p className="text-sm md:text-base text-[#3B4F6B] italic">
-                    {diff.comparison}
-                  </p>
+          {/* Comparison Table */}
+          <motion.div
+            className="max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+              {/* Table Header */}
+              <div className="grid grid-cols-2">
+                <div className="py-4 px-6 md:py-6 md:px-8 bg-[#6B7280]">
+                  <h3 className="text-lg md:text-xl font-bold text-white">Traditional Approaches</h3>
+                  <p className="text-sm text-white/90 mt-1">Tutors, Workbooks, Generic Platforms</p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+                <div className="py-4 px-6 md:py-6 md:px-8 bg-[#4ECDC4]">
+                  <h3 className="text-lg md:text-xl font-bold text-white">EduCourse</h3>
+                  <p className="text-sm text-white/90 mt-1">Comprehensive Test Preparation</p>
+                </div>
+              </div>
 
-          {/* Comparison CTA */}
+              {/* Practice Questions Comparison */}
+              <div className="grid grid-cols-2 border-b border-gray-200">
+                <div className="py-6 px-6 md:px-8 bg-[#FEF2F2]">
+                  <div className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Practice Questions</h4>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed">
+                        Tutors: <strong className="text-[#DC2626]">Limited to session time</strong> (maybe 20-30 questions per hour)
+                      </p>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed mt-2">
+                        Workbooks: <strong className="text-[#DC2626]">200-400 questions</strong> then you're done
+                      </p>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed mt-2">
+                        Generic platforms: Questions don't match your specific test format
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="py-6 px-6 md:px-8 bg-[#E6F7F5]">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Practice Questions</h4>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed">
+                        <strong className="text-[#047857]">1000+ questions</strong> calibrated to your specific test
+                      </p>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed mt-2">
+                        <strong className="text-[#047857]">5 full practice tests</strong> with real-time conditions to simulate the real exam
+                      </p>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed mt-2">
+                        <strong className="text-[#047857]">Covers all sections</strong> of your specific test
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Insights Comparison */}
+              <div className="grid grid-cols-2 border-b border-gray-200">
+                <div className="py-6 px-6 md:px-8 bg-[#FEF2F2]">
+                  <div className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Performance Insights</h4>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed">
+                        Tutors: <strong className="text-[#DC2626]">General feedback</strong> - "needs work on reading"
+                      </p>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed mt-2">
+                        Workbooks: <strong className="text-[#DC2626]">Answer key only</strong> - no insights on patterns
+                      </p>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed mt-2">
+                        You guess where to focus - wasting time on already-strong areas
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="py-6 px-6 md:px-8 bg-[#E6F7F5]">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Performance Insights</h4>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed">
+                        <strong className="text-[#047857]">Sub-skill level analytics</strong> across 50+ specific skills
+                      </p>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed mt-2">
+                        <strong className="text-[#047857]">Detailed feedback and walkthroughs</strong> for every question
+                      </p>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed mt-2">
+                        <strong className="text-[#047857]">Diagnostic-driven</strong> practice focused on your gaps
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cost Comparison */}
+              <div className="grid grid-cols-2">
+                <div className="py-6 px-6 md:px-8 bg-[#FEF2F2]">
+                  <div className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Cost</h4>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed">
+                        <strong className="text-[#DC2626]">$800-1,500+</strong> for private tutoring (8-12 sessions at $80-150/hour)
+                      </p>
+                      <p className="text-[#6B7280] text-sm md:text-base leading-relaxed mt-2">
+                        <strong className="text-[#DC2626]">$80-150</strong> for workbooks with limited questions
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="py-6 px-6 md:px-8 bg-[#E6F7F5]">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-[#2C3E50] mb-2">Cost</h4>
+                      <p className="text-[#3B4F6B] text-sm md:text-base leading-relaxed">
+                        <strong className="text-[#047857]">Only $199</strong> for 12 months unlimited access
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CTA after comparison */}
           <motion.div
             className="text-center mt-12"
             initial={{ opacity: 0, y: 20 }}
@@ -741,19 +843,9 @@ const CourseDetail = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            <div className="inline-block bg-white px-8 py-6 rounded-xl shadow-lg mb-8">
-              <p className="text-lg font-semibold text-[#2C3E50] mb-2">
-                EduCourse: $199 | Private Tutoring: $800-1,500+
-              </p>
-              <p className="text-[#6B7280]">
-                More practice, better analytics, unlimited feedback - at a fraction of the cost
-              </p>
-            </div>
-
-            {/* CTA after Why EduCourse */}
             <div className="max-w-3xl mx-auto">
               <p className="text-lg text-[#3B4F6B] mb-6 font-medium">
-                See the difference for yourself - risk-free for 7 days
+                Get more for less - with our 7-day money-back guarantee
               </p>
               <Button
                 size="lg"
@@ -1188,7 +1280,7 @@ const CourseDetail = () => {
                 {
                   step: 4,
                   title: "Practice",
-                  description: "Complete targeted drills personalized to diagnostic results"
+                  description: "Complete targeted drills personalised to diagnostic results"
                 },
                 {
                   step: 5,
@@ -1208,15 +1300,15 @@ const CourseDetail = () => {
                     <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#4ECDC4] to-transparent z-0" />
                   )}
 
-                  <div className="relative bg-white p-8 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 border-2 border-transparent group-hover:border-[#4ECDC4]/30 z-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white rounded-full font-bold text-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="relative bg-white p-8 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 border-2 border-transparent group-hover:border-[#4ECDC4]/30 z-10 h-full min-h-[280px] flex flex-col">
+                    <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] text-white rounded-full font-bold text-lg group-hover:scale-110 transition-transform duration-300 mx-auto">
                       {step.step}
                     </div>
 
                     <h3 className="text-xl font-semibold text-[#2C3E50] mb-3 group-hover:text-[#6366F1] transition-colors duration-300">
                       {step.title}
                     </h3>
-                    <p className="text-[#6B7280] leading-relaxed">
+                    <p className="text-[#6B7280] leading-relaxed flex-grow">
                       {step.description}
                     </p>
                   </div>

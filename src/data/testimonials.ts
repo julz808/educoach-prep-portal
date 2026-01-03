@@ -101,7 +101,7 @@ export const productTestimonials: { [key: string]: Testimonial[] } = {
       test: "vic-selective"
     },
     {
-      quote: "The analytical writing for VIC selective is really specific - you have to analyze a text, not just write an essay. This was the only platform that actually practiced that skill properly. She's thriving at Mac.Rob now.",
+      quote: "The analytical writing for VIC selective is really specific - you have to analyse a text, not just write an essay. This was the only platform that actually practiced that skill properly. She's thriving at Mac.Rob now.",
       name: "Michelle D.",
       details: "Parent of Year 8 student, Camberwell",
       stars: 5,

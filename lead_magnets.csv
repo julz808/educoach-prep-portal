@@ -1,0 +1,91 @@
+Product,Lead Magnet #,Resource Type,Title,Description,Estimated Time to Create,Conversion Potential,File Format,Key Features
+ACER,1,Practice Test,"Free ACER Practice Test - 20 Questions","Authentic ACER-style questions covering all sections: Reading, Mathematics, Verbal Reasoning, Abstract Reasoning. Includes complete answer key with detailed explanations and marking rubric.",2-3 hours,Very High,PDF,"- 20 questions across all sections
+- Detailed answer explanations
+- Marking rubric
+- Time management tips
+- Similar difficulty to real test"
+ACER,2,Cheat Sheet,"ACER Test Cheat Sheet: Formulas & Strategies","One-page quick reference guide with essential formulas, key strategies for each section, time management tips, and common question patterns.",1 hour,High,PDF,"- All key math formulas
+- Section-by-section strategies
+- Question type breakdown
+- Time allocation guide
+- Test day checklist"
+ACER,3,Study Schedule,"8-Week ACER Preparation Schedule","Week-by-week study plan with daily tasks, practice goals, and progress tracking checkboxes. Includes diagnostic baseline and weekly review milestones.",1-2 hours,Medium-High,PDF or Google Sheets,"- Daily study tasks
+- Weekly goals and milestones
+- Progress tracking checkboxes
+- Diagnostic baseline week
+- Final week revision plan"
+EduTest,1,Practice Test,"Free EduTest Practice Test - 25 Questions","Sample questions covering Quantitative, Verbal, and Written Expression. Complete with answers, explanations, and scoring guide to benchmark current level.",2-3 hours,Very High,PDF,"- 25 questions (Quant, Verbal, Writing)
+- Comprehensive answer key
+- Scoring guide and percentiles
+- Time limits per section
+- Writing rubric"
+EduTest,2,Writing Guide,"EduTest Writing: Sample Essays & Rubrics","3 sample writing prompts with high-scoring (90th percentile), average (50th percentile), and low-scoring responses. Includes detailed rubric and examiner comments.",2-3 hours,Very High,PDF,"- 3 complete sample essays
+- Scoring rubric explained
+- Examiner feedback comments
+- Common mistakes to avoid
+- High-scoring techniques"
+EduTest,3,Formula Sheet,"EduTest Mathematics Formula Reference","Comprehensive formula sheet covering all mathematics topics tested: algebra, geometry, measurement, data, and probability. Organized by topic with examples.",1-2 hours,Medium,PDF,"- Formulas by topic
+- Quick example for each
+- Common mistake warnings
+- Mental math shortcuts
+- Calculator vs non-calculator tips"
+Year 5 NAPLAN,1,Practice Test,"Year 5 NAPLAN Practice Questions - 30 Questions","Mixed questions from all sections: Reading, Writing, Language Conventions, and Numeracy. Mirrors actual NAPLAN format and difficulty level.",2-3 hours,Very High,PDF,"- 30 questions across all sections
+- NAPLAN-aligned difficulty
+- Complete answer key
+- Band level indicators
+- Parent guide to results"
+Year 5 NAPLAN,2,Writing Prompts,"Year 5 NAPLAN Writing: Prompts & Model Answers","5 narrative and 5 persuasive writing prompts with model responses at different band levels. Shows what makes a strong response.",2 hours,High,PDF,"- 10 writing prompts total
+- Model answers (Bands 4-8)
+- Marking criteria explained
+- Planning templates
+- Common errors highlighted"
+Year 5 NAPLAN,3,Study Planner,"Year 5 NAPLAN 6-Week Study Planner","Structured preparation plan for the 6 weeks before NAPLAN. Includes daily 20-30 minute activities, weekend practice tests, and confidence-building exercises.",1 hour,Medium-High,PDF or Printable,"- Daily 20-30 min activities
+- Weekend practice tests
+- Skill focus by week
+- Parent tips per week
+- Progress tracker"
+Year 7 NAPLAN,1,Practice Test,"Year 7 NAPLAN Full Practice Test - 40 Questions","Complete practice test covering Reading, Writing, Language Conventions, and Numeracy at Year 7 level. Includes timing guidelines.",2-3 hours,Very High,PDF,"- 40 questions (all sections)
+- Year 7 difficulty level
+- Timing guidelines included
+- Detailed answer key
+- Band score estimator"
+Year 7 NAPLAN,2,Writing Guide,"Year 7 NAPLAN Writing Success Guide","Complete guide to both narrative and persuasive writing with planning frameworks, vocabulary lists, sentence starters, and 4 annotated sample essays.",3 hours,Very High,PDF,"- Both text types covered
+- Planning frameworks
+- Vocabulary lists by level
+- 4 annotated samples
+- Editing checklist"
+Year 7 NAPLAN,3,Cheat Sheet,"Year 7 NAPLAN Grammar & Spelling Quick Guide","Two-page reference with essential grammar rules, common spelling patterns, punctuation rules, and frequently tested conventions.",1 hour,Medium,PDF,"- Essential grammar rules
+- High-frequency spelling words
+- Punctuation guide
+- Common homophones
+- Quick self-test"
+NSW Selective,1,Practice Test,"NSW Selective Entry Sample Test - 30 Questions","Questions covering Reading, Mathematical Reasoning, and Thinking Skills. Reflects actual test format and difficulty of NSW Selective Entry.",3 hours,Very High,PDF,"- 30 questions (3 sections)
+- Actual test format
+- Multiple choice format
+- Complete solutions
+- Competitive score guide"
+NSW Selective,2,Study Schedule,"NSW Selective 12-Week Preparation Plan","Comprehensive 12-week plan starting from diagnostic through to final revision week. Includes skill-building, practice tests, and review cycles.",1-2 hours,High,PDF or Excel,"- 12 weeks structured prep
+- Weekly focus areas
+- Built-in practice tests
+- Review and revision weeks
+- Daily time allocation"
+NSW Selective,3,School Guide,"NSW Selective Schools: Complete Parent's Guide","Comprehensive guide to all NSW selective schools: locations, specialties, entry scores, travel options, and how to make your preference list.",2 hours,Medium-High,PDF,"- All selective schools listed
+- Entry score benchmarks
+- School profiles
+- Preference strategy guide
+- Application timeline"
+VIC Selective,1,Practice Test,"VIC Selective Entry Practice Test - 35 Questions","Sample test covering Numerical Reasoning, Reading Comprehension, Verbal Reasoning, and Writing. Aligned with VIC selective entry format.",3 hours,Very High,PDF,"- 35 questions (4 sections)
+- VIC-specific format
+- Writing task included
+- Detailed solutions
+- Percentile indicators"
+VIC Selective,2,Writing Prompts,"VIC Selective Writing: Prompts & Sample Essays","5 writing prompts typical of VIC selective entry with 3 complete sample responses showing different quality levels and detailed feedback.",2-3 hours,High,PDF,"- 5 authentic prompts
+- 3 responses per prompt
+- Quality level indicators
+- Assessor feedback
+- Planning templates"
+VIC Selective,3,Strategy Guide,"VIC Selective Entry: Section-by-Section Strategy Guide","Comprehensive strategies for each test section: Numerical Reasoning, Reading, Verbal Reasoning, and Writing. Includes time management and question prioritization.",2 hours,Medium-High,PDF,"- Strategies per section
+- Time management tips
+- Question type breakdown
+- Practice recommendations
+- Test day tactics"

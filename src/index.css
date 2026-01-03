@@ -45,7 +45,7 @@
   }
   
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; - Removed to improve performance on lower-powered devices */
   }
   
   body {

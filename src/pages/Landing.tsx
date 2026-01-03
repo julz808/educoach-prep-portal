@@ -596,8 +596,147 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Problem-Solution Framework Section */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+              Test Preparation Shouldn't Feel Like This
+            </h2>
+            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
+              Stop wasting time and money on approaches that don't work
+            </p>
+          </motion.div>
+
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              {/* Problem Side */}
+              <motion.div
+                className="bg-[#FEF2F2] border-2 border-[#FF6B6B]/20 rounded-xl p-6 md:p-8"
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-2xl font-bold text-[#DC2626] mb-6 flex items-center">
+                  <X className="h-6 w-6 mr-2" />
+                  The Traditional Approach
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#6B7280] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Expensive tutoring</strong> at $80-120/hour with inconsistent results and limited availability
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#6B7280] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Generic workbooks</strong> that don't match the actual test format your child will face
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#6B7280] leading-relaxed">
+                      <strong className="text-[#2C3E50]">No visibility</strong> into what your child actually needs to practice most
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#6B7280] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Test anxiety</strong> because your child has no idea what to expect on exam day
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <X className="h-5 w-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#6B7280] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Waiting days</strong> for writing feedback from busy tutors
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
+
+              {/* Solution Side */}
+              <motion.div
+                className="bg-[#E6F7F5] border-2 border-[#4ECDC4] rounded-xl p-6 md:p-8"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-2xl font-bold text-[#047857] mb-6 flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-2" />
+                  The EduCourse Difference
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#3B4F6B] leading-relaxed">
+                      <strong className="text-[#2C3E50]">$199 total</strong> for 12 months unlimited access vs $800-1,500+ for tutoring
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#3B4F6B] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Test-specific practice</strong> that mirrors the exact format of each exam
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#3B4F6B] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Sub-skill analytics</strong> show exactly where to focus practice time
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#3B4F6B] leading-relaxed">
+                      <strong className="text-[#2C3E50]">5 full-length practice tests</strong> eliminate surprises on exam day
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-[#4ECDC4] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#3B4F6B] leading-relaxed">
+                      <strong className="text-[#2C3E50]">Instant AI feedback</strong> on every writing task - no waiting
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
+            </div>
+
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <p className="text-xl text-[#3B4F6B] mb-6 font-medium">
+                The choice is clear. Stop overpaying for inconsistent results.
+              </p>
+              <Button
+                size="lg"
+                className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white px-8 py-6 text-lg shadow-xl"
+                onClick={() => {
+                  const productsSection = document.getElementById('test-products');
+                  productsSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                See All Test Packages
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Test Products Section */}
-      <section id="products" className="py-16 md:py-20 bg-white">
+      <section id="test-products" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <motion.h2

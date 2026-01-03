@@ -129,7 +129,7 @@ export const faqs = [
   },
   {
     question: "How do the diagnostic tests work?",
-    answer: "Our diagnostic tests assess your child's current knowledge and skills across all test sections and sub-skills. After completion, you'll receive a detailed breakdown showing strengths and gaps, along with personalized recommendations for which areas to practice most."
+    answer: "Our diagnostic tests assess your child's current knowledge and skills across all test sections and sub-skills. After completion, you'll receive a detailed breakdown showing strengths and gaps, along with personalised recommendations for which areas to practice most."
   },
   {
     question: "Do you provide feedback on writing tasks?",
@@ -137,6 +137,30 @@ export const faqs = [
   },
   {
     question: "Can siblings share one account?",
-    answer: "Each purchase is designed for one student to ensure accurate progress tracking and personalized analytics. If you have multiple children preparing for tests, please contact us at learning@educourse.com.au for family discount options."
+    answer: "Each purchase is designed for one student to ensure accurate progress tracking and personalised analytics. If you have multiple children preparing for tests, please contact us at learning@educourse.com.au for family discount options."
+  },
+  {
+    question: "How is this different from hiring a private tutor?",
+    answer: "Private tutors cost $80-150/hour and typically require 8-12 sessions ($640-1,800 total) for adequate preparation. With EduCourse, you get unlimited practice questions, instant AI feedback, detailed analytics, and full practice tests for just $199 - less than 2 tutor sessions. Plus, your child can practice anytime, get immediate feedback, and work at their own pace without scheduling constraints."
+  },
+  {
+    question: "Will this actually improve my child's test score?",
+    answer: "Our approach is proven: diagnostic testing identifies exact gaps, targeted drills strengthen weak areas, and full practice tests build confidence. Families using our platform see an average 20+ percentile improvement. The key is our sub-skill analytics - instead of generic practice, your child focuses precisely on question types they struggle with. It's the same methodology top tutors use, available 24/7."
+  },
+  {
+    question: "My child already does well in school - do they need test prep?",
+    answer: "School performance and test performance require different skills. Tests like NAPLAN, selective entry, and scholarship exams assess problem-solving, abstract reasoning, and time-pressured comprehension - skills not typically taught in regular classrooms. Even high-achieving students benefit from learning test-specific strategies, practicing under timed conditions, and understanding question formats they won't see in school."
+  },
+  {
+    question: "Is online practice as effective as face-to-face tutoring?",
+    answer: "Online practice offers several advantages: (1) Instant feedback vs waiting days for tutor notes, (2) Unlimited practice vs limited tutoring hours, (3) Detailed analytics showing progress across 50+ sub-skills vs general tutor feedback, (4) Practice anytime vs scheduled appointments, (5) Consistent quality vs tutor variability. Plus, at $199 vs $800-1,800 for tutoring, you can invest the savings in additional resources if needed."
+  },
+  {
+    question: "What if my child doesn't like practicing online?",
+    answer: "That's exactly why we offer a 7-day money-back guarantee - try it risk-free! Most students actually prefer our platform because: (1) they can work at their own pace without pressure, (2) instant feedback is motivating, (3) progress charts show improvement visually, (4) they can practice when it suits them, not when tutoring is scheduled. If your child genuinely doesn't engage with it after trying, we'll refund you fully."
+  },
+  {
+    question: "How much time should my child spend practicing each week?",
+    answer: "We recommend 3-4 practice sessions per week, 30-45 minutes each, for 8-12 weeks before the test. This balanced approach prevents burnout while building skills progressively. Our analytics dashboard helps you track whether practice time is being used effectively - if scores aren't improving, you'll know to adjust focus areas, not just add more hours."
   }
 ];
