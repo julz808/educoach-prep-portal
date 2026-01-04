@@ -33,6 +33,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { courses, faqs } from '@/data/courses';
 import { getTestimonialsForTest } from '@/data/testimonials';
 import { getHeroContent } from '@/data/productContent';
+import { getPackageDetails } from '@/data/packageDetails';
 import { getSchoolLogosForTest, allSchoolLogos } from '@/data/schoolLogos';
 import { TEST_STRUCTURES, SECTION_TO_SUB_SKILLS, UNIFIED_SUB_SKILLS } from '@/data/curriculumData';
 import { Course } from '@/types';
@@ -157,6 +158,7 @@ const CourseDetail = () => {
   // Get test-specific content
   const heroContent = slug ? getHeroContent(slug) : null;
   const testimonials = slug ? getTestimonialsForTest(slug) : [];
+  const packageDetails = slug ? getPackageDetails(slug) : null;
 
   useEffect(() => {
     const foundCourse = courses.find(c => c.slug === slug);
@@ -585,6 +587,113 @@ const CourseDetail = () => {
         </div>
       </section>
 
+      {/* SECTION 1.5: Everything You Need for Success - Pricing Card */}
+      {packageDetails && (
+        <section className="py-16 md:py-20 bg-[#F8F9FA]">
+          <div className="container mx-auto px-4">
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
+                Everything You Need for Success
+              </h2>
+              <p className="text-lg md:text-xl text-[#6B7280]">
+                Complete preparation package with unlimited access
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="max-w-lg mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              {/* Pricing Card */}
+              <div className="bg-white rounded-2xl shadow-2xl border-4 border-[#4ECDC4] overflow-hidden">
+                {/* Logo/Icon at top */}
+                <div className="flex justify-center pt-8 pb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#6366F1] rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div className="text-center px-6 pb-6">
+                  <h2 className="text-2xl md:text-3xl font-bold text-[#6366F1] mb-2">
+                    {course.title} Preparation Package
+                  </h2>
+                  <p className="text-[#6B7280] text-sm">
+                    Now includes {packageDetails.roundedQuestions.toLocaleString()}+ questions
+                  </p>
+                </div>
+
+                {/* Price */}
+                <div className="text-center pb-6">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <span className="text-3xl md:text-4xl font-bold text-[#047857]">$199</span>
+                    <span className="text-2xl text-[#DC2626] line-through">$249</span>
+                  </div>
+                  <p className="text-[#6B7280] text-sm">Valid for 365 days</p>
+                </div>
+
+                {/* What's Included List */}
+                <div className="px-8 pb-8">
+                  <div className="space-y-3">
+                    {packageDetails.items.map((item, index) => (
+                      <div key={index}>
+                        {/* Main Item */}
+                        <div className="flex items-start space-x-3">
+                          <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5 text-[#22C55E]" />
+                          <span className={`text-[#2C3E50] ${item.highlight ? 'font-semibold' : ''}`}>
+                            {item.count === 1 && !item.highlight ? (
+                              item.label
+                            ) : (
+                              <>
+                                {item.count.toLocaleString()}+ {item.label}
+                              </>
+                            )}
+                          </span>
+                        </div>
+
+                        {/* Sub Items */}
+                        {item.subItems && item.subItems.length > 0 && (
+                          <div className="ml-8 mt-2 space-y-2">
+                            {item.subItems.map((subItem, subIndex) => (
+                              <div key={subIndex} className="flex items-start space-x-2">
+                                <span className="text-[#22C55E] text-sm">•</span>
+                                <span className="text-[#2C3E50] text-sm">
+                                  {subItem.count} x {subItem.label}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <div className="px-8 pb-8">
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] hover:from-[#45B8AF] hover:to-[#5B5BD6] text-white py-6 text-lg font-bold shadow-xl hover:shadow-2xl transition-all"
+                    onClick={handlePurchase}
+                  >
+                    Get {course.title} - $199
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* SECTION 2: Social Proof - Test-Specific Testimonials */}
       <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -865,85 +974,6 @@ const CourseDetail = () => {
               </Button>
               <p className="text-sm text-[#6B7280] mt-4">
                 Join {heroContent.socialProofStat.replace('Join ', '').toLowerCase()}
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* SECTION 4: What's Included - Enhanced */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-12 md:mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4">
-              Everything You Need for Success
-            </h2>
-            <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto">
-              Comprehensive preparation that covers every aspect of the {course.title} test
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                title: "1000+ Practice Questions",
-                description: "Expert-crafted questions calibrated to match the exact difficulty and format of the real test - 3x more practice than leading competitors"
-              },
-              {
-                title: "5 Full-Length Practice Tests",
-                description: "Complete timed exams that perfectly replicate the real test experience. Students report feeling 'like I'd already done this before' on exam day"
-              },
-              {
-                title: "Unlimited AI Writing Feedback",
-                description: "Get instant, detailed feedback on every writing task - worth $500+ in tutor fees. Improve structure, vocabulary, and persuasive power in seconds, not days"
-              },
-              {
-                title: "Sub-Skill Level Analytics",
-                description: "Laser-focused insights showing performance across 50+ sub-skills. No wasted time on what's already mastered - rapid improvement where it matters most"
-              },
-              {
-                title: "Visual Progress Dashboards",
-                description: "Track improvement week by week with detailed charts and graphs. See exactly where your child stands vs test requirements and watch percentile gains in real-time"
-              },
-              {
-                title: "Multi-Device Access",
-                description: "Practice at their pace, on their schedule. Works perfectly on iPad, laptop, or desktop - progress syncs automatically across all devices"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex items-start space-x-4 bg-[#F8F9FA] p-6 rounded-xl hover:shadow-lg transition-all duration-300"
-              >
-                <CheckCircle className="h-6 w-6 text-[#22C55E] flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="text-lg md:text-xl font-bold text-[#2C3E50] mb-2">{feature.title}</h3>
-                  <p className="text-sm md:text-base text-[#6B7280] leading-relaxed">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Outcome Stat */}
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="inline-block bg-gradient-to-r from-[#4ECDC4] to-[#6366F1] text-white px-8 py-4 rounded-full shadow-lg">
-              <p className="text-lg font-semibold">
-                Average improvement: 20+ percentile points in 8-12 weeks
               </p>
             </div>
           </motion.div>

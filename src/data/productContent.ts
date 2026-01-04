@@ -17,17 +17,17 @@ export interface ProductDifferentiator {
 export const heroContent: { [key: string]: ProductHeroContent } = {
   'edutest-scholarship': {
     headline: "Help Your Child Win Independent School Scholarships with EduTest Excellence",
-    subheadline: "Master EduTest's unique 5-section format with Australia's most comprehensive preparation platform. From Verbal Reasoning to Written Expression, we've got every section covered.",
+    subheadline: "Our comprehensive online learning platform delivers expert-designed practice for EduTest's unique 5-section format. Access 2,200+ questions, 5 full-length practice tests, and detailed performance analytics—all from home.",
     bullets: [
       "Join 200+ scholarship recipients who used EduCourse for EduTest prep",
       "Sub-skill analytics pinpoint exactly where to focus - no wasted practice time",
-      "Unlimited AI writing feedback vs $100+/hour tutoring costs"
+      "Detailed writing feedback vs $100+/hour tutoring costs"
     ],
     socialProofStat: "Join 200+ EduTest scholarship recipients"
   },
   'acer-scholarship': {
     headline: "Turn Your Child's Potential Into a Private School Scholarship",
-    subheadline: "Master ACER's challenging abstract reasoning, advanced mathematics, and analytical writing with expert-designed preparation that matches the test's unique difficulty.",
+    subheadline: "Our online learning platform provides expert-designed preparation for ACER's challenging abstract reasoning, advanced mathematics, and analytical writing. Access 800+ questions, 5 full-length practice tests, and performance tracking—anytime, anywhere.",
     bullets: [
       "Trusted by 150+ families who've won ACER scholarships to top independent schools",
       "Abstract reasoning practice that builds pattern recognition systematically",
@@ -37,7 +37,7 @@ export const heroContent: { [key: string]: ProductHeroContent } = {
   },
   'vic-selective': {
     headline: "Get Into Melbourne High, Mac.Robertson, or Nossal High with Confidence",
-    subheadline: "Master Victoria's demanding selective entry exam with specialized practice for dual writing tasks, advanced reasoning, and sophisticated mathematics that define this unique test.",
+    subheadline: "Our online learning platform delivers specialized preparation for Victoria's demanding selective entry exam. Access 2,000+ questions, dual writing practice, advanced reasoning, and detailed analytics—study from home on any device.",
     bullets: [
       "Join 180+ students now attending VIC selective schools after using EduCourse",
       "Only platform with dedicated dual writing practice - creative AND analytical",
@@ -47,7 +47,7 @@ export const heroContent: { [key: string]: ProductHeroContent } = {
   },
   'nsw-selective': {
     headline: "James Ruse, North Sydney Girls, Baulkham Hills - Your Path Starts Here",
-    subheadline: "Excel in NSW's competitive selective high school placement test with comprehensive preparation for Reading, Mathematical Reasoning, Thinking Skills, and Persuasive Writing.",
+    subheadline: "Our comprehensive online platform provides expert preparation for NSW's competitive selective high school test. Access 1,300+ questions, 5 full practice tests, and detailed performance insights—practice anytime from your computer, tablet, or phone.",
     bullets: [
       "Trusted by 250+ families whose children now attend NSW selective high schools",
       "Fast-paced reading strategies that work - finish tests with time to check answers",
@@ -57,7 +57,7 @@ export const heroContent: { [key: string]: ProductHeroContent } = {
   },
   'year-5-naplan': {
     headline: "Build Your Year 5 Student's Confidence for NAPLAN Success",
-    subheadline: "Comprehensive preparation for Reading, Writing, Language Conventions, and Numeracy. Help your child feel prepared, confident, and ready to show what they know on test day.",
+    subheadline: "Our online learning platform delivers comprehensive Year 5 NAPLAN preparation for Reading, Writing, Language Conventions, and Numeracy. Access 1,700+ practice questions, 5 full tests, and detailed feedback—help your child feel prepared and confident.",
     bullets: [
       "Join 300+ Year 5 families who've seen an average 18 percentile improvement",
       "Adaptive practice that builds skills progressively - from foundations to mastery",
@@ -67,7 +67,7 @@ export const heroContent: { [key: string]: ProductHeroContent } = {
   },
   'year-7-naplan': {
     headline: "Push Your High-Achieving Year 7 Student to the Top NAPLAN Bands",
-    subheadline: "Advanced preparation for ambitious students aiming for Band 9-10 results. Master sophisticated reading, complex numeracy, advanced grammar, and persuasive writing at the highest level.",
+    subheadline: "Our online platform provides advanced Year 7 NAPLAN preparation for ambitious students targeting Band 9-10 results. Access 1,900+ questions, 5 full practice tests, and performance tracking—master sophisticated reading, complex numeracy, and persuasive writing.",
     bullets: [
       "Trusted by 220+ families whose Year 7s achieved Band 9 or 10 results",
       "Advanced numeracy including algebra, geometry, and statistical reasoning",
@@ -86,10 +86,10 @@ export const differentiators: { [key: string]: ProductDifferentiator[] } = {
       comparison: "Generic test prep platforms use one-size-fits-all content. We've designed every question specifically for EduTest's unique structure."
     },
     {
-      title: "Unlimited AI Writing Feedback",
+      title: "Unlimited Writing Feedback",
       problem: "Tutors charge $80-120/hour and take 2-3 days to review a single essay. You can't afford unlimited writing practice at those rates.",
       description: "Get instant, detailed feedback on every Written Expression practice task - structure, vocabulary, grammar, coherence, and specific improvement suggestions.",
-      comparison: "Tutors charge $80-120/hour and take days to review writing. Our AI provides unlimited feedback instantly for one flat fee of $199."
+      comparison: "Tutors charge $80-120/hour and take days to review writing. Our platform provides unlimited feedback instantly for one flat fee of $199."
     },
     {
       title: "Sub-Skill Level Analytics",
@@ -121,8 +121,8 @@ export const differentiators: { [key: string]: ProductDifferentiator[] } = {
     {
       title: "Persuasive Writing for Scholarships",
       problem: "Generic writing practice won't win scholarships. You need writing that actually persuades judges, not just follows a formula.",
-      description: "AI feedback calibrated to scholarship-level expectations - argument structure, evidence quality, sophisticated vocabulary, and persuasive techniques.",
-      comparison: "Generic writing feedback checks grammar. Our AI evaluates whether writing would actually win a scholarship competition."
+      description: "Detailed feedback calibrated to scholarship-level expectations - argument structure, evidence quality, sophisticated vocabulary, and persuasive techniques.",
+      comparison: "Generic writing feedback checks grammar. Our platform evaluates whether writing would actually win a scholarship competition."
     },
     {
       title: "Unlimited Practice at $199",
@@ -182,7 +182,7 @@ export const differentiators: { [key: string]: ProductDifferentiator[] } = {
       title: "Persuasive Writing That Convinces",
       problem: "School writing teaches basic structure but doesn't develop the sophisticated argumentation and persuasive power that selective schools demand. Your child needs writing that actually convinces, not just follows a template.",
       description: "Learn to construct arguments that actually persuade - clear thesis, evidenced points, counter-arguments addressed, strong conclusions.",
-      comparison: "School writing teaches structure. Selective writing demands sophistication and persuasive power. Our AI feedback targets what actually scores well."
+      comparison: "School writing teaches structure. Selective writing demands sophistication and persuasive power. Our detailed feedback targets what actually scores well."
     }
   ],
 
@@ -208,8 +208,8 @@ export const differentiators: { [key: string]: ProductDifferentiator[] } = {
     {
       title: "Writing Instruction, Not Just Marking",
       problem: "Teachers mark your child's writing but don't have time to teach improvement. Your child sees a grade but doesn't learn what to actually change or how to write better next time.",
-      description: "AI feedback that teaches narrative and persuasive writing skills - story structure, descriptive language, argument construction, vocabulary choice.",
-      comparison: "Teachers mark writing but rarely have time to teach improvement. Our AI does both - instant feedback with specific improvement guidance."
+      description: "Detailed feedback that teaches narrative and persuasive writing skills - story structure, descriptive language, argument construction, vocabulary choice.",
+      comparison: "Teachers mark writing but rarely have time to teach improvement. Our platform does both - instant feedback with specific improvement guidance."
     }
   ],
 
