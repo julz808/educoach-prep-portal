@@ -16,7 +16,6 @@ import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/da
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import Lenis from 'lenis';
 
 // Map frontend product IDs to curriculum product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
@@ -237,27 +236,6 @@ const PerformanceDashboard = () => {
   const spiderChartObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
   const topBottomSkillsObserver = useIntersectionObserver({ threshold: 0.1, rootMargin: '50px' });
 
-  // Initialize Lenis smooth scrolling
-  useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.1,
-      wheelMultiplier: 0.8,
-      gestureOrientation: 'vertical',
-      normalizeWheel: false,
-      smoothTouch: false
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // Load essential data first (user profile and overall performance)
   useEffect(() => {

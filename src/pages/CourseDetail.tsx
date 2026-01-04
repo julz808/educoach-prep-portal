@@ -39,7 +39,6 @@ import { TEST_STRUCTURES, SECTION_TO_SUB_SKILLS, UNIFIED_SUB_SKILLS } from '@/da
 import { Course } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import Lenis from 'lenis';
 import { redirectToCheckout } from '@/services/stripeService';
 import { SEOHead } from '@/components/SEOHead';
 import { CourseSchema } from '@/components/CourseSchema';
@@ -187,27 +186,6 @@ const CourseDetail = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Initialize Lenis smooth scrolling
-  useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.1,
-      wheelMultiplier: 0.8,
-      gestureOrientation: 'vertical',
-      normalizeWheel: false,
-      smoothTouch: false
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // Testimonials rotation
   useEffect(() => {

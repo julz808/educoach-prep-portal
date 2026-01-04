@@ -7,7 +7,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { courses, faqs } from '@/data/courses';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
-import Lenis from 'lenis';
 import { SEOHead } from '@/components/SEOHead';
 import { useSEOMetadata } from '@/hooks/useSEOMetadata';
 import { 
@@ -171,28 +170,6 @@ const Landing = () => {
   }, []);
 
   // School logos continuous rotation - removed for CSS animation approach
-
-  // Initialize Lenis smooth scrolling
-  useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.1,
-      wheelMultiplier: 0.8,
-      gestureOrientation: 'vertical',
-      normalizeWheel: false,
-      smoothTouch: false
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // School logos array with actual uploaded logos
   const schoolLogos = [
