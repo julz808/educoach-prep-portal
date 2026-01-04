@@ -605,6 +605,11 @@ const CourseDetail = () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-[#6366F1] mb-2">
                     {course.title} Preparation Package
                   </h2>
+                  {(slug === 'acer-scholarship' || slug === 'edutest-scholarship') && (
+                    <p className="text-[#2C3E50] text-sm font-bold mb-1">
+                      Year 7 Entry Package
+                    </p>
+                  )}
                   <p className="text-[#6B7280] text-sm">
                     Now includes {packageDetails.roundedQuestions.toLocaleString()}+ questions
                   </p>
