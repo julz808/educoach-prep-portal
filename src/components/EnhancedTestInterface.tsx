@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatQuestionText, cleanOptionText, formatPassageText, formatExplanationText } from '@/utils/textFormatting';
 import { WritingAssessmentFeedback } from './WritingAssessmentFeedback';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
+import SVGRenderer from './SVGRenderer';
 
 interface Question {
   id: string;
@@ -19,6 +20,7 @@ interface Question {
   subSkill: string;
   difficulty: number;
   passageContent?: string;
+  visualSvg?: string; // SVG or HTML markup for visual questions
   format?: 'Multiple Choice' | 'Written Response';
   userTextAnswer?: string; // For written responses
   maxPoints: number; // Maximum points for this question (1 for MC, varies for writing)
@@ -491,6 +493,15 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                       <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
                         {formatQuestionText(currentQuestion?.text || '')}
                       </h2>
+                      {/* Visual (SVG diagram or HTML table) */}
+                      {currentQuestion?.visualSvg && (
+                        <div className="mb-6">
+                          <SVGRenderer
+                            svgContent={currentQuestion.visualSvg}
+                            className="max-w-full rounded-lg border border-gray-200 bg-white p-3"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Answer Options - Multiple Choice or Written Response */}
@@ -649,6 +660,15 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
                       {formatQuestionText(currentQuestion?.text || '')}
                     </h2>
+                    {/* Visual (SVG diagram or HTML table) */}
+                    {currentQuestion?.visualSvg && (
+                      <div className="mb-6">
+                        <SVGRenderer
+                          svgContent={currentQuestion.visualSvg}
+                          className="max-w-full rounded-lg border border-gray-200 bg-white p-3"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Answer Options - Multiple Choice or Written Response */}

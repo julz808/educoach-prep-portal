@@ -49,11 +49,14 @@ export const WritingAssessmentFeedback: React.FC<WritingAssessmentFeedbackProps>
     return (
       <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-white rounded-xl border-l-4 border-amber-400">
         <div className="flex items-start space-x-3">
-          <AlertCircle size={20} className="text-amber-600 mt-0.5" />
-          <div>
+          <AlertCircle size={20} className="text-amber-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
             <h3 className="font-semibold text-amber-800 mb-2">Assessment Unavailable</h3>
-            <p className="text-amber-700">
+            <p className="text-amber-700 mb-3">
               Your writing response has been saved, but detailed assessment is not available at this time.
+            </p>
+            <p className="text-sm text-amber-600">
+              This may be due to a temporary connection issue. Try refreshing the page, or contact support if the issue persists.
             </p>
           </div>
         </div>

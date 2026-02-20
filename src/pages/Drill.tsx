@@ -5,22 +5,29 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { HeroBanner } from '@/components/ui/hero-banner';
 import { MetricsCards } from '@/components/ui/metrics-cards';
-import { 
-  BookOpen, Clock, Target, Play, Trophy, BarChart3, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  BookOpen, Clock, Target, Play, Trophy, BarChart3,
   ArrowRight, ChevronLeft, ChevronDown, ChevronRight, ChevronUp,
   CheckCircle, CheckCircle2, AlertCircle, Brain, Star, Zap, Flag,
   RotateCcw, ArrowLeft, Award, TrendingUp, Users, Timer,
-  Home, MessageSquare, Calculator, PieChart, 
-  PenTool, Palette, Trash2
+  Home, MessageSquare, Calculator, PieChart,
+  PenTool, Palette, Trash2, Sparkles, TrendingDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
 import { PaywallComponent } from '@/components/PaywallComponent';
 import { isPaywallUIEnabled } from '@/config/stripeConfig';
-import { 
-  fetchDrillModes, 
-  type TestMode, 
+import {
+  fetchDrillModes,
+  type TestMode,
   type TestSection,
   type OrganizedQuestion
 } from '@/services/supabaseQuestionService';
@@ -29,6 +36,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DrillSessionService } from '@/services/drillSessionService';
 import { DeveloperTools } from '@/components/DeveloperTools';
 import { getOrCreateSubSkillUUID, generateDeterministicUUID } from '@/utils/uuidUtils';
+import { getDrillRecommendations, type DrillRecommendation } from '@/services/drillRecommendationService';
 
 // Helper function to generate consistent UUIDs for writing drills
 const getWritingDrillUUID = (sectionName: string): string => {
@@ -92,7 +100,17 @@ const Drill: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [drillProgress, setDrillProgress] = useState<Record<string, any>>({});
   const [averageScore, setAverageScore] = useState<number>(0);
-  
+  const [recommendations, setRecommendations] = useState<DrillRecommendation[]>([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+
+  // Dropdown selector states
+  const [selectedSectionId, setSelectedSectionId] = useState<string>('');
+  const [selectedSubSkillId, setSelectedSubSkillId] = useState<string>('');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+
+  // Progressive disclosure state for "View All Skills"
+  const [showAllSkills, setShowAllSkills] = useState<boolean>(false);
+
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -340,18 +358,41 @@ const Drill: React.FC = () => {
     }
   };
 
+  // Load recommendations based on test performance
+  const loadRecommendations = async () => {
+    if (!user) {
+      setRecommendations([]);
+      return;
+    }
+
+    setLoadingRecommendations(true);
+    try {
+      const recs = await getDrillRecommendations(user.id, selectedProduct, 3);
+      setRecommendations(recs);
+      console.log('🎯 DRILL: Loaded', recs.length, 'recommendations (top 3 worst-performing)');
+    } catch (error) {
+      console.error('🎯 DRILL: Error loading recommendations:', error);
+      setRecommendations([]);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
   useEffect(() => {
     const loadDrillData = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Load drill progress from database
         const progressData = await reloadProgressData();
 
         // Calculate average score from drill sessions
         await calculateAverageScore();
-        
+
+        // Load recommendations
+        await loadRecommendations();
+
         const modes = await fetchDrillModes(selectedProduct);
         // Detailed logging of the data structure
         if (modes && modes.length > 0) {
@@ -591,6 +632,47 @@ const Drill: React.FC = () => {
     setSelectedSkillArea(skillArea);
     setSelectedSubSkill(subSkill);
     setCurrentView('sub-skill');
+  };
+
+  // Handle dropdown-based drill start
+  const handleDropdownDrillStart = () => {
+    if (!selectedSectionId || !selectedSubSkillId) return;
+
+    const skillArea = skillAreas.find(sa => sa.id === selectedSectionId);
+    const subSkill = skillArea?.subSkills.find(ss => ss.id === selectedSubSkillId);
+
+    if (skillArea && subSkill) {
+      selectSubSkill(skillArea, subSkill);
+    }
+  };
+
+  // Handle recommendation card click
+  const handleRecommendationClick = (recommendation: DrillRecommendation) => {
+    // Find matching skill area and sub-skill
+    const skillArea = skillAreas.find(sa =>
+      sa.name.toLowerCase().includes(recommendation.section.toLowerCase()) ||
+      recommendation.section.toLowerCase().includes(sa.name.toLowerCase())
+    );
+
+    const subSkill = skillArea?.subSkills.find(ss =>
+      ss.name.toLowerCase().includes(recommendation.subSkill.toLowerCase()) ||
+      recommendation.subSkill.toLowerCase().includes(ss.name.toLowerCase())
+    );
+
+    if (skillArea && subSkill) {
+      setSelectedSkillArea(skillArea);
+      setSelectedSubSkill(subSkill);
+      setCurrentView('sub-skill');
+    } else {
+      console.warn('Could not find matching skill area or sub-skill for recommendation:', recommendation);
+    }
+  };
+
+  // Get filtered sub-skills based on selected section
+  const getFilteredSubSkills = () => {
+    if (!selectedSectionId) return [];
+    const skillArea = skillAreas.find(sa => sa.id === selectedSectionId);
+    return skillArea?.subSkills || [];
   };
 
   const startDrill = async (difficulty: 'easy' | 'medium' | 'hard') => {
@@ -982,12 +1064,87 @@ const Drill: React.FC = () => {
         }}
       />
 
-      {/* Skill Areas - Single Column */}
+      {/* Recommended Drills Section */}
+      {recommendations.length > 0 && (
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <Sparkles className="w-6 h-6 text-orange-600" />
+            <h2 className="text-2xl font-bold text-slate-900">
+              Focus on Your Weakest Areas
+            </h2>
+          </div>
+          <p className="text-slate-600 mb-6">
+            Based on all your completed tests, here are the 3 sub-skills where you need the most practice:
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {recommendations.map((rec, index) => (
+              <Card
+                key={index}
+                className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200"
+                onClick={() => handleRecommendationClick(rec)}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-red-100 text-red-700 border-red-200 text-xs font-bold">
+                        #{index + 1}
+                      </Badge>
+                      <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
+                        {rec.section}
+                      </Badge>
+                    </div>
+                    <TrendingDown className="w-4 h-4 text-orange-600" />
+                  </div>
+
+                  <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2">
+                    {rec.subSkill}
+                  </h3>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Current Score:</span>
+                      <span className="font-bold text-slate-900">
+                        {rec.averageScore !== null ? `${rec.averageScore}%` : 'N/A'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Suggested:</span>
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {rec.difficulty}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 mt-3 italic">
+                    {rec.reason}
+                  </p>
+
+                  <Button
+                    size="sm"
+                    className="w-full mt-4 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRecommendationClick(rec);
+                    }}
+                  >
+                    <Play size={14} className="mr-2" />
+                    Start Practice
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Browse All Drills - Dropdown Selectors */}
       <div>
         <h2 className="text-2xl font-bold mb-6 text-slate-900">
-          Skill Areas
+          Browse All Drills
         </h2>
-        
+
         {skillAreas.length === 0 ? (
           <Card className="p-12 text-center bg-white border border-slate-200">
             <AlertCircle className="h-16 w-16 text-slate-400 mx-auto mb-4" />
@@ -995,8 +1152,140 @@ const Drill: React.FC = () => {
             <p className="text-slate-600">Drill questions for this test type are coming soon.</p>
           </Card>
         ) : (
-          <div className="space-y-6">
-            {skillAreas.map((skillArea) => (
+          <>
+            {/* Cascading Dropdown Selectors */}
+            <Card className="bg-white border border-slate-200 mb-6">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* Test Section Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Test Section
+                    </label>
+                    <Select value={selectedSectionId} onValueChange={(value) => {
+                      setSelectedSectionId(value);
+                      setSelectedSubSkillId(''); // Reset sub-skill when section changes
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select section..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {skillAreas.map((area) => (
+                          <SelectItem key={area.id} value={area.id}>
+                            {area.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Sub-Skill Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Sub-Skill
+                    </label>
+                    <Select
+                      value={selectedSubSkillId}
+                      onValueChange={setSelectedSubSkillId}
+                      disabled={!selectedSectionId}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select sub-skill..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getFilteredSubSkills().map((subSkill) => (
+                          <SelectItem key={subSkill.id} value={subSkill.id}>
+                            {subSkill.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Difficulty Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Difficulty
+                    </label>
+                    <Select
+                      value={selectedDifficulty}
+                      onValueChange={(value) => setSelectedDifficulty(value as 'easy' | 'medium' | 'hard')}
+                      disabled={!selectedSubSkillId}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="easy">Easy</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="hard">Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Start Button */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 invisible">
+                      Action
+                    </label>
+                    <Button
+                      className="w-full h-10 bg-gradient-to-r from-edu-teal to-teal-600 hover:from-edu-teal/90 hover:to-teal-600/90"
+                      onClick={handleDropdownDrillStart}
+                      disabled={!selectedSectionId || !selectedSubSkillId}
+                    >
+                      <Play size={16} className="mr-2" />
+                      Start Drill
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Progressive Disclosure: View All Skills */}
+            <Card
+              className="bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200 cursor-pointer hover:shadow-md transition-all"
+              onClick={() => setShowAllSkills(!showAllSkills)}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-slate-600" />
+                    <div>
+                      <h3 className="font-semibold text-slate-900">View All Available Skills</h3>
+                      <p className="text-sm text-slate-600">
+                        See complete list of all drills and track your progress
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAllSkills(!showAllSkills);
+                    }}
+                  >
+                    {showAllSkills ? (
+                      <>
+                        <span>Hide</span>
+                        <ChevronUp className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        <span>Show All</span>
+                        <ChevronDown className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Collapsible Skill Areas Section */}
+            {showAllSkills && (
+              <div className="space-y-6 mt-6">
+                {skillAreas.map((skillArea) => (
               <Card 
                 key={skillArea.id} 
                 className={cn(
@@ -1188,8 +1477,10 @@ const Drill: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
