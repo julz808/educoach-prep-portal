@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Writing Assessment Test</title>
+</head>
+<body>
+    <h1>Writing Assessment Edge Function Test</h1>
+    <button onclick="testAssessment()">Test Edge Function</button>
+    <pre id="output"></pre>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        window.testAssessment = async function() {
+            const output = document.getElementById('output')
+            output.textContent = 'Testing Edge Function...\n'
+
+            try {
+                // Get session
+                const { data: { session } } = await supabase.auth.getSession()
+                output.textContent += 'Session: ' + (session ? 'Found' : 'Not found') + '\n'
+
+                if (!session) {
+                    output.textContent += 'ERROR: You must be logged in. Please log in to your app first.\n'
+                    return
+                }
+
+                output.textContent += 'Calling Edge Function...\n'
+
+                const response = await supabase.functions.invoke('assess-writing', {
+                    body: {
+                        userResponse: "This is a test narrative. Once upon a time, there was a brave knight who went on an adventure.",
+                        writingPrompt: "Write a short narrative about a character going on an adventure.",
+                        rubric: {
+                            testName: "Test",
+                            genre: "Narrative Writing",
+                            totalMarks: 20,
+                            timeMinutes: 30,
+                            criteria: [
+                                { name: "Content", maxMarks: 10, description: "Story content and development" },
+                                { name: "Language", maxMarks: 10, description: "Language use and vocabulary" }
+                            ]
+                        },
+                        yearLevel: "Year 7"
+                    }
+                })
+
+                output.textContent += '\nResponse:\n'
+                output.textContent += JSON.stringify(response, null, 2)
+
+                if (response.error) {
+                    output.textContent += '\n\nERROR DETAILS:\n'
+                    output.textContent += JSON.stringify(response.error, null, 2)
+                } else if (response.data) {
+                    output.textContent += '\n\nSUCCESS! Assessment:\n'
+                    output.textContent += 'Score: ' + response.data.totalScore + '/' + response.data.maxPossibleScore + '\n'
+                    output.textContent += 'Percentage: ' + response.data.percentageScore + '%\n'
+                    output.textContent += 'Feedback: ' + response.data.overallFeedback
+                }
+
+            } catch (error) {
+                output.textContent += '\n\nEXCEPTION:\n'
+                output.textContent += error.message + '\n'
+                output.textContent += error.stack
+            }
+        }
+    </script>
+</body>
+</html>

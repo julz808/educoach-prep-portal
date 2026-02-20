@@ -71,7 +71,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// EduCourse custom colors (Updated to CLAUDE.md specifications)
+				// EduCourse custom colors (Updated to docs/project/CLAUDE.md specifications)
 				"edu-teal": "#4ECDC4",
 				"edu-coral": "#FF6B6B", 
 				"edu-navy": "#3B4F6B",

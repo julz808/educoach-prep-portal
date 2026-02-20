@@ -1,6 +1,12 @@
 // ============================================================================
-// SUPABASE STORAGE ENGINE
+// SUPABASE STORAGE ENGINE (V1 - DEPRECATED)
 // ============================================================================
+// ⚠️ DEPRECATED: This V1 storage engine writes to the `questions` table.
+// For new generation, use V2 storage at `src/engines/questionGeneration/v2/supabaseStorage.ts`
+//
+// This V1 storage is kept for backwards compatibility with existing users.
+// DO NOT USE for new question generation - use V2 which writes to `questions_v2` table.
+//
 // Handles all database storage operations for generated content
 // Integrates with the main generation engine as the authoritative storage layer
 

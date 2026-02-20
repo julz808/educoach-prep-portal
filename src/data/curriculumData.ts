@@ -4,36 +4,29 @@
 export const TEST_STRUCTURES = {
   "Year 5 NAPLAN": {
     "Writing": {
-      "questions": 1, 
-      "time": 42, 
+      "questions": 1,
+      "time": 42,
       "format": "Written Response",
       "passages": 0,
       "words_per_passage": 0
     },
     "Reading": {
-      "questions": 40, 
-      "time": 50, 
+      "questions": 40,
+      "time": 50,
       "format": "Multiple Choice",
       "passages": 8,
       "words_per_passage": 150
     },
     "Language Conventions": {
-      "questions": 40, 
-      "time": 45, 
+      "questions": 40,
+      "time": 45,
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
     },
-    "Numeracy No Calculator": {
-      "questions": 25, 
-      "time": 25, 
-      "format": "Multiple Choice",
-      "passages": 0,
-      "words_per_passage": 0
-    },
-    "Numeracy Calculator": {
-      "questions": 25, 
-      "time": 25, 
+    "Numeracy": {
+      "questions": 50,
+      "time": 50,
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
@@ -941,23 +934,12 @@ export const SECTION_TO_SUB_SKILLS = {
     "Vocabulary Usage & Word Choice",
     "Proofreading & Error Recognition"
   ],
-  "Year 5 NAPLAN - Numeracy No Calculator": [
-    "Number Sense & Operations",
-    "Algebraic Thinking & Patterns",
-    "Measurement Concepts",
-    "Geometric Reasoning", 
-    "Data Interpretation",
-    "Mathematical Reasoning",
-    "Mental Mathematics Fluency"
-  ],
-  "Year 5 NAPLAN - Numeracy Calculator": [
-    "Complex Number Operations",
-    "Algebraic Problem Solving",
-    "Advanced Measurement Applications",
-    "Geometric Problem Solving",
-    "Statistical Analysis",
-    "Multi-Step Problem Solving",
-    "Technology Integration"
+  "Year 5 NAPLAN - Numeracy": [
+    "Number Operations & Place Value",
+    "Fractions & Basic Fraction Operations",
+    "Patterns & Algebra",
+    "Measurement, Time & Money",
+    "Data & Basic Probability"
   ],
   "Year 5 NAPLAN - Writing": [
     "Narrative Writing",
@@ -1171,16 +1153,16 @@ export const SUB_SKILL_VISUAL_MAPPING = {
 
   // Year 5 NAPLAN
   "Year 5 NAPLAN": {
-    "Numeracy Calculator": {
+    "Numeracy": {
       "Geometric Problem Solving": {
         visualTypes: ["geometric_shapes", "coordinate_grid"],
         probability: 0.0,
-        notes: "Applied geometry with technological support"
+        notes: "Basic geometry and spatial reasoning"
       },
-      "Statistical Analysis": {
+      "Data Interpretation": {
         visualTypes: ["bar_chart", "line_graph", "pie_chart", "table"],
         probability: 0.0,
-        notes: "Basic statistical analysis with simple charts"
+        notes: "Basic data analysis with simple charts"
       }
     }
   },

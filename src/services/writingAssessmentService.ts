@@ -374,21 +374,35 @@ export class WritingAssessmentService {
    * Get writing assessment for a specific question and session
    */
   static async getWritingAssessment(questionId: string, sessionId: string): Promise<any> {
-    const { data, error } = await supabase
+    // First, check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error('Cannot fetch writing assessment: User not authenticated');
+      return null;
+    }
+
+    // Try without .single() first to see if any records exist
+    const { data: assessments, error: listError } = await supabase
       .from('writing_assessments')
       .select('*')
       .eq('question_id', questionId)
       .eq('session_id', sessionId)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Error fetching writing assessment:', error);
+      .limit(1);
+
+    if (listError) {
+      console.error('Error fetching writing assessment:', listError);
       return null;
     }
-    
-    return data;
+
+    // If no assessments found, log it
+    if (!assessments || assessments.length === 0) {
+      console.log('No writing assessment found for question:', questionId, 'session:', sessionId);
+      return null;
+    }
+
+    // Return the first (and should be only) assessment
+    return assessments[0];
   }
   
   /**

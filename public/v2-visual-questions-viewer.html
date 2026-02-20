@@ -1,0 +1,2567 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Questions Viewer - All Questions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stats h2 {
+            margin-top: 0;
+            color: #3498db;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+        .filter-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .question-header {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .test-type {
+            display: inline-block;
+            background: #9b59b6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+        .sub-skill {
+            color: #3498db;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .question-text {
+            font-size: 1.1em;
+            margin: 20px 0;
+            color: #2c3e50;
+            white-space: pre-wrap;
+        }
+        .visual-container {
+            background: #ffffff;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        .visual-label {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .answer-options {
+            margin: 20px 0;
+        }
+        .answer-option {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #dee2e6;
+        }
+        .answer-option.correct {
+            background: #d4edda;
+            border-left-color: #28a745;
+            font-weight: bold;
+        }
+        .solution {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .solution-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, #3498db, transparent);
+            margin: 40px 0;
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        table {
+            margin: 0 auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Visual Questions Viewer</h1>
+
+    <div class="stats">
+        <h2>📈 Summary Statistics</h2>
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-value">21</div>
+                <div class="stat-label">Total Visual Questions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Test Types</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Visual Types</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2/13/2026</div>
+                <div class="stat-label">Generated</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <h3>🔍 Filter by Test Type:</h3>
+        <div class="filter-group">
+            <button class="filter-btn active" onclick="filterByTestType('all')">All (21)</button>
+            
+                <button class="filter-btn" onclick="filterByTestType('EduTest Scholarship (Year 7 Entry)')">
+                    EduTest Scholarship (Year 7 Entry) (21)
+                </button>
+            
+        </div>
+
+        <h3 style="margin-top: 20px;">📊 Filter by Visual Type:</h3>
+        <div class="filter-group">
+            
+                <button class="filter-btn" onclick="filterByVisualType('chart')">
+                    chart (4)
+                </button>
+            
+                <button class="filter-btn" onclick="filterByVisualType('graph')">
+                    graph (2)
+                </button>
+            
+                <button class="filter-btn" onclick="filterByVisualType('table')">
+                    table (4)
+                </button>
+            
+                <button class="filter-btn" onclick="filterByVisualType('geometry')">
+                    geometry (10)
+                </button>
+            
+                <button class="filter-btn" onclick="filterByVisualType('grid')">
+                    grid (1)
+                </button>
+            
+        </div>
+    </div>
+
+    <div id="questions-container">
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="chart">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">1. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: chart |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:35:07 AM
+                </div>
+            </div>
+
+            <div class="question-text">The bar chart shows the number of goals scored by different players in Harper's soccer team during the season. What is the range of goals scored by these players?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (chart)</div>
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="400" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333">Goals Scored This Season</text>
+  
+  <!-- Chart area background -->
+  <rect x="80" y="50" width="360" height="280" fill="white" stroke="#ddd" stroke-width="1"/>
+  
+  <!-- Y-axis gridlines and labels -->
+  <g stroke="#e0e0e0" stroke-width="0.5">
+    <line x1="80" y1="330" x2="440" y2="330"/>
+    <line x1="80" y1="274" x2="440" y2="274"/>
+    <line x1="80" y1="218" x2="440" y2="218"/>
+    <line x1="80" y1="162" x2="440" y2="162"/>
+    <line x1="80" y1="106" x2="440" y2="106"/>
+    <line x1="80" y1="50" x2="440" y2="50"/>
+  </g>
+  
+  <!-- Y-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="end">
+    <text x="75" y="335">0</text>
+    <text x="75" y="279">5</text>
+    <text x="75" y="223">10</text>
+    <text x="75" y="167">15</text>
+    <text x="75" y="111">20</text>
+    <text x="75" y="55">25</text>
+  </g>
+  
+  <!-- Y-axis title -->
+  <text x="25" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333" transform="rotate(-90, 25, 190)">Number of Goals</text>
+  
+  <!-- Bars -->
+  <!-- Alex: 15 goals -->
+  <rect x="90" y="162" width="50" height="168" fill="#4285f4"/>
+  <text x="115" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">15</text>
+  
+  <!-- Blake: 23 goals -->
+  <rect x="150" y="61" width="50" height="269" fill="#34a853"/>
+  <text x="175" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">23</text>
+  
+  <!-- Casey: 11 goals -->
+  <rect x="210" y="205" width="50" height="125" fill="#fbbc04"/>
+  <text x="235" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">11</text>
+  
+  <!-- Drew: 5 goals -->
+  <rect x="270" y="274" width="50" height="56" fill="#ea4335"/>
+  <text x="295" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">5</text>
+  
+  <!-- Emma: 19 goals -->
+  <rect x="330" y="106" width="50" height="224" fill="#9c27b0"/>
+  <text x="355" y="99" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">19</text>
+  
+  <!-- Flynn: 8 goals -->
+  <rect x="390" y="241" width="50" height="89" fill="#ff9800"/>
+  <text x="415" y="234" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">8</text>
+  
+  <!-- X-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+    <text x="115" y="350">Alex</text>
+    <text x="175" y="350">Blake</text>
+    <text x="235" y="350">Casey</text>
+    <text x="295" y="350">Drew</text>
+    <text x="355" y="350">Emma</text>
+    <text x="415" y="350">Flynn</text>
+  </g>
+  
+  <!-- X-axis title -->
+  <text x="260" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">Player</text>
+  
+  <!-- Axes -->
+  <line x1="80" y1="50" x2="80" y2="330" stroke="#333" stroke-width="2"/>
+  <line x1="80" y1="330" x2="440" y2="330" stroke="#333" stroke-width="2"/>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 12 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 15 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 18 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 21 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 24 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Range = Highest value - Lowest value
+• From the chart: Highest number of goals = 23 (scored by one player)
+• From the chart: Lowest number of goals = 5 (scored by one player)
+• Range = 23 - 5 = 18
+• Therefore, the answer is C because the range of goals scored is 18
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="graph">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">2. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: graph |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:34:33 AM
+                </div>
+            </div>
+
+            <div class="question-text">The line graph shows the daily temperature readings in Darwin over a 7-day period. On which day was the temperature exactly equal to the mean temperature for the week?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (graph)</div>
+                <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="350" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Daily Temperature in Darwin</text>
+  
+  <!-- Grid lines -->
+  <g stroke="#e0e0e0" stroke-width="1">
+    <!-- Horizontal grid lines -->
+    <line x1="80" y1="60" x2="450" y2="60"/>
+    <line x1="80" y1="85" x2="450" y2="85"/>
+    <line x1="80" y1="110" x2="450" y2="110"/>
+    <line x1="80" y1="135" x2="450" y2="135"/>
+    <line x1="80" y1="160" x2="450" y2="160"/>
+    <line x1="80" y1="185" x2="450" y2="185"/>
+    <line x1="80" y1="210" x2="450" y2="210"/>
+    <line x1="80" y1="235" x2="450" y2="235"/>
+    <line x1="80" y1="260" x2="450" y2="260"/>
+    <line x1="80" y1="285" x2="450" y2="285"/>
+    <line x1="80" y1="310" x2="450" y2="310"/>
+    
+    <!-- Vertical grid lines -->
+    <line x1="133" y1="60" x2="133" y2="310"/>
+    <line x1="186" y1="60" x2="186" y2="310"/>
+    <line x1="239" y1="60" x2="239" y2="310"/>
+    <line x1="292" y1="60" x2="292" y2="310"/>
+    <line x1="345" y1="60" x2="345" y2="310"/>
+    <line x1="398" y1="60" x2="398" y2="310"/>
+  </g>
+  
+  <!-- Axes -->
+  <g stroke="#333" stroke-width="2" fill="none">
+    <!-- Y-axis -->
+    <line x1="80" y1="60" x2="80" y2="310"/>
+    <!-- X-axis -->
+    <line x1="80" y1="310" x2="450" y2="310"/>
+  </g>
+  
+  <!-- Y-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="end">
+    <text x="75" y="65">35</text>
+    <text x="75" y="90">34</text>
+    <text x="75" y="115">33</text>
+    <text x="75" y="140">32</text>
+    <text x="75" y="165">31</text>
+    <text x="75" y="190">30</text>
+    <text x="75" y="215">29</text>
+    <text x="75" y="240">28</text>
+    <text x="75" y="265">27</text>
+    <text x="75" y="290">26</text>
+    <text x="75" y="315">25</text>
+  </g>
+  
+  <!-- X-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+    <text x="80" y="330">Mon</text>
+    <text x="133" y="330">Tue</text>
+    <text x="186" y="330">Wed</text>
+    <text x="239" y="330">Thu</text>
+    <text x="292" y="330">Fri</text>
+    <text x="345" y="330">Sat</text>
+    <text x="398" y="330">Sun</text>
+  </g>
+  
+  <!-- Axis labels -->
+  <text x="265" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">Day</text>
+  <text x="25" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333" transform="rotate(-90 25 185)">Temperature (°C)</text>
+  
+  <!-- Data line -->
+  <polyline points="80,235 133,135 186,285 239,210 292,85 345,160 398,260" 
+            fill="none" stroke="#2563eb" stroke-width="3"/>
+  
+  <!-- Data points -->
+  <g fill="#2563eb">
+    <circle cx="80" cy="235" r="4"/>
+    <circle cx="133" cy="135" r="4"/>
+    <circle cx="186" cy="285" r="4"/>
+    <circle cx="239" cy="210" r="4"/>
+    <circle cx="292" cy="85" r="4"/>
+    <circle cx="345" cy="160" r="4"/>
+    <circle cx="398" cy="260" r="4"/>
+  </g>
+  
+  <!-- Data point labels -->
+  <g font-family="Arial, sans-serif" font-size="11" fill="#333" text-anchor="middle">
+    <text x="80" y="225">28°</text>
+    <text x="133" y="125">31°</text>
+    <text x="186" y="275">26°</text>
+    <text x="239" y="200">29°</text>
+    <text x="292" y="75">33°</text>
+    <text x="345" y="150">30°</text>
+    <text x="398" y="250">27°</text>
+  </g>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) Tuesday 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) Wednesday 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) Thursday ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) Friday 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) Saturday 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • First, find the sum of all temperatures: 28 + 31 + 26 + 29 + 33 + 30 + 27 = 204°C
+• Calculate the mean: 204 ÷ 7 = 29.14°C (approximately 29°C)
+• Check each day's temperature against the mean of 29°C
+• Monday: 28°C, Tuesday: 31°C, Wednesday: 26°C, Thursday: 29°C, Friday: 33°C, Saturday: 30°C, Sunday: 27°C
+• Therefore, the answer is C because Thursday had exactly 29°C, which equals the mean temperature
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="chart">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">3. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: chart |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:34:06 AM
+                </div>
+            </div>
+
+            <div class="question-text">The pie chart shows how 150 students at Riverside Middle School spend their lunch break. Calculate how many more students play sports than those who use the library.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (chart)</div>
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333">Student Lunch Break Activities</text>
+  <text x="250" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">(150 Students Total)</text>
+  
+  <!-- Pie Chart -->
+  <g transform="translate(180, 200)">
+    <!-- Sports: 32% (0° to 115.2°) -->
+    <path d="M 0,0 L 0,-80 A 80,80 0 0,1 75.89,-25.88 Z" fill="#4A90E2" stroke="white" stroke-width="2"/>
+    
+    <!-- Cafeteria: 28% (115.2° to 216°) -->
+    <path d="M 0,0 L 75.89,-25.88 A 80,80 0 0,1 24.72,75.89 Z" fill="#7ED321" stroke="white" stroke-width="2"/>
+    
+    <!-- Library: 18% (216° to 280.8°) -->
+    <path d="M 0,0 L 24.72,75.89 A 80,80 0 0,1 -61.44,51.42 Z" fill="#F5A623" stroke="white" stroke-width="2"/>
+    
+    <!-- Outdoors: 15% (280.8° to 334.8°) -->
+    <path d="M 0,0 L -61.44,51.42 A 80,80 0 0,1 -65.45,-32.14 Z" fill="#D0021B" stroke="white" stroke-width="2"/>
+    
+    <!-- Study Hall: 7% (334.8° to 360°) -->
+    <path d="M 0,0 L -65.45,-32.14 A 80,80 0 0,1 0,-80 Z" fill="#9013FE" stroke="white" stroke-width="2"/>
+    
+    <!-- Percentage Labels -->
+    <text x="25" y="-40" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">32%</text>
+    <text x="45" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">28%</text>
+    <text x="-15" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">18%</text>
+    <text x="-50" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">15%</text>
+    <text x="-25" y="-50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">7%</text>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(320, 120)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Activities:</text>
+    
+    <rect x="0" y="15" width="12" height="12" fill="#4A90E2"/>
+    <text x="18" y="25" font-family="Arial, sans-serif" font-size="12" fill="#333">Sports (48 students)</text>
+    
+    <rect x="0" y="35" width="12" height="12" fill="#7ED321"/>
+    <text x="18" y="45" font-family="Arial, sans-serif" font-size="12" fill="#333">Cafeteria (42 students)</text>
+    
+    <rect x="0" y="55" width="12" height="12" fill="#F5A623"/>
+    <text x="18" y="65" font-family="Arial, sans-serif" font-size="12" fill="#333">Library (27 students)</text>
+    
+    <rect x="0" y="75" width="12" height="12" fill="#D0021B"/>
+    <text x="18" y="85" font-family="Arial, sans-serif" font-size="12" fill="#333">Outdoors (23 students)</text>
+    
+    <rect x="0" y="95" width="12" height="12" fill="#9013FE"/>
+    <text x="18" y="105" font-family="Arial, sans-serif" font-size="12" fill="#333">Study Hall (10 students)</text>
+  </g>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 15 students 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 18 students 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 21 students ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 24 students 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 27 students 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • From the pie chart: Sports = 32%, Library = 18%
+• Students playing sports: 32% of 150 = 0.32 × 150 = 48 students
+• Students using library: 18% of 150 = 0.18 × 150 = 27 students
+• Difference: 48 - 27 = 21 students
+• Therefore, the answer is C because 21 more students play sports than use the library
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="table">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">4. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: table |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:33:42 AM
+                </div>
+            </div>
+
+            <div class="question-text">The table shows the number of books Charlotte read each month during her summer reading challenge. Calculate the median number of books she read per month.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (table)</div>
+                <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="400" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">Charlotte's Summer Reading Challenge</text>
+  
+  <!-- Table border -->
+  <rect x="50" y="50" width="700" height="120" fill="none" stroke="#34495e" stroke-width="2"/>
+  
+  <!-- Header row background -->
+  <rect x="50" y="50" width="700" height="60" fill="#ecf0f1" stroke="none"/>
+  
+  <!-- Vertical grid lines -->
+  <line x1="137.5" y1="50" x2="137.5" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="225" y1="50" x2="225" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="312.5" y1="50" x2="312.5" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="400" y1="50" x2="400" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="487.5" y1="50" x2="487.5" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="575" y1="50" x2="575" y2="170" stroke="#34495e" stroke-width="1"/>
+  <line x1="662.5" y1="50" x2="662.5" y2="170" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Horizontal grid line -->
+  <line x1="50" y1="110" x2="750" y2="110" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Header text -->
+  <text x="93.75" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Month</text>
+  <text x="181.25" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">June</text>
+  <text x="268.75" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">July</text>
+  <text x="356.25" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">August</text>
+  <text x="443.75" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">September</text>
+  <text x="531.25" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">October</text>
+  <text x="618.75" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">November</text>
+  <text x="706.25" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">December</text>
+  
+  <!-- Data row text -->
+  <text x="93.75" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">Number of Books</text>
+  <text x="181.25" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">6</text>
+  <text x="268.75" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">11</text>
+  <text x="356.25" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">7</text>
+  <text x="443.75" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">12</text>
+  <text x="531.25" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">9</text>
+  <text x="618.75" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">8</text>
+  <text x="706.25" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2c3e50">10</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 7 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 8 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 9 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 10 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 11 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • First, list all the monthly values from the table: 6, 11, 7, 12, 9, 8, 10
+• Arrange these values in ascending order: 6, 7, 8, 9, 10, 11, 12
+• Since there are 7 values (odd number), the median is the middle value
+• The middle position is the 4th value in the ordered list
+• The 4th value is 9
+• Therefore, the answer is C because the median number of books Charlotte read per month is 9
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="table">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">5. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: table |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:33:20 AM
+                </div>
+            </div>
+
+            <div class="question-text">The table shows the number of points Ethan scored in each basketball game during the tournament. Find the median of his scores.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (table)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">
+    Ethan's Basketball Tournament Scores
+  </text>
+  
+  <!-- Table border -->
+  <rect x="50" y="45" width="300" height="220" fill="none" stroke="#333" stroke-width="2"/>
+  
+  <!-- Header row background -->
+  <rect x="50" y="45" width="300" height="30" fill="#e6f3ff" stroke="#333" stroke-width="1"/>
+  
+  <!-- Vertical divider -->
+  <line x1="200" y1="45" x2="200" y2="265" stroke="#333" stroke-width="1"/>
+  
+  <!-- Header text -->
+  <text x="125" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">
+    Game
+  </text>
+  <text x="275" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">
+    Points Scored
+  </text>
+  
+  <!-- Horizontal lines for rows -->
+  <line x1="50" y1="75" x2="350" y2="75" stroke="#333" stroke-width="1"/>
+  <line x1="50" y1="100" x2="350" y2="100" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="125" x2="350" y2="125" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="150" x2="350" y2="150" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="175" x2="350" y2="175" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="200" x2="350" y2="200" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="225" x2="350" y2="225" stroke="#666" stroke-width="0.5"/>
+  <line x1="50" y1="250" x2="350" y2="250" stroke="#666" stroke-width="0.5"/>
+  
+  <!-- Data rows -->
+  <text x="125" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 1</text>
+  <text x="275" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">19</text>
+  
+  <text x="125" y="117" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 2</text>
+  <text x="275" y="117" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">23</text>
+  
+  <text x="125" y="142" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 3</text>
+  <text x="275" y="142" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">11</text>
+  
+  <text x="125" y="167" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 4</text>
+  <text x="275" y="167" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">16</text>
+  
+  <text x="125" y="192" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 5</text>
+  <text x="275" y="192" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">21</text>
+  
+  <text x="125" y="217" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 6</text>
+  <text x="275" y="217" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">17</text>
+  
+  <text x="125" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">Game 7</text>
+  <text x="275" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">14</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 14 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 16 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 17 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 18 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 19 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • First, arrange the scores in ascending order: 11, 14, 16, 17, 19, 21, 23
+• Count the number of values: there are 7 scores
+• For an odd number of values, the median is the middle value
+• The middle position is the 4th value (since (7+1)÷2 = 4)
+• The 4th value in the ordered list is 17
+• Therefore, the answer is C because the median score is 17 points
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="table">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">6. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: table |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:32:53 AM
+                </div>
+            </div>
+
+            <div class="question-text">The table shows the number of hours Zara spent practising piano each day last week. What is the median number of hours she practised?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (table)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">Zara's Piano Practice Hours</text>
+  
+  <!-- Table border -->
+  <rect x="50" y="45" width="300" height="220" fill="none" stroke="#34495e" stroke-width="2"/>
+  
+  <!-- Header row background -->
+  <rect x="50" y="45" width="300" height="30" fill="#ecf0f1" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Header text -->
+  <text x="75" y="65" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Day</text>
+  <text x="275" y="65" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Hours</text>
+  
+  <!-- Vertical separator line -->
+  <line x1="200" y1="45" x2="200" y2="265" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Row separators -->
+  <line x1="50" y1="75" x2="350" y2="75" stroke="#34495e" stroke-width="1"/>
+  <line x1="50" y1="105" x2="350" y2="105" stroke="#bdc3c7" stroke-width="0.5"/>
+  <line x1="50" y1="135" x2="350" y2="135" stroke="#bdc3c7" stroke-width="0.5"/>
+  <line x1="50" y1="165" x2="350" y2="165" stroke="#bdc3c7" stroke-width="0.5"/>
+  <line x1="50" y1="195" x2="350" y2="195" stroke="#bdc3c7" stroke-width="0.5"/>
+  <line x1="50" y1="225" x2="350" y2="225" stroke="#bdc3c7" stroke-width="0.5"/>
+  <line x1="50" y1="235" x2="350" y2="235" stroke="#bdc3c7" stroke-width="0.5"/>
+  
+  <!-- Data rows -->
+  <text x="75" y="95" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Monday</text>
+  <text x="275" y="95" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">1.5</text>
+  
+  <text x="75" y="125" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Tuesday</text>
+  <text x="275" y="125" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">2</text>
+  
+  <text x="75" y="155" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Wednesday</text>
+  <text x="275" y="155" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">2.5</text>
+  
+  <text x="75" y="185" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Thursday</text>
+  <text x="275" y="185" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">4</text>
+  
+  <text x="75" y="215" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Friday</text>
+  <text x="275" y="215" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">3.5</text>
+  
+  <text x="75" y="245" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Saturday</text>
+  <text x="275" y="245" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">2.5</text>
+  
+  <text x="75" y="255" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Sunday</text>
+  <text x="275" y="255" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">3</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 2.0 hours 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        B) 2.5 hours ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 3.0 hours 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 3.5 hours 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 4.0 hours 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • First, list all the daily practice hours from the table: 1.5, 2.0, 2.5, 4.0, 3.5, 2.5, 3.0
+• To find the median, arrange the values in order from smallest to largest: 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 4.0
+• Count the number of values: there are 7 values
+• For an odd number of values, the median is the middle value (the 4th value in this case)
+• The 4th value in the ordered list is 2.5 hours
+• Therefore, the answer is B because the median is 2.5 hours
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="chart">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">7. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: chart |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:32:28 AM
+                </div>
+            </div>
+
+            <div class="question-text">The bar graph shows the number of goals scored by players in Yuki's hockey team during the season. Calculate the range of goals scored.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (chart)</div>
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="400" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Goals Scored by Hockey Team Players</text>
+  
+  <!-- Chart area background -->
+  <rect x="80" y="50" width="360" height="280" fill="white" stroke="#ddd" stroke-width="1"/>
+  
+  <!-- Horizontal gridlines -->
+  <g stroke="#e0e0e0" stroke-width="0.5">
+    <line x1="80" y1="330" x2="440" y2="330"/>
+    <line x1="80" y1="294" x2="440" y2="294"/>
+    <line x1="80" y1="258" x2="440" y2="258"/>
+    <line x1="80" y1="222" x2="440" y2="222"/>
+    <line x1="80" y1="186" x2="440" y2="186"/>
+    <line x1="80" y1="150" x2="440" y2="150"/>
+    <line x1="80" y1="114" x2="440" y2="114"/>
+    <line x1="80" y1="78" x2="440" y2="78"/>
+  </g>
+  
+  <!-- Y-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="end">
+    <text x="75" y="334">0</text>
+    <text x="75" y="298">2</text>
+    <text x="75" y="262">4</text>
+    <text x="75" y="226">6</text>
+    <text x="75" y="190">8</text>
+    <text x="75" y="154">10</text>
+    <text x="75" y="118">12</text>
+    <text x="75" y="82">14</text>
+    <text x="75" y="56">16</text>
+  </g>
+  
+  <!-- Y-axis title -->
+  <text x="25" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333" transform="rotate(-90, 25, 190)">Number of Goals</text>
+  
+  <!-- Bars -->
+  <g>
+    <!-- Emma: 8 goals -->
+    <rect x="90" y="186" width="50" height="144" fill="#4A90E2"/>
+    <text x="115" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">8</text>
+    
+    <!-- Carlos: 12 goals -->
+    <rect x="162" y="114" width="50" height="216" fill="#7ED321"/>
+    <text x="187" y="108" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">12</text>
+    
+    <!-- Zara: 11 goals -->
+    <rect x="234" y="132" width="50" height="198" fill="#F5A623"/>
+    <text x="259" y="126" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">11</text>
+    
+    <!-- Marcus: 15 goals -->
+    <rect x="306" y="60" width="50" height="270" fill="#BD10E0"/>
+    <text x="331" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">15</text>
+    
+    <!-- Finn: 14 goals -->
+    <rect x="378" y="78" width="50" height="252" fill="#50E3C2"/>
+    <text x="403" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">14</text>
+  </g>
+  
+  <!-- X-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+    <text x="115" y="350">Emma</text>
+    <text x="187" y="350">Carlos</text>
+    <text x="259" y="350">Zara</text>
+    <text x="331" y="350">Marcus</text>
+    <text x="403" y="350">Finn</text>
+  </g>
+  
+  <!-- X-axis title -->
+  <text x="260" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">Player</text>
+  
+  <!-- Axes -->
+  <g stroke="#333" stroke-width="2" fill="none">
+    <line x1="80" y1="50" x2="80" y2="330"/>
+    <line x1="80" y1="330" x2="440" y2="330"/>
+  </g>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 8 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 12 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 15 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 23 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        E) 7 ✓
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • To find the range, identify the highest and lowest values from the graph
+• Highest number of goals scored = 15 (Marcus)
+• Lowest number of goals scored = 8 (Emma)
+• Range = highest value - lowest value
+• Range = 15 - 8 = 7
+• Therefore, the answer is E because the range represents the difference between the maximum and minimum values
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="graph">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">8. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: graph |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:32:06 AM
+                </div>
+            </div>
+
+            <div class="question-text">The line graph shows the number of visitors to Tao's family farm over 5 consecutive days. On Monday there were 45 visitors, Tuesday had 52 visitors, Wednesday had 38 visitors, Thursday had 61 visitors, and Friday had 49 visitors. What is the mean number of visitors per day?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (graph)</div>
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="400" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Daily Visitors to Farm</text>
+  
+  <!-- Grid lines -->
+  <g stroke="#e0e0e0" stroke-width="1">
+    <!-- Horizontal grid lines -->
+    <line x1="80" y1="60" x2="450" y2="60"/>
+    <line x1="80" y1="110" x2="450" y2="110"/>
+    <line x1="80" y1="160" x2="450" y2="160"/>
+    <line x1="80" y1="210" x2="450" y2="210"/>
+    <line x1="80" y1="260" x2="450" y2="260"/>
+    <line x1="80" y1="310" x2="450" y2="310"/>
+    
+    <!-- Vertical grid lines -->
+    <line x1="154" y1="60" x2="154" y2="310"/>
+    <line x1="228" y1="60" x2="228" y2="310"/>
+    <line x1="302" y1="60" x2="302" y2="310"/>
+    <line x1="376" y1="60" x2="376" y2="310"/>
+  </g>
+  
+  <!-- Axes -->
+  <g stroke="#333" stroke-width="2" fill="none">
+    <!-- Y-axis -->
+    <line x1="80" y1="60" x2="80" y2="310"/>
+    <!-- X-axis -->
+    <line x1="80" y1="310" x2="450" y2="310"/>
+  </g>
+  
+  <!-- Y-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="end">
+    <text x="75" y="65">70</text>
+    <text x="75" y="115">60</text>
+    <text x="75" y="165">50</text>
+    <text x="75" y="215">40</text>
+    <text x="75" y="265">30</text>
+    <text x="75" y="315">0</text>
+  </g>
+  
+  <!-- X-axis labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+    <text x="117" y="330">Monday</text>
+    <text x="191" y="330">Tuesday</text>
+    <text x="265" y="330">Wednesday</text>
+    <text x="339" y="330">Thursday</text>
+    <text x="413" y="330">Friday</text>
+  </g>
+  
+  <!-- Axis labels -->
+  <text x="40" y="185" font-family="Arial, sans-serif" font-size="14" fill="#333" text-anchor="middle" transform="rotate(-90 40 185)">Number of Visitors</text>
+  <text x="265" y="365" font-family="Arial, sans-serif" font-size="14" fill="#333" text-anchor="middle">Day</text>
+  
+  <!-- Data line -->
+  <polyline points="117,147.5 191,126 265,175 339,91.5 413,137.5" 
+            fill="none" 
+            stroke="#2563eb" 
+            stroke-width="3"/>
+  
+  <!-- Data points -->
+  <g fill="#2563eb">
+    <circle cx="117" cy="147.5" r="5"/>
+    <circle cx="191" cy="126" r="5"/>
+    <circle cx="265" cy="175" r="5"/>
+    <circle cx="339" cy="91.5" r="5"/>
+    <circle cx="413" cy="137.5" r="5"/>
+  </g>
+  
+  <!-- Data point labels -->
+  <g font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">
+    <text x="117" y="140">45</text>
+    <text x="191" y="119">52</text>
+    <text x="265" y="168">38</text>
+    <text x="339" y="84">61</text>
+    <text x="413" y="130">49</text>
+  </g>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 45 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        B) 49 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 52 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 48 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 50 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Add all the visitor numbers: 45 + 52 + 38 + 61 + 49 = 245
+• Count the number of days: 5 days
+• Calculate the mean by dividing total visitors by number of days: 245 ÷ 5 = 49
+• Therefore, the answer is B because the mean number of visitors per day is 49
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="chart">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">9. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: chart |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:31:43 AM
+                </div>
+            </div>
+
+            <div class="question-text">The pie chart shows how Sofia spent her $120 birthday money. If she spent 25% on clothes, 30% on games, 20% on books, and the rest on food, how much money did she spend on food?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (chart)</div>
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="250" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Sofia's Birthday Money Spending ($120 total)</text>
+  
+  <!-- Pie chart center -->
+  <g transform="translate(200, 200)">
+    <!-- Clothes 25% (90°) - Blue -->
+    <path d="M 0,0 L 0,-100 A 100,100 0 0,1 70.71,-70.71 Z" fill="#4A90E2" stroke="white" stroke-width="2"/>
+    
+    <!-- Games 30% (108°) - Orange -->
+    <path d="M 0,0 L 70.71,-70.71 A 100,100 0 0,1 80.9,58.78 Z" fill="#F5A623" stroke="white" stroke-width="2"/>
+    
+    <!-- Food 25% (90°) - Purple -->
+    <path d="M 0,0 L 80.9,58.78 A 100,100 0 0,1 0,100 Z" fill="#9013FE" stroke="white" stroke-width="2"/>
+    
+    <!-- Books 20% (72°) - Green -->
+    <path d="M 0,0 L 0,100 A 100,100 0 0,1 -95.11,-30.9 Z" fill="#50C878" stroke="white" stroke-width="2"/>
+    
+    <!-- Close the circle - back to Clothes -->
+    <path d="M 0,0 L -95.11,-30.9 A 100,100 0 0,1 0,-100 Z" fill="#4A90E2" stroke="white" stroke-width="2"/>
+    
+    <!-- Labels on pie slices -->
+    <text x="25" y="-60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">25%</text>
+    <text x="60" y="-10" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">30%</text>
+    <text x="25" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">25%</text>
+    <text x="-50" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">20%</text>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(320, 120)">
+    <!-- Clothes -->
+    <rect x="0" y="0" width="15" height="15" fill="#4A90E2"/>
+    <text x="20" y="12" font-family="Arial, sans-serif" font-size="14" fill="#333">Clothes - $30</text>
+    
+    <!-- Games -->
+    <rect x="0" y="25" width="15" height="15" fill="#F5A623"/>
+    <text x="20" y="37" font-family="Arial, sans-serif" font-size="14" fill="#333">Games - $36</text>
+    
+    <!-- Books -->
+    <rect x="0" y="50" width="15" height="15" fill="#50C878"/>
+    <text x="20" y="62" font-family="Arial, sans-serif" font-size="14" fill="#333">Books - $24</text>
+    
+    <!-- Food -->
+    <rect x="0" y="75" width="15" height="15" fill="#9013FE"/>
+    <text x="20" y="87" font-family="Arial, sans-serif" font-size="14" fill="#333">Food - $30</text>
+  </g>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option correct">
+                        A) $30 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) $25 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) $35 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) $20 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) $40 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • First, find the percentage spent on food: 100% - 25% - 30% - 20% = 25%
+• Calculate 25% of $120: 0.25 × $120 = $30
+• Check: Clothes $30 + Games $36 + Books $24 + Food $30 = $120 ✓
+• Therefore, the answer is A because Sofia spent $30 on food
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="table">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">10. Statistics & Data Interpretation</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: table |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:31:19 AM
+                </div>
+            </div>
+
+            <div class="question-text">The table shows the number of books read by five students during the school holidays. Calculate the mean number of books read.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (table)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">Books Read During School Holidays</text>
+  
+  <!-- Table border -->
+  <rect x="50" y="50" width="300" height="200" fill="none" stroke="#34495e" stroke-width="2"/>
+  
+  <!-- Header row background -->
+  <rect x="50" y="50" width="300" height="35" fill="#ecf0f1" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Column separator -->
+  <line x1="200" y1="50" x2="200" y2="250" stroke="#34495e" stroke-width="1"/>
+  
+  <!-- Header text -->
+  <text x="125" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Student</text>
+  <text x="275" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Books Read</text>
+  
+  <!-- Row separators -->
+  <line x1="50" y1="85" x2="350" y2="85" stroke="#34495e" stroke-width="1"/>
+  <line x1="50" y1="120" x2="350" y2="120" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="50" y1="155" x2="350" y2="155" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="50" y1="190" x2="350" y2="190" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="50" y1="225" x2="350" y2="225" stroke="#bdc3c7" stroke-width="1"/>
+  
+  <!-- Data rows -->
+  <!-- Raj -->
+  <text x="125" y="107" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Raj</text>
+  <text x="275" y="107" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">5</text>
+  
+  <!-- Emma -->
+  <text x="125" y="142" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Emma</text>
+  <text x="275" y="142" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">7</text>
+  
+  <!-- Sophie -->
+  <text x="125" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Sophie</text>
+  <text x="275" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">10</text>
+  
+  <!-- Carlos -->
+  <text x="125" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Carlos</text>
+  <text x="275" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">6</text>
+  
+  <!-- Zoe -->
+  <text x="125" y="247" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">Zoe</text>
+  <text x="275" y="247" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#2c3e50">12</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 6 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 7 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 8 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 9 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 10 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Add all the values: 5 + 7 + 10 + 6 + 12 = 40
+• Count the number of students: 5 students
+• Calculate the mean: 40 ÷ 5 = 8
+• Therefore, the answer is C because the mean number of books read is 8
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">11. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:31:00 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a triangular park sign ABC. What type of angle is formed at corner B if it measures 90 degrees?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Triangle ABC -->
+  <polygon points="100,200 200,200 200,100" 
+           fill="none" 
+           stroke="#2563eb" 
+           stroke-width="2"/>
+  
+  <!-- Right angle square at B -->
+  <rect x="180" y="180" width="20" height="20" 
+        fill="none" 
+        stroke="#2563eb" 
+        stroke-width="1.5"/>
+  
+  <!-- Vertex labels -->
+  <text x="95" y="215" 
+        font-family="Arial, sans-serif" 
+        font-size="16" 
+        font-weight="bold" 
+        fill="#1e40af" 
+        text-anchor="middle">A</text>
+  
+  <text x="200" y="220" 
+        font-family="Arial, sans-serif" 
+        font-size="16" 
+        font-weight="bold" 
+        fill="#1e40af" 
+        text-anchor="middle">B</text>
+  
+  <text x="205" y="95" 
+        font-family="Arial, sans-serif" 
+        font-size="16" 
+        font-weight="bold" 
+        fill="#1e40af" 
+        text-anchor="start">C</text>
+  
+  <!-- Right angle label -->
+  <text x="220" y="195" 
+        font-family="Arial, sans-serif" 
+        font-size="14" 
+        fill="#7c3aed" 
+        text-anchor="start">90°</text>
+  
+  <!-- Vertex points -->
+  <circle cx="100" cy="200" r="3" fill="#2563eb"/>
+  <circle cx="200" cy="200" r="3" fill="#2563eb"/>
+  <circle cx="200" cy="100" r="3" fill="#2563eb"/>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) acute angle 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) obtuse angle 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) right angle ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) straight angle 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) reflex angle 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • An angle that measures exactly 90 degrees is called a right angle
+• Acute angles measure less than 90 degrees
+• Obtuse angles measure between 90 and 180 degrees
+• Straight angles measure exactly 180 degrees
+• Reflex angles measure between 180 and 360 degrees
+• Therefore, the answer is C because a 90-degree angle is the definition of a right angle
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">12. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:30:44 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a rectangular garden bed PQRS. If the garden bed has a length of 8 metres and a width of 5 metres, what is the perimeter of the garden bed?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rectangle PQRS -->
+  <rect x="80" y="80" width="240" height="150" fill="none" stroke="#2563eb" stroke-width="2"/>
+  
+  <!-- Right angle markers -->
+  <rect x="80" y="80" width="12" height="12" fill="none" stroke="#2563eb" stroke-width="1"/>
+  <rect x="308" y="80" width="12" height="12" fill="none" stroke="#2563eb" stroke-width="1"/>
+  <rect x="308" y="218" width="12" height="12" fill="none" stroke="#2563eb" stroke-width="1"/>
+  <rect x="80" y="218" width="12" height="12" fill="none" stroke="#2563eb" stroke-width="1"/>
+  
+  <!-- Vertex labels -->
+  <text x="75" y="75" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af" text-anchor="middle">P</text>
+  <text x="325" y="75" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af" text-anchor="middle">Q</text>
+  <text x="325" y="245" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af" text-anchor="middle">R</text>
+  <text x="75" y="245" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af" text-anchor="middle">S</text>
+  
+  <!-- Length dimension lines and labels -->
+  <line x1="80" y1="50" x2="320" y2="50" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"/>
+  <text x="200" y="45" font-family="Arial, sans-serif" font-size="14" fill="#333" text-anchor="middle">8 metres</text>
+  
+  <!-- Width dimension lines and labels -->
+  <line x1="50" y1="80" x2="50" y2="230" stroke="#666" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"/>
+  <text x="35" y="160" font-family="Arial, sans-serif" font-size="14" fill="#333" text-anchor="middle" transform="rotate(-90, 35, 160)">5 metres</text>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 13 metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 18 metres 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 26 metres ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 40 metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 80 metres 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • The perimeter of a rectangle is calculated using the formula: Perimeter = 2 × (length + width)
+• Given: length = 8 metres and width = 5 metres
+• Substitute the values: Perimeter = 2 × (8 + 5)
+• Calculate inside the brackets first: Perimeter = 2 × 13
+• Final calculation: Perimeter = 26 metres
+• Therefore, the answer is C because the perimeter is 26 metres
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">13. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:30:25 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a quadrilateral WXYZ where opposite angles are supplementary. If angle W is (4a + 20)°, angle X is (3a - 10)°, and angle Y is (2a + 40)°, find the measure of angle Z.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#2563eb" stroke-width="2"/>
+  
+  <!-- Quadrilateral WXYZ -->
+  <polygon points="120,80 280,120 320,280 80,240" fill="none" stroke="#1e40af" stroke-width="2"/>
+  
+  <!-- Vertices -->
+  <circle cx="120" cy="80" r="3" fill="#1e40af"/>
+  <circle cx="280" cy="120" r="3" fill="#1e40af"/>
+  <circle cx="320" cy="280" r="3" fill="#1e40af"/>
+  <circle cx="80" cy="240" r="3" fill="#1e40af"/>
+  
+  <!-- Vertex labels -->
+  <text x="110" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af">W</text>
+  <text x="290" y="115" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af">X</text>
+  <text x="330" y="290" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af">Y</text>
+  <text x="65" y="250" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e40af">Z</text>
+  
+  <!-- Angle arcs -->
+  <!-- Angle W -->
+  <path d="M 140 95 A 25 25 0 0 1 135 105" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  
+  <!-- Angle X -->
+  <path d="M 265 135 A 25 25 0 0 1 275 155" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  
+  <!-- Angle Y -->
+  <path d="M 305 265 A 25 25 0 0 1 295 255" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  
+  <!-- Angle Z -->
+  <path d="M 95 225 A 25 25 0 0 1 105 235" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  
+  <!-- Angle labels -->
+  <text x="145" y="110" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed">(4a + 20)°</text>
+  <text x="285" y="175" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed">(3a - 10)°</text>
+  <text x="250" y="270" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed">(2a + 40)°</text>
+  <text x="45" y="220" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#dc2626">?</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 110° 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 120° 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 130° ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 140° 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 150° 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • In a quadrilateral where opposite angles are supplementary, this describes a cyclic quadrilateral
+• In a cyclic quadrilateral, opposite angles sum to 180°
+• So angle W + angle Y = 180°: (4a + 20) + (2a + 40) = 180
+• Simplifying: 6a + 60 = 180, therefore 6a = 120, so a = 20
+• Now find angle X: 3a - 10 = 3(20) - 10 = 60 - 10 = 50°
+• Since opposite angles are supplementary: angle Z + angle X = 180°
+• Therefore angle Z = 180° - 50° = 130°
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">14. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:30:00 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a parallelogram PQRS where angle P is (3x - 15)° and the adjacent angle Q is (2x + 35)°. Find the value of x.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Parallelogram PQRS -->
+  <polygon points="80,80 280,60 320,180 120,200" 
+           fill="none" 
+           stroke="#2563eb" 
+           stroke-width="2"/>
+  
+  <!-- Parallel side markings -->
+  <!-- PQ parallel to SR -->
+  <g stroke="#7c3aed" stroke-width="1.5">
+    <line x1="120" y1="75" x2="130" y2="73" opacity="0.8"/>
+    <line x1="140" y1="71" x2="150" y2="69" opacity="0.8"/>
+    <line x1="160" y1="67" x2="170" y2="65" opacity="0.8"/>
+    
+    <line x1="180" y1="185" x2="190" y2="187" opacity="0.8"/>
+    <line x1="200" y1="189" x2="210" y2="191" opacity="0.8"/>
+    <line x1="220" y1="193" x2="230" y2="195" opacity="0.8"/>
+  </g>
+  
+  <!-- PS parallel to QR -->
+  <g stroke="#7c3aed" stroke-width="1.5">
+    <line x1="85" y1="120" x2="87" y2="130" opacity="0.8"/>
+    <line x1="89" y1="140" x2="91" y2="150" opacity="0.8"/>
+    
+    <line x1="285" y1="100" x2="287" y2="110" opacity="0.8"/>
+    <line x1="289" y1="120" x2="291" y2="130" opacity="0.8"/>
+  </g>
+  
+  <!-- Angle markings -->
+  <!-- Angle P -->
+  <path d="M 100,80 A 20,20 0 0,1 115,95" 
+        fill="none" 
+        stroke="#dc2626" 
+        stroke-width="2"/>
+  
+  <!-- Angle Q -->
+  <path d="M 265,75 A 20,20 0 0,1 275,95" 
+        fill="none" 
+        stroke="#dc2626" 
+        stroke-width="2"/>
+  
+  <!-- Vertex labels -->
+  <text x="75" y="75" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">P</text>
+  <text x="285" y="55" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">Q</text>
+  <text x="325" y="185" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">R</text>
+  <text x="115" y="205" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">S</text>
+  
+  <!-- Angle labels -->
+  <text x="105" y="105" font-family="Arial, sans-serif" font-size="14" fill="#dc2626">(3x - 15)°</text>
+  <text x="240" y="100" font-family="Arial, sans-serif" font-size="14" fill="#dc2626">(2x + 35)°</text>
+  
+  <!-- Side labels for parallel indication -->
+  <text x="170" y="50" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed" opacity="0.8">PQ</text>
+  <text x="210" y="210" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed" opacity="0.8">SR</text>
+  <text x="60" y="140" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed" opacity="0.8">PS</text>
+  <text x="310" y="120" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed" opacity="0.8">QR</text>
+  
+  <!-- Parallel symbols -->
+  <text x="180" y="35" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed">||</text>
+  <text x="350" y="140" font-family="Arial, sans-serif" font-size="12" fill="#7c3aed">||</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 25 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 30 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 32 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 35 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 40 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • In a parallelogram, adjacent angles are supplementary (they add up to 180°)
+• Set up the equation: (3x - 15)° + (2x + 35)° = 180°
+• Simplify: 3x - 15 + 2x + 35 = 180
+• Combine like terms: 5x + 20 = 180
+• Subtract 20 from both sides: 5x = 160
+• Divide by 5: x = 32
+• Therefore, the answer is C because adjacent angles in a parallelogram are supplementary
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">15. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:29:34 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a circular flower bed with centre O. What is the name for a straight line that passes through the centre of the circle and connects two points on the edge?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid lines for reference -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  
+  <!-- Circle with radius 4cm (80 units at 20 units per cm) -->
+  <circle cx="200" cy="150" r="80" fill="none" stroke="#2563eb" stroke-width="2"/>
+  
+  <!-- Diameter line from A to B -->
+  <line x1="120" y1="150" x2="280" y2="150" stroke="#1d4ed8" stroke-width="2"/>
+  
+  <!-- Center point O -->
+  <circle cx="200" cy="150" r="3" fill="#dc2626"/>
+  
+  <!-- Endpoint A -->
+  <circle cx="120" cy="150" r="3" fill="#dc2626"/>
+  
+  <!-- Endpoint B -->
+  <circle cx="280" cy="150" r="3" fill="#dc2626"/>
+  
+  <!-- Labels -->
+  <text x="200" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937">O</text>
+  <text x="110" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937">A</text>
+  <text x="290" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937">B</text>
+  
+  <!-- Diameter label -->
+  <text x="200" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#4b5563">diameter</text>
+  
+  <!-- Scale indicator -->
+  <text x="20" y="280" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Scale: 1 cm = 20 units</text>
+  <text x="20" y="260" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Radius = 4 cm</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) radius 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        B) diameter ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) chord 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) circumference 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) arc 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • A line that passes through the centre of a circle and connects two points on the edge is called a diameter
+• A radius goes from the centre to the edge but doesn't pass all the way through
+• A chord connects two points on the edge but doesn't necessarily pass through the centre
+• Circumference is the distance around the circle
+• An arc is a curved section of the circle's edge
+• Therefore, the answer is B because a diameter is specifically defined as a line passing through the centre from edge to edge
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">16. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:29:15 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a square playground ABCD. If the playground has a perimeter of 48 metres, what is the area of the playground?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid lines for reference -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  
+  <!-- Grid background -->
+  <rect width="400" height="300" fill="url(#grid)"/>
+  
+  <!-- Title -->
+  <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Square Playground ABCD</text>
+  
+  <!-- Square playground -->
+  <rect x="120" y="80" width="160" height="160" fill="#87CEEB" stroke="#2c5aa0" stroke-width="3"/>
+  
+  <!-- Right angle markers -->
+  <rect x="120" y="80" width="12" height="12" fill="none" stroke="#2c5aa0" stroke-width="2"/>
+  <rect x="268" y="80" width="12" height="12" fill="none" stroke="#2c5aa0" stroke-width="2"/>
+  <rect x="268" y="228" width="12" height="12" fill="none" stroke="#2c5aa0" stroke-width="2"/>
+  <rect x="120" y="228" width="12" height="12" fill="none" stroke="#2c5aa0" stroke-width="2"/>
+  
+  <!-- Vertex labels -->
+  <text x="115" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c5aa0">A</text>
+  <text x="285" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c5aa0">B</text>
+  <text x="285" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c5aa0">C</text>
+  <text x="115" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c5aa0">D</text>
+  
+  <!-- Side length labels -->
+  <text x="200" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">12 metres</text>
+  <text x="295" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666" transform="rotate(90 295 165)">12 metres</text>
+  
+  <!-- Vertex points -->
+  <circle cx="120" cy="240" r="3" fill="#2c5aa0"/>
+  <circle cx="280" cy="240" r="3" fill="#2c5aa0"/>
+  <circle cx="280" cy="80" r="3" fill="#2c5aa0"/>
+  <circle cx="120" cy="80" r="3" fill="#2c5aa0"/>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option correct">
+                        A) 144 square metres ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 192 square metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 216 square metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 288 square metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 576 square metres 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Since the playground is a square, all four sides are equal in length
+• Perimeter of a square = 4 × side length
+• So 48 = 4 × side length
+• Therefore, side length = 48 ÷ 4 = 12 metres
+• Area of a square = side length × side length
+• Area = 12 × 12 = 144 square metres
+• Therefore, the answer is A because the area is 144 square metres
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">17. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:28:53 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a regular hexagon ABCDEF with centre O. If one interior angle of the hexagon is represented as (2y + 30)°, find the value of y.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hexagon outline -->
+  <polygon points="200,50 273.2,125 273.2,275 200,350 126.8,275 126.8,125" 
+           fill="none" 
+           stroke="#2563eb" 
+           stroke-width="2"/>
+  
+  <!-- Lines from center to vertices -->
+  <line x1="200" y1="200" x2="200" y2="50" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="200" y1="200" x2="273.2" y2="125" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="200" y1="200" x2="273.2" y2="275" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="200" y1="200" x2="200" y2="350" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="200" y1="200" x2="126.8" y2="275" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="200" y1="200" x2="126.8" y2="125" stroke="#6b7280" stroke-width="1.5"/>
+  
+  <!-- Center point -->
+  <circle cx="200" cy="200" r="3" fill="#1f2937"/>
+  
+  <!-- Vertex points -->
+  <circle cx="200" cy="50" r="2" fill="#2563eb"/>
+  <circle cx="273.2" cy="125" r="2" fill="#2563eb"/>
+  <circle cx="273.2" cy="275" r="2" fill="#2563eb"/>
+  <circle cx="200" cy="350" r="2" fill="#2563eb"/>
+  <circle cx="126.8" cy="275" r="2" fill="#2563eb"/>
+  <circle cx="126.8" cy="125" r="2" fill="#2563eb"/>
+  
+  <!-- Vertex labels -->
+  <text x="200" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">A</text>
+  <text x="285" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">B</text>
+  <text x="285" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">C</text>
+  <text x="200" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">D</text>
+  <text x="115" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">E</text>
+  <text x="115" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">F</text>
+  
+  <!-- Center label -->
+  <text x="210" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">O</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option correct">
+                        A) 45 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 50 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 55 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 60 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 65 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • A regular hexagon has 6 equal sides and 6 equal interior angles
+• The sum of interior angles of any hexagon is (6-2) × 180° = 4 × 180° = 720°
+• Since all interior angles are equal in a regular hexagon, each angle = 720° ÷ 6 = 120°
+• We know one interior angle is (2y + 30)°, so: 2y + 30 = 120
+• Solving for y: 2y = 120 - 30 = 90, therefore y = 45
+• Therefore, the answer is A because y = 45
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">18. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:27:49 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a triangular garden bed ABC. If angle A is 65° and angle B is 45°, what is the measure of angle C?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Triangle ABC -->
+  <polygon points="100,220 300,220 180,80" fill="none" stroke="#2563eb" stroke-width="2"/>
+  
+  <!-- Vertex labels -->
+  <text x="180" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">A</text>
+  <text x="90" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">B</text>
+  <text x="310" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1f2937">C</text>
+  
+  <!-- Angle arc at A (65°) -->
+  <path d="M 160,100 A 25,25 0 0,1 200,100" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="180" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#7c3aed">65°</text>
+  
+  <!-- Angle arc at B (45°) -->
+  <path d="M 120,220 A 25,25 0 0,1 110,195" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="135" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#7c3aed">45°</text>
+  
+  <!-- Angle arc at C (unknown) -->
+  <path d="M 290,195 A 25,25 0 0,1 280,220" fill="none" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="265" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#dc2626">?</text>
+  
+  <!-- Vertex points -->
+  <circle cx="180" cy="80" r="3" fill="#1f2937"/>
+  <circle cx="100" cy="220" r="3" fill="#1f2937"/>
+  <circle cx="300" cy="220" r="3" fill="#1f2937"/>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 60° 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        B) 70° ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 75° 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 80° 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 85° 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • In any triangle, the sum of all three interior angles equals 180°
+• Given: angle A = 65° and angle B = 45°
+• Using the angle sum property: angle A + angle B + angle C = 180°
+• Substituting the known values: 65° + 45° + angle C = 180°
+• Simplifying: 110° + angle C = 180°
+• Solving for angle C: angle C = 180° - 110° = 70°
+• Therefore, the answer is B because angle C measures 70°
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">19. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 1 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:27:33 AM
+                </div>
+            </div>
+
+            <div class="question-text">The diagram shows a rectangular swimming pool. If the pool has a length of 12 metres and a width of 8 metres, what is the perimeter of the pool?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Swimming pool rectangle -->
+  <rect x="80" y="80" width="240" height="160" fill="#4A90E2" stroke="#2C5282" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Water ripple effect -->
+  <path d="M 90 100 Q 110 95 130 100 T 170 100" stroke="#87CEEB" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M 200 120 Q 220 115 240 120 T 280 120" stroke="#87CEEB" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M 120 180 Q 140 175 160 180 T 200 180" stroke="#87CEEB" stroke-width="1" fill="none" opacity="0.6"/>
+  
+  <!-- Dimension lines -->
+  <!-- Length dimension line (top) -->
+  <line x1="80" y1="60" x2="320" y2="60" stroke="#333" stroke-width="1"/>
+  <line x1="80" y1="55" x2="80" y2="65" stroke="#333" stroke-width="1"/>
+  <line x1="320" y1="55" x2="320" y2="65" stroke="#333" stroke-width="1"/>
+  
+  <!-- Width dimension line (right) -->
+  <line x1="340" y1="80" x2="340" y2="240" stroke="#333" stroke-width="1"/>
+  <line x1="335" y1="80" x2="345" y2="80" stroke="#333" stroke-width="1"/>
+  <line x1="335" y1="240" x2="345" y2="240" stroke="#333" stroke-width="1"/>
+  
+  <!-- Corner markers for right angles -->
+  <rect x="80" y="80" width="12" height="12" fill="none" stroke="#333" stroke-width="1"/>
+  <rect x="308" y="80" width="12" height="12" fill="none" stroke="#333" stroke-width="1"/>
+  <rect x="80" y="228" width="12" height="12" fill="none" stroke="#333" stroke-width="1"/>
+  <rect x="308" y="228" width="12" height="12" fill="none" stroke="#333" stroke-width="1"/>
+  
+  <!-- Labels -->
+  <text x="200" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">12m</text>
+  <text x="355" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333" transform="rotate(90, 355, 165)">8m</text>
+  
+  <!-- Title -->
+  <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Swimming Pool</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 20 metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 32 metres 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 40 metres ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 48 metres 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 96 metres 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Perimeter of a rectangle = 2 × (length + width)
+• Length = 12 metres, width = 8 metres
+• Perimeter = 2 × (12 + 8)
+• Perimeter = 2 × 20 = 40 metres
+• Therefore, the answer is C because the perimeter is 40 metres
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="geometry">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">20. Geometry & Spatial Reasoning</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 3 |
+                    Visual Type: geometry |
+                    Section: Mathematics |
+                    Created: 2/13/2026, 10:27:16 AM
+                </div>
+            </div>
+
+            <div class="question-text">In the diagram, quadrilateral PQRS is a parallelogram where angle P is (3x + 20)° and angle Q is (2x + 40)°. Find the value of x.</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (geometry)</div>
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Parallelogram PQRS -->
+  <polygon points="80,60 280,60 320,180 40,180" 
+           fill="none" 
+           stroke="#2563eb" 
+           stroke-width="2"/>
+  
+  <!-- Vertex labels -->
+  <text x="80" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">P</text>
+  <text x="280" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Q</text>
+  <text x="320" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">R</text>
+  <text x="40" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">S</text>
+  
+  <!-- Angle P marking -->
+  <path d="M 100,60 A 20,20 0 0,0 80,80" 
+        fill="none" 
+        stroke="#7c3aed" 
+        stroke-width="2"/>
+  <text x="110" y="85" font-family="Arial, sans-serif" font-size="14" fill="#7c3aed">(3x + 20)°</text>
+  
+  <!-- Angle Q marking -->
+  <path d="M 280,80 A 20,20 0 0,0 260,60" 
+        fill="none" 
+        stroke="#dc2626" 
+        stroke-width="2"/>
+  <text x="230" y="85" font-family="Arial, sans-serif" font-size="14" fill="#dc2626">(2x + 40)°</text>
+  
+  <!-- Parallel marks for PQ and SR -->
+  <g stroke="#059669" stroke-width="2">
+    <!-- PQ parallel marks -->
+    <line x1="170" y1="55" x2="175" y2="55"/>
+    <line x1="185" y1="55" x2="190" y2="55"/>
+    
+    <!-- SR parallel marks -->
+    <line x1="170" y1="185" x2="175" y2="185"/>
+    <line x1="185" y1="185" x2="190" y2="185"/>
+  </g>
+  
+  <!-- Parallel marks for PS and QR -->
+  <g stroke="#059669" stroke-width="2">
+    <!-- PS parallel marks -->
+    <line x1="55" y1="110" x2="55" y2="115"/>
+    <line x1="55" y1="125" x2="55" y2="130"/>
+    
+    <!-- QR parallel marks -->
+    <line x1="305" y1="110" x2="305" y2="115"/>
+    <line x1="305" y1="125" x2="305" y2="130"/>
+  </g>
+  
+  <!-- Side labels -->
+  <text x="180" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#374151">PQ</text>
+  <text x="300" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#374151">QR</text>
+  <text x="180" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#374151">SR</text>
+  <text x="60" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#374151">PS</text>
+  
+  <!-- Legend -->
+  <text x="20" y="240" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Parallelogram PQRS</text>
+  <line x1="20" y1="250" x2="35" y2="250" stroke="#059669" stroke-width="2"/>
+  <line x1="20" y1="255" x2="35" y2="255" stroke="#059669" stroke-width="2"/>
+  <text x="40" y="255" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Parallel sides</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 20 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        B) 24 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        C) 28 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 30 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 32 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • In a parallelogram, adjacent angles are supplementary (sum to 180°)
+• So angle P + angle Q = 180°
+• Substitute the expressions: (3x + 20) + (2x + 40) = 180
+• Simplify: 3x + 20 + 2x + 40 = 180
+• Combine like terms: 5x + 60 = 180
+• Subtract 60 from both sides: 5x = 120
+• Divide by 5: x = 24
+• Therefore, the answer is B because x = 24
+            </div>
+        </div>
+
+        <div class="divider"></div>
+    
+        <div class="question-card" data-test-type="EduTest Scholarship (Year 7 Entry)" data-visual-type="grid">
+            <div class="question-header">
+                <div>
+                    <span class="test-type">EduTest Scholarship (Year 7 Entry)</span>
+                    <span class="sub-skill">21. Number Matrices & Grid Patterns</span>
+                </div>
+                <div class="meta">
+                    Difficulty: 2 |
+                    Visual Type: grid |
+                    Section: Numerical Reasoning |
+                    Created: 2/13/2026, 9:19:48 AM
+                </div>
+            </div>
+
+            <div class="question-text">Look at the pattern in the grid below. What number should replace the question mark?</div>
+
+            <div class="visual-container">
+                <div class="visual-label">📊 Generated Visual (grid)</div>
+                <svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid lines -->
+  <!-- Vertical lines -->
+  <line x1="0" y1="0" x2="0" y2="240" stroke="#333" stroke-width="2"/>
+  <line x1="120" y1="0" x2="120" y2="240" stroke="#333" stroke-width="2"/>
+  <line x1="240" y1="0" x2="240" y2="240" stroke="#333" stroke-width="2"/>
+  <line x1="360" y1="0" x2="360" y2="240" stroke="#333" stroke-width="2"/>
+  
+  <!-- Horizontal lines -->
+  <line x1="0" y1="0" x2="360" y2="0" stroke="#333" stroke-width="2"/>
+  <line x1="0" y1="80" x2="360" y2="80" stroke="#333" stroke-width="2"/>
+  <line x1="0" y1="160" x2="360" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="0" y1="240" x2="360" y2="240" stroke="#333" stroke-width="2"/>
+  
+  <!-- Cell backgrounds -->
+  <rect x="0" y="0" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="120" y="0" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="240" y="0" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="0" y="80" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="120" y="80" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="240" y="80" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="0" y="160" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="120" y="160" width="120" height="80" fill="#f8f9fa" stroke="none"/>
+  <rect x="240" y="160" width="120" height="80" fill="#fff3cd" stroke="none"/>
+  
+  <!-- Numbers -->
+  <!-- Row 1 -->
+  <text x="60" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">3</text>
+  <text x="180" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">6</text>
+  <text x="300" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">12</text>
+  
+  <!-- Row 2 -->
+  <text x="60" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">4</text>
+  <text x="180" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">8</text>
+  <text x="300" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">16</text>
+  
+  <!-- Row 3 -->
+  <text x="60" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">5</text>
+  <text x="180" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">10</text>
+  <text x="300" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#856404">?</text>
+</svg>
+            </div>
+
+            <div class="answer-options">
+                <strong>Answer Options:</strong>
+                
+                    <div class="answer-option ">
+                        A) 16 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        B) 18 
+                    </div>
+                    
+                    <div class="answer-option correct">
+                        C) 20 ✓
+                    </div>
+                    
+                    <div class="answer-option ">
+                        D) 22 
+                    </div>
+                    
+                    <div class="answer-option ">
+                        E) 24 
+                    </div>
+                    
+            </div>
+
+            <div class="solution">
+                <div class="solution-title">💡 Solution:</div>
+                • Examine each row to identify the pattern
+• Row 1: 3 × 2 = 6, 3 × 4 = 12 (multiplying first number by 2, then by 4)
+• Row 2: 4 × 2 = 8, 4 × 4 = 16 (same pattern: multiply by 2, then by 4)
+• Row 3: 5 × 2 = 10, 5 × 4 = ? (applying the same pattern)
+• Calculate: 5 × 4 = 20
+• Therefore, the answer is C because each row follows the pattern of multiplying the first number by 2 and then by 4
+            </div>
+        </div>
+
+        
+    
+    </div>
+
+    <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #7f8c8d;">
+        <p>Generated from Questions Table - V2 Question Generation Engine</p>
+        <p>2/13/2026, 11:49:05 AM</p>
+    </footer>
+
+    <script>
+        function filterByTestType(testType) {
+            const cards = document.querySelectorAll('.question-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update button states
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            cards.forEach(card => {
+                if (testType === 'all' || card.dataset.testType === testType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterByVisualType(visualType) {
+            const cards = document.querySelectorAll('.question-card');
+
+            cards.forEach(card => {
+                if (card.dataset.visualType === visualType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+  

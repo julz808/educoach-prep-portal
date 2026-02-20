@@ -1,6 +1,18 @@
 /**
- * CURRICULUM-BASED QUESTION GENERATION ENGINE
- * 
+ * CURRICULUM-BASED QUESTION GENERATION ENGINE (V1 - DEPRECATED)
+ *
+ * ⚠️ DEPRECATED: This is the V1 generation engine that stores questions in the `questions` table.
+ * For new question generation, use the V2 engine at `src/engines/questionGeneration/v2/`
+ *
+ * This V1 engine is kept for backwards compatibility as it supports existing users
+ * in the `questions` table. DO NOT USE for new generation - use V2 instead.
+ *
+ * V2 Engine Benefits:
+ * - Uses curriculumData v2 with visual tagging
+ * - Stores in questions_v2 table
+ * - Enhanced validation and diversity tracking
+ * - Better visual generation support
+ *
  * This module provides the core generation logic that follows curriculum requirements
  * for passage-to-question ratios, difficulty assignments, and test-specific configurations
  */
@@ -353,6 +365,9 @@ export class CurriculumBasedGenerator {
         }
       }
       
+      // Determine if visual should be generated based on curriculum data v2
+      const shouldGenVisual = this.shouldGenerateVisualForQuestion(context.subSkill, context.testType, context.sectionName);
+
       // Build question prompt
       const questionPrompt = await buildQuestionPrompt({
         testType: context.testType,
@@ -360,7 +375,7 @@ export class CurriculumBasedGenerator {
         subSkill: context.subSkill,
         difficulty: context.difficulty,
         responseType: this.config.isWritingSection ? 'extended_response' : 'multiple_choice',
-        generateVisual: false,
+        generateVisual: shouldGenVisual,
         generationContext: this.generationContext,
         passageContent: passageContent,
         existingQuestions: existingQuestions
@@ -454,6 +469,82 @@ export class CurriculumBasedGenerator {
       'difficulty_2': 0,
       'difficulty_3': 0
     };
+  }
+
+  /**
+   * Determine if a visual should be generated for this question based on curriculum data v2
+   */
+  private shouldGenerateVisualForQuestion(subSkill: string, testType: string, sectionName: string): boolean {
+    try {
+      // Import curriculum data based on test type
+      let curriculumData: any = null;
+
+      if (testType.includes('ACER')) {
+        const { ACER_SUB_SKILLS } = require('../../data/curriculumData_v2/acer');
+        curriculumData = ACER_SUB_SKILLS;
+      } else if (testType.includes('EduTest')) {
+        const { EDUTEST_SUB_SKILLS } = require('../../data/curriculumData_v2/edutest');
+        curriculumData = EDUTEST_SUB_SKILLS;
+      } else if (testType.includes('NSW Selective')) {
+        const { NSW_SELECTIVE_SUB_SKILLS } = require('../../data/curriculumData_v2/nsw-selective');
+        curriculumData = NSW_SELECTIVE_SUB_SKILLS;
+      } else if (testType.includes('VIC Selective')) {
+        const { VIC_SELECTIVE_SUB_SKILLS } = require('../../data/curriculumData_v2/vic-selective');
+        curriculumData = VIC_SELECTIVE_SUB_SKILLS;
+      } else if (testType.includes('Year 5 NAPLAN')) {
+        const { YEAR5_NAPLAN_SUB_SKILLS } = require('../../data/curriculumData_v2/year5-naplan');
+        curriculumData = YEAR5_NAPLAN_SUB_SKILLS;
+      } else if (testType.includes('Year 7 NAPLAN')) {
+        const { YEAR7_NAPLAN_SUB_SKILLS } = require('../../data/curriculumData_v2/year7-naplan');
+        curriculumData = YEAR7_NAPLAN_SUB_SKILLS;
+      }
+
+      if (!curriculumData) {
+        console.log(`   ⚠️  No curriculum data v2 found for ${testType} - defaulting to no visual`);
+        return false;
+      }
+
+      // Get the section key (e.g., "ACER Scholarship (Year 7 Entry) - Mathematics")
+      const sectionKey = `${testType} - ${sectionName}`;
+      const sectionData = curriculumData[sectionKey];
+
+      if (!sectionData || !sectionData[subSkill]) {
+        console.log(`   ⚠️  Sub-skill "${subSkill}" not found in curriculum data - defaulting to no visual`);
+        return false;
+      }
+
+      const subSkillData = sectionData[subSkill];
+      const examples = subSkillData.examples || [];
+
+      if (examples.length === 0) {
+        return false;
+      }
+
+      // Check if any examples require visuals
+      const visualExamples = examples.filter((ex: any) => ex.requires_visual === true);
+      const nonVisualExamples = examples.filter((ex: any) => ex.requires_visual === false);
+
+      // If there are both types, use 50/50 probability
+      if (visualExamples.length > 0 && nonVisualExamples.length > 0) {
+        const shouldGenerate = Math.random() < 0.5;
+        console.log(`   🎲 Sub-skill has both visual and non-visual examples - randomly chose: ${shouldGenerate ? 'VISUAL' : 'TEXT-ONLY'}`);
+        return shouldGenerate;
+      }
+
+      // If only visual examples exist, return true
+      if (visualExamples.length > 0) {
+        console.log(`   🎨 Sub-skill requires visual (${visualExamples.length}/${examples.length} examples)`);
+        return true;
+      }
+
+      // Otherwise, no visual needed
+      console.log(`   📝 Sub-skill is text-only (${examples.length} examples)`);
+      return false;
+
+    } catch (error) {
+      console.error(`   ❌ Error checking visual requirement: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      return false;
+    }
   }
 
   /**

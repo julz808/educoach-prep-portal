@@ -1,0 +1,230 @@
+================================================================================
+EDUCOACH PLATFORM - QUICK REFERENCE SUMMARY
+================================================================================
+
+ROUTE STRUCTURE:
+  /dashboard                              → Main hub with 3 cards
+  /dashboard/diagnostic                   → Diagnostic assessment sections
+  /dashboard/drill                        → Skill drills browser
+  /dashboard/practice-tests               → Practice test launcher
+  /dashboard/insights                     → Analytics dashboard
+  /test/{mode}/{section}/{session}        → Test taking interface
+  /test-instructions/{mode}/{section}     → Pre-test instructions
+
+================================================================================
+THREE MAIN MODES
+================================================================================
+
+1. DIAGNOSTIC ASSESSMENT
+   File: /src/pages/Diagnostic.tsx (1110 lines)
+   Purpose: Initial skills assessment across all sub-skills
+   Structure: Single test with 3-5 sections per product (130-220 questions)
+   Time Limits: From TEST_STRUCTURES curriculum data
+   Auto-Save: Every 30 seconds
+   Results: Section scores + sub-skill breakdown in Insights
+
+2. SKILL DRILLS
+   File: /src/pages/Drill.tsx (1200 lines)
+   Purpose: Targeted sub-skill practice with 3 difficulty levels
+   Structure: Skill Areas → Sub-Skills → Easy/Medium/Hard
+   Timer: None (immediate answer feedback)
+   Results: Score for each difficulty level
+   Gap: NOT automatically recommended based on diagnostic results
+
+3. PRACTICE TESTS
+   File: /src/pages/PracticeTests.tsx (250+ lines)
+   Purpose: Full-length exam simulation
+   Available: 5 practice tests per product
+   Timer: Yes (enforced by time limits)
+   Results: Full test score + section breakdown
+
+================================================================================
+INSIGHTS/ANALYTICS SYSTEM
+================================================================================
+
+File: /src/pages/Insights.tsx (1000+ lines)
+       /src/services/analyticsService.ts (500+ lines)
+
+TABS:
+  1. Overall Performance       → Aggregated metrics + Spider chart
+  2. Diagnostic Results        → Section breakdown + Sub-skill analysis
+  3. Practice Tests Results    → Trends across 5 tests
+  4. Drills Performance        → Difficulty progression + Accuracy
+
+KEY CONCEPT: Sub-Skill Tracking
+  - 60+ unified sub-skills defined in /src/data/curriculumData.ts
+  - Every question tagged with a sub_skill
+  - Performance aggregated and displayed by sub-skill
+  - Example: Reading section has 8+ sub-skills:
+    * Literal Comprehension
+    * Inferential Reasoning
+    * Vocabulary in Context
+    * Text Structure Analysis
+    * Character Analysis
+    * Theme & Message Analysis
+    * Critical Analysis & Evaluation
+    * Integration & Synthesis
+
+DATA SOURCES:
+  user_test_sessions table        → Session metadata
+  question_attempt_history table  → Per-question responses
+  writing_assessments table       → Writing rubric scores (0-30 pts)
+
+CALCULATION METHOD:
+  1. Fetch question_attempt_history for session
+  2. Look up question details (section, sub_skill, max_points)
+  3. For writing: Use rubric score; for MC: Use binary correct/incorrect
+  4. Aggregate by section and sub-skill
+  5. Calculate Score % = (earned points / max possible points) × 100
+  6. Calculate Accuracy % = (correct answers / total attempts) × 100
+
+================================================================================
+SUB-SKILL SYSTEM
+================================================================================
+
+Source File: /src/data/curriculumData.ts
+
+UNIFIED_SUB_SKILLS export:
+  Reading & Comprehension (9 skills)
+  Mathematical Skills (6 skills)
+  Logical Reasoning (5 skills)
+  Writing Skills (7 skills)
+  + Language & Grammar skills
+  + Measurement & Data skills
+
+SECTION_TO_SUB_SKILLS export:
+  Maps curriculum sections to their sub-skills
+  Example: Reading Comprehension → [Literal Comprehension, Inferential Reasoning, ...]
+
+Each sub-skill has:
+  - Description (pedagogical definition)
+  - visual_required flag (for diagrams/shapes)
+
+================================================================================
+PRODUCTS & THEIR STRUCTURES
+================================================================================
+
+Product              Sections                                    Total Q's
+─────────────────────────────────────────────────────────────────────────────
+Year 5 NAPLAN        Writing, Reading, Language, Numeracy(2)         131
+Year 7 NAPLAN        Writing, Reading, Language, Numeracy(2)         180
+ACER (Year 7)        Written Expression, Mathematics, Humanities      71
+EduTest (Year 7)     Reading, Verbal, Numerical, Math, Writing        222
+NSW Selective (Y7)   Reading, Math Reasoning, Thinking, Writing       106
+VIC Selective (Y9)   Reading, Math, Gen Ability(2), Writing           222
+
+================================================================================
+NAVIGATION FLOW: USER JOURNEY
+================================================================================
+
+NEW USER:
+  1. Dashboard                 → Show 0/X progress on all three modes
+  2. Start Diagnostic          → Pick first section
+  3. Read Instructions         → Test format, time, rules
+  4. Take Test                 → Questions, flag, review
+  5. View Results              → Score + section breakdown
+  6. View Insights             → Sub-skill performance + weak areas
+  7. Navigate to Drills        → MUST DO MANUALLY (gap)
+  8. Select weak sub-skill     → MUST FIND MANUALLY (gap)
+  9. Practice drills
+ 10. Take Practice Tests
+
+FRICTION POINTS:
+  - No automated drill recommendations from diagnostic results
+  - Manual navigation between Insights and Drills pages
+  - No "Start Drill" button from weak skills in Insights
+  - Sub-skill matching issues (UUID generation complexity)
+
+================================================================================
+WRITING QUESTIONS SPECIAL HANDLING
+================================================================================
+
+Different from multiple choice:
+  - Format: Written Response (essays, short answers)
+  - Points: 0-30 (not binary 1/0)
+  - Scoring: Rubric-based (WritingAssessmentService)
+  - Stored in: writing_assessments table
+  - Drills: Routed through TestTaking.tsx (not DrillSessionService)
+  - Session Table: user_test_sessions (not drill_sessions)
+
+Rubric breakdown:
+  Content (0-10)        → Ideas and relevance
+  Organization (0-10)   → Structure and flow
+  Style/Grammar (0-10)  → Language conventions
+  Total (0-30)          → Summed score
+
+================================================================================
+SESSION PERSISTENCE
+================================================================================
+
+Auto-Save: Every 30 seconds while active
+Saved Data:
+  - Current answers
+  - Current question index
+  - Flagged questions
+  - Time spent
+
+Resume:
+  - Load last session_data
+  - Restore answers + position
+  - Restore time remaining
+  - Continue where user left off
+
+================================================================================
+KEY FILES BY RESPONSIBILITY
+================================================================================
+
+PAGES:
+  Dashboard.tsx               (400 lines)     → Hub with 3 cards
+  Diagnostic.tsx             (1110 lines)    → Diagnostic test
+  Drill.tsx                  (1200 lines)    → Drill browser
+  PracticeTests.tsx          (250 lines)     → Practice launcher
+  Insights.tsx               (1000 lines)    → Analytics
+  TestTaking.tsx             (1968 lines)    → Universal test interface
+  TestInstructionsPage.tsx   (400 lines)     → Pre-test instructions
+
+SERVICES:
+  analyticsService.ts        (500+ lines)    → Performance analysis
+  sessionService.ts          (200+ lines)    → Session state
+  testSessionService.ts      (200+ lines)    → Practice/diagnostic sessions
+  drillSessionService.ts     (150+ lines)    → Drill sessions
+  writingAssessmentService.ts(150+ lines)    → Writing rubric
+  supabaseQuestionService.ts (300+ lines)    → Content retrieval
+  scoringService.ts          (150+ lines)    → Score calculation
+
+DATA:
+  curriculumData.ts          (700+ lines)    → TEST_STRUCTURES, UNIFIED_SUB_SKILLS
+  productConfig.ts           (100 lines)     → Product definitions
+
+COMPONENTS:
+  EnhancedTestInterface.tsx                  → Test UI (Q&A)
+  InteractiveInsightsDashboard.tsx           → Analytics viz
+  WritingAssessmentFeedback.tsx              → Writing feedback
+  HeroBanner.tsx                             → Section headers
+
+================================================================================
+RECOMMENDATIONS FOR LANDING PAGE
+================================================================================
+
+1. SUB-SKILL LEVEL INSIGHTS
+   "See exactly WHERE your child is struggling, not just overall scores"
+   "Track progress in 60+ specific skills"
+
+2. THREE-STEP METHODOLOGY
+   Diagnostic → Identify gaps
+   Drills → Targeted practice
+   Practice Tests → Exam simulation
+
+3. DETAILED FEEDBACK
+   "Every question includes expert explanations"
+
+4. PROGRESS TRACKING
+   "Charts show improvement week-by-week"
+
+5. EXPERT-DESIGNED
+   "1000+ questions mapped to official curriculums"
+
+6. PARENT DASHBOARD
+   "Monitor real-time progress"
+
+================================================================================

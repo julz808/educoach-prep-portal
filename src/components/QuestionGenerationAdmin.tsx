@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
-import VisualRenderer from './VisualRenderer';
 import { 
   TEST_STRUCTURES, 
   UNIFIED_SUB_SKILLS

@@ -977,9 +977,36 @@ export const WRITING_RUBRICS = {
 
 export class WritingRubricService {
   /**
-   * Get rubric for specific product and genre
+   * Map V2 sub-skill names to rubric genre names
    */
-  static getRubric(productType: string, genre: string): WritingRubric | null {
+  private static normalizeGenreName(subSkill: string, productType: string): string {
+    // Direct mappings for V2 sub-skill names → rubric genres
+    const mappings: Record<string, string> = {
+      // ACER
+      "Creative & Imaginative Writing": "Creative Writing",
+      "Persuasive & Argumentative Writing": "Persuasive Writing",
+
+      // NSW Selective
+      "Imaginative/Speculative Writing": "Imaginative Writing",
+      "Informative/Explanatory Writing": "Expository Writing",
+      "Narrative/Creative Writing": "Narrative Writing",
+      "Personal/Reflective Writing": "Narrative Writing", // Fallback
+      "Persuasive/Argumentative Writing": "Persuasive Writing",
+
+      // VIC, NAPLAN (already match exactly)
+      "Creative Writing": "Creative Writing",
+      "Persuasive Writing": "Persuasive Writing",
+      "Narrative Writing": "Narrative Writing",
+    };
+
+    return mappings[subSkill] || subSkill;
+  }
+
+  /**
+   * Get rubric for specific product and genre
+   * Supports both exact genre names and V2 sub-skill names
+   */
+  static getRubric(productType: string, genreOrSubSkill: string): WritingRubric | null {
     try {
       const productRubrics = WRITING_RUBRICS[productType as keyof typeof WRITING_RUBRICS];
       if (!productRubrics) {
@@ -987,9 +1014,12 @@ export class WritingRubricService {
         return null;
       }
 
-      const rubric = productRubrics[genre as keyof typeof productRubrics];
+      // Normalize the genre name (handles V2 sub-skill → rubric genre mapping)
+      const normalizedGenre = this.normalizeGenreName(genreOrSubSkill, productType);
+
+      const rubric = productRubrics[normalizedGenre as keyof typeof productRubrics];
       if (!rubric) {
-        console.warn(`No rubric found for genre: ${genre} in product: ${productType}`);
+        console.warn(`No rubric found for genre: ${normalizedGenre} (from: ${genreOrSubSkill}) in product: ${productType}`);
         return null;
       }
 
