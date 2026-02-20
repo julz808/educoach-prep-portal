@@ -1,0 +1,530 @@
+📊 READING SECTIONS AUDIT
+====================================================================================================
+
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 EduTest Scholarship (Year 7 Entry) - Reading Comprehension
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 6
+   Questions: 298
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      medium: 6
+
+   ✅ No orphaned passages (all have questions)
+
+❓ QUESTION BREAKDOWN:
+   By Test Mode:
+      practice_1: 50
+      practice_2: 49
+      practice_3: 50
+      practice_4: 50
+      practice_5: 49
+      diagnostic: 50
+
+   ⚠️  ORPHANED QUESTIONS (missing passage_id): 258
+      diagnostic: 43 questions missing passage_id
+      practice_1: 43 questions missing passage_id
+      practice_3: 43 questions missing passage_id
+      practice_2: 43 questions missing passage_id
+      practice_4: 43 questions missing passage_id
+      practice_5: 43 questions missing passage_id
+
+   📊 Questions per Passage:
+      Min: 6, Max: 7, Avg: 6.7
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 50
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+   practice_2:
+      Questions: 49
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+   practice_3:
+      Questions: 50
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+   practice_4:
+      Questions: 50
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+   practice_5:
+      Questions: 49
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+   diagnostic:
+      Questions: 50
+      Unique Passages: 1
+      Passage Types: { medium: 1 }
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 NSW Selective Entry (Year 7 Entry) - Reading
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 43
+   Questions: 0
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      informational: 18
+      narrative: 13
+      poetry: 6
+      visual: 6
+
+   ⚠️  ORPHANED PASSAGES (no questions): 43
+      1. "The Last Jar of Honey" (narrative) - ID: 727a288b
+      2. "The Wrong Answer" (narrative) - ID: ea9d044e
+      3. "The Ancient City Beneath the Waves" (informational) - ID: 7e7e47a6
+      4. "Why Leaves Change Colour in Autumn" (informational) - ID: a07157b6
+      5. "The Mystery of Animal Migration" (informational) - ID: 4866ce3a
+      6. "The Night Market" (poetry) - ID: d7cafa59
+      7. "Break the Cycle" (visual) - ID: 314f7399
+      8. "The Colour of Courage" (narrative) - ID: f7a4b5c3
+      9. "The Silent Gift" (narrative) - ID: 24ba3506
+      10. "The Secret Language of Bees" (informational) - ID: e99ba2c8
+      11. "The Underground Cities of Cappadocia" (informational) - ID: 3265fd0f
+      12. "How Chocolate Travels from Tree to Table" (informational) - ID: 0af2b159
+      13. "The Old Lighthouse Keeper" (poetry) - ID: e7a583fd
+      14. "Clean Hands, Healthy Schools" (visual) - ID: 5ef8ab3b
+      15. "The Last Piece" (narrative) - ID: f2983857
+      16. "The Silent Speech" (narrative) - ID: d7f074d3
+      17. "The Secret Language of Bees" (informational) - ID: fbdb1006
+      18. "The Ancient City Beneath the Waves" (informational) - ID: fd68717e
+      19. "How Plants Drink Without a Mouth" (informational) - ID: 836a3543
+      20. "The Market at Dawn" (poetry) - ID: 4720420f
+      21. "Save Water, Save Tomorrow" (visual) - ID: 058388bd
+      22. "The Colour of Courage" (narrative) - ID: 13d1c719
+      23. "The Last Library Book" (narrative) - ID: 89e1a8fb
+      24. "The Secret Language of Bees" (informational) - ID: cff35733
+      25. "The Mystery of Disappearing Islands" (informational) - ID: c2ed5a91
+      26. "The Ancient Art of Making Paper" (informational) - ID: 328d307c
+      27. "The Old Train Station" (poetry) - ID: f2352c20
+      28. "Wash Your Hands—Save Lives" (visual) - ID: 4d87cf44
+      29. "The Courage to Speak" (narrative) - ID: 458e230e
+      30. "The Last Tree on Maple Street" (narrative) - ID: 087143b0
+      31. "The Secret Language of Bees" (informational) - ID: 756b5c32
+      32. "The Mystery of the Mummified Iceman" (informational) - ID: 9435cd91
+      33. "How Earthquakes Shape Our Planet" (informational) - ID: bc3fc847
+      34. "The Fisherman's Daughter" (poetry) - ID: 988bed0f
+      35. "Turn Off the Tap: Every Drop Counts" (visual) - ID: 87ac66ab
+      36. "The Colour of Courage" (narrative) - ID: 9775df05
+      37. "The Last Chess Match" (narrative) - ID: d3f58cc1
+      38. "The Mystery of Bioluminescence" (informational) - ID: b9463b16
+      39. "The Ancient City Buried in Ash" (informational) - ID: f68c5583
+      40. "How Birds Navigate Across Continents" (informational) - ID: ec2b6308
+      41. "The Market at Dawn" (poetry) - ID: a8d8a3c3
+      42. "Hands Across the Playground" (visual) - ID: 5c65fb11
+      43. "The Courage to Speak" (narrative) - ID: e915d14a
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 0
+      Unique Passages: 0
+
+   practice_2:
+      Questions: 0
+      Unique Passages: 0
+
+   practice_3:
+      Questions: 0
+      Unique Passages: 0
+
+   practice_4:
+      Questions: 0
+      Unique Passages: 0
+
+   practice_5:
+      Questions: 0
+      Unique Passages: 0
+
+   diagnostic:
+      Questions: 0
+      Unique Passages: 0
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 VIC Selective Entry (Year 9 Entry) - Reading Reasoning
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 54
+   Questions: 64
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      long: 12
+      medium: 24
+      micro: 18
+
+   ⚠️  ORPHANED PASSAGES (no questions): 36
+      1. "The Language of Whistles" (medium) - ID: 54d2a549
+      2. "The Mathematics of Murmuration" (medium) - ID: b63fd963
+      3. "The Underground Orchestra" (medium) - ID: bace3bb8
+      4. "The Science of Sourdough" (medium) - ID: 5e175bc6
+      5. "The Mapmaker's Dilemma" (long) - ID: bd2c0e08
+      6. "The Forgotten Script of Easter Island" (long) - ID: efbc3dd3
+      7. "The Silent Language of Bees" (medium) - ID: bbb43dbc
+      8. "The Chess Revolution in an Unlikely Place" (medium) - ID: 6d198557
+      9. "The Underground Farmers of London" (medium) - ID: 0a408cfa
+      10. "The Library That Lives in a Camel" (medium) - ID: 6b138894
+      11. "The Boy Who Mapped the Forgotten River" (long) - ID: 503cf7fd
+      12. "The Mathematician Who Refused a Million Dollars" (long) - ID: dd0a083c
+      13. "The Mathematics of Murmuration" (medium) - ID: 100eedf5
+      14. "The Memory Palace Method" (medium) - ID: 2f3a10c9
+      15. "The Language of Flowers" (medium) - ID: 424b3d72
+      16. "The Art of Silence in Japanese Tea Ceremonies" (medium) - ID: 8dde88ba
+      17. "The Mapmaker's Dilemma" (long) - ID: 1d0b3853
+      18. "The Last Speaker" (long) - ID: fdf7a7ed
+      19. "The Silent Language of Honey Bees" (medium) - ID: 0ee4c755
+      20. "The Library That Remembers" (medium) - ID: 30d2291b
+      21. "The Map That Changed Medicine" (medium) - ID: 0fc1d606
+      22. "The Underground Orchestra of Tokyo" (medium) - ID: ee01ddba
+      23. "The Boy Who Painted Rain" (long) - ID: 125a6868
+      24. "The Last Keeper of the Eternal Flame" (long) - ID: a4a9f583
+      25. "The Mathematics of Murmuration" (medium) - ID: bd5d9eea
+      26. "The Colour Thieves of Victorian London" (medium) - ID: 843c0651
+      27. "The Library That Grows in the Desert" (medium) - ID: f0c254b8
+      28. "The Secret Language of Elephants" (medium) - ID: e25aa75b
+      29. "The Girl Who Mapped the Stars from Memory" (long) - ID: 8dd46c2d
+      30. "The Boy Who Refused to Forget His Mother Tongue" (long) - ID: 6fdb9cbc
+      31. "The Library That Lives Underground" (medium) - ID: bb680d82
+      32. "The Mystery of the Dancing Plague" (medium) - ID: 1c24ed6f
+      33. "The Forgotten Art of Knot Tying" (medium) - ID: ddb6999b
+      34. "The Secret Language of Bees" (medium) - ID: 2a4873e9
+      35. "The Boy Who Refused to Speak" (long) - ID: 4425162b
+      36. "The Woman Who Mapped the Ocean Floor" (long) - ID: 0110cba0
+
+❓ QUESTION BREAKDOWN:
+   By Test Mode:
+      practice_1: 18
+      practice_2: 9
+      practice_3: 10
+      practice_4: 10
+      practice_5: 8
+      diagnostic: 9
+
+   ⚠️  ORPHANED QUESTIONS (missing passage_id): 32
+      practice_5: 4 questions missing passage_id
+      practice_1: 12 questions missing passage_id
+      practice_2: 4 questions missing passage_id
+      practice_3: 4 questions missing passage_id
+      practice_4: 4 questions missing passage_id
+      diagnostic: 4 questions missing passage_id
+
+   📊 Questions per Passage:
+      Min: 0, Max: 2, Avg: 0.6
+
+      ⚠️  Passages with 0 questions:
+         "The Language of Whistles" (medium)
+         "The Mathematics of Murmuration" (medium)
+         "The Underground Orchestra" (medium)
+         "The Science of Sourdough" (medium)
+         "The Mapmaker's Dilemma" (long)
+         "The Forgotten Script of Easter Island" (long)
+         "The Silent Language of Bees" (medium)
+         "The Chess Revolution in an Unlikely Place" (medium)
+         "The Underground Farmers of London" (medium)
+         "The Library That Lives in a Camel" (medium)
+         "The Boy Who Mapped the Forgotten River" (long)
+         "The Mathematician Who Refused a Million Dollars" (long)
+         "The Mathematics of Murmuration" (medium)
+         "The Memory Palace Method" (medium)
+         "The Language of Flowers" (medium)
+         "The Art of Silence in Japanese Tea Ceremonies" (medium)
+         "The Mapmaker's Dilemma" (long)
+         "The Last Speaker" (long)
+         "The Silent Language of Honey Bees" (medium)
+         "The Library That Remembers" (medium)
+         "The Map That Changed Medicine" (medium)
+         "The Underground Orchestra of Tokyo" (medium)
+         "The Boy Who Painted Rain" (long)
+         "The Last Keeper of the Eternal Flame" (long)
+         "The Mathematics of Murmuration" (medium)
+         "The Colour Thieves of Victorian London" (medium)
+         "The Library That Grows in the Desert" (medium)
+         "The Secret Language of Elephants" (medium)
+         "The Girl Who Mapped the Stars from Memory" (long)
+         "The Boy Who Refused to Forget His Mother Tongue" (long)
+         "The Library That Lives Underground" (medium)
+         "The Mystery of the Dancing Plague" (medium)
+         "The Forgotten Art of Knot Tying" (medium)
+         "The Secret Language of Bees" (medium)
+         "The Boy Who Refused to Speak" (long)
+         "The Woman Who Mapped the Ocean Floor" (long)
+
+      ⚠️  Passages with unusually high question count (>1):
+         "The Museum's Newest Resident" (micro): 1 questions across [practice_2]
+         "The Vanishing Art of Korean Hanji" (micro): 1 questions across [practice_5]
+         "The Night Market's Secret Ingredient" (micro): 1 questions across [practice_5]
+         "The Colour-Changing Chemistry of Mood Rings" (micro): 1 questions across [diagnostic]
+         "The Vanishing Art of Letter Sealing" (micro): 2 questions across [practice_2]
+         "The Vanishing Ice Caves" (micro): 2 questions across [practice_1]
+         "The Library's Silent Guardian" (micro): 2 questions across [practice_1]
+         "The Night Market's Last Lantern" (micro): 2 questions across [practice_1]
+         "The Lighthouse Keeper's Final Night" (micro): 2 questions across [practice_2]
+         "The Accidental Discovery of Velcro" (micro): 2 questions across [practice_3]
+         "The Night Market's Lost Art" (micro): 2 questions across [practice_3]
+         "The Lighthouse Keeper's Final Shift" (micro): 2 questions across [practice_3]
+         "The Vanishing Ice Caves of Eisriesenwelt" (micro): 2 questions across [practice_4]
+         "The Lighthouse Keeper's Final Night" (micro): 2 questions across [practice_4]
+         "The Accidental Symphony" (micro): 2 questions across [practice_4]
+         "The Lighthouse Keeper's Final Log" (micro): 2 questions across [practice_5]
+         "The Unexpected Origins of Bubble Wrap" (micro): 2 questions across [diagnostic]
+         "The Silent Language of Traffic Lights" (micro): 2 questions across [diagnostic]
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 18
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+   practice_2:
+      Questions: 9
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+   practice_3:
+      Questions: 10
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+   practice_4:
+      Questions: 10
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+   practice_5:
+      Questions: 8
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+   diagnostic:
+      Questions: 9
+      Unique Passages: 3
+      Passage Types: { micro: 3 }
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 ACER Scholarship (Year 7 Entry) - Humanities
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 41
+   Questions: 164
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      informational: 13
+      narrative: 5
+      persuasive: 13
+      poetry: 5
+      visual: 5
+
+   ⚠️  ORPHANED PASSAGES (no questions): 3
+      1. "The Floating Gardens of the Aztecs" (informational) - ID: 62ebf06d
+      2. "Our Oceans Are Drowning in Plastic — And We Must Act Now" (persuasive) - ID: 0dad60be
+      3. "Why School Uniforms Must Go" (persuasive) - ID: bcef6736
+
+❓ QUESTION BREAKDOWN:
+   By Test Mode:
+      practice_1: 30
+      practice_2: 27
+      practice_3: 31
+      practice_4: 30
+      practice_5: 31
+      diagnostic: 14
+      drill: 1
+
+   ⚠️  ORPHANED QUESTIONS (missing passage_id): 1
+      drill: 1 questions missing passage_id
+
+   📊 Questions per Passage:
+      Min: 0, Max: 6, Avg: 4.0
+
+      ⚠️  Passages with 0 questions:
+         "The Floating Gardens of the Aztecs" (informational)
+         "Our Oceans Are Drowning in Plastic — And We Must Act Now" (persuasive)
+         "Why School Uniforms Must Go" (persuasive)
+
+      ⚠️  Passages with unusually high question count (>6):
+         "The Lighthouse Keeper's Daughter" (narrative): 6 questions across [practice_3]
+         "The Colour of Courage" (narrative): 6 questions across [practice_1]
+         "The Colour of Courage" (narrative): 6 questions across [practice_2]
+         "The Colour of Courage" (narrative): 6 questions across [practice_4]
+         "Why Our Neighbourhood Parks Are Worth Fighting For" (persuasive): 6 questions across [practice_5]
+         "The Colour of Courage" (narrative): 6 questions across [practice_5]
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 30
+      Unique Passages: 7
+      Passage Types: { informational: 2, persuasive: 2, narrative: 1, poetry: 1, visual: 1 }
+
+   practice_2:
+      Questions: 27
+      Unique Passages: 7
+      Passage Types: { informational: 2, persuasive: 2, narrative: 1, poetry: 1, visual: 1 }
+
+   practice_3:
+      Questions: 31
+      Unique Passages: 7
+      Passage Types: { persuasive: 2, narrative: 1, informational: 2, poetry: 1, visual: 1 }
+
+   practice_4:
+      Questions: 30
+      Unique Passages: 7
+      Passage Types: { informational: 2, persuasive: 2, narrative: 1, poetry: 1, visual: 1 }
+
+   practice_5:
+      Questions: 31
+      Unique Passages: 7
+      Passage Types: { informational: 2, persuasive: 2, narrative: 1, poetry: 1, visual: 1 }
+
+   diagnostic:
+      Questions: 14
+      Unique Passages: 3
+      Passage Types: { informational: 2, persuasive: 1 }
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 Year 5 NAPLAN - Reading
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 30
+   Questions: 222
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      informational: 12
+      multimodal: 6
+      narrative: 6
+      persuasive: 6
+
+   ✅ No orphaned passages (all have questions)
+
+❓ QUESTION BREAKDOWN:
+   By Test Mode:
+      practice_1: 37
+      practice_2: 37
+      practice_3: 37
+      practice_4: 37
+      practice_5: 37
+      diagnostic: 37
+
+   ✅ No orphaned questions (all have passage_id)
+
+   📊 Questions per Passage:
+      Min: 7, Max: 8, Avg: 7.4
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { narrative: 1, informational: 2, persuasive: 1, multimodal: 1 }
+
+   practice_2:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { narrative: 1, informational: 2, persuasive: 1, multimodal: 1 }
+
+   practice_3:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { narrative: 1, informational: 2, persuasive: 1, multimodal: 1 }
+
+   practice_4:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { informational: 2, narrative: 1, persuasive: 1, multimodal: 1 }
+
+   practice_5:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { narrative: 1, persuasive: 1, multimodal: 1, informational: 2 }
+
+   diagnostic:
+      Questions: 37
+      Unique Passages: 5
+      Passage Types: { narrative: 1, informational: 2, persuasive: 1, multimodal: 1 }
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+📖 Year 7 NAPLAN - Reading
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+📦 TOTALS:
+   Passages: 42
+   Questions: 257
+
+📖 PASSAGE BREAKDOWN:
+   By Type:
+      informational: 18
+      multimodal: 6
+      narrative: 12
+      persuasive: 6
+
+   ✅ No orphaned passages (all have questions)
+
+❓ QUESTION BREAKDOWN:
+   By Test Mode:
+      practice_1: 42
+      practice_2: 43
+      practice_3: 43
+      practice_4: 43
+      practice_5: 43
+      diagnostic: 43
+
+   ✅ No orphaned questions (all have passage_id)
+
+   📊 Questions per Passage:
+      Min: 6, Max: 7, Avg: 6.1
+
+🎯 TEST MODE ANALYSIS:
+
+   practice_1:
+      Questions: 42
+      Unique Passages: 7
+      Passage Types: { informational: 3, narrative: 2, persuasive: 1, multimodal: 1 }
+
+   practice_2:
+      Questions: 43
+      Unique Passages: 7
+      Passage Types: { narrative: 2, informational: 3, persuasive: 1, multimodal: 1 }
+
+   practice_3:
+      Questions: 43
+      Unique Passages: 7
+      Passage Types: { narrative: 2, informational: 3, persuasive: 1, multimodal: 1 }
+
+   practice_4:
+      Questions: 43
+      Unique Passages: 7
+      Passage Types: { informational: 3, persuasive: 1, narrative: 2, multimodal: 1 }
+
+   practice_5:
+      Questions: 43
+      Unique Passages: 7
+      Passage Types: { narrative: 2, informational: 3, persuasive: 1, multimodal: 1 }
+
+   diagnostic:
+      Questions: 43
+      Unique Passages: 7
+      Passage Types: { narrative: 2, informational: 3, persuasive: 1, multimodal: 1 }
+
+
+====================================================================================================
+✅ AUDIT COMPLETE
+====================================================================================================
