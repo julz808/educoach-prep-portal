@@ -636,15 +636,83 @@ const Drill: React.FC = () => {
     setCurrentView('sub-skill');
   };
 
-  // Handle dropdown-based drill start
-  const handleDropdownDrillStart = () => {
-    if (!selectedSectionId || !selectedSubSkillId) return;
+  // Handle dropdown-based drill start - go directly to test interface
+  const handleDropdownDrillStart = async () => {
+    if (!selectedSectionId || !selectedSubSkillId || !user) return;
 
     const skillArea = skillAreas.find(sa => sa.id === selectedSectionId);
     const subSkill = skillArea?.subSkills.find(ss => ss.id === selectedSubSkillId);
 
-    if (skillArea && subSkill) {
-      selectSubSkill(skillArea, subSkill);
+    if (!skillArea || !subSkill) return;
+
+    // Instead of going to intermediate view, directly start the drill with selected difficulty
+    const questions = subSkill.questions;
+    if (questions.length === 0) return;
+
+    // Map difficulty names to numeric values
+    const difficultyMap = { easy: 1, medium: 2, hard: 3 };
+    const targetDifficulty = difficultyMap[selectedDifficulty];
+
+    // Filter questions by actual difficulty level from database
+    const availableQuestions = questions.filter(q => q.difficulty === targetDifficulty);
+
+    if (availableQuestions.length > 0) {
+      try {
+        // Check if this is a writing/written expression drill
+        const isWritingDrill = subSkill.name.toLowerCase().includes('writing') ||
+                              subSkill.name.toLowerCase().includes('written') ||
+                              subSkill.name.toLowerCase().includes('expression');
+
+        if (isWritingDrill) {
+          // For writing drills, route directly to TestTaking.tsx
+          const difficultyKey = selectedDifficulty as 'easy' | 'medium' | 'hard';
+          const existingSessionId = subSkill.progress[difficultyKey]?.sessionId;
+
+          const subjectId = subSkill.name.toLowerCase().replace(/\s+/g, '-');
+          let navigationUrl = `/test/drill/${subjectId}?sectionName=${encodeURIComponent(subSkill.name)}&difficulty=${selectedDifficulty}`;
+
+          if (existingSessionId) {
+            navigationUrl += `&sessionId=${existingSessionId}`;
+          }
+
+          navigate(navigationUrl);
+          return;
+        }
+
+        // For NON-WRITING drills, continue with existing DrillSessionService logic
+        const subSkillText = subSkill.questions[0]?.subSkill || subSkill.name;
+        const firstQuestionWithUUID = subSkill.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
+
+        const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
+        const dbProductType = getDbProductType(selectedProduct);
+
+        // Check for existing active session
+        const existingSession = await DrillSessionService.getActiveSession(
+          user.id,
+          actualSubSkillId,
+          targetDifficulty,
+          dbProductType
+        );
+
+        let navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${selectedDifficulty}&skillArea=${skillArea.name}`;
+
+        if (existingSession) {
+          navigationUrl += `&sessionId=${existingSession.sessionId}`;
+
+          if (existingSession.status === 'completed' ||
+              (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
+            navigationUrl += '&review=true';
+          }
+        }
+
+        navigate(navigationUrl);
+      } catch (error) {
+        console.error('🎯 DROPDOWN DRILL: Error starting drill:', error);
+        const navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${selectedDifficulty}&skillArea=${skillArea.name}`;
+        navigate(navigationUrl);
+      }
+    } else {
+      console.warn(`No ${selectedDifficulty} questions available for ${subSkill.name}`);
     }
   };
 
