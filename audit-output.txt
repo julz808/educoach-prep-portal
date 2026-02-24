@@ -1,0 +1,554 @@
+🔍 Starting Comprehensive Questions Audit...
+
+📊 Total questions in database: 1000
+
+═══════════════════════════════════════════════════════
+📋 CHECK 1: QUESTION COUNTS PER TEST SECTION
+═══════════════════════════════════════════════════════
+
+
+📦 ACER Scholarship (Year 7 Entry)
+────────────────────────────────────────────────────────────
+
+  📝 diagnostic
+    ❓ Humanities: 35 questions (no requirement defined)
+    ⚠️ OVER Mathematics: 35 questions (expected: 15)
+    ❓ Written Expression: 2 questions (no requirement defined)
+
+  📝 drill
+    ❓ Humanities: 1 questions (no requirement defined)
+
+  📝 practice_1
+    ❓ Humanities: 35 questions (no requirement defined)
+    ❓ Mathematics: 35 questions (no requirement defined)
+    ❓ Written Expression: 3 questions (no requirement defined)
+
+  📝 practice_2
+    ❓ Humanities: 35 questions (no requirement defined)
+    ❓ Mathematics: 35 questions (no requirement defined)
+    ❓ Written Expression: 3 questions (no requirement defined)
+
+  📝 practice_3
+    ❓ Humanities: 35 questions (no requirement defined)
+    ❓ Mathematics: 35 questions (no requirement defined)
+    ❓ Written Expression: 3 questions (no requirement defined)
+
+  📝 practice_4
+    ❓ Humanities: 35 questions (no requirement defined)
+    ❓ Mathematics: 35 questions (no requirement defined)
+    ❓ Written Expression: 2 questions (no requirement defined)
+
+  📝 practice_5
+    ❓ Humanities: 35 questions (no requirement defined)
+    ❓ Mathematics: 35 questions (no requirement defined)
+    ❓ Written Expression: 3 questions (no requirement defined)
+
+📦 EduTest Scholarship (Year 7 Entry)
+────────────────────────────────────────────────────────────
+
+  📝 diagnostic
+    ⚠️ OVER Mathematics: 50 questions (expected: 15)
+    ❓ Numerical Reasoning: 50 questions (no requirement defined)
+    ⚠️ OVER Reading Comprehension: 50 questions (expected: 15)
+    ❓ Verbal Reasoning: 60 questions (no requirement defined)
+    ❓ Written Expression: 2 questions (no requirement defined)
+
+  📝 practice_1
+    ❓ Mathematics: 47 questions (no requirement defined)
+    ❓ Numerical Reasoning: 50 questions (no requirement defined)
+    ❓ Reading Comprehension: 50 questions (no requirement defined)
+    ❓ Verbal Reasoning: 60 questions (no requirement defined)
+    ❓ Written Expression: 2 questions (no requirement defined)
+
+  📝 practice_2
+    ❓ Mathematics: 46 questions (no requirement defined)
+    ❓ Numerical Reasoning: 50 questions (no requirement defined)
+    ❓ Reading Comprehension: 46 questions (no requirement defined)
+
+
+═══════════════════════════════════════════════════════
+⚖️ CHECK 2: DIFFICULTY & SUB-SKILL BALANCE
+═══════════════════════════════════════════════════════
+
+
+📦 ACER Scholarship (Year 7 Entry)
+────────────────────────────────────────────────────────────
+
+  📝 diagnostic
+    Humanities:
+      Difficulty: Easy=34, Medium=1, Hard=0
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 6
+        - Analysis & Comparison: 6
+        - Inference & Interpretation: 6
+        - Literal Comprehension: 6
+        - Sequencing & Text Organization: 3
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=11, Medium=13, Hard=11
+      Sub-skills (8 unique):
+        - Geometry - Perimeter & Area: 5
+        - Probability: 5
+        - Set Theory & Venn Diagrams: 5
+        - Spatial Reasoning - 3D Visualization: 4
+        - Spatial Reasoning - Reflections & Transformations: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=2, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 1
+        - Creative & Imaginative Writing: 1
+
+  📝 drill
+    Humanities:
+      Difficulty: Easy=1, Medium=0, Hard=0
+      Sub-skills (1 unique):
+        - Main Idea & Theme Identification: 1
+
+  📝 practice_1
+    Humanities:
+      Difficulty: Easy=33, Medium=2, Hard=0
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 6
+        - Literal Comprehension: 6
+        - Analysis & Comparison: 6
+        - Inference & Interpretation: 6
+        - Main Idea & Theme Identification: 4
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=11, Medium=15, Hard=9
+      Sub-skills (8 unique):
+        - Probability: 5
+        - Set Theory & Venn Diagrams: 5
+        - Geometry - Perimeter & Area: 5
+        - Fractions & Number Lines: 4
+        - Spatial Reasoning - 3D Visualization: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=3, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Creative & Imaginative Writing: 2
+        - Persuasive & Argumentative Writing: 1
+
+  📝 practice_2
+    Humanities:
+      Difficulty: Easy=30, Medium=2, Hard=3
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 7
+        - Literal Comprehension: 6
+        - Inference & Interpretation: 6
+        - Analysis & Comparison: 6
+        - Main Idea & Theme Identification: 4
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=10, Medium=13, Hard=12
+      Sub-skills (8 unique):
+        - Set Theory & Venn Diagrams: 5
+        - Probability: 5
+        - Geometry - Perimeter & Area: 5
+        - Data Interpretation & Applied Mathematics: 4
+        - Spatial Reasoning - 3D Visualization: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=3, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 2
+        - Creative & Imaginative Writing: 1
+
+  📝 practice_3
+    Humanities:
+      Difficulty: Easy=32, Medium=3, Hard=0
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 7
+        - Literal Comprehension: 6
+        - Inference & Interpretation: 6
+        - Analysis & Comparison: 6
+        - Poetry Analysis: 3
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=9, Medium=16, Hard=10
+      Sub-skills (8 unique):
+        - Set Theory & Venn Diagrams: 5
+        - Geometry - Perimeter & Area: 5
+        - Probability: 5
+        - Logic Puzzles & Algebraic Reasoning: 4
+        - Spatial Reasoning - 3D Visualization: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=3, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 2
+        - Creative & Imaginative Writing: 1
+
+  📝 practice_4
+    Humanities:
+      Difficulty: Easy=33, Medium=2, Hard=0
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 8
+        - Literal Comprehension: 6
+        - Inference & Interpretation: 6
+        - Analysis & Comparison: 6
+        - Main Idea & Theme Identification: 4
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=11, Medium=17, Hard=7
+      Sub-skills (8 unique):
+        - Probability: 5
+        - Geometry - Perimeter & Area: 5
+        - Set Theory & Venn Diagrams: 5
+        - Data Interpretation & Applied Mathematics: 4
+        - Logic Puzzles & Algebraic Reasoning: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=2, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 1
+        - Creative & Imaginative Writing: 1
+
+  📝 practice_5
+    Humanities:
+      Difficulty: Easy=33, Medium=2, Hard=0
+      Sub-skills (8 unique):
+        - Vocabulary in Context: 7
+        - Analysis & Comparison: 6
+        - Inference & Interpretation: 6
+        - Literal Comprehension: 6
+        - Main Idea & Theme Identification: 4
+        ... and 3 more
+    Mathematics:
+      Difficulty: Easy=10, Medium=13, Hard=12
+      Sub-skills (8 unique):
+        - Set Theory & Venn Diagrams: 5
+        - Probability: 5
+        - Geometry - Perimeter & Area: 5
+        - Spatial Reasoning - 3D Visualization: 4
+        - Spatial Reasoning - Reflections & Transformations: 4
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=3, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 2
+        - Creative & Imaginative Writing: 1
+
+📦 EduTest Scholarship (Year 7 Entry)
+────────────────────────────────────────────────────────────
+
+  📝 diagnostic
+    Mathematics:
+      Difficulty: Easy=18, Medium=16, Hard=16
+      Sub-skills (6 unique):
+        - Decimals & Decimal Operations: 10
+        - Fractions & Mixed Numbers: 10
+        - Applied Word Problems: 10
+        - Algebra & Equation Solving: 10
+        - Geometry & Spatial Reasoning: 7
+        ... and 1 more
+    Numerical Reasoning:
+      Difficulty: Easy=14, Medium=20, Hard=16
+      Sub-skills (4 unique):
+        - Number Series & Pattern Recognition: 13
+        - Word Problems & Applied Reasoning: 13
+        - Number Matrices & Grid Patterns: 12
+        - Number Properties & Operations: 12
+    Reading Comprehension:
+      Difficulty: Easy=21, Medium=16, Hard=13
+      Sub-skills (6 unique):
+        - Vocabulary in Context: 12
+        - Figurative Language & Idioms: 8
+        - Sentence Transformation: 8
+        - Grammar & Sentence Correction: 8
+        - Punctuation & Capitalization: 7
+        ... and 1 more
+    Verbal Reasoning:
+      Difficulty: Easy=17, Medium=22, Hard=21
+      Sub-skills (8 unique):
+        - Vocabulary & Semantic Knowledge: 8
+        - Word Manipulation & Rearrangement: 8
+        - Code Breaking & Pattern Recognition: 8
+        - Analogical Reasoning & Relationships: 8
+        - Sequential Ordering & Position Reasoning: 7
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=2, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Persuasive & Argumentative Writing: 1
+        - Creative & Imaginative Writing: 1
+
+  📝 practice_1
+    Mathematics:
+      Difficulty: Easy=18, Medium=14, Hard=15
+      Sub-skills (6 unique):
+        - Fractions & Mixed Numbers: 10
+        - Applied Word Problems: 10
+        - Decimals & Decimal Operations: 10
+        - Algebra & Equation Solving: 10
+        - Geometry & Spatial Reasoning: 4
+        ... and 1 more
+    Numerical Reasoning:
+      Difficulty: Easy=15, Medium=18, Hard=17
+      Sub-skills (4 unique):
+        - Word Problems & Applied Reasoning: 13
+        - Number Series & Pattern Recognition: 13
+        - Number Properties & Operations: 12
+        - Number Matrices & Grid Patterns: 12
+    Reading Comprehension:
+      Difficulty: Easy=21, Medium=16, Hard=13
+      Sub-skills (6 unique):
+        - Vocabulary in Context: 12
+        - Grammar & Sentence Correction: 8
+        - Sentence Transformation: 8
+        - Figurative Language & Idioms: 8
+        - Punctuation & Capitalization: 7
+        ... and 1 more
+    Verbal Reasoning:
+      Difficulty: Easy=21, Medium=16, Hard=23
+      Sub-skills (8 unique):
+        - Word Manipulation & Rearrangement: 8
+        - Analogical Reasoning & Relationships: 8
+        - Vocabulary & Semantic Knowledge: 8
+        - Code Breaking & Pattern Recognition: 8
+        - Logical Deduction & Conditional Reasoning: 7
+        ... and 3 more
+    Written Expression:
+      Difficulty: Easy=2, Medium=0, Hard=0
+      Sub-skills (2 unique):
+        - Creative & Imaginative Writing: 1
+        - Persuasive & Argumentative Writing: 1
+
+  📝 practice_2
+    Mathematics:
+      Difficulty: Easy=15, Medium=15, Hard=16
+      Sub-skills (6 unique):
+        - Applied Word Problems: 10
+        - Algebra & Equation Solving: 10
+        - Decimals & Decimal Operations: 10
+        - Fractions & Mixed Numbers: 10
+        - Statistics & Data Interpretation: 5
+        ... and 1 more
+    Numerical Reasoning:
+      Difficulty: Easy=14, Medium=20, Hard=16
+      Sub-skills (4 unique):
+        - Number Series & Pattern Recognition: 13
+        - Word Problems & Applied Reasoning: 13
+        - Number Matrices & Grid Patterns: 12
+        - Number Properties & Operations: 12
+    Reading Comprehension:
+      Difficulty: Easy=21, Medium=11, Hard=14
+      Sub-skills (6 unique):
+        - Vocabulary in Context: 12
+        - Figurative Language & Idioms: 8
+        - Grammar & Sentence Correction: 8
+        - Punctuation & Capitalization: 7
+        - Passage Comprehension & Inference: 7
+        ... and 1 more
+
+
+═══════════════════════════════════════════════════════
+📖 CHECK 3: READING PASSAGE COUNTS & RATIOS
+═══════════════════════════════════════════════════════
+
+❌ EduTest Scholarship (Year 7 Entry) > diagnostic > Reading Comprehension:
+   Passages: 1 (expected: 2)
+   Questions with passage: 7/50
+   Avg questions per passage: 7.0 (expected: ~7)
+
+
+═══════════════════════════════════════════════════════
+✍️ CHECK 4: WRITING PROMPTS
+═══════════════════════════════════════════════════════
+
+
+
+═══════════════════════════════════════════════════════
+🔄 CHECK 5: DUPLICATE DETECTION
+═══════════════════════════════════════════════════════
+
+⚠️ Found 309 potential duplicates:
+
+  92% match: ACER Scholarship (Year 7 Entry) > diagnostic > Humanities
+    Q1 (7c1b20c4): Read the passage and answer the question.
+
+Passage: Why Scho...
+    Q2 (d951e436): Read the passage and answer the question.
+
+Passage: Why Scho...
+
+  95% match: ACER Scholarship (Year 7 Entry) > diagnostic > Humanities
+    Q1 (69033a36): Read the passage and answer the question.
+
+Passage:
+How Citi...
+    Q2 (dedfc744): Read the passage and answer the question.
+
+Passage:
+How Citi...
+
+  95% match: ACER Scholarship (Year 7 Entry) > diagnostic > Humanities
+    Q1 (00021679): Read the passage and answer the question.
+
+Passage:
+The Myst...
+    Q2 (035a0cd9): Read the passage and answer the question.
+
+Passage:
+The Myst...
+
+  91% match: ACER Scholarship (Year 7 Entry) > diagnostic > Humanities
+    Q1 (65f84909): Read the passage and answer the question.
+
+Passage:
+Title: V...
+    Q2 (a38305bd): Read the passage and answer the question.
+
+Passage:
+Title: V...
+
+  81% match: ACER Scholarship (Year 7 Entry) > practice_1 > Humanities
+    Q1 (4f26ec31): Read the passage and answer the question.
+
+Passage:
+Title: H...
+    Q2 (4f5397de): Read the passage and answer the question.
+
+Passage:
+Title: H...
+
+  86% match: ACER Scholarship (Year 7 Entry) > practice_1 > Humanities
+    Q1 (b9b985a6): Read the passage and answer the question.
+
+Passage: Why Scho...
+    Q2 (e0c97438): Read the passage and answer the question.
+
+Passage: Why Scho...
+
+  97% match: ACER Scholarship (Year 7 Entry) > practice_2 > Humanities
+    Q1 (2614b11a): Read the passage and answer the question.
+
+Passage:
+The Myst...
+    Q2 (53d34884): Read the passage and answer the question.
+
+Passage:
+The Myst...
+
+  97% match: ACER Scholarship (Year 7 Entry) > practice_2 > Humanities
+    Q1 (22d6011c): Read the passage and answer the question.
+
+Passage:
+How Bees...
+    Q2 (19beec4e): Read the passage and answer the question.
+
+Passage:
+How Bees...
+
+  92% match: ACER Scholarship (Year 7 Entry) > practice_2 > Humanities
+    Q1 (e9889649): Read the passage and answer the question.
+
+Passage:
+Why Ever...
+    Q2 (b3b96e97): Read the passage and answer the question.
+
+Passage:
+Why Ever...
+
+  95% match: ACER Scholarship (Year 7 Entry) > practice_2 > Humanities
+    Q1 (8c8332e9): Read the passage and answer the question.
+
+Passage:
+Why Ever...
+    Q2 (cd415483): Read the passage and answer the question.
+
+Passage:
+Why Ever...
+
+  ... and 299 more potential duplicates
+
+
+═══════════════════════════════════════════════════════
+🔬 CHECK 6: SPOT CHECK FOR HALLUCINATIONS
+═══════════════════════════════════════════════════════
+
+
+
+═══════════════════════════════════════════════════════
+📊 AUDIT SUMMARY
+═══════════════════════════════════════════════════════
+
+Total Questions: 1000
+Test Packages: 2
+Critical Issues: 1
+Warnings: 63
+Potential Duplicates: 309
+
+❌ CRITICAL ISSUES:
+
+1. EduTest Scholarship (Year 7 Entry) > diagnostic > Reading Comprehension: Has 1 passages but needs 2
+
+⚠️  WARNINGS:
+
+1. ACER Scholarship (Year 7 Entry) > diagnostic > Mathematics: Over-generated by 20 questions (has 35, needs 15)
+2. EduTest Scholarship (Year 7 Entry) > diagnostic > Mathematics: Over-generated by 35 questions (has 50, needs 15)
+3. EduTest Scholarship (Year 7 Entry) > diagnostic > Reading Comprehension: Over-generated by 35 questions (has 50, needs 15)
+4. ACER Scholarship (Year 7 Entry) > diagnostic > Humanities: Easy difficulty at 97.1% (expected 25-40%)
+5. ACER Scholarship (Year 7 Entry) > diagnostic > Humanities: Medium difficulty at 2.9% (expected 35-50%)
+6. ACER Scholarship (Year 7 Entry) > diagnostic > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+7. ACER Scholarship (Year 7 Entry) > diagnostic > Mathematics: Hard difficulty at 31.4% (expected 15-25%)
+8. ACER Scholarship (Year 7 Entry) > diagnostic > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+9. ACER Scholarship (Year 7 Entry) > diagnostic > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+10. ACER Scholarship (Year 7 Entry) > diagnostic > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+11. ACER Scholarship (Year 7 Entry) > drill > Humanities: Easy difficulty at 100.0% (expected 25-40%)
+12. ACER Scholarship (Year 7 Entry) > drill > Humanities: Medium difficulty at 0.0% (expected 35-50%)
+13. ACER Scholarship (Year 7 Entry) > drill > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+14. ACER Scholarship (Year 7 Entry) > practice_1 > Humanities: Easy difficulty at 94.3% (expected 25-40%)
+15. ACER Scholarship (Year 7 Entry) > practice_1 > Humanities: Medium difficulty at 5.7% (expected 35-50%)
+16. ACER Scholarship (Year 7 Entry) > practice_1 > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+17. ACER Scholarship (Year 7 Entry) > practice_1 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+18. ACER Scholarship (Year 7 Entry) > practice_1 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+19. ACER Scholarship (Year 7 Entry) > practice_1 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+20. ACER Scholarship (Year 7 Entry) > practice_2 > Humanities: Easy difficulty at 85.7% (expected 25-40%)
+21. ACER Scholarship (Year 7 Entry) > practice_2 > Humanities: Medium difficulty at 5.7% (expected 35-50%)
+22. ACER Scholarship (Year 7 Entry) > practice_2 > Humanities: Hard difficulty at 8.6% (expected 15-25%)
+23. ACER Scholarship (Year 7 Entry) > practice_2 > Mathematics: Hard difficulty at 34.3% (expected 15-25%)
+24. ACER Scholarship (Year 7 Entry) > practice_2 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+25. ACER Scholarship (Year 7 Entry) > practice_2 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+26. ACER Scholarship (Year 7 Entry) > practice_2 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+27. ACER Scholarship (Year 7 Entry) > practice_3 > Humanities: Easy difficulty at 91.4% (expected 25-40%)
+28. ACER Scholarship (Year 7 Entry) > practice_3 > Humanities: Medium difficulty at 8.6% (expected 35-50%)
+29. ACER Scholarship (Year 7 Entry) > practice_3 > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+30. ACER Scholarship (Year 7 Entry) > practice_3 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+31. ACER Scholarship (Year 7 Entry) > practice_3 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+32. ACER Scholarship (Year 7 Entry) > practice_3 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+33. ACER Scholarship (Year 7 Entry) > practice_4 > Humanities: Easy difficulty at 94.3% (expected 25-40%)
+34. ACER Scholarship (Year 7 Entry) > practice_4 > Humanities: Medium difficulty at 5.7% (expected 35-50%)
+35. ACER Scholarship (Year 7 Entry) > practice_4 > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+36. ACER Scholarship (Year 7 Entry) > practice_4 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+37. ACER Scholarship (Year 7 Entry) > practice_4 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+38. ACER Scholarship (Year 7 Entry) > practice_4 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+39. ACER Scholarship (Year 7 Entry) > practice_5 > Humanities: Easy difficulty at 94.3% (expected 25-40%)
+40. ACER Scholarship (Year 7 Entry) > practice_5 > Humanities: Medium difficulty at 5.7% (expected 35-50%)
+41. ACER Scholarship (Year 7 Entry) > practice_5 > Humanities: Hard difficulty at 0.0% (expected 15-25%)
+42. ACER Scholarship (Year 7 Entry) > practice_5 > Mathematics: Hard difficulty at 34.3% (expected 15-25%)
+43. ACER Scholarship (Year 7 Entry) > practice_5 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+44. ACER Scholarship (Year 7 Entry) > practice_5 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+45. ACER Scholarship (Year 7 Entry) > practice_5 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+46. EduTest Scholarship (Year 7 Entry) > diagnostic > Mathematics: Hard difficulty at 32.0% (expected 15-25%)
+47. EduTest Scholarship (Year 7 Entry) > diagnostic > Numerical Reasoning: Hard difficulty at 32.0% (expected 15-25%)
+48. EduTest Scholarship (Year 7 Entry) > diagnostic > Verbal Reasoning: Hard difficulty at 35.0% (expected 15-25%)
+49. EduTest Scholarship (Year 7 Entry) > diagnostic > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+50. EduTest Scholarship (Year 7 Entry) > diagnostic > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+51. EduTest Scholarship (Year 7 Entry) > diagnostic > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+52. EduTest Scholarship (Year 7 Entry) > practice_1 > Mathematics: Medium difficulty at 29.8% (expected 35-50%)
+53. EduTest Scholarship (Year 7 Entry) > practice_1 > Mathematics: Hard difficulty at 31.9% (expected 15-25%)
+54. EduTest Scholarship (Year 7 Entry) > practice_1 > Numerical Reasoning: Hard difficulty at 34.0% (expected 15-25%)
+55. EduTest Scholarship (Year 7 Entry) > practice_1 > Verbal Reasoning: Medium difficulty at 26.7% (expected 35-50%)
+56. EduTest Scholarship (Year 7 Entry) > practice_1 > Verbal Reasoning: Hard difficulty at 38.3% (expected 15-25%)
+57. EduTest Scholarship (Year 7 Entry) > practice_1 > Written Expression: Easy difficulty at 100.0% (expected 25-40%)
+58. EduTest Scholarship (Year 7 Entry) > practice_1 > Written Expression: Medium difficulty at 0.0% (expected 35-50%)
+59. EduTest Scholarship (Year 7 Entry) > practice_1 > Written Expression: Hard difficulty at 0.0% (expected 15-25%)
+60. EduTest Scholarship (Year 7 Entry) > practice_2 > Mathematics: Hard difficulty at 34.8% (expected 15-25%)
+61. EduTest Scholarship (Year 7 Entry) > practice_2 > Numerical Reasoning: Hard difficulty at 32.0% (expected 15-25%)
+62. EduTest Scholarship (Year 7 Entry) > practice_2 > Reading Comprehension: Medium difficulty at 23.9% (expected 35-50%)
+63. EduTest Scholarship (Year 7 Entry) > practice_2 > Reading Comprehension: Hard difficulty at 30.4% (expected 15-25%)
+
+═══════════════════════════════════════════════════════
+

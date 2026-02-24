@@ -8,13 +8,16 @@ import type { SubSkillExamplesDatabase } from './types';
  *
  * Sections:
  * - Writing (2 sub-skills: Narrative & Persuasive)
- * - Reading (5 sub-skills, examples across 6 difficulty levels)
- * - Language Conventions (4 sub-skills, examples across 6 difficulty levels)
- * - Numeracy (5 sub-skills, examples across 6 difficulty levels)
+ * - Reading (5 sub-skills, examples across 3 difficulty levels)
+ * - Language Conventions (4 sub-skills, examples across 3 difficulty levels)
+ * - Numeracy (5 sub-skills, examples across 3 difficulty levels)
  *
  * Total: 16 sub-skills
  *
- * NOTE: Year 5 NAPLAN uses 6 difficulty levels (1-6) based on sample question tags.
+ * NOTE: Year 5 NAPLAN now uses 3 difficulty levels (1-3) for consistency across all products.
+ *  *   - Level 1 (Easy): Covers original NAPLAN levels 1-2
+ *  *   - Level 2 (Medium): Covers original NAPLAN levels 3-4
+ *  *   - Level 3 (Hard): Covers original NAPLAN levels 5-6
  * NOTE: Year 5 NAPLAN does NOT have separate calculator/non-calculator sections (unlike Year 7).
  */
 export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
@@ -31,12 +34,27 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,  // LLM can generate the writing prompt text
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Write a narrative based on the given prompt",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          question_text: "NAPLAN WRITING TASK:\n\nWrite a story about your best day at school.\n\nYou have 42 minutes to plan and write your story.\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include interesting characters and descriptive details\n• Be written in sentences and paragraphs\n• Use correct spelling and punctuation",
+          answer_options: [],
+          correct_answer: "Open-ended narrative writing response",
+          explanation: "This simple narrative prompt asks Year 5 students to write about a familiar, concrete experience. Students can draw on personal memories to create a story with basic narrative structure. The topic is straightforward and accessible to all students.",
+          characteristics: [
+            "Narrative writing",
+            "Personal experience theme",
+            "Familiar everyday topic",
+            "Time-limited (42 mins)",
+            "Planning encouraged",
+            "Clear structure required"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
           question_text: "NAPLAN WRITING TASK:\n\nWrite a story about a time when you discovered something amazing.\n\nYou have 42 minutes to plan and write your story.\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include interesting characters and descriptive details\n• Be written in sentences and paragraphs\n• Use correct spelling and punctuation",
           answer_options: [],
           correct_answer: "Open-ended narrative writing response",
@@ -48,6 +66,22 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Time-limited (42 mins)",
             "Planning encouraged",
             "Clear structure required"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "NAPLAN WRITING TASK:\n\nWrite a story that begins with this sentence: 'I never expected that one small decision would change everything.'\n\nYou have 42 minutes to plan and write your story.\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include well-developed characters and descriptive details\n• Use a variety of sentence structures\n• Be written in paragraphs\n• Use correct spelling and punctuation",
+          answer_options: [],
+          correct_answer: "Open-ended narrative writing response",
+          explanation: "This challenging narrative prompt requires Year 5 students to build a sophisticated story from an abstract opening sentence. Students must demonstrate creativity in developing a plot around the theme of consequences and decision-making, create believable character development, and use advanced narrative techniques including varied sentence structures and descriptive language.",
+          characteristics: [
+            "Narrative writing",
+            "Abstract theme (consequences/decisions)",
+            "Opening sentence provided",
+            "Requires sophisticated development",
+            "Time-limited (42 mins)",
+            "Planning encouraged",
+            "Advanced structure required"
           ]
         }
       ],
@@ -67,11 +101,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, concrete prompts with everyday experiences",
-          "2": "Familiar topics requiring some imagination",
-          "3": "Moderately creative prompts with clear focus",
-          "4": "Abstract or imaginative scenarios requiring developed creativity",
-          "5": "Complex prompts requiring sophisticated narrative development",
-          "6": "Highly abstract or challenging prompts requiring advanced storytelling"
+          "2": "Moderately creative prompts with clear focus",
+          "3": "Complex prompts requiring sophisticated narrative development",
         }
       }
     },
@@ -82,12 +113,27 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,  // LLM can generate the writing prompt text
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Write a persuasive piece on the given topic",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          question_text: "NAPLAN WRITING TASK:\n\nDo you think students should have longer lunch breaks?\n\nWrite to persuade others to agree with your point of view.\n\nYou have 42 minutes to plan and write your persuasive text.\n\nYour writing should:\n• State your opinion clearly\n• Give reasons to support your view\n• Try to convince the reader\n• Be written in sentences and paragraphs\n• Use correct spelling and punctuation",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This simple persuasive prompt asks Year 5 students to take a position on a familiar school topic. The issue is concrete and straightforward with obvious arguments on either side. Students can easily draw on personal experience to support their opinion.",
+          characteristics: [
+            "Persuasive writing",
+            "Simple school-related topic",
+            "Familiar everyday issue",
+            "Time-limited (42 mins)",
+            "Planning encouraged",
+            "Clear opinion required"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
           question_text: "NAPLAN WRITING TASK:\n\nDo you think students should have more time for sport and physical activity at school?\n\nWrite to persuade others to agree with your point of view.\n\nYou have 42 minutes to plan and write your persuasive text.\n\nYour writing should:\n• State your opinion clearly\n• Give reasons to support your view\n• Try to convince the reader\n• Be written in sentences and paragraphs\n• Use correct spelling and punctuation",
           answer_options: [],
           correct_answer: "Open-ended persuasive writing response",
@@ -99,6 +145,22 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Time-limited (42 mins)",
             "Planning encouraged",
             "Clear opinion required"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "NAPLAN WRITING TASK:\n\nShould all schools have a 'no homework' policy to give students more time for family, hobbies, and rest?\n\nWrite to persuade others to agree with your point of view.\n\nYou have 42 minutes to plan and write your persuasive text.\n\nYour writing should:\n• State your opinion clearly\n• Give strong reasons and evidence to support your view\n• Consider different perspectives\n• Use persuasive language to convince the reader\n• Be written in well-organized paragraphs\n• Use correct spelling and punctuation",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This complex persuasive prompt requires Year 5 students to consider a nuanced educational issue with multiple perspectives. Students must develop sophisticated arguments that balance the benefits of homework (learning reinforcement, study habits) against the need for rest and family time. The topic requires students to think beyond simple personal preference and consider broader educational and social implications.",
+          characteristics: [
+            "Persuasive writing",
+            "Complex social issue",
+            "Multiple perspectives",
+            "Requires sophisticated reasoning",
+            "Time-limited (42 mins)",
+            "Planning encouraged",
+            "Advanced persuasive techniques expected"
           ]
         }
       ],
@@ -118,11 +180,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, familiar topics with obvious positions (e.g., should we have longer lunch breaks)",
-          "2": "Common school/community topics requiring basic reasoning",
-          "3": "Moderately complex issues requiring developed arguments",
-          "4": "Topics requiring consideration of multiple perspectives",
-          "5": "Complex social or environmental issues requiring sophisticated arguments",
-          "6": "Abstract or challenging topics requiring advanced persuasive techniques"
+          "2": "Moderately complex issues requiring developed arguments",
+          "3": "Complex social or environmental issues requiring sophisticated arguments",
         }
       }
     }
@@ -141,12 +200,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Answer literal comprehension questions about the passage",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Read this passage:\n\n'The platypus is one of Australia's most unusual animals. It has a duck-like bill, webbed feet, and a beaver-like tail. Platypuses live in freshwater streams and rivers along the eastern coast of Australia. They are excellent swimmers and spend most of their time in the water.'\n\nWhere do platypuses live?",
           answer_options: [
             "A: In the ocean",
@@ -165,7 +224,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Read this passage:\n\n'The invention of the printing press in 1440 by Johannes Gutenberg revolutionized the spread of information. Before this invention, books were copied by hand, a process that took months or even years. The printing press allowed books to be produced quickly and in large quantities, making them more affordable and accessible to ordinary people.'\n\nHow long did it take to copy a book by hand?",
           answer_options: [
             "A: Days",
@@ -181,6 +240,25 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Specific detail retrieval",
             "Requires careful reading",
             "Multi-clause sentence"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Read this passage:\n\n'The Antarctic krill, despite being only 6 centimetres long, is one of the most important creatures in the Southern Ocean ecosystem. These tiny crustaceans form enormous swarms, sometimes covering several square kilometres of ocean. Scientists estimate that the total biomass of Antarctic krill exceeds that of humans. They serve as a crucial food source for whales, seals, penguins, and numerous fish species. However, climate change and commercial fishing pose significant threats to krill populations, which could have devastating consequences throughout the entire food web.'\n\nAccording to the passage, what makes Antarctic krill particularly important to the Southern Ocean ecosystem?",
+          answer_options: [
+            "A: They are 6 centimetres long",
+            "B: They form enormous swarms",
+            "C: They serve as a crucial food source for many animals",
+            "D: Their biomass exceeds that of humans"
+          ],
+          correct_answer: "C",
+          explanation: "While the passage mentions multiple facts about krill, the key detail about their ecosystem importance is explicitly stated: 'They serve as a crucial food source for whales, seals, penguins, and numerous fish species.' The other options are facts mentioned but don't directly answer what makes them important to the ecosystem.",
+          distractor_strategy: "Includes other true facts from the passage that don't answer the specific question about ecosystem importance",
+          characteristics: [
+            "Complex scientific text",
+            "Multiple facts to process",
+            "Requires identifying relevant detail among many",
+            "Sophisticated vocabulary (biomass, ecosystem, crustaceans)"
           ]
         }
       ],
@@ -203,11 +281,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Obvious details, simple sentences, familiar topics",
-          "2": "Clear details, straightforward language, common topics",
-          "3": "Details requiring careful reading, some complex sentences",
-          "4": "Details embedded in longer text, more complex language",
-          "5": "Subtle details, sophisticated vocabulary, less familiar topics",
-          "6": "Implicit details requiring very careful reading, challenging texts"
+          "2": "Details requiring careful reading, some complex sentences",
+          "3": "Subtle details, sophisticated vocabulary, less familiar topics",
         }
       }
     },
@@ -218,12 +293,31 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Make inferences based on passage content",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          question_text: "Read this passage:\n\n'Sarah walked into the kitchen and saw a big cake on the table with candles on top. Colorful balloons were hanging from the ceiling, and wrapped presents were stacked in the corner.'\n\nWhat can you infer is happening?",
+          answer_options: [
+            "A: It's a regular Tuesday",
+            "B: Someone is having a birthday party",
+            "C: The family is moving to a new house",
+            "D: Sarah is going to school"
+          ],
+          correct_answer: "B",
+          explanation: "The obvious clues (birthday cake with candles, balloons, wrapped presents) all point to a birthday celebration. This is a simple inference with very clear, familiar context clues that Year 5 students can easily recognize.",
+          distractor_strategy: "Includes everyday scenarios that don't match the celebration clues",
+          characteristics: [
+            "Very clear context clues",
+            "Familiar celebration scenario",
+            "Simple inference",
+            "Obvious birthday indicators"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
           question_text: "Read this passage:\n\n'Tom hurried to put on his raincoat and grabbed his umbrella from the stand. He looked out the window one more time before leaving, sighing deeply.'\n\nWhat can you infer about the weather?",
           answer_options: [
             "A: It was sunny",
@@ -242,7 +336,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
           question_text: "Read this passage:\n\n'The stadium erupted in cheers as Maria crossed the finish line, her face flushed and arms raised high. Months of early morning training sessions had finally paid off. Her coach rushed over, eyes glistening with pride.'\n\nWhat can you infer about Maria's result in the race?",
           answer_options: [
             "A: She came in last place",
@@ -280,11 +374,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, obvious inferences with clear clues",
-          "2": "Straightforward inferences, familiar contexts",
-          "3": "Moderate inferences requiring connection of clues",
-          "4": "Complex inferences, multiple pieces of evidence",
-          "5": "Sophisticated inference, synthesis of multiple clues",
-          "6": "Subtle implications, challenging texts, multiple valid interpretations"
+          "2": "Moderate inferences requiring connection of clues",
+          "3": "Sophisticated inference, synthesis of multiple clues",
         }
       }
     },
@@ -295,12 +386,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Determine word meaning from context",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Read this sentence:\n\n'The enormous elephant towered over the other animals at the waterhole.'\n\nWhat does 'enormous' mean in this sentence?",
           answer_options: [
             "A: Very large",
@@ -319,7 +410,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Read this sentence:\n\n'The scientist's hypothesis was controversial, causing heated debates among her colleagues.'\n\nWhat does 'controversial' mean?",
           answer_options: [
             "A: Widely accepted by everyone",
@@ -335,6 +426,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Context provides definition",
             "Scientific context",
             "Abstract concept"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Read this sentence:\n\n'Despite the team's valiant effort in the final quarter, they succumbed to their opponent's relentless pressure and lost by three points.'\n\nWhat does 'succumbed' mean in this context?",
+          answer_options: [
+            "A: Celebrated their victory",
+            "B: Gave in or yielded to something",
+            "C: Improved their performance",
+            "D: Requested additional time"
+          ],
+          correct_answer: "B",
+          explanation: "The context shows the team made a 'valiant effort' but ultimately lost, indicating they 'gave in' to the pressure. The word 'succumbed' is sophisticated vocabulary requiring students to infer meaning from the contrast between their effort and the outcome.",
+          distractor_strategy: "Includes positive outcomes (A, C) that contradict the loss, and an unrelated option (D)",
+          characteristics: [
+            "Sophisticated vocabulary",
+            "Subtle context clues",
+            "Sports context",
+            "Requires inference from outcome",
+            "Challenging word with minimal direct support"
           ]
         }
       ],
@@ -357,11 +468,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple words with obvious context clues",
-          "2": "Common words with clear supporting context",
-          "3": "Less common words, moderate context support",
-          "4": "Academic vocabulary, inference required",
-          "5": "Challenging vocabulary, subtle context clues",
-          "6": "Sophisticated words, minimal context support, figurative usage"
+          "2": "Less common words, moderate context support",
+          "3": "Challenging vocabulary, subtle context clues",
         }
       }
     },
@@ -372,12 +480,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify text structure and purpose of text features",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Look at this text structure:\n\nTitle: 'How to Make a Paper Airplane'\n1. Fold the paper in half lengthwise\n2. Unfold and fold the top corners to the center\n3. Fold the sides to the center line\n4. Fold in half and create wings\n\nWhat type of text is this?",
           answer_options: [
             "A: A story",
@@ -396,7 +504,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "A science textbook has a section with this structure:\n\n- Main heading: 'The Water Cycle'\n- Subheadings: 'Evaporation', 'Condensation', 'Precipitation'\n- A labeled diagram\n- A caption under the diagram\n\nWhat is the main purpose of the subheadings?",
           answer_options: [
             "A: To make the page look pretty",
@@ -412,6 +520,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Hierarchical structure",
             "Science content",
             "Understanding organizational purpose"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Read this passage structure:\n\n'Many Australian farmers face significant challenges. On one hand, periods of drought reduce crop yields and strain water supplies. On the other hand, when heavy rains finally arrive, they can cause flooding and soil erosion. Both extremes create economic hardship for farming communities. Therefore, developing sustainable water management strategies has become essential for Australia's agricultural future.'\n\nHow is this passage organized?",
+          answer_options: [
+            "A: Chronologically, showing events in time order",
+            "B: As a comparison of two different farming methods",
+            "C: By presenting a problem and hinting at a solution",
+            "D: As a cause and effect sequence"
+          ],
+          correct_answer: "C",
+          explanation: "The passage presents the problem (drought and flooding challenges facing farmers) and then hints at a solution (developing sustainable water management strategies). While there are cause-effect elements, the overall organizational pattern is problem-solution.",
+          distractor_strategy: "Includes other organizational patterns that partially fit (D has some cause-effect) but don't capture the main structure",
+          characteristics: [
+            "Complex organizational pattern",
+            "Problem-solution structure",
+            "Environmental/agricultural content",
+            "Requires understanding overall structure, not just details",
+            "Sophisticated analysis of text organization"
           ]
         }
       ],
@@ -432,11 +560,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Obvious text types and features, simple structures",
-          "2": "Clear text types, basic features",
-          "3": "Less obvious structures, understanding feature purpose",
-          "4": "Complex texts, multiple features, inferring structure",
-          "5": "Sophisticated structures, nuanced feature purposes",
-          "6": "Challenging organizational patterns, abstract structures"
+          "2": "Less obvious structures, understanding feature purpose",
+          "3": "Sophisticated structures, nuanced feature purposes",
         }
       }
     },
@@ -447,12 +572,31 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Determine author's purpose or perspective",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          question_text: "Read this passage:\n\n'Once upon a time, there was a brave little mouse named Pip who loved to explore. One day, Pip discovered a magical garden full of talking flowers and singing birds.'\n\nWhat is the author's main purpose?",
+          answer_options: [
+            "A: To teach you how to grow a garden",
+            "B: To tell an entertaining story",
+            "C: To persuade you to get a pet mouse",
+            "D: To explain facts about mice"
+          ],
+          correct_answer: "B",
+          explanation: "The phrase 'Once upon a time' and the imaginative elements (talking flowers, singing birds) clearly indicate this is a fictional story meant to entertain readers. This is an obvious narrative text with familiar story elements.",
+          distractor_strategy: "Includes other purposes (teach, persuade, inform) that don't match the obvious entertainment purpose",
+          characteristics: [
+            "Clear story opening ('Once upon a time')",
+            "Fictional/fantasy elements",
+            "Simple narrative",
+            "Obvious entertainment purpose"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
           question_text: "Read this passage:\n\n'Visit Sunny Beach Resort! With crystal-clear water, soft white sand, and amazing restaurants, it's the perfect family vacation spot. Book now and save 20%!'\n\nWhat is the author's main purpose?",
           answer_options: [
             "A: To tell a story about a family vacation",
@@ -471,7 +615,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
           question_text: "Read this passage:\n\n'While some people claim video games are harmful, research shows that certain games can improve problem-solving skills and hand-eye coordination. However, moderation is important, as too much screen time can affect sleep and physical health.'\n\nWhat is the author's perspective on video games?",
           answer_options: [
             "A: Video games are completely bad",
@@ -509,11 +653,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Obvious purposes, clear text types",
-          "2": "Straightforward purposes, simple language",
-          "3": "Moderately clear purposes, some inference needed",
-          "4": "Multiple purposes, recognizing bias",
-          "5": "Subtle purposes, complex perspectives, balanced views",
-          "6": "Sophisticated analysis, multiple layers of meaning, subtle bias"
+          "2": "Moderately clear purposes, some inference needed",
+          "3": "Subtle purposes, complex perspectives, balanced views",
         }
       }
     }
@@ -532,12 +673,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify correct grammar usage or sentence structure",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Which sentence is written correctly?",
           answer_options: [
             "A: The dogs is playing in the park.",
@@ -556,7 +697,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Choose the sentence with correct verb tense:",
           answer_options: [
             "A: Yesterday, I go to the beach and swim in the ocean.",
@@ -572,6 +713,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Compound verb usage",
             "Past tense",
             "Time markers"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Which sentence uses pronouns correctly?",
+          answer_options: [
+            "A: Between you and I, the test was easier than expected.",
+            "B: Between you and me, the test was easier than expected.",
+            "C: Between you and myself, the test was easier than expected.",
+            "D: Between yourself and I, the test was easier than expected."
+          ],
+          correct_answer: "B",
+          explanation: "After the preposition 'between', the objective pronoun 'me' is required, not the subjective 'I'. This is a sophisticated grammar concept that many students (and adults) get wrong. 'Myself' is a reflexive pronoun used incorrectly here.",
+          distractor_strategy: "Includes the very common error 'between you and I' (A) and incorrect use of reflexive pronouns (C, D)",
+          characteristics: [
+            "Pronoun case (objective vs. subjective)",
+            "Prepositional phrase",
+            "Sophisticated grammar rule",
+            "Common error even among adults",
+            "Reflexive pronoun misuse"
           ]
         }
       ],
@@ -594,11 +755,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic agreement and tense with familiar contexts",
-          "2": "Clear grammar rules with simple sentences",
-          "3": "Moderately complex sentences, less obvious errors",
-          "4": "Complex sentences, multiple potential errors",
-          "5": "Sophisticated structures, subtle errors",
-          "6": "Advanced grammar concepts, challenging contexts"
+          "2": "Moderately complex sentences, less obvious errors",
+          "3": "Sophisticated structures, subtle errors",
         }
       }
     },
@@ -609,12 +767,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify correct spelling",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Which word is spelled correctly?",
           answer_options: [
             "A: frend",
@@ -633,7 +791,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Which word is spelled correctly?",
           answer_options: [
             "A: seperate",
@@ -649,6 +807,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Academic vocabulary",
             "Vowel confusion",
             "Multi-syllable word"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Which word is spelled correctly?",
+          answer_options: [
+            "A: accomodate",
+            "B: acommodate",
+            "C: accommodate",
+            "D: acomodate"
+          ],
+          correct_answer: "C",
+          explanation: "'Accommodate' is the correct spelling with double 'c' and double 'm'. This is one of the most commonly misspelled words in English, requiring knowledge of the pattern of doubled consonants.",
+          distractor_strategy: "Includes all common misspelling variations (single c, single m, both single)",
+          characteristics: [
+            "Very challenging spelling",
+            "Double consonant pattern",
+            "Frequently misspelled by adults",
+            "Academic/formal vocabulary",
+            "Complex pattern recognition"
           ]
         }
       ],
@@ -671,11 +849,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, common words with obvious misspellings",
-          "2": "Familiar words, clear spelling patterns",
-          "3": "Less common words, trickier patterns",
-          "4": "Commonly confused words, subtle errors",
-          "5": "Challenging vocabulary, complex patterns",
-          "6": "Sophisticated words, very subtle spelling issues"
+          "2": "Less common words, trickier patterns",
+          "3": "Challenging vocabulary, complex patterns",
         }
       }
     },
@@ -686,12 +861,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify correct punctuation",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Which sentence has correct punctuation?",
           answer_options: [
             "A: The dog ate its food",
@@ -710,7 +885,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Which sentence uses commas correctly?",
           answer_options: [
             "A: I bought apples oranges and bananas.",
@@ -748,11 +923,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic end punctuation, obvious errors",
-          "2": "Simple comma rules, basic apostrophes",
-          "3": "More complex comma usage, quotation marks",
-          "4": "Multiple punctuation marks, subtle errors",
-          "5": "Sophisticated punctuation, complex sentences",
-          "6": "Advanced punctuation, nuanced usage"
+          "2": "More complex comma usage, quotation marks",
+          "3": "Sophisticated punctuation, complex sentences",
         }
       }
     },
@@ -763,12 +935,31 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Choose the correct word or part of speech",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          question_text: "Choose the word that best completes the sentence:\n\nThe dog is very _____.",
+          answer_options: [
+            "A: run",
+            "B: running",
+            "C: friendly",
+            "D: friend"
+          ],
+          correct_answer: "C",
+          explanation: "The adjective 'friendly' is needed after 'is' to describe what the dog is like. 'Run' and 'running' are verb forms, and 'friend' is a noun.",
+          distractor_strategy: "Includes verb forms (A, B) and related noun (D) that don't work grammatically",
+          characteristics: [
+            "Basic adjective usage",
+            "Simple sentence structure",
+            "Obvious correct choice",
+            "Common vocabulary"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
           question_text: "Choose the word that best completes the sentence:\n\nThe children played _____ in the park all afternoon.",
           answer_options: [
             "A: happy",
@@ -787,7 +978,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "Which word best completes this sentence?\n\nThe weather today is _____ than yesterday.",
           answer_options: [
             "A: good",
@@ -803,6 +994,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Irregular forms",
             "Comparison context",
             "Common error (more good)"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Choose the word that best completes the sentence:\n\nThe athlete performed _____ despite her injury, earning respect from everyone.",
+          answer_options: [
+            "A: good",
+            "B: well",
+            "C: best",
+            "D: better"
+          ],
+          correct_answer: "B",
+          explanation: "'Well' is the correct adverb to modify the verb 'performed.' This is a sophisticated distinction because 'good' is often incorrectly used in spoken English. Students must recognize that 'performed' is a verb requiring an adverb ('well'), not an adjective ('good').",
+          distractor_strategy: "Includes the very common error 'good' (A) and comparative/superlative forms that don't fit the context",
+          characteristics: [
+            "Good vs. well distinction",
+            "Adverb modifying verb",
+            "Sophisticated grammar concept",
+            "Common error in spoken English",
+            "Requires understanding part of speech function"
           ]
         }
       ],
@@ -825,11 +1036,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic parts of speech, obvious choices",
-          "2": "Simple word forms, clear contexts",
-          "3": "Adverb/adjective distinctions, comparatives",
-          "4": "Irregular forms, subtle differences",
-          "5": "Complex word choices, nuanced meanings",
-          "6": "Sophisticated vocabulary, advanced grammar concepts"
+          "2": "Adverb/adjective distinctions, comparatives",
+          "3": "Complex word choices, nuanced meanings",
         }
       }
     }
@@ -848,12 +1056,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve number problems using mental strategies",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "What is 45 + 38?",
           answer_options: [
             "A: 73",
@@ -872,7 +1080,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "What is the value of the digit 7 in the number 47,325?",
           answer_options: [
             "A: 7",
@@ -888,6 +1096,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Five-digit number",
             "Thousands place",
             "Conceptual understanding"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "What is 8 × 125?",
+          answer_options: [
+            "A: 900",
+            "B: 1,000",
+            "C: 1,100",
+            "D: 1,250"
+          ],
+          correct_answer: "B",
+          explanation: "8 × 125 can be solved mentally by recognizing that 8 × 125 = 8 × (1000 ÷ 8) = 1,000. Alternatively, 125 = 100 + 25, so 8 × 100 = 800 and 8 × 25 = 200, giving 800 + 200 = 1,000. This requires sophisticated mental computation strategies.",
+          distractor_strategy: "Includes results from common calculation errors and approximations",
+          characteristics: [
+            "Challenging mental multiplication",
+            "Strategic thinking required",
+            "Pattern recognition (125 × 8 = 1000)",
+            "Multi-step mental computation",
+            "Sophisticated number sense"
           ]
         }
       ],
@@ -910,11 +1138,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Single-digit operations, basic place value",
-          "2": "Two-digit operations, simple place value",
-          "3": "Larger numbers, multi-step problems",
-          "4": "Complex calculations, advanced place value",
-          "5": "Challenging mental computation, sophisticated concepts",
-          "6": "Very difficult mental arithmetic, complex number understanding"
+          "2": "Larger numbers, multi-step problems",
+          "3": "Challenging mental computation, sophisticated concepts",
         }
       }
     },
@@ -925,12 +1150,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve fraction problems using mental strategies",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "Which fraction is equivalent to 1/2?",
           answer_options: [
             "A: 2/3",
@@ -949,7 +1174,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "What is 3/4 + 1/4?",
           answer_options: [
             "A: 4/8",
@@ -965,6 +1190,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Like denominators",
             "Simplifying to whole",
             "Mental computation"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "A recipe calls for 2/3 cup of flour. If you want to make 1 1/2 times the recipe, how much flour do you need?",
+          answer_options: [
+            "A: 1/2 cup",
+            "B: 2/3 cup",
+            "C: 1 cup",
+            "D: 1 1/3 cups"
+          ],
+          correct_answer: "C",
+          explanation: "To find 1 1/2 times 2/3, multiply: (3/2) × (2/3) = 6/6 = 1 cup. This can also be solved by finding half of 2/3 (which is 1/3) and adding it to the original 2/3: 2/3 + 1/3 = 3/3 = 1. This requires sophisticated fraction multiplication and understanding of mixed numbers.",
+          distractor_strategy: "Includes common errors from incorrect operations or partial calculations",
+          characteristics: [
+            "Fraction multiplication",
+            "Mixed numbers",
+            "Real-world context",
+            "Multi-step problem",
+            "Sophisticated fraction operations"
           ]
         }
       ],
@@ -987,11 +1232,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic fraction recognition, simple equivalents",
-          "2": "Common equivalent fractions, simple comparisons",
-          "3": "Fraction operations with like denominators, fraction of quantity",
-          "4": "More complex equivalents, comparing unlike fractions",
-          "5": "Challenging fraction operations, mixed numbers",
-          "6": "Complex fraction problems, multiple steps"
+          "2": "Fraction operations with like denominators, fraction of quantity",
+          "3": "Challenging fraction operations, mixed numbers",
         }
       }
     },
@@ -1002,12 +1244,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify patterns and solve algebraic problems",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "What is the next number in this pattern?\n\n2, 4, 6, 8, ___",
           answer_options: [
             "A: 9",
@@ -1026,7 +1268,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "If n + 7 = 15, what is the value of n?",
           answer_options: [
             "A: 7",
@@ -1042,6 +1284,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "One variable",
             "Basic algebra",
             "Inverse operation"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Look at this pattern:\n\n1, 4, 9, 16, 25, ___\n\nWhat is the next number?",
+          answer_options: [
+            "A: 30",
+            "B: 32",
+            "C: 36",
+            "D: 49"
+          ],
+          correct_answer: "C",
+          explanation: "This is the pattern of square numbers: 1² = 1, 2² = 4, 3² = 9, 4² = 16, 5² = 25, so the next is 6² = 36. Students must recognize this sophisticated pattern beyond simple addition or multiplication sequences.",
+          distractor_strategy: "Includes results from incorrect patterns (adding 5, adding 6, or next square after 36)",
+          characteristics: [
+            "Square number pattern",
+            "Non-linear sequence",
+            "Pattern recognition",
+            "Sophisticated mathematical thinking",
+            "Requires knowledge of multiplication facts"
           ]
         }
       ],
@@ -1064,11 +1326,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple repeating patterns, obvious sequences",
-          "2": "Arithmetic patterns, basic sequences",
-          "3": "More complex patterns, simple equations",
-          "4": "Challenging patterns, equations with one operation",
-          "5": "Complex sequences, multi-step equations",
-          "6": "Sophisticated patterns, algebraic thinking"
+          "2": "More complex patterns, simple equations",
+          "3": "Complex sequences, multi-step equations",
         }
       }
     },
@@ -1079,12 +1338,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve measurement, time, or money problems",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "How many centimeters are in 2 meters?",
           answer_options: [
             "A: 2 cm",
@@ -1103,7 +1362,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "A movie starts at 2:45 PM and runs for 2 hours and 30 minutes. What time does it end?",
           answer_options: [
             "A: 4:15 PM",
@@ -1119,6 +1378,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Duration calculation",
             "12-hour format",
             "Mental time computation"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "Emma left home at 8:35 AM and arrived at her grandmother's house at 11:20 AM. If she stopped for a 25-minute break along the way, how long did she actually spend traveling (not including the break)?",
+          answer_options: [
+            "A: 2 hours 20 minutes",
+            "B: 2 hours 45 minutes",
+            "C: 2 hours 50 minutes",
+            "D: 3 hours 10 minutes"
+          ],
+          correct_answer: "A",
+          explanation: "Total time from 8:35 AM to 11:20 AM is 2 hours and 45 minutes (8:35 to 11:35 is 3 hours, minus 15 minutes = 2 hours 45 minutes). Subtract the 25-minute break: 2 hours 45 minutes - 25 minutes = 2 hours 20 minutes of actual travel time. This requires multiple steps and careful time calculation.",
+          distractor_strategy: "Includes the total time without subtracting break (B), and results from calculation errors",
+          characteristics: [
+            "Multi-step time problem",
+            "Elapsed time calculation",
+            "Subtraction of time intervals",
+            "Complex mental computation",
+            "Real-world context"
           ]
         }
       ],
@@ -1141,11 +1420,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic conversions, simple money, telling time",
-          "2": "Standard conversions, simple duration, basic money problems",
-          "3": "Multiple-step conversions, elapsed time, multi-coin problems",
-          "4": "Complex time problems, mixed unit calculations",
-          "5": "Challenging measurement scenarios, complex time/money problems",
-          "6": "Sophisticated multi-step problems across different units"
+          "2": "Multiple-step conversions, elapsed time, multi-coin problems",
+          "3": "Challenging measurement scenarios, complex time/money problems",
         }
       }
     },
@@ -1156,12 +1432,12 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Answer questions about data or probability",
 
       examples: [
         {
-          difficulty: 2,
+          difficulty: 1,  // Easy (mapped from old level 2)
           question_text: "A bag contains 3 red marbles and 2 blue marbles. What is the total number of marbles?",
           answer_options: [
             "A: 2",
@@ -1180,7 +1456,7 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 4,
+          difficulty: 2,  // Medium (mapped from old level 4)
           question_text: "A spinner has 4 equal sections: red, blue, green, and yellow. What is the chance of spinning red?",
           answer_options: [
             "A: 1 out of 2",
@@ -1196,6 +1472,26 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Equal outcomes",
             "Fraction language",
             "Conceptual understanding"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          question_text: "This table shows the number of books read by students in a class over one month:\n\nBooks Read: 0, 1, 2, 3, 4, 5\nNumber of Students: 2, 5, 8, 6, 3, 1\n\nHow many more students read 2 books than students who read 4 or 5 books combined?",
+          answer_options: [
+            "A: 2 students",
+            "B: 4 students",
+            "C: 5 students",
+            "D: 8 students"
+          ],
+          correct_answer: "B",
+          explanation: "Students who read 2 books: 8. Students who read 4 or 5 books: 3 + 1 = 4. Difference: 8 - 4 = 4 students. This requires interpreting the table, combining data from multiple categories, and performing subtraction.",
+          distractor_strategy: "Includes the number who read 4+5 books (A), just those who read 2 books (D), and other calculation errors",
+          characteristics: [
+            "Complex data interpretation",
+            "Multi-step calculation",
+            "Combining categories",
+            "Table reading",
+            "Comparison question"
           ]
         }
       ],
@@ -1218,11 +1514,8 @@ export const NAPLAN_YEAR5_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple pictographs, obvious data",
-          "2": "Bar graphs, basic counting, simple probability",
-          "3": "Multiple data sets, comparison questions",
-          "4": "More complex graphs, probability calculations",
-          "5": "Interpreting trends, complex probability",
-          "6": "Sophisticated data analysis, combined probability"
+          "2": "Multiple data sets, comparison questions",
+          "3": "Interpreting trends, complex probability",
         }
       }
     }

@@ -271,16 +271,21 @@ Return ONLY valid JSON:
     const result = JSON.parse(jsonMatch[0]);
 
     // For pattern-based questions, be more lenient:
-    // - Accept if confidence >= 70 (vs 80 for others)
-    // - Accept if is_correct is true even if some distractors are questionable
+    // Letter series have inherently ambiguous patterns, so even more lenient
+    // Other pattern questions get moderate leniency
     if (isPatternBased) {
       const confidence = result.confidence || 0;
       const isCorrect = result.is_correct === true;
 
-      // More lenient: pass if answer is correct and confidence is decent (70+)
-      // OR if both checks pass with lower confidence
-      const passed = (isCorrect && confidence >= 70) ||
-                     (isCorrect && result.all_distractors_wrong === true);
+      // Check if this is specifically a letter series question (most ambiguous)
+      const isLetterSeries = question.sub_skill?.toLowerCase().includes('letter series') ||
+                            question.sub_skill?.toLowerCase().includes('letter pattern');
+
+      // Letter series: Very lenient - 60% confidence OR just correct answer
+      // Other patterns: Lenient - 70% confidence OR correct + all distractors wrong
+      const passed = isLetterSeries
+        ? (isCorrect && confidence >= 60) || isCorrect  // Accept if just correct for letter series
+        : (isCorrect && confidence >= 70) || (isCorrect && result.all_distractors_wrong === true);
 
       return {
         passed,
@@ -377,7 +382,7 @@ function levenshteinDistance(str1: string, str2: string): number {
 //    Clearly different topics → NOT duplicate.
 // ============================================================================
 
-type SectionCategory = 'maths' | 'verbal' | 'reading' | 'writing';
+type SectionCategory = 'maths' | 'verbal' | 'reading' | 'writing' | 'grammar';
 
 const SECTION_CATEGORIES: Record<string, SectionCategory> = {
   // Maths / Numerical
@@ -393,8 +398,10 @@ const SECTION_CATEGORIES: Record<string, SectionCategory> = {
   // Verbal / Vocabulary
   'Verbal Reasoning':                   'verbal',
   'Thinking Skills':                    'verbal',
-  'Language Conventions':               'verbal',
   'General Ability - Verbal':           'verbal',
+
+  // Grammar / Language Conventions
+  'Language Conventions':               'grammar',
 
   // Reading
   'Reading':                            'reading',
@@ -413,7 +420,8 @@ function getSectionCategory(sectionName: string): SectionCategory {
   // Fallback: keyword scan
   const lower = sectionName.toLowerCase();
   if (lower.includes('math') || lower.includes('numer') || lower.includes('quantit')) return 'maths';
-  if (lower.includes('verbal') || lower.includes('language') || lower.includes('thinking')) return 'verbal';
+  if (lower.includes('language conventions') || lower.includes('grammar') || lower.includes('punctuation')) return 'grammar';
+  if (lower.includes('verbal') || lower.includes('thinking')) return 'verbal';
   if (lower.includes('reading') || lower.includes('humanit') || lower.includes('comprehension')) return 'reading';
   if (lower.includes('writ')) return 'writing';
   return 'verbal'; // safe default
@@ -447,9 +455,10 @@ function isStandardizedQuestionFormat(subSkill: string): boolean {
 function buildDuplicatePrompt(
   question: QuestionV2,
   recentList: string,
-  category: SectionCategory
+  category: SectionCategory,
+  passageInfo: string = ''
 ): string {
-  const newQ = `"${question.question_text}" → ${question.correct_answer ?? 'N/A'}`;
+  const newQ = `"${question.question_text}" → ${question.correct_answer ?? 'N/A'}${passageInfo}`;
 
   const categoryGuidance: Record<SectionCategory, string> = {
     maths: `DUPLICATE RULE FOR MATHS/NUMERICAL QUESTIONS:
@@ -465,18 +474,56 @@ A duplicate means the new question tests the SAME TARGET WORD(S), analogy pair, 
 - Different words testing a similar category (e.g. two different synonym pairs) → NOT a duplicate`,
 
     reading: `DUPLICATE RULE FOR READING COMPREHENSION QUESTIONS:
-IMPORTANT: Multiple questions about the SAME passage is normal and expected — that is NOT a duplicate.
-A duplicate means the new question asks essentially the SAME THING about the passage as an existing one (same intent, same answer source).
-- Two questions about the same passage that test DIFFERENT things (different word, different paragraph, different inference) → NOT a duplicate
-- Same question about the same part of the passage, testing the same detail → duplicate
-- Similar question type (e.g. both ask about vocabulary) is only a duplicate if they test the exact same word or the same answer
-Focus only on whether the QUESTION ITSELF is asking the same thing, not whether it references the same passage.`,
+
+⚠️ CRITICAL: MULTIPLE QUESTIONS ABOUT THE SAME PASSAGE IS NORMAL AND EXPECTED!
+A passage typically has 5-8 questions testing different aspects. This is NOT duplication.
+
+🔍 PASSAGE IDs: Questions include [Passage: xxxxxxxx] tags. Different Passage IDs = AUTOMATICALLY NOT DUPLICATE.
+
+ONLY mark as duplicate if BOTH conditions are true:
+1. Same Passage ID (or both questions reference the same passage content)
+2. AND asks the exact same question (same word, same detail, same inference point)
+
+NOT DUPLICATES (these are acceptable):
+- Different [Passage: xxx] IDs → AUTOMATICALLY NOT duplicate (even if similar question type)
+- "What is the main idea?" about Passage A vs. "What is the main idea?" about Passage B → NOT duplicate (different passages)
+- "What does 'declares' mean?" vs. "What does 'essential' mean?" in same passage → NOT duplicate (different vocabulary words)
+- "Main idea?" vs. "Author's purpose?" about same passage → NOT duplicate (different comprehension aspects)
+- Multiple vocabulary questions from same passage testing different words → NOT duplicate
+- Multiple inference questions from same passage about different paragraphs → NOT duplicate
+
+DUPLICATES (reject these):
+- Same [Passage: xxx] ID AND "What does 'declares' mean in paragraph 2?" twice → duplicate (exact same word in same passage)
+- Same [Passage: xxx] ID AND "What is the main idea?" twice → duplicate (exact same question about same passage)
+
+Focus on: Does the question test the EXACT SAME SKILL about the EXACT SAME TEXT SEGMENT IN THE SAME PASSAGE? If not, it's acceptable.`,
 
     writing: `DUPLICATE RULE FOR WRITING PROMPTS:
 A duplicate means the new prompt covers the SAME TOPIC or SCENARIO as an existing one.
 - Same topic even if the exact wording differs → duplicate (e.g. two prompts both about "a time you helped someone")
 - Same scenario type with a different setting or character → duplicate (e.g. two "write a story about overcoming fear" prompts)
 - Clearly different topics or scenarios → NOT a duplicate`,
+
+    grammar: `DUPLICATE RULE FOR GRAMMAR/PUNCTUATION/SPELLING QUESTIONS:
+
+⚠️ CRITICAL: IT IS NORMAL AND EXPECTED TO HAVE MULTIPLE QUESTIONS TESTING THE SAME GRAMMAR/PUNCTUATION RULE!
+
+For Language Conventions questions, the EXAMPLE SENTENCE is what makes each question unique, NOT the underlying grammar rule being tested.
+
+ONLY mark as duplicate if the question uses the EXACT SAME EXAMPLE SENTENCE or PHRASE.
+
+NOT DUPLICATES (these are acceptable):
+- Two questions about "commas in a list" with different example sentences → NOT duplicate
+- Two questions about "apostrophes for possession" with different examples (girls' vs. children's) → NOT duplicate
+- Two questions about "capital letters for proper nouns" with different name examples → NOT duplicate
+- "Which sentence uses commas correctly?" with different sentence options → NOT duplicate
+- Multiple questions testing the same punctuation rule (e.g., commas, apostrophes, quotation marks) → NOT duplicate as long as the sentences/examples differ
+
+DUPLICATES (reject these):
+- EXACT same sentence/phrase in both questions → duplicate
+- Word-for-word identical question text AND identical answer options → duplicate
+
+Focus on: Does the question use the EXACT SAME SENTENCE/PHRASE/EXAMPLE as an existing question? If the example is different, it's acceptable even if testing the same grammar rule.`,
   };
 
   return `You are checking if a new test question is a duplicate of existing questions.
@@ -495,7 +542,7 @@ Return ONLY valid JSON:
 
 async function checkDuplicate(
   question: QuestionV2,
-  recentQuestions: Array<{ question_text: string; correct_answer: string; answer_options?: string[] }>
+  recentQuestions: Array<{ question_text: string; correct_answer: string; answer_options?: string[]; passage_id?: string | null }>
 ): Promise<{ isDuplicate: boolean; reason: string }> {
   const category = getSectionCategory(question.section_name ?? '');
 
@@ -506,6 +553,84 @@ async function checkDuplicate(
 
     for (const recent of recentQuestions) {
       const normalizedRecent = recent.question_text.trim().toLowerCase();
+
+      // READING PASSAGES: Quick passage-aware check
+      // If both questions have passage_ids and they're different, skip duplicate check entirely
+      if (category === 'reading' && question.passage_id && recent.passage_id) {
+        if (question.passage_id !== recent.passage_id) {
+          // Different passages = cannot be duplicate, skip to next question
+          continue;
+        }
+        // Same passage = continue with normal duplicate checks below
+      }
+
+      // READING DRILLS: Check embedded passage content and title for similarity
+      // Drills embed passages in question_text instead of using passage_id
+      if (category === 'reading' && !question.passage_id && !recent.passage_id) {
+        // Extract title and passage from question_text
+        const extractInfo = (text: string) => {
+          const titleMatch = text.match(/Read this passage:\s*Title:\s*([^\n]+)/i);
+          const passageMatch = text.match(/Read this passage:[^\n]*\n\n['"]?([^'"]+?)['"]?\n\n(?:What|Which|According|Why|How)/s);
+          return {
+            title: titleMatch ? titleMatch[1].trim().toLowerCase() : null,
+            content: passageMatch ? passageMatch[1].trim().toLowerCase() : null
+          };
+        };
+
+        const newInfo = extractInfo(normalizedNew);
+        const recentInfo = extractInfo(normalizedRecent);
+
+        // Check 1: Title similarity (catch "The Birth of X" vs "The Invention of X")
+        if (newInfo.title && recentInfo.title) {
+          const newTitleWords = newInfo.title.split(/\s+/).filter(w => w.length > 3);
+          const recentTitleWords = recentInfo.title.split(/\s+/).filter(w => w.length > 3);
+
+          // Count significant word overlap (excluding "the", "of", "a")
+          const titleOverlap = newTitleWords.filter(w => recentTitleWords.includes(w)).length;
+          const titleSimilarity = titleOverlap / Math.max(newTitleWords.length, recentTitleWords.length, 1);
+
+          // If >50% of significant words match, titles are too similar
+          if (titleSimilarity > 0.5) {
+            return {
+              isDuplicate: true,
+              reason: `Duplicate - titles are too similar: "${newInfo.title}" vs "${recentInfo.title}"`
+            };
+          }
+
+          // Check for same title patterns: "The Mystery of...", "The Birth of...", "The Silent..."
+          const extractPattern = (title: string) => {
+            const match = title.match(/^(the\s+\w+\s+of|the\s+\w+\s+\w+)/i);
+            return match ? match[1] : null;
+          };
+
+          const newPattern = extractPattern(newInfo.title);
+          const recentPattern = extractPattern(recentInfo.title);
+
+          if (newPattern && recentPattern && newPattern === recentPattern) {
+            return {
+              isDuplicate: true,
+              reason: `Duplicate title pattern: both use "${newPattern}..." structure`
+            };
+          }
+        }
+
+        // Check 2: Content similarity (actual passage text)
+        if (newInfo.content && recentInfo.content) {
+          const newWords = new Set(newInfo.content.split(/\s+/).filter(w => w.length > 3));
+          const recentWords = new Set(recentInfo.content.split(/\s+/).filter(w => w.length > 3));
+          const overlap = [...newWords].filter(w => recentWords.has(w)).length;
+          const totalUnique = newWords.size + recentWords.size - overlap;
+          const similarity = overlap / totalUnique;
+
+          // Lowered threshold to 50% to catch more similar topics
+          if (similarity > 0.5) {
+            return {
+              isDuplicate: true,
+              reason: `Duplicate - passages are ${(similarity * 100).toFixed(0)}% similar (same topic)`
+            };
+          }
+        }
+      }
 
       // Rule 1: Word-for-word identical question text
       // BUT: For standardized question formats (same stem for all questions),
@@ -627,11 +752,22 @@ async function checkDuplicate(
         const preview = q.question_text.length > previewLen
           ? q.question_text.slice(0, previewLen) + '...'
           : q.question_text;
-        return `${i + 1}. "${preview}" → ${q.correct_answer ?? 'N/A'}`;
+
+        // For reading questions, include passage ID to help Haiku understand context
+        const passageInfo = (category === 'reading' && q.passage_id)
+          ? ` [Passage: ${q.passage_id.slice(0, 8)}]`
+          : '';
+
+        return `${i + 1}. "${preview}" → ${q.correct_answer ?? 'N/A'}${passageInfo}`;
       })
       .join('\n');
 
-    const prompt = buildDuplicatePrompt(question, recentList, category);
+    // Build prompt with new question's passage info
+    const newQuestionPassageInfo = (category === 'reading' && question.passage_id)
+      ? ` [Passage ID: ${question.passage_id.slice(0, 8)}]`
+      : '';
+
+    const prompt = buildDuplicatePrompt(question, recentList, category, newQuestionPassageInfo);
 
     const response = await anthropic.messages.create({
       model: HAIKU_MODEL,

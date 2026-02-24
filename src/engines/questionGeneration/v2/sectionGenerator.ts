@@ -159,6 +159,7 @@ export async function generateSectionV2(params: {
         testType,
         sectionName,
         config: section_structure.passage_blueprint!,
+        totalQuestions: sectionConfig.total_questions,
         difficultyPlan,
         testMode,
         skipStorage
@@ -424,12 +425,13 @@ async function generatePassageBasedSection(params: {
   testType: string;
   sectionName: string;
   config: any;
+  totalQuestions: number;
   difficultyPlan: DifficultyDistributionPlan;
   testMode: string;
   skipStorage: boolean;
 }): Promise<{ questions: QuestionV2[]; passages: PassageV2[]; totalCost: number; subSkillStats: Record<string, SubSkillStats> }> {
 
-  const { testType, sectionName, config, difficultyPlan, testMode, skipStorage } = params;
+  const { testType, sectionName, config, totalQuestions, difficultyPlan, testMode, skipStorage } = params;
   const { total_passages, passage_distribution } = config;
 
   console.log(`📖 PASSAGE-BASED GENERATION`);
@@ -461,7 +463,7 @@ async function generatePassageBasedSection(params: {
 
     // Check if questions already exist for this test mode
     const existingQuestionCount = await getExistingQuestionCount(testType, sectionName, testMode);
-    const targetQuestionCount = config.total_questions || 30;
+    const targetQuestionCount = totalQuestions;
 
     if (existingQuestionCount >= targetQuestionCount) {
       console.log(`   ✅ ${existingQuestionCount}/${targetQuestionCount} questions already exist for ${testMode}. Skipping.\n`);
@@ -479,7 +481,8 @@ async function generatePassageBasedSection(params: {
       targetQuestionCount,
       existingQuestionCount,
       difficultyPlan,
-      skipStorage
+      skipStorage,
+      passageBlueprint: config  // ✅ ADDED: Pass the passage blueprint config
     });
 
     return {
@@ -866,12 +869,13 @@ async function generateQuestionsFromExistingPassages(params: {
   existingQuestionCount: number;
   difficultyPlan: DifficultyDistributionPlan;
   skipStorage: boolean;
+  passageBlueprint: any;  // ✅ ADDED: The passage_blueprint config
 }): Promise<{
   questions: QuestionV2[];
   totalCost: number;
   subSkillStats: Record<string, SubSkillStats>;
 }> {
-  const { testType, sectionName, testMode, targetQuestionCount, existingQuestionCount, difficultyPlan, skipStorage } = params;
+  const { testType, sectionName, testMode, targetQuestionCount, existingQuestionCount, difficultyPlan, skipStorage, passageBlueprint } = params;
 
   // Get passages that are ALREADY LINKED to this test mode via existing questions
   const { data: existingQuestions, error: qError } = await supabase
@@ -949,8 +953,8 @@ async function generateQuestionsFromExistingPassages(params: {
       const questionIndex = startIndex + q;
       const difficulty = difficultyPlan.sequence[questionIndex % difficultyPlan.sequence.length];
 
-      // Get the sub-skill for this passage type (from section config)
-      const subSkill = getSubSkillForPassageType(passage.passage_type);
+      // Get the sub-skill for this passage type (from passage blueprint config)
+      const subSkill = getSubSkillForPassageType(passage.passage_type, passageBlueprint);
 
       try {
         const result = await generateQuestionV2(
@@ -991,15 +995,28 @@ async function generateQuestionsFromExistingPassages(params: {
   return { questions, totalCost, subSkillStats };
 }
 
-// Helper to map passage type to sub-skill
-function getSubSkillForPassageType(passageType: string): string {
-  const mapping: Record<string, string> = {
-    'narrative': 'Understanding Story Structure',
-    'informational': 'Identifying Main Ideas',
-    'poetry': 'Poetry Analysis',
-    'visual': 'Visual Text Interpretation'
-  };
-  return mapping[passageType] || 'Identifying Main Ideas';
+/**
+ * Maps passage type to sub-skills based on the passage_blueprint configuration.
+ * Returns a random sub-skill from the list defined for this passage type.
+ * This ensures we use the CORRECT sub-skills for each test type (not hardcoded NSW sub-skills).
+ */
+function getSubSkillForPassageType(passageType: string, passageBlueprint: any): string {
+  // Find the passage type spec in the blueprint
+  const passageSpec = passageBlueprint.passage_distribution.find(
+    (spec: any) => spec.passage_type === passageType
+  );
+
+  if (!passageSpec || !passageSpec.sub_skills || passageSpec.sub_skills.length === 0) {
+    console.warn(`⚠️  No sub-skills found for passage type "${passageType}" in blueprint, using first available`);
+    // Fallback: use the first sub-skill from the first passage type
+    const firstSpec = passageBlueprint.passage_distribution[0];
+    return firstSpec?.sub_skills?.[0] || 'Unknown';
+  }
+
+  // Rotate through sub-skills to ensure even distribution
+  // Pick a random sub-skill from the list for this passage type
+  const randomIndex = Math.floor(Math.random() * passageSpec.sub_skills.length);
+  return passageSpec.sub_skills[randomIndex];
 }
 
 // ============================================================================

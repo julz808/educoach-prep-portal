@@ -340,7 +340,7 @@ export async function getExistingPassageTopics(
   try {
     const { data: passages, error } = await supabase
       .from('passages_v2')
-      .select('title, passage_type, metadata')
+      .select('title, passage_type, generation_metadata')
       .eq('test_type', testType)
       .eq('section_name', sectionName)
       .order('created_at', { ascending: false })
@@ -349,9 +349,13 @@ export async function getExistingPassageTopics(
     if (error) throw new Error(`Failed to query passage topics: ${error.message}`);
 
     return (passages || []).map(p => {
-      const themes = (p.metadata?.main_themes || []).slice(0, 2).join(', ');
-      return themes
-        ? `"${p.title}" [${p.passage_type}] — ${themes}`
+      // Try to extract themes from generation_metadata if available
+      const metadata = p.generation_metadata as any;
+      const themes = metadata?.main_themes || metadata?.themes || [];
+      const themeStr = Array.isArray(themes) ? themes.slice(0, 2).join(', ') : '';
+
+      return themeStr
+        ? `"${p.title}" [${p.passage_type}] — ${themeStr}`
         : `"${p.title}" [${p.passage_type}]`;
     });
   } catch (error) {
@@ -436,11 +440,12 @@ export async function getRecentQuestionsForSubSkill(
   solution: string;
   test_mode: string;
   created_at: string;
+  passage_id?: string | null;
 }>> {
   try {
     let query = supabase
       .from('questions_v2')
-      .select('question_text, answer_options, correct_answer, solution, test_mode, created_at')
+      .select('question_text, answer_options, correct_answer, solution, test_mode, created_at, passage_id')
       .eq('test_type', testType)
       .eq('section_name', sectionName)
       .eq('sub_skill', subSkill);

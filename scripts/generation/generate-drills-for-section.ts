@@ -7,8 +7,7 @@
  * focused practice drills after the main practice tests and diagnostic are complete.
  *
  * DIFFICULTY RULES:
- *   - 3-level tests (ACER, EduTest, NSW, VIC): 10 questions per difficulty (1, 2, 3) = 30 total per sub-skill
- *   - 6-level tests (NAPLAN Year 5, Year 7): 5 questions per difficulty (1-6) = 30 total per sub-skill
+ *   - ALL tests use 3-level difficulty (1, 2, 3): 10 questions per difficulty = 30 total per sub-skill
  *
  * Usage:
  *   npx tsx --env-file=.env scripts/generation/generate-drills-for-section.ts \
@@ -26,7 +25,7 @@
  *     --test="ACER Scholarship (Year 7 Entry)" \
  *     --section="Humanities"
  *
- *   # Generate drills for Year 5 NAPLAN Reading (5 questions × 6 difficulties = 30 per sub-skill)
+ *   # Generate drills for Year 5 NAPLAN Reading (10 questions × 3 difficulties = 30 per sub-skill)
  *   npx tsx --env-file=.env scripts/generation/generate-drills-for-section.ts \
  *     --test="Year 5 NAPLAN" \
  *     --section="Reading"
@@ -37,6 +36,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { generateQuestionV2 } from '@/engines/questionGeneration/v2';
+import { generateMiniPassageWithQuestion } from '@/engines/questionGeneration/v2/passageGenerator';
 import { SECTION_CONFIGURATIONS } from '@/data/curriculumData_v2/sectionConfigurations';
 import { getExistingQuestionsForSubSkill } from '@/engines/questionGeneration/v2/gapDetection';
 
@@ -66,31 +66,19 @@ function parseArguments(): { testType: string; sectionName: string } {
 
 /**
  * Determines difficulty configuration based on test type
- * - 3-level tests: 10 questions × 3 difficulties = 30 per sub-skill
- * - 6-level tests: 5 questions × 6 difficulties = 30 per sub-skill
+ * - ALL tests use 3 difficulty levels: 10 questions × 3 difficulties = 30 per sub-skill
  */
 function getDifficultyConfig(testType: string): {
   difficultyLevels: number[];
   questionsPerLevel: number;
   totalPerSubSkill: number;
 } {
-  const naplanTests = ['Year 5 NAPLAN', 'Year 7 NAPLAN'];
-
-  if (naplanTests.includes(testType)) {
-    // NAPLAN tests use 6 difficulty levels
-    return {
-      difficultyLevels: [1, 2, 3, 4, 5, 6],
-      questionsPerLevel: 5,
-      totalPerSubSkill: 30
-    };
-  } else {
-    // All other tests (ACER, EduTest, NSW, VIC) use 3 difficulty levels
-    return {
-      difficultyLevels: [1, 2, 3],
-      questionsPerLevel: 10,
-      totalPerSubSkill: 30
-    };
-  }
+  // ALL tests (ACER, EduTest, NSW, VIC, NAPLAN Year 5, NAPLAN Year 7) use 3 difficulty levels
+  return {
+    difficultyLevels: [1, 2, 3],
+    questionsPerLevel: 10,
+    totalPerSubSkill: 30
+  };
 }
 
 // ============================================================================
@@ -280,6 +268,64 @@ async function generateDrillsForSection(
   let totalGenerated = 0;
   let totalCost = 0;
 
+  // Track used topics for passage-based sections (reading, humanities, etc.)
+  // Check if this section uses passage-based or hybrid generation
+  const generationStrategy = sectionConfig.section_structure.generation_strategy;
+  const isPassageBasedSection = generationStrategy === 'passage_based' || generationStrategy === 'hybrid';
+  const usedTopics: string[] = [];
+
+  // Define passage type variety for drills (rotate through these)
+  const drillPassageTypes = ['informational', 'narrative', 'persuasive'];
+  let passageTypeIndex = 0;
+
+  if (isPassageBasedSection) {
+    console.log(`   📖 Passage-based section detected: Will generate mini-passages with topic diversity tracking`);
+
+    // Load ALL existing drill questions to extract passage topics
+    console.log(`   📚 Loading existing drill questions to extract passage topics...`);
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.VITE_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: existingDrills, error } = await supabase
+      .from('questions_v2')
+      .select('question_text')
+      .eq('test_type', testType)
+      .eq('section_name', sectionName)
+      .eq('test_mode', 'drill');
+
+    if (!error && existingDrills) {
+      // Extract passage titles and content from existing drill questions
+      const extractPassageInfo = (questionText: string): string | null => {
+        // Match: "Read this passage: Title: [TITLE] [CONTENT]"
+        const titleMatch = questionText.match(/Read this passage:\s*Title:\s*([^\n]+)/);
+        const passageMatch = questionText.match(/Read this passage:[^\n]*\n\n(['"]?)(.+?)\1\n\n(?:What|Which|According|Why|How)/s);
+
+        if (titleMatch && passageMatch) {
+          const title = titleMatch[1].trim();
+          const content = passageMatch[2].trim().substring(0, 100); // First 100 chars
+          return `"${title}" - ${content}...`;
+        } else if (passageMatch) {
+          // No title, just content preview
+          const content = passageMatch[2].trim().substring(0, 80);
+          return `${content}...`;
+        }
+        return null;
+      };
+
+      for (const drill of existingDrills) {
+        const passageInfo = extractPassageInfo(drill.question_text);
+        if (passageInfo) {
+          usedTopics.push(passageInfo);
+        }
+      }
+
+      console.log(`   ✅ Extracted ${usedTopics.length} passage topics from existing drills`);
+    }
+  }
+
   for (let i = 0; i < gapReport.length; i++) {
     const { subSkill, difficultyGaps, totalNeeded, totalTarget } = gapReport[i];
 
@@ -306,6 +352,9 @@ async function generateDrillsForSection(
     console.log(`   Gaps to fill: ${totalNeeded} questions`);
     console.log('');
     console.log(`   🔀 Cross-mode diversity: Loading questions from practice tests + diagnostic`);
+    if (isPassageBasedSection) {
+      console.log(`   📚 Topic diversity: Tracking ${usedTopics.length} topics to ensure variety`);
+    }
     console.log('');
 
     let questionsGenerated = 0;
@@ -328,28 +377,63 @@ async function generateDrillsForSection(
       // Generate each missing question for this difficulty
       for (let q = 0; q < gap.needed; q++) {
         try {
-          const result = await generateQuestionV2(
-            {
-              testType,
-              section: sectionName,
-              subSkill,
-              difficulty,
-              testMode: 'drill'  // All drill questions use 'drill' mode
-            },
-            {
-              skipValidation: false,
-              skipStorage: false,
-              strictValidation: true,
-              crossModeDiversity: true  // ⭐ KEY: Enable cross-mode diversity
-            }
-          );
+          // For passage-based sections (Reading, Humanities, etc.), generate mini-passage with question and track topics
+          if (isPassageBasedSection) {
+            // Rotate through passage types for variety
+            const passageType = drillPassageTypes[passageTypeIndex % drillPassageTypes.length];
+            passageTypeIndex++;
 
-          if (result.success) {
-            difficultyQuestions++;
-            questionsGenerated++;
-            difficultyCost += result.metadata.generation_cost;
+            const result = await generateMiniPassageWithQuestion({
+              testType,
+              sectionName,
+              subSkill,
+              passageType,  // Rotate: informational, narrative, persuasive
+              difficulty,
+              testMode: 'drill',
+              skipStorage: false,
+              usedTopics  // Pass accumulated topics for diversity
+            });
+
+            if (result.question) {
+              difficultyQuestions++;
+              questionsGenerated++;
+              difficultyCost += result.metadata.total_cost;
+
+              // Track the FULL passage (title + content) for diversity
+              const title = result.passage.title;
+              const content = result.passage.content.substring(0, 100);
+              const passageSignature = `"${title}" - ${content}...`;
+              usedTopics.push(passageSignature);
+
+              console.log(`      📝 Topic tracked: ${title}`);
+            } else {
+              console.log(`      ⚠️  Question ${q + 1} failed: No question generated`);
+            }
           } else {
-            console.log(`      ⚠️  Question ${q + 1} failed: ${result.error}`);
+            // For non-passage sections (Verbal Reasoning, Quantitative Reasoning, etc.), use regular generation
+            const result = await generateQuestionV2(
+              {
+                testType,
+                section: sectionName,
+                subSkill,
+                difficulty,
+                testMode: 'drill'
+              },
+              {
+                skipValidation: false,
+                skipStorage: false,
+                strictValidation: true,
+                crossModeDiversity: true
+              }
+            );
+
+            if (result.success) {
+              difficultyQuestions++;
+              questionsGenerated++;
+              difficultyCost += result.metadata.generation_cost;
+            } else {
+              console.log(`      ⚠️  Question ${q + 1} failed: ${result.error}`);
+            }
           }
         } catch (error: any) {
           console.log(`      ⚠️  Question ${q + 1} error: ${error.message}`);
@@ -457,8 +541,7 @@ if (!testType || !sectionName) {
   console.error('    --section="<SECTION_NAME>"');
   console.error('');
   console.error('Difficulty Configuration (automatic):');
-  console.error('  • 3-level tests (ACER, EduTest, NSW, VIC): 10 questions × 3 difficulties = 30 per sub-skill');
-  console.error('  • 6-level tests (NAPLAN Year 5, Year 7): 5 questions × 6 difficulties = 30 per sub-skill');
+  console.error('  • ALL tests use 3-level difficulty: 10 questions × 3 difficulties = 30 per sub-skill');
   console.error('');
   console.error('Examples:');
   console.error('  # Generate drills for EduTest Verbal Reasoning');

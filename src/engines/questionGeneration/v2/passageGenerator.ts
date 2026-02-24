@@ -19,6 +19,62 @@ const anthropic = new Anthropic({
 });
 
 // ============================================================================
+// DUPLICATE CHECKING HELPERS
+// ============================================================================
+
+/**
+ * Check if a passage is too similar to existing passages
+ * Used topics are in format: "Title - content preview..."
+ */
+function checkIfPassageIsDuplicate(candidate: PassageV2, usedTopics: string[]): boolean {
+  const candidateTitle = candidate.title.toLowerCase();
+  const candidateContent = candidate.content.toLowerCase();
+
+  for (const used of usedTopics) {
+    // Extract title from format: "Title - content..."
+    const titleMatch = used.match(/^"?([^"-]+)"?\s*-/);
+    const title = titleMatch ? titleMatch[1].toLowerCase() : '';
+
+    // Check 1: Exact title match
+    if (title && candidateTitle === title) {
+      return true;
+    }
+
+    // Check 2: Title word overlap (>50%)
+    const candidateTitleWords = candidateTitle.split(/\s+/).filter(w => w.length > 3);
+    const usedTitleWords = title.split(/\s+/).filter(w => w.length > 3);
+    const titleOverlap = candidateTitleWords.filter(w => usedTitleWords.includes(w)).length;
+    const titleSimilarity = titleOverlap / Math.max(candidateTitleWords.length, usedTitleWords.length, 1);
+    if (titleSimilarity > 0.5) {
+      return true;
+    }
+
+    // Check 3: Title pattern match ("The Mystery of...", "The Birth of...")
+    const extractPattern = (t: string) => {
+      const match = t.match(/^the\s+(\w+)\s+(of|alarm|messengers?|sentinels?)/i);
+      return match ? match[1] + ' ' + match[2] : null;
+    };
+    const candPattern = extractPattern(candidateTitle);
+    const usedPattern = extractPattern(title);
+    if (candPattern && usedPattern && candPattern === usedPattern) {
+      return true;
+    }
+
+    // Check 4: Content overlap (>40% - stricter than validator)
+    const candidateWords = new Set(candidateContent.split(/\s+/).filter(w => w.length > 3));
+    const usedWords = new Set(used.toLowerCase().split(/\s+/).filter(w => w.length > 3));
+    const contentOverlap = [...candidateWords].filter(w => usedWords.has(w)).length;
+    const totalUnique = candidateWords.size + usedWords.size - contentOverlap;
+    const contentSimilarity = contentOverlap / Math.max(totalUnique, 1);
+    if (contentSimilarity > 0.4) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// ============================================================================
 // PASSAGE GENERATION
 // ============================================================================
 
@@ -376,53 +432,86 @@ export async function generateMiniPassageWithQuestion(params: {
   const { testType, sectionName, subSkill, passageType, difficulty, testMode, skipStorage = false, usedTopics = [] } = params;
   const startTime = Date.now();
 
-  // Step 1: Generate mini-passage
-  const prompt = buildMiniPassagePrompt(
-    testType,
-    sectionName,
-    subSkill,
-    passageType,
-    difficulty,
-    usedTopics
-  );
+  // Load existing passages from passages_v2 table (same system as practice tests!)
+  const existingPassageTopics = await getExistingPassageTopics(testType, sectionName);
 
-  const response = await anthropic.messages.create({
-    model: CLAUDE_CONFIG.model,
-    max_tokens: 800,
-    temperature: CLAUDE_CONFIG.temperature,
-    messages: [{ role: 'user', content: prompt }]
-  });
+  // Combine with session-level usedTopics
+  const allUsedTopics = [...existingPassageTopics, ...usedTopics];
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  console.log(`   📚 Loaded ${existingPassageTopics.length} existing passages + ${usedTopics.length} from session = ${allUsedTopics.length} total for duplicate prevention`);
 
-  if (!jsonMatch) {
-    throw new Error('Failed to parse mini-passage response - no JSON found');
+  let passage: PassageV2 | null = null;
+  let attempts = 0;
+  const maxAttempts = 3;
+
+  // Step 1: Generate mini-passage with retry on duplicates
+  while (attempts < maxAttempts && !passage) {
+    attempts++;
+
+    const prompt = buildMiniPassagePrompt(
+      testType,
+      sectionName,
+      subSkill,
+      passageType,
+      difficulty,
+      allUsedTopics  // Use combined database + session topics
+    );
+
+    const response = await anthropic.messages.create({
+      model: CLAUDE_CONFIG.model,
+      max_tokens: 800,
+      temperature: CLAUDE_CONFIG.temperature,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+    if (!jsonMatch) {
+      console.warn(`   ⚠️  Attempt ${attempts}: Failed to parse mini-passage response`);
+      continue;
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    const wordCount = parsed.content.split(/\s+/).length;
+
+    const candidatePassage: PassageV2 = {
+      id: crypto.randomUUID(),
+      title: parsed.title,
+      content: parsed.content,
+      passage_type: passageType as any,
+      word_count: wordCount,
+      difficulty,
+      test_type: testType,
+      year_level: getYearLevel(testType),
+      section_name: sectionName,
+      metadata: {
+        main_themes: parsed.main_themes || [],
+        key_characters: parsed.key_characters || [],
+        setting: parsed.setting || '',
+        potential_question_topics: parsed.potential_question_topics || [subSkill],
+        generation_timestamp: new Date().toISOString()
+      }
+    };
+
+    // Check for duplicate against allUsedTopics
+    const isDuplicate = checkIfPassageIsDuplicate(candidatePassage, allUsedTopics);
+
+    if (isDuplicate) {
+      console.warn(`   ⚠️  Attempt ${attempts}: Passage "${candidatePassage.title}" is too similar to existing passages`);
+      // Add this failed attempt so next iteration avoids it
+      allUsedTopics.push(`"${candidatePassage.title}" - ${candidatePassage.content.substring(0, 100)}...`);
+      continue;
+    }
+
+    // Passage is unique!
+    passage = candidatePassage;
+    console.log(`   📄 Mini-passage generated: "${passage.title}" (${passage.word_count} words)`);
   }
 
-  const parsed = JSON.parse(jsonMatch[0]);
-  const wordCount = parsed.content.split(/\s+/).length;
-
-  const passage: PassageV2 = {
-    id: crypto.randomUUID(),
-    title: parsed.title,
-    content: parsed.content,
-    passage_type: passageType as any,
-    word_count: wordCount,
-    difficulty,
-    test_type: testType,
-    year_level: getYearLevel(testType),
-    section_name: sectionName,
-    metadata: {
-      main_themes: parsed.main_themes || [],
-      key_characters: parsed.key_characters || [],
-      setting: parsed.setting || '',
-      potential_question_topics: parsed.potential_question_topics || [subSkill],
-      generation_timestamp: new Date().toISOString()
-    }
-  };
-
-  console.log(`   📄 Mini-passage generated: "${passage.title}" (${passage.word_count} words)`);
+  if (!passage) {
+    throw new Error(`Failed to generate unique mini-passage after ${maxAttempts} attempts`);
+  }
 
   // Step 2: Store mini-passage
   let passageId = passage.id;

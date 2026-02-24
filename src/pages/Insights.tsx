@@ -22,7 +22,9 @@ const PRODUCT_ID_TO_TYPE: Record<string, string> = {
   'year-5-naplan': 'Year 5 NAPLAN',
   'year-7-naplan': 'Year 7 NAPLAN',
   'acer-year-7': 'ACER Scholarship (Year 7 Entry)',
+  'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
   'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
+  'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
   'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
   'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
 };
@@ -32,15 +34,17 @@ const getFilterTabsForProduct = (productId: string) => {
   // Map the product ID to the curriculum product type
   const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
   const sections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
-  
+
+  console.log('🔍 getFilterTabsForProduct:', { productId, productType, sections });
+
   // Create filter tabs from actual sections
   const filterTabs = [{ id: 'all', label: 'All Skills' }];
-  
+
   // Add each section as a filter, using a simplified ID
   sections.forEach(section => {
     let id = 'other';
     const lowerSection = section.toLowerCase();
-    
+
     if (lowerSection.includes('reading')) {
       id = 'reading';
     } else if (lowerSection.includes('verbal')) {
@@ -58,13 +62,15 @@ const getFilterTabsForProduct = (productId: string) => {
     } else if (lowerSection.includes('humanities')) {
       id = 'humanities';
     }
-    
+
     // Check if this filter ID already exists
     if (!filterTabs.find(tab => tab.id === id)) {
       filterTabs.push({ id, label: section });
     }
   });
-  
+
+  console.log('✅ Filter tabs generated:', filterTabs);
+
   return filterTabs;
 };
 
@@ -200,6 +206,7 @@ const PerformanceDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('diagnostic');
   const [selectedPracticeTest, setSelectedPracticeTest] = useState<number | null>(null);
+  const [diagnosticFilter, setDiagnosticFilter] = useState('all');
   const [practiceFilter, setPracticeFilter] = useState('all');
   const [drillFilter, setDrillFilter] = useState('all');
   const [sectionView, setSectionView] = useState<'score' | 'accuracy'>('score');
@@ -576,8 +583,8 @@ const PerformanceDashboard = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-3">Complete Your Diagnostic First</h3>
                   <p className="text-slate-600 mb-8 max-w-md mx-auto">You need to complete <strong>all sections</strong> of the diagnostic test to see your detailed performance insights, strengths, and areas for improvement.</p>
-                  <button 
-                    onClick={() => navigate('/diagnostic')}
+                  <button
+                    onClick={() => navigate('/dashboard/diagnostic')}
                     className="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     Start Diagnostic Test
@@ -585,6 +592,47 @@ const PerformanceDashboard = () => {
                 </div>
               ) : (
                 <div className="space-y-8">
+                  {/* Partial Completion Banner */}
+                  {performanceData.diagnostic.isPartiallyComplete && (
+                    <div className="bg-gradient-to-r from-teal-50 via-white to-orange-50 border-2 border-teal-200 rounded-xl p-6 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Flag className="h-6 w-6 text-teal-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-slate-900 mb-2">
+                            Great Start! Complete All Sections for Full Insights
+                          </h3>
+                          <p className="text-slate-700 mb-3">
+                            You've completed <strong className="text-teal-600">{performanceData.diagnostic.completedSections?.length || 0} of {performanceData.diagnostic.totalSections}</strong> sections.
+                            Finish the remaining sections to unlock your complete performance analysis!
+                          </p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm">
+                              <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                              <span className="text-slate-700">
+                                <strong className="text-teal-700">Completed:</strong> {performanceData.diagnostic.completedSections?.join(', ')}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                              <Clock className="h-4 w-4 text-edu-coral flex-shrink-0" />
+                              <span className="text-slate-700">
+                                <strong className="text-edu-coral">Remaining:</strong> {performanceData.diagnostic.missingSections?.join(', ')}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => navigate('/dashboard/diagnostic')}
+                            className="mt-4 px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 inline-flex items-center gap-2"
+                          >
+                            <Target className="h-4 w-4" />
+                            Continue Diagnostic Test
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Summary Cards - Mobile-optimized responsive grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {/* Overall Score */}
@@ -731,12 +779,14 @@ const PerformanceDashboard = () => {
                     <div className="flex flex-col lg:flex-row">
                       {/* Spider Chart - Top on mobile, Left on desktop */}
                       <div ref={spiderChartObserver.ref} className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
-                        <SpiderChart 
-                          data={performanceData.diagnostic.sectionBreakdown.map(section => ({
-                            label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
-                            value: sectionView === 'score' ? section.score : section.accuracy,
-                            maxValue: 100
-                          }))}
+                        <SpiderChart
+                          data={performanceData.diagnostic.sectionBreakdown
+                            .filter(section => section.completed !== false)
+                            .map(section => ({
+                              label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+                              value: sectionView === 'score' ? section.score : section.accuracy,
+                              maxValue: 100
+                            }))}
                           size={280}
                           animate={animateSpiderChart}
                         />
@@ -755,46 +805,65 @@ const PerformanceDashboard = () => {
                           const displayScore = section.score;
                           const displayAccuracy = section.accuracy;
                           
+                          // Check if section is incomplete
+                          const isIncomplete = section.completed === false;
+
                           return (
-                            <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                            <div key={index} className={`px-4 py-3 transition-colors ${isIncomplete ? 'opacity-60' : 'hover:bg-slate-50'}`}>
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-slate-900 text-base">{section.sectionName}</h4>
+                                  <h4 className={`font-medium text-base ${isIncomplete ? 'text-slate-400' : 'text-slate-900'}`}>{section.sectionName}</h4>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
-                                  <div className={`text-base font-semibold ${
-                                    sectionView === 'score'
-                                      ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
-                                      : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
-                                  }`}>
-                                    {animatedSectionScores[section.sectionName] !== undefined ? animatedSectionScores[section.sectionName] : (sectionView === 'score' ? displayScore : displayAccuracy)}%
-                                  </div>
-                                  <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                    <div 
-                                      key={`${section.sectionName}-${sectionView}`} // Force re-render on toggle
-                                      className={`h-full rounded-full growToRight ${
+                                  {isIncomplete ? (
+                                    <>
+                                      <div className="text-sm font-medium text-slate-400 italic">
+                                        Not Completed
+                                      </div>
+                                      <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div className="h-full rounded-full bg-slate-300" style={{ width: '0%' }} />
+                                      </div>
+                                      <div className="text-sm text-slate-400 italic">
+                                        -/-
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className={`text-base font-semibold ${
                                         sectionView === 'score'
-                                          ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                          : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                      }`}
-                                      style={{ 
-                                        width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
-                                        animationDelay: `${index * 150}ms`
-                                      }}
-                                    />
-                                  </div>
-                                  <div 
-                                    key={`${section.sectionName}-fraction-${sectionView}`}
-                                    className="text-sm text-slate-600 fadeIn"
-                                    style={{ animationDelay: `${index * 150 + 600}ms` }}
-                                  >
-                                    {sectionView === 'score' 
-                                      ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                      : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
-                                        ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                        : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
-                                    }
-                                  </div>
+                                          ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
+                                          : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
+                                      }`}>
+                                        {animatedSectionScores[section.sectionName] !== undefined ? animatedSectionScores[section.sectionName] : (sectionView === 'score' ? displayScore : displayAccuracy)}%
+                                      </div>
+                                      <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div
+                                          key={`${section.sectionName}-${sectionView}`} // Force re-render on toggle
+                                          className={`h-full rounded-full growToRight ${
+                                            sectionView === 'score'
+                                              ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                              : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                          }`}
+                                          style={{
+                                            width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
+                                            animationDelay: `${index * 150}ms`
+                                          }}
+                                        />
+                                      </div>
+                                      <div
+                                        key={`${section.sectionName}-fraction-${sectionView}`}
+                                        className="text-sm text-slate-600 fadeIn"
+                                        style={{ animationDelay: `${index * 150 + 600}ms` }}
+                                      >
+                                        {sectionView === 'score'
+                                          ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                          : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
+                                            ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                            : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
+                                        }
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -857,10 +926,21 @@ const PerformanceDashboard = () => {
                         <div className="space-y-4">
                           {(() => {
                             const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
-                            const sortedSkills = topBottomView === 'score' 
-                              ? [...allSubSkills].sort((a, b) => (b.score || 0) - (a.score || 0))
-                              : [...allSubSkills].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0));
-                            return sortedSkills.slice(0, 5).map((item, index) => (
+                            // Only include sub-skills that have been attempted AND score >50%
+                            const attemptedSkills = allSubSkills.filter(skill => {
+                              const score = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
+                              return skill.questionsAttempted > 0 && score > 50;
+                            });
+                            const sortedSkills = topBottomView === 'score'
+                              ? [...attemptedSkills].sort((a, b) => (b.score || 0) - (a.score || 0))
+                              : [...attemptedSkills].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0));
+
+                            // Smart splitting: if less than 5 total, divide evenly
+                            const totalAttempted = sortedSkills.length;
+                            const topCount = totalAttempted < 5 ? Math.ceil(totalAttempted / 2) : 5;
+                            const topSkills = sortedSkills.slice(0, topCount);
+
+                            return topSkills.map((item, index) => (
                             <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                               <div className="flex-1">
                                 <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
@@ -871,10 +951,10 @@ const PerformanceDashboard = () => {
                                   {animatedTopSkillScores[item.subSkill] !== undefined ? animatedTopSkillScores[item.subSkill] : (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%
                                 </div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
-                                  <div 
+                                  <div
                                     key={`${item.subSkill}-${topBottomView}`}
                                     className="h-full rounded-full bg-green-500 growToRight"
-                                    style={{ 
+                                    style={{
                                       width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%`,
                                       animationDelay: `${index * 150}ms`
                                     }}
@@ -884,7 +964,7 @@ const PerformanceDashboard = () => {
                             </div>
                             ));
                           })()}
-                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.length === 0) && (
+                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.filter(s => s.questionsAttempted > 0).length === 0) && (
                             <div className="text-center py-8 text-slate-500">
                               <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               Complete more questions to see your top sub-skills
@@ -945,10 +1025,22 @@ const PerformanceDashboard = () => {
                         <div className="space-y-4">
                           {(() => {
                             const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
-                            const sortedSkills = topBottomView === 'score' 
-                              ? [...allSubSkills].sort((a, b) => (a.score || 0) - (b.score || 0))
-                              : [...allSubSkills].sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0));
-                            return sortedSkills.slice(0, 5).map((item, index) => (
+                            // Only include sub-skills that have been attempted AND score >50%
+                            const attemptedSkills = allSubSkills.filter(skill => {
+                              const score = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
+                              return skill.questionsAttempted > 0 && score > 50;
+                            });
+                            const sortedSkills = topBottomView === 'score'
+                              ? [...attemptedSkills].sort((a, b) => (a.score || 0) - (b.score || 0))
+                              : [...attemptedSkills].sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0));
+
+                            // Smart splitting: if less than 5 total, divide evenly
+                            const totalAttempted = sortedSkills.length;
+                            const topCount = totalAttempted < 5 ? Math.ceil(totalAttempted / 2) : 5;
+                            const bottomCount = totalAttempted < 5 ? Math.floor(totalAttempted / 2) : 5;
+                            const bottomSkills = sortedSkills.slice(0, bottomCount);
+
+                            return bottomSkills.map((item, index) => (
                             <div key={index} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
                               <div className="flex-1">
                                 <h5 className="text-base font-medium text-slate-900 mb-1">{item.subSkill}</h5>
@@ -959,12 +1051,12 @@ const PerformanceDashboard = () => {
                                   (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'text-orange-600' : 'text-red-600'
                                 }`}>{animatedBottomSkillScores[item.subSkill] !== undefined ? animatedBottomSkillScores[item.subSkill] : (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0))}%</div>
                                 <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
-                                  <div 
+                                  <div
                                     key={`${item.subSkill}-${topBottomView}`}
                                     className={`h-full rounded-full growToRight ${
                                       (topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)) >= 60 ? 'bg-orange-500' : 'bg-red-500'
                                     }`}
-                                    style={{ 
+                                    style={{
                                       width: `${topBottomView === 'score' ? (item.score || 0) : (item.accuracy || 0)}%`,
                                       animationDelay: `${index * 150}ms`
                                     }}
@@ -974,7 +1066,7 @@ const PerformanceDashboard = () => {
                             </div>
                             ));
                           })()}
-                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.length === 0) && (
+                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.filter(s => s.questionsAttempted > 0).length === 0) && (
                             <div className="text-center py-8 text-slate-500">
                               <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                               Complete more questions to see your bottom sub-skills
@@ -1028,15 +1120,15 @@ const PerformanceDashboard = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Filter Tabs - Better responsive wrapping */}
                       <div className="flex flex-wrap gap-2 mb-2">
                         {getFilterTabsForProduct(selectedProduct).map((filter) => (
                           <button
                             key={filter.id}
-                            onClick={() => setPracticeFilter(filter.id)}
+                            onClick={() => setDiagnosticFilter(filter.id)}
                             className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                              practiceFilter === filter.id
+                              diagnosticFilter === filter.id
                                 ? 'bg-slate-900 text-white'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
@@ -1046,7 +1138,7 @@ const PerformanceDashboard = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div className="divide-y divide-slate-100">
                       {/* Use all sub-skills from analytics service */}
                       {(function() {
@@ -1107,14 +1199,12 @@ const PerformanceDashboard = () => {
                         
                         return mappedSkills
                           .filter(item => {
-                            // Filter by score/accuracy tab: 
-                            // Score tab: show ALL sub-skills (including unattempted)
-                            // Accuracy tab: show ONLY attempted sub-skills
-                            if (subSkillView === 'accuracy' && item.answered === 0) {
+                            // ALWAYS only show attempted sub-skills (both score and accuracy views)
+                            if (item.answered === 0) {
                               return false;
                             }
-                            
-                            return practiceFilter === 'all' || item.category === practiceFilter;
+
+                            return diagnosticFilter === 'all' || item.category === diagnosticFilter;
                           })
                           .sort((a, b) => {
                             const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
@@ -1316,6 +1406,47 @@ const PerformanceDashboard = () => {
                 
                 return (
                   <div className="space-y-8">
+                    {/* Partial Completion Banner for Practice Tests */}
+                    {selectedTest.isPartiallyComplete && (
+                      <div className="bg-gradient-to-r from-teal-50 via-white to-orange-50 border-2 border-teal-200 rounded-xl p-6 shadow-sm">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                            <Flag className="h-6 w-6 text-teal-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">
+                              Keep Going! Complete All Sections for Full Results
+                            </h3>
+                            <p className="text-slate-700 mb-3">
+                              You've completed <strong className="text-teal-600">{selectedTest.completedSections?.length || 0} of {selectedTest.totalSections}</strong> sections for Practice Test {selectedTest.testNumber}.
+                              Finish the remaining sections to see your complete performance!
+                            </p>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm">
+                                <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                                <span className="text-slate-700">
+                                  <strong className="text-teal-700">Completed:</strong> {selectedTest.completedSections?.join(', ')}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-edu-coral flex-shrink-0" />
+                                <span className="text-slate-700">
+                                  <strong className="text-edu-coral">Remaining:</strong> {selectedTest.missingSections?.join(', ')}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => navigate('/dashboard/practice-tests')}
+                              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 inline-flex items-center gap-2"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Continue Practice Test
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Overall Performance Cards - Mobile-optimized responsive grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                       {/* Overall Score */}

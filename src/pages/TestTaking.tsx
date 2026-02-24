@@ -50,6 +50,7 @@ interface Question {
   userAnswer?: number;
   flagged?: boolean;
   passageContent?: string;
+  visualSvg?: string; // SVG or HTML markup for visual questions
   format?: 'Multiple Choice' | 'Written Response';
   userTextAnswer?: string; // For written responses
   maxPoints: number; // Maximum points for this question (1 for MC, varies for writing)
@@ -293,10 +294,11 @@ const TestTaking: React.FC = () => {
         topic: q.topic || 'General',
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
-        passageId: q.passageId, // Include passage ID for proper grouping
+        passageId: q.passageId,
         passageContent: q.passageContent || '',
+        visualSvg: q.visualSvg || undefined,
         format: questionFormat,
-        maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
+        maxPoints: q.maxPoints || 1
       }));
     } else if (testType === 'practice') {
       const organizedData = await fetchQuestionsFromSupabase();
@@ -393,10 +395,11 @@ const TestTaking: React.FC = () => {
         topic: q.topic || 'General',
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
-        passageId: q.passageId, // Include passage ID for proper grouping
+        passageId: q.passageId,
         passageContent: q.passageContent || '',
+        visualSvg: q.visualSvg || undefined,
         format: questionFormat,
-        maxPoints: q.maxPoints || 1 // Add maxPoints with default of 1
+        maxPoints: q.maxPoints || 1
       }));
     } else if (testType === 'drill') {
       const drillModes = await fetchDrillModes(selectedProduct);
@@ -501,6 +504,7 @@ const TestTaking: React.FC = () => {
         subSkill: q.subSkill || 'General',
         difficulty: q.difficulty || 2,
         passageContent: q.passageContent || '',
+        visualSvg: q.visualSvg || undefined,
         format: isWritingDrill ? 'Written Response' as const : 'Multiple Choice' as const,
         maxPoints: isWritingDrill ? getMaxPointsForWriting(selectedProduct) : 1
       }));

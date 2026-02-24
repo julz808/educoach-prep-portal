@@ -166,7 +166,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "narrative",
             count: 2,
             word_count_range: [300, 400],
-            questions_per_passage: [4, 5],  // 4-5 questions each (8-10 total)
+            questions_per_passage: 5,  // 5 questions each (10 total) - FIXED from [4,5]
             sub_skills: [
               "Main Idea & Theme Identification",
               "Inference & Conclusion Drawing",
@@ -198,7 +198,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "visual",
             count: 1,
             word_count_range: [0, 50],  // Just caption/context
-            questions_per_passage: [3, 4],  // 3-4 questions (3-4 total)
+            questions_per_passage: 4,  // 4 questions (4 total) - FIXED from [3,4]
             sub_skills: ["Vocabulary in Context"]
           }
         ]
@@ -599,7 +599,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "informational",
             count: 2,
             word_count_range: [300, 400],
-            questions_per_passage: [7, 8],  // 14-16 total questions
+            questions_per_passage: 8,  // 8 questions each = 16 total (FIXED from [7,8])
             sub_skills: [
               "Literal Comprehension",
               "Text Structure & Features",
@@ -610,7 +610,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "persuasive",
             count: 1,
             word_count_range: [250, 350],
-            questions_per_passage: 7,  // 7 total questions
+            questions_per_passage: 8,  // 8 total questions (FIXED from 7)
             sub_skills: [
               "Author's Purpose & Perspective",
               "Inferential Comprehension"
@@ -620,7 +620,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "multimodal",
             count: 1,
             word_count_range: [200, 300],
-            questions_per_passage: [7, 9],  // 7-9 total questions
+            questions_per_passage: 8,  // 8 total questions (FIXED from [7,9])
             sub_skills: [
               "Text Structure & Features",
               "Literal Comprehension"
@@ -714,7 +714,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "narrative",
             count: 2,
             word_count_range: [500, 600],
-            questions_per_passage: 6,  // 12 total questions
+            questions_per_passage: 7,  // 7 each = 14 total (FIXED from 6)
             sub_skills: [
               "Literal & Inferential Comprehension",
               "Vocabulary & Word Meaning"
@@ -724,7 +724,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "informational",
             count: 3,
             word_count_range: [500, 550],
-            questions_per_passage: [6, 7],  // 18-21 total questions
+            questions_per_passage: 8,  // 8 each = 24 total (FIXED from [6,7])
             sub_skills: [
               "Literal & Inferential Comprehension",
               "Text Structure & Organization",
@@ -745,7 +745,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
             passage_type: "multimodal",
             count: 1,
             word_count_range: [400, 500],
-            questions_per_passage: [6, 8],  // 6-8 total questions
+            questions_per_passage: 6,  // 6 total questions (FIXED from [6,8])
             sub_skills: [
               "Text Structure & Organization",
               "Vocabulary & Word Meaning"

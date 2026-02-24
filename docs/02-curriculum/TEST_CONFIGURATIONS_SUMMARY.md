@@ -53,28 +53,30 @@
 
 ## Year 5 NAPLAN
 
-| Section | Questions | Sub-Skills |
-|---------|-----------|------------|
-| Reading | 40 | TBD |
-| Language Conventions | 40 | TBD |
-| Numeracy | 50 | TBD |
-| **TOTAL** | **130** | **TBD** |
+| Section | Questions | Sub-Skills | Difficulty Levels |
+|---------|-----------|------------|-------------------|
+| Reading | 40 | 5 | 3 (Easy, Medium, Hard) |
+| Language Conventions | 40 | 4 | 3 (Easy, Medium, Hard) |
+| Numeracy | 50 | 5 | 3 (Easy, Medium, Hard) |
+| Writing | 1 | 2 | 3 (Easy, Medium, Hard) |
+| **TOTAL** | **131** | **16** | - |
 
-**Note:** Year 5 NAPLAN curriculum data is currently empty placeholders. Configuration exists but needs curriculum examples.
+**Note:** Year 5 NAPLAN uses **3 difficulty levels** (Easy, Medium, Hard). Complete curriculum with 56 examples (100% coverage). Updated 2026-02-22.
 
 ---
 
 ## Year 7 NAPLAN
 
-| Section | Questions | Sub-Skills |
-|---------|-----------|------------|
-| Reading | 50 | TBD |
-| Language Conventions | 45 | TBD |
-| Numeracy No Calculator | 30 | TBD |
-| Numeracy Calculator | 35 | TBD |
-| **TOTAL** | **160** | **TBD** |
+| Section | Questions | Sub-Skills | Difficulty Levels |
+|---------|-----------|------------|-------------------|
+| Reading | 50 | 4 | 3 (Easy, Medium, Hard) |
+| Language Conventions | 45 | 4 | 3 (Easy, Medium, Hard) |
+| Numeracy No Calculator | 30 | 5 | 3 (Easy, Medium, Hard) |
+| Numeracy Calculator | 35 | 5 | 3 (Easy, Medium, Hard) |
+| Writing | 1 | 2 | 3 (Easy, Medium, Hard) |
+| **TOTAL** | **161** | **20** | - |
 
-**Note:** Year 7 NAPLAN curriculum data needs review for completeness.
+**Note:** Year 7 NAPLAN uses **3 difficulty levels** (Easy, Medium, Hard). Complete curriculum with 60 examples (100% coverage). Updated 2026-02-22.
 
 ---
 

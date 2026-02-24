@@ -1,0 +1,1254 @@
+{
+  "summary": {
+    "totalTableQuestions": 89,
+    "conversionStrategy": "Convert markdown tables in question_text to HTML tables"
+  },
+  "questions": [
+    {
+      "id": "750dae14-1f03-4752-9b19-ead5118ff70c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A marine aquarium tracks the feeding schedule for different sea creatures. The table shows the daily food requirements:\n\n| Creature | Base Amount (grams) | Per kg of Body Weight (grams) |\n|----------|---------------------|-------------------------------|\n| Seahorse | 2 | 0.5 |\n| Starfish | 3 | 1 |\n| Small octopus | 5 | 2 |\n| Jellyfish | 1 | 0.25 |\n\nThe aquarium has a 3 kg small octopus and a 8 kg starfish. If food costs $0.20 per gram, what is the total daily cost to feed both creatures?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "4e10aa09-f602-4c69-8c05-458b2ae43648",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A telescope observatory tracks the number of celestial objects visible each night. The table shows the observation data for one week:\n\n| Night | Stars | Planets | Satellites |\n|-------|-------|---------|------------|\n| Mon   | 45    | 3       | 2          |\n| Tue   | 52    | 4       | 1          |\n| Wed   | 38    | 2       | 3          |\n| Thu   | 49    | 3       | 2          |\n| Fri   | 41    | 4       | 1          |\n\nHow many stars were observed on Tuesday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "ed5959d0-e8af-47d3-bb3b-5db576833996",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 5,
+        "hasData": true
+      },
+      "question_text": "A plant nursery tracks the number of seedlings planted in different garden beds during spring. The table shows the planting data:\n\n| Garden Bed | Monday | Tuesday | Wednesday | Thursday |\n|------------|--------|---------|-----------|----------|\n| Vegetables | 45     | 38      | 52        | 41       |\n| Flowers    | 32     | 29      | 35        | 38       |\n| Herbs      | 18     | 22      | 19        | 25       |\n\nHow many seedlings in total were planted on Tuesday and Wednesday combined?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "3b41559d-78c7-4cc4-a07a-8b42aa6ad6d2",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A gaming arcade uses tokens for different games. The table shows the token requirements:\n\n| Game Type | Base Tokens | Per Minute |\n|-----------|-------------|------------|\n| Racing | 2 | 3 |\n| Puzzle | 1 | 2 |\n| Adventure | 3 | 4 |\n| Sports | 2 | 2 |\n\nSarah plays a Racing game for 5 minutes and a Puzzle game for 8 minutes. How many tokens does she use in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "aa556f9a-831f-45f5-a7a8-67f72077e4a4",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A robotics club tracks the battery usage of different robots during practice sessions. The table shows the battery consumption:\n\n| Robot Type | Base Usage (%) | Per Minute (%) |\n|------------|----------------|----------------|\n| Explorer   | 5              | 2              |\n| Builder    | 8              | 1.5            |\n| Racer      | 10             | 3              |\n| Helper     | 3              | 1              |\n\nSarah runs an Explorer robot for 12 minutes and a Helper robot for 15 minutes. What is the total battery usage for both robots?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "11b25677-e55f-4623-b1c7-9fe6086d9b34",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 6,
+        "hasData": true
+      },
+      "question_text": "A mobile phone shop tracks the number of accessories sold during a school holiday week. The table shows the sales data:\n\n| Accessory Type | Monday | Tuesday | Wednesday | Thursday | Friday |\n|----------------|--------|---------|-----------|----------|--------|\n| Phone Cases    | 12     | 15      | 18        | 14       | 21     |\n| Screen Protectors | 8   | 10      | 12        | 9        | 15     |\n| Chargers       | 5      | 7       | 9         | 6        | 13     |\n\nHow many phone cases were sold during the entire week?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "40c20612-260d-4625-8f87-030a87316e2a",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A mountain rescue team tracks the equipment weight carried by hikers at different altitudes. The table shows the recommended equipment load:\n\n| Altitude (m) | Base Weight (kg) | Per Person (kg) |\n|--------------|------------------|------------------|\n| 0-500 | 5 | 2 |\n| 501-1000 | 6 | 2.5 |\n| 1001-1500 | 7 | 3 |\n| 1501-2000 | 8 | 3.5 |\n\nA group of 4 hikers is planning to trek at 1200m altitude. What is the total recommended equipment weight for the entire group?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "2d522c73-3a5f-4732-ab8b-6e5fdb4fd881",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A community recycling center tracks the weight of materials collected each day. The table shows the collection data for one week:\n\n| Day | Paper (kg) | Plastic (kg) | Glass (kg) |\n|---------|------------|--------------|------------|\n| Monday | 45 | 28 | 32 |\n| Tuesday | 52 | 31 | 28 |\n| Wednesday | 38 | 25 | 35 |\n| Thursday | 48 | 29 | 30 |\n| Friday | 55 | 33 | 38 |\n\nWhat was the total weight of plastic collected during the week?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "296625ad-17c5-4dcc-b911-c3def1bf4a42",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A cinema tracks the number of tickets sold for different movie sessions during one day. The table shows the ticket sales:\n\n| Session Time | Adult Tickets | Child Tickets |\n|--------------|---------------|---------------|\n| 10:00 AM     | 45            | 38            |\n| 1:00 PM      | 62            | 54            |\n| 4:00 PM      | 58            | 47            |\n| 7:00 PM      | 73            | 29            |\n\nHow many more adult tickets than child tickets were sold during the entire day?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "8ed93682-775e-45d6-84c7-cbfa9c2eb130",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A fruit farm charges different prices for picking fruit depending on the type and season. The table shows the pricing structure:\n\n| Fruit Type | Spring ($/kg) | Summer ($/kg) | Autumn ($/kg) |\n|------------|---------------|---------------|---------------|\n| Strawberries | 8 | 6 | 10 |\n| Apples | 5 | 7 | 4 |\n| Cherries | 12 | 9 | 15 |\n\nSarah visits the farm in summer and picks 3 kg of strawberries and 2.5 kg of cherries. How much does she pay in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "15c10791-ec3c-48c1-92a9-ba16afa98381",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A science club is organizing a field trip to observe different bird species. The table shows the number of birds spotted at three different locations during their visit:\n\n| Location | Parrots | Finches | Doves |\n|----------|---------|---------|-------|\n| Park | 8 | 15 | 12 |\n| Lake | 5 | 22 | 18 |\n| Forest | 11 | 9 | 7 |\n\nThe club wants to create a report showing the total number of each bird type spotted. If they spotted twice as many finches at the Park than initially recorded, what would be the new total number of finches spotted across all three locations?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "4bdf4156-dcfa-4b7d-a2a8-50074563e9e6",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A sports equipment store tracks the number of tennis balls sold in different container types. The table shows the sales for one day:\n\n| Container Type | Number Sold | Balls per Container |\n|----------------|-------------|---------------------|\n| Single can     | 12          | 3                   |\n| Double can     | 8           | 6                   |\n| Bucket         | 5           | 24                  |\n\nHow many tennis balls in total were sold that day?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "7863ec86-2d4e-4eb1-9ed3-e49dca3268fa",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A museum shop sells souvenir postcards in different pack sizes. The table shows the pricing:\n\n| Pack Size | Number of Postcards | Price |\n|-----------|---------------------|-------|\n| Small | 5 | $3 |\n| Medium | 12 | $6 |\n| Large | 20 | $9 |\n| Family | 30 | $12 |\n\nSarah buys one Medium pack. How much money does she spend per postcard?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "987c40ba-bcb4-4f3a-ab2e-685b35c8d621",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A botanical garden charges different entry fees based on age and day of the week. The table shows the pricing structure:\n\n| Visitor Type | Weekday Fee | Weekend Fee |\n|--------------|-------------|-------------|\n| Child (5-12) | $8 | $12 |\n| Teen (13-17) | $12 | $18 |\n| Adult (18+) | $15 | $22 |\n| Senior (65+) | $10 | $15 |\n\nA family visits on Saturday with 2 children aged 7 and 10, 1 teen aged 15, and 2 adults. What is their total entry cost?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "1c7f129c-dd17-45d1-951b-b70453733f3c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A weather station records rainfall data for different months. The table shows the average rainfall (in mm) and number of rainy days:\n\n| Month | Rainfall (mm) | Rainy Days |\n|-------|---------------|------------|\n| March | 120 | 8 |\n| April | 90 | 6 |\n| May | 150 | 10 |\n| June | 75 | 5 |\n\nWhat is the average rainfall per rainy day in April and June combined?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "d3157891-d7e6-4b39-bed2-4e29858157be",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A nature park records the number of visitors who visit different attractions. The table shows the visitor counts for one Saturday:\n\n| Attraction | Morning | Afternoon |\n|------------|---------|----------|\n| Bird House | 45 | 62 |\n| Reptile Zone | 38 | 51 |\n| Butterfly Garden | 53 | 47 |\n| Aquarium | 67 | 74 |\n\nHow many visitors went to the Butterfly Garden on this Saturday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "2d814c97-4f6a-4c86-b291-bebb22f57345",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A school canteen tracks the number of sandwiches sold during lunch breaks. The table shows the sales for one week:\n\n| Day | Cheese | Ham | Salad |\n|---------|--------|-----|-------|\n| Monday | 12 | 18 | 8 |\n| Tuesday | 15 | 16 | 10 |\n| Wednesday | 14 | 20 | 9 |\n| Thursday | 11 | 17 | 12 |\n| Friday | 16 | 22 | 11 |\n\nHow many sandwiches were sold on Wednesday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "13851b57-8cf7-4892-86aa-ca07915fa3ef",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A bakery tracks the number of pastries sold during a weekend. The table shows the sales data:\n\n| Pastry Type | Saturday | Sunday |\n|-------------|----------|--------|\n| Croissants  | 45       | 38     |\n| Muffins     | 52       | 47     |\n| Danishes    | 28       | 35     |\n| Scones      | 31       | 29     |\n\nEach croissant costs $4.50 and each Danish costs $5.00. What was the total revenue from croissants and Danishes sold across both days?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "cf4a33e9-27a7-4618-892b-91c480d630f4",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A swimming coach records the training times for her squad. The table shows the weekly training hours for different age groups:\n\n| Age Group | Pool Hours | Gym Hours | Total Sessions |\n|-----------|------------|-----------|----------------|\n| 8-9 years | 3 | 1 | 4 |\n| 10-11 years | 4.5 | 1.5 | 5 |\n| 12-13 years | 6 | 2 | 6 |\n| 14-15 years | 7.5 | 2.5 | 7 |\n\nSarah is in the 10-11 years age group and trains for 8 weeks. What is the total number of hours (pool and gym combined) that Sarah spends training over this period?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "856487d3-fbe3-477d-9218-67d92a6a6e17",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A library tracks the number of books borrowed by students each day. The table shows the borrowing data for one week:\n\n| Day | Fiction | Non-Fiction | Total |\n|---------|---------|-------------|-------|\n| Monday | 12 | 8 | 20 |\n| Tuesday | 15 | 10 | 25 |\n| Wednesday | 18 | 7 | 25 |\n| Thursday | 14 | 11 | 25 |\n| Friday | 20 | 15 | 35 |\n\nHow many more Fiction books than Non-Fiction books were borrowed during the entire week?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "7aacefe5-e870-4379-9cb6-98cc874d3666",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "A toy store tracks the number of building block sets sold over four weeks. The table shows the sales data:\n\n| Week | Small Sets | Medium Sets | Large Sets |\n|------|------------|-------------|------------|\n| 1    | 12         | 8           | 5          |\n| 2    | 15         | 10          | 4          |\n| 3    | 10         | 12          | 6          |\n| 4    | 18         | 9           | 7          |\n\nHow many medium sets were sold in total across all four weeks?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "64e082b0-547c-4722-b283-f1fc4012b94c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "A swimming pool uses different amounts of chlorine tablets based on pool size and water temperature. The table shows the daily tablet requirements:\n\n| Pool Size | Base Tablets | Per 10°C above 20°C |\n|-----------|--------------|---------------------|\n| Small | 2 | 1 |\n| Medium | 3 | 1.5 |\n| Large | 4 | 2 |\n\nA medium pool has a water temperature of 30°C. How many tablets are needed for 5 days?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "504760ad-1ba2-41c3-9c2d-788d63363950",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of eggs collected from a chicken farm over 5 days:\n\nDay | Eggs Collected\nMonday | 24\nTuesday | 30\nWednesday | 27\nThursday | 30\nFriday | 19\n\nWhat is the mode of the number of eggs collected?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "ab588e7e-26c4-4469-89a7-41f549966807",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of apps downloaded from different categories on a smartphone during one week:\n\nCategory | Downloads\nGames    | 15\nEducation| 8\nMusic    | 12\nSports   | 5\n\nHow many apps were downloaded in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "8b292c14-52aa-4607-a1b7-ff2a320052c8",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of books borrowed from a library over three months:\n\nBook Type | January | February | March\nFiction   | 156     | 132      | 168\nNon-fiction | 84    | 96       | 72\nBiography | 48      | 60       | 54\n\nWhat percentage of the total books borrowed in February were Fiction books?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "2c28a26d-5542-4934-99b7-0fc0280a60bf",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of sea creatures spotted during a diving expedition:\n\nSea Creature | Number Spotted\nDolphins      | 8\nSea Turtles   | 15\nStingrays     | 12\nOctopuses     | 6\n\nWhat fraction of the total sea creatures spotted were dolphins?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "37a10aaf-089f-4998-854a-b01a858dd99a",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of pizzas sold by a restaurant on different days:\n\nDay       | Pizzas Sold\nMonday    | 32\nTuesday   | 28\nWednesday | 45\nThursday  | 38\n\nHow many pizzas were sold on Monday and Thursday combined?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "c62cb9bc-c692-4d8c-9481-1d9fc2df260e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of vehicles that passed through a toll booth during peak and off-peak hours:\n\nVehicle Type | Peak Hours | Off-Peak Hours\nCars         | 240        | 180\nTrucks       | 45         | 30\nMotorcycles  | 60         | 45\nBuses        | 15         | 10\n\nWhat percentage of the total vehicles during peak hours were either trucks or buses?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "f056762d-0f57-44db-8265-d208d34a1d1d",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of birds observed at a wildlife sanctuary over a weekend:\n\nBird Type | Saturday | Sunday\nParrots   | 28       | 35\nCockatoos | 42       | 38\nKookaburras| 15      | 22\nRosellas  | 31       | 27\n\nOn which day were more birds observed in total, and by how many?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "08493f42-8786-40b5-9a04-49e21bb7aed7",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of points earned by five teams in a robotics competition across three rounds:\n\nTeam    | Round 1 | Round 2 | Round 3\nAlpha   | 85      | 92      | 78\nBeta    | 76      | 88      | 95\nGamma   | 90      | 85      | 82\nDelta   | 82      | 79      | 91\nEpsilon | 88      | 90      | 84\n\nWhich team had the greatest improvement from their lowest round score to their highest round score?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "8eedcf76-6338-44f1-9402-848ccbe6a46e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of trees planted by different community groups during an environmental project:\n\nGroup        | Trees Planted\nGreen Team   | 84\nEco Warriors | 96\nNature Club  | 72\nTree Lovers  | 108\n\nThe groups decided to redistribute the trees so that each group plants an equal number. After redistribution, how many more trees will the Nature Club need to plant compared to what they originally had?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "866758e4-2251-49d8-beed-d1828cd11693",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of hours spent on different activities by students during a school camp:\n\nActivity | Hours\nHiking | 8\nSwimming | 5\nCrafts | 6\nSports | 9\nCampfire | 4\n\nIf the total time available was 40 hours and the remaining time was spent on meals and rest, what percentage of the total time was spent on meals and rest?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "6f64c5b9-307a-4364-956c-dc1ad8878adb",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of medals won by different countries at a swimming competition:\n\nCountry    | Gold | Silver | Bronze\nAustralia  | 8    | 6      | 5\nJapan      | 5    | 7      | 9\nUSA        | 10   | 4      | 6\nCanada     | 3    | 8      | 4\n\nWhich country won the greatest total number of medals?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "45013fe1-8fa3-4c2e-99a5-4261e5eecc57",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of stamps collected by five friends:\n\nFriend | Stamps\nJason  | 24\nKeiko  | 36\nLiam   | 18\nMia    | 30\nNina   | 27\n\nHow many stamps do Jason and Liam have together?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "b3695b6b-0e05-4f9f-8d0b-cc3c5d694694",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the temperature (°C) recorded at a weather station at different times during one day:\n\nTime        | Temperature (°C)\n6:00 AM     | 8\n9:00 AM     | 14\n12:00 PM    | 22\n3:00 PM     | 26\n6:00 PM     | 18\n9:00 PM     | 12\n\nWhat was the mean temperature increase per hour between 6:00 AM and 3:00 PM?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "f08bb89a-eaba-4756-8feb-5ede70d1db5a",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of goals scored by five soccer players during a tournament:\n\nPlayer   | Goals Scored\nEmma     | 7\nFinn     | 5\nGrace    | 9\nHenry    | 6\nIsla     | 8\n\nWhat fraction of the total goals were scored by Grace?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9955962f-f1cd-4a7a-8abd-1e9433247e82",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of shells collected by four students during a beach excursion:\n\nStudent | Shells Collected\nAisha   | 17\nBen     | 23\nChloe   | 19\nDaniel  | 25\n\nHow many shells did Aisha and Chloe collect together?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "0c06226b-e793-4661-90e8-6f21fb1dcc7c",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of coins in Emma's collection:\n\nCoin Type | Number\n5 cent    | 28\n10 cent   | 42\n20 cent   | 35\n50 cent   | 15\n\nHow many coins does Emma have in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "3482da05-eb70-4f2a-a005-540a5c9e6f68",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of hours different students spent on homework during one week:\n\nStudent | Hours\nOliver  | 8\nPriya   | 12\nQuinn   | 9\nRyan    | 15\nSofia   | 11\n\nWhat is the difference between the total hours spent by the three students who studied the most and the total hours spent by the two students who studied the least?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "02a557d4-d0b2-4915-a50c-fd00f897b2bd",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 5,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of trees planted in a community garden over four seasons:\n\nTree Type | Spring | Summer | Autumn | Winter\nOak       | 15     | 8      | 12     | 6\nMaple     | 18     | 10     | 9      | 5\nPine      | 12     | 14     | 11     | 8\n\nWhat fraction of all the trees planted were Maple trees?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "926dfedc-c0a0-42b1-853e-19abf4ee07fd",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of gemstones collected by a geology museum from three different regions:\n\nRegion | Emeralds | Sapphires | Rubies\nNorth  | 24       | 36        | 18\nSouth  | 32       | 28        | 22\nEast   | 16       | 44        | 26\n\nWhat percentage of the total sapphires collected came from the East region?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9d82e72e-d7d4-4b43-85fe-9bbcdff7be8f",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of visitors to a museum over four days:\n\nDay       | Visitors\nMonday    | 145\nTuesday   | 178\nWednesday | 162\nThursday  | 195\n\nHow many visitors came to the museum on Tuesday and Wednesday combined?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "6385f45e-da03-44f0-98bc-c47fcc735397",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of instruments played by students in a school orchestra:\n\nInstrument | Number of Students\nViolin     | 28\nFlute      | 16\nClarinet   | 12\nTrumpet    | 20\nCello      | 14\n\nWhat fraction of the students play either violin or trumpet?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "99cb2698-6a34-41de-a72d-86ce8a2a9029",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of minerals extracted from three mines during a month:\n\nMine      | Iron (tonnes) | Copper (tonnes) | Gold (kg)\nNorthern  | 450          | 280            | 12\nEastern   | 520          | 195            | 18\nWestern   | 380          | 315            | 15\n\nWhat is the total mass of copper extracted from the mine that produced the least iron?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "47e437f9-6656-4d27-89b2-5bc2455c712b",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of fish caught by three fishing boats during one week:\n\nBoat       | Snapper | Tuna | Mackerel\nBlue Wave  | 45      | 28   | 36\nSea Breeze | 52      | 35   | 29\nOcean Star | 38      | 41   | 33\n\nWhat percentage of the total fish caught by Blue Wave were Snapper?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "447f03fc-c08d-4509-9097-3579146edc8e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of pastries sold by a bakery over three days:\n\nPastry Type | Thursday | Friday | Saturday\nCroissants  | 45       | 52     | 68\nMuffins     | 38       | 41     | 55\nDanish      | 27       | 33     | 42\n\nOn which day was the total number of pastries sold exactly 126?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "4dae0b14-22c7-4258-bfef-d62aceea51ba",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of flowers sold by a florist on Saturday:\n\nFlower Type | Number Sold\nRoses       | 28\nTulips      | 35\nDaisies     | 22\nLilies      | 19\n\nHow many flowers were sold in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "d2b4f37a-351a-4f9c-8fc0-71af31045bcb",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of sandwiches sold by a café during lunch service:\n\nSandwich Type | Number Sold\nChicken       | 28\nVegetarian    | 15\nTuna          | 22\nHam           | 19\n\nIf the café made a profit of $3 on each sandwich sold, what was the total profit from all sandwiches?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "b8d39fdb-8db7-45a8-8eda-43f43b4a009e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 4,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of visitors to a museum on different days and their ticket types:\n\nDay       | Adult | Child | Senior\nMonday    | 45    | 28    | 17\nTuesday   | 52    | 35    | 21\nWednesday | 38    | 42    | 19\n\nIf adult tickets cost $15, child tickets cost $8, and senior tickets cost $10, what was the total revenue collected on Tuesday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "3a328cbf-0dd2-42f3-99e1-38504e590daa",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of goals scored by players in a soccer tournament:\n\nPlayer | Goals in Group Stage | Goals in Finals\nEmma   | 5                    | 3\nJake   | 4                    | 2\nSofia  | 6                    | 4\nLiam   | 3                    | 1\n\nWhat percentage of the total goals were scored during the Finals stage?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "3503d105-f340-40ac-a1fd-075042c8b7dc",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the temperature (in °C) recorded at a weather station at different times during one day:\n\nTime        | Temperature (°C)\n6:00 AM     | 8\n9:00 AM     | 14\n12:00 PM    | 22\n3:00 PM     | 26\n6:00 PM     | 18\n9:00 PM     | 12\n\nWhat was the mean temperature increase per 3-hour period from 6:00 AM to 3:00 PM?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "40e25ea8-3f6c-4818-98ff-dc39c4bae4f4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of medals won by different countries at a swimming competition:\n\n| Country   | Gold | Silver | Bronze |\n|-----------|------|--------|--------|\n| Australia | 12   | 8      | 6      |\n| Japan     | 9    | 11     | 7      |\n| Canada    | 7    | 6      | 10     |\n\nHow many medals in total did Japan win?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "a2e48daa-1869-4f53-8f25-2491f001277a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of passengers on different flights departing from an airport:\n\n| Flight | Passengers |\n|--------|------------|\n| FL101  | 145        |\n| FL202  | 178        |\n| FL303  | 162        |\n| FL404  | 155        |\n\nHow many more passengers were on flight FL202 than on flight FL101?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "dd8aff52-0405-499c-8522-9315dbc2d957",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of vehicles that crossed a bridge during morning peak hour:\n\n| Vehicle Type | Number |\n|--------------|--------|\n| Cars         | 245    |\n| Motorcycles  | 68     |\n| Buses        | 32     |\n| Trucks       | 45     |\n\nIf motorcycles and buses together represent what percentage of the total vehicles, what is the answer (rounded to the nearest whole number)?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9cfbb542-5e35-42e0-8d0b-7e3dacbd321f",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 5,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of books borrowed from a library by different age groups during one month:\n\n| Age Group | Week 1 | Week 2 | Week 3 | Week 4 |\n|-----------|--------|--------|--------|--------|\n| Children  | 45     | 52     | 48     | 55     |\n| Teens     | 38     | 41     | 39     | 46     |\n| Adults    | 67     | 71     | 69     | 73     |\n\nIf the library charges a processing fee of $0.50 per book borrowed, what was the total processing fee collected from the Teens age group for the entire month?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9358134e-b8c4-41d0-b626-979173acf81f",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of sandwiches sold at a café during lunch service:\n\n| Sandwich Type | Number Sold |\n|---------------|-------------|\n| Chicken       | 34          |\n| Vegetarian    | 28          |\n| Ham           | 41          |\n| Tuna          | 22          |\n\nHow many more Ham sandwiches than Tuna sandwiches were sold?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "ba916cf1-69cc-48f5-8958-d185f2628d7c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of photographs taken by a wildlife photographer during a safari expedition:\n\n| Animal Type | Morning | Afternoon | Evening |\n|-------------|---------|-----------|----------|\n| Lions       | 12      | 8         | 15       |\n| Elephants   | 18      | 22        | 10       |\n| Zebras      | 25      | 19        | 14       |\n\nHow many more photographs were taken in the morning than in the evening?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "0ad4d875-4679-409a-89e6-8a54fab71a9a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of fish caught by three anglers during a fishing competition:\n\n| Angler | Trout | Salmon | Bass |\n|--------|-------|--------|------|\n| Jack   | 12    | 8      | 15   |\n| Maya   | 10    | 14     | 11   |\n| Ryan   | 16    | 9      | 13   |\n\nWhat is the total number of Salmon caught by all three anglers?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "610a295f-0a23-4a9e-aa12-e9ce7844050d",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of cookies baked by a bakery on Wednesday:\n\nCookie Type | Number Baked\nChocolate Chip | 145\nOatmeal Raisin | 98\nPeanut Butter | 112\nShortbread | 85\n\nHow many cookies were baked in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "5fbcc74c-3fc3-4e1a-a350-4d15bd8f8890",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of tickets sold at a theme park on Sunday:\n\n| Ticket Type | Number Sold |\n|-------------|-------------|\n| Child       | 342         |\n| Adult       | 428         |\n| Senior      | 156         |\n| Family Pass | 89          |\n\nIf each Family Pass admits 4 people, how many individual people entered the theme park on Sunday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "94035882-6b42-4b57-a538-52ff02728661",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of coins collected by a numismatist over three months:\n\n| Coin Type | March | April | May |\n|-----------|-------|-------|-----|\n| Bronze    | 12    | 15    | 18  |\n| Silver    | 8     | 10    | 14  |\n| Gold      | 3     | 5     | 7   |\n\nWhat was the total number of silver and gold coins collected across all three months?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "c67c273d-9faf-470c-90f3-70dae37b7b87",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of visitors to a science museum over four days:\n\nDay       | Visitors\nThursday  | 245\nFriday    | 318\nSaturday  | 492\nSunday    | 385\n\nHow many more visitors attended on the weekend (Saturday and Sunday combined) than on the weekdays (Thursday and Friday combined)?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "8c83d859-587d-49e5-bdb5-0f7b2598e1bf",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The line graph shows the temperature recorded at a weather station over 6 hours:\n\nTime    | Temperature (°C)\n8:00 AM | 12\n9:00 AM | 15\n10:00 AM| 18\n11:00 AM| 22\n12:00 PM| 25\n1:00 PM | 23\n\nBetween which two consecutive hours was the rate of temperature change the greatest?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "72fd215d-23af-462e-befc-655daf982d98",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of trees planted in a community park:\n\nTree Type | Number Planted\nOak       | 24\nMaple     | 36\nPine      | 18\nBirch     | 30\n\nWhat percentage of the total trees planted were Maple trees?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "bf04100b-8a4a-4cc8-8552-75f04f4d6562",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of pages read by four students during a reading challenge:\n\nStudent | Pages Read\nOlivia  | 156\nJack    | 142\nMia     | 168\nNoah    | 134\n\nHow many more pages did Mia read than Noah?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "fe304916-4d7e-497d-9dc9-b80691b22baa",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of goals scored by five soccer players during a tournament:\n\nPlayer | Goals\nLiam   | 7\nSofia  | 5\nJake   | 9\nMia    | 6\nOliver | 3\n\nHow many more goals did Jake score than Sofia?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "6156079d-07fb-4dcd-9a64-362018bb802d",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_1",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of birds spotted during a nature walk:\n\nBird Type | Number Spotted\nSparrow   | 12\nRobin     | 8\nMagpie    | 5\nParrot    | 3\n\nHow many more sparrows than parrots were spotted?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "10869dcb-7fdb-4b63-8cc7-f6605c4d6157",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of medals won by different countries at a swimming championship:\n\nCountry   | Gold | Silver | Bronze\nAustralia | 12   | 8      | 6\nJapan     | 9    | 11     | 7\nUSA       | 15   | 10     | 9\nCanada    | 6    | 9      | 8\n\nWhich country won the greatest total number of medals?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "6a07e587-3d1e-4145-a6da-c086b4fbd294",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of books borrowed from a library during one week:\n\nBook Type | Number Borrowed\nFiction   | 156\nNon-fiction | 84\nBiography | 72\nScience   | 48\n\nWhat percentage of the total borrowed books were Fiction books?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "ccc6bb14-3d23-441d-a0ee-6d022f07ca6e",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of fruits sold at a market stall on Monday:\n\nFruit Type | Number Sold\nApples     | 42\nOranges    | 38\nBananas    | 55\nGrapes     | 29\n\nHow many more bananas than grapes were sold?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9de3109a-d5b9-4814-bd5e-eaa2442f737a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of vehicles that passed through a toll booth in one hour:\n\nVehicle Type | Number\nCars         | 45\nTrucks       | 18\nMotorcycles  | 12\nBuses        | 5\n\nHow many more cars than trucks passed through the toll booth?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "938b5983-e754-4a45-bb88-7180fdd1d6c4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of items recycled by a school over three months:\n\n| Material  | January | February | March |\n|-----------|---------|----------|-------|\n| Paper     | 145 kg  | 168 kg   | 152 kg|\n| Plastic   | 87 kg   | 95 kg    | 103 kg|\n| Glass     | 62 kg   | 58 kg    | 70 kg |\n| Metal     | 34 kg   | 41 kg    | 37 kg |\n\nWhat percentage of the total recycled materials in February was plastic? (Round to the nearest whole number)",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "7c0ed87b-6620-40e5-b2ed-cd7ca4baf6d1",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_2",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of sandwiches sold at a café on Saturday:\n\n| Sandwich Type | Number Sold |\n|---------------|-------------|\n| Chicken       | 34          |\n| Vegetarian    | 28          |\n| Tuna          | 19          |\n| Ham           | 23          |\n\nHow many more Chicken sandwiches were sold than Tuna sandwiches?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "095cb1ef-ddb0-44fc-8a70-ed1f9eb8337c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of stamps collected by three friends:\n\n| Collector | Animal Stamps | Flower Stamps | Space Stamps |\n|-----------|---------------|---------------|-------------|\n| Hassan    | 24            | 18            | 12          |\n| Priya     | 15            | 22            | 19          |\n| Tom       | 31            | 14            | 16          |\n\nHow many stamps does Hassan have in total?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "e2ee59fe-3583-4382-93dc-3b898e69d8d7",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of customers who visited a cinema on different days of the week:\n\n| Day       | Customers |\n|-----------|----------|\n| Monday    | 145      |\n| Tuesday   | 128      |\n| Wednesday | 156      |\n| Thursday  | 142      |\n| Friday    | 189      |\n\nHow many more customers visited on Friday than on Tuesday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "771dfb62-8d8f-4a37-96b9-7d7984df1304",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of drinks sold at a school canteen during lunchtime:\n\n| Drink Type | Number Sold |\n|------------|-------------|\n| Water      | 45          |\n| Juice      | 32          |\n| Milk       | 28          |\n\nHow many more bottles of water were sold than milk?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "802eddca-fa8f-4f1c-87a2-faa4ecf9e1d8",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of marine animals observed during three diving expeditions:\n\n| Animal Type | Expedition 1 | Expedition 2 | Expedition 3 |\n|-------------|--------------|--------------|-------------|\n| Dolphins    | 8            | 12           | 6           |\n| Turtles     | 15           | 9            | 18          |\n| Sharks      | 3            | 5            | 7           |\n| Rays        | 11           | 14           | 10          |\n\nWhat is the ratio of the total number of Dolphins observed across all expeditions to the total number of Sharks observed across all expeditions?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "e120236e-e9d9-4f14-9316-8702322f17cc",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of plants sold at a garden centre over three days:\n\n| Plant Type | Thursday | Friday | Saturday |\n|------------|----------|--------|----------|\n| Roses      | 24       | 30     | 36       |\n| Tulips     | 18       | 22     | 28       |\n| Daisies    | 12       | 15     | 18       |\n\nWhat was the total number of Roses and Tulips sold on Friday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "9732a589-b842-41c8-907e-d93e1f629ff5",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 5,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of musical instruments rented from a music store over four weeks:\n\n| Instrument | Week 1 | Week 2 | Week 3 | Week 4 |\n|------------|--------|--------|--------|--------|\n| Guitar     | 12     | 15     | 18     | 13     |\n| Piano      | 8      | 10     | 9      | 11     |\n| Violin     | 6      | 7      | 8      | 9      |\n| Drums      | 5      | 6      | 7      | 6      |\n\nWhat was the percentage increase in total rentals from Week 1 to Week 3?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "48c0e822-1fa8-49c6-a980-063088a3ca7b",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_3",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of emails received by an office worker on different days:\n\n| Day       | Emails |\n|-----------|--------|\n| Monday    | 34     |\n| Tuesday   | 28     |\n| Wednesday | 41     |\n| Thursday  | 35     |\n\nHow many more emails were received on Wednesday than on Tuesday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "83c4cb63-c95e-4fd1-9ed9-96d273045e56",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of apps downloaded from a digital store over three days:\n\n| App Type | Monday | Tuesday | Wednesday |\n|----------|--------|---------|----------|\n| Games    | 45     | 52      | 38       |\n| Education| 28     | 35      | 42       |\n| Music    | 33     | 29      | 31       |\n\nWhat is the total number of Education apps downloaded over the three days?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "6b695ecb-157d-4fd9-ba98-1ba7dd40019c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of visitors to a museum on different days and their ticket types:\n\n| Day       | Adult Tickets | Child Tickets | Senior Tickets |\n|-----------|---------------|---------------|----------------|\n| Thursday  | 45            | 32            | 18             |\n| Friday    | 52            | 28            | 22             |\n| Saturday  | 78            | 64            | 31             |\n| Sunday    | 71            | 58            | 26             |\n\nIf adult tickets cost $15, child tickets cost $8, and senior tickets cost $10, what was the total revenue collected on Saturday?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "cbacf8c8-b8ec-4733-890b-72da1c9fef09",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the temperature recorded at different times during a school day:\n\n| Time  | Temperature (°C) |\n|-------|------------------|\n| 9 am  | 16               |\n| 11 am | 22               |\n| 1 pm  | 25               |\n| 3 pm  | 23               |\n\nWhat was the difference between the highest and lowest temperatures recorded?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "5112a7de-1b29-410b-8ee9-3219fb9cdace",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of points scored by a basketball team in each quarter of a game:\n\n| Quarter | Points Scored |\n|---------|---------------|\n| 1st     | 18            |\n| 2nd     | 24            |\n| 3rd     | 15            |\n| 4th     | 27            |\n\nIf the opposing team scored 79 points in total, by how many points did this team win or lose the game?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "8c25092c-a619-4153-bc1d-58a199b7f592",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 3,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of trees planted in a park over two years:\n\n| Tree Type | 2022 | 2023 |\n|-----------|------|------|\n| Oak       | 45   | 38   |\n| Maple     | 32   | 41   |\n| Pine      | 28   | 35   |\n\nHow many trees in total were planted in 2023?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "b538148d-27da-4b1b-af9c-3bcefd206db5",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_4",
+      "tableInfo": {
+        "rows": 7,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of goals scored by a soccer team in five matches:\n\n| Match | Goals Scored |\n|-------|-------------|\n| 1     | 3           |\n| 2     | 1           |\n| 3     | 4           |\n| 4     | 2           |\n| 5     | 5           |\n\nHow many goals did the team score in total across all five matches?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "39a2b9d9-1670-4d5d-8b2c-6c3ae183af72",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "practice_5",
+      "tableInfo": {
+        "rows": 6,
+        "cols": 2,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of hours different students spent on homework during one week:\n\n| Student | Hours |\n|---------|-------|\n| Lucas   | 8     |\n| Maya    | 12    |\n| Noah    | 10    |\n| Olivia  | 14    |\n\nHow many more hours did Olivia spend on homework than Lucas?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "ba233091-260e-4ec9-8b87-c9908c42b141",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 4,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of birds observed at a nature reserve during three seasons:\n\n| Bird Type | Spring | Summer | Autumn |\n|-----------|--------|--------|--------|\n| Parrots   | 45     | 38     | 52     |\n| Cockatoos | 62     | 71     | 58     |\n| Finches   | 33     | 29     | 41     |\n\nHow many more Cockatoos than Finches were observed across all three seasons combined?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    },
+    {
+      "id": "80bcb247-da53-4de7-80f4-e7a34606de40",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "test_mode": "diagnostic",
+      "tableInfo": {
+        "rows": 5,
+        "cols": 5,
+        "hasData": true
+      },
+      "question_text": "The table shows the number of different types of fossils discovered at an archaeological site during four excavation periods:\n\n| Fossil Type | Period 1 | Period 2 | Period 3 | Period 4 |\n|-------------|----------|----------|----------|----------|\n| Trilobites  | 24       | 18       | 30       | 22       |\n| Ammonites   | 16       | 25       | 20       | 19       |\n| Brachiopods | 12       | 15       | 18       | 15       |\n\nIn which period was the total number of fossils discovered exactly 25% more than the total discovered in Period 1?",
+      "currentSVG": "Has SVG (will be replaced)",
+      "actionPlan": "Parse markdown table from question_text and render as HTML"
+    }
+  ]
+}

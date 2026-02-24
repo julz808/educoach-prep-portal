@@ -688,6 +688,7 @@ export interface DiagnosticResults {
     questionsTotal: number;
     questionsAttempted: number;
     accuracy: number;
+    completed?: boolean;
   }[];
   strengths: {
     subSkill: string;
@@ -707,6 +708,11 @@ export interface DiagnosticResults {
     questionsCorrect: number;
     sectionName: string;
   }[];
+  // Partial completion tracking
+  isPartiallyComplete?: boolean;
+  completedSections?: string[];
+  missingSections?: string[];
+  totalSections?: number;
 }
 
 export interface PracticeTestResults {
@@ -737,6 +743,11 @@ export interface PracticeTestResults {
       questionsAttempted: number;
       accuracy: number;
     }[];
+    // Partial completion tracking
+    isPartiallyComplete?: boolean;
+    completedSections?: string[];
+    missingSections?: string[];
+    totalSections?: number;
   }[];
   progressOverTime: {
     testNumber: number;
@@ -1091,19 +1102,31 @@ export class AnalyticsService {
         return null;
       }
 
-      // Check if ALL diagnostic sections are completed before showing insights
+      // Check section completion status - now allowing partial results!
       const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
       const completedSectionNames = diagnosticSessions.map(s => s.section_name);
       const missingSections = expectedSections.filter(section => !completedSectionNames.includes(section));
-      
-      if (missingSections.length > 0) {
-        console.log(`ℹ️ Diagnostic insights not available - missing ${missingSections.length} sections: ${missingSections.join(', ')}`);
-        return null;
-      }
-      
+      const isPartiallyComplete = completedSectionNames.length > 0 && missingSections.length > 0;
+
+      console.log('🔍 Diagnostic Section Completion Check:', {
+        productType,
+        expectedSections,
+        completedSectionNames,
+        missingSections,
+        isPartiallyComplete,
+        allCompleted: missingSections.length === 0
+      });
+
       if (diagnosticSessions.length === 0) {
         console.log('ℹ️ No completed diagnostic sections found');
         return null;
+      }
+
+      // Now we show insights even if only partial sections are complete
+      if (isPartiallyComplete) {
+        console.log(`✨ Showing partial diagnostic insights - ${completedSectionNames.length}/${expectedSections.length} sections completed`);
+        console.log(`✅ Completed sections:`, completedSectionNames);
+        console.log(`⏳ Remaining sections:`, missingSections);
       }
 
       // COMPLETELY REBUILD sub-skill performance calculation
@@ -1635,16 +1658,42 @@ export class AnalyticsService {
       const weaknesses = sortedSkills.slice(-5).reverse(); // Bottom 5 performing sub-skills, reversed to show worst first
       const allSubSkills = sortedSkills; // All sub-skills for comprehensive display
 
+      // Add incomplete sections to sectionBreakdown with completed: false flag
+      const completeSectionBreakdown = [...sectionBreakdown];
+      if (missingSections.length > 0) {
+        missingSections.forEach(missingSection => {
+          completeSectionBreakdown.push({
+            sectionName: missingSection,
+            score: 0,
+            questionsCorrect: 0,
+            questionsTotal: 0,
+            questionsAttempted: 0,
+            accuracy: 0,
+            completed: false
+          });
+        });
+      } else {
+        // Mark all sections as completed
+        completeSectionBreakdown.forEach(section => {
+          (section as any).completed = true;
+        });
+      }
+
       return {
         overallScore,
         totalQuestionsCorrect: totalCorrect,
         totalQuestions,
         totalQuestionsAttempted,
         overallAccuracy,
-        sectionBreakdown,
+        sectionBreakdown: completeSectionBreakdown,
         strengths,
         weaknesses,
         allSubSkills, // Include all sub-skills for comprehensive display
+        // Partial completion tracking
+        isPartiallyComplete,
+        completedSections: completedSectionNames,
+        missingSections,
+        totalSections: expectedSections.length,
       };
 
     } catch (error) {
@@ -1828,14 +1877,15 @@ export class AnalyticsService {
         let aggregatedTestData = null;
         
         if (testSessions.length > 0) {
-          // Check if ALL sections of this practice test are completed
+          // Check section completion status - now allowing partial results!
           const expectedSections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
           const completedSectionsForThisTest = testSessions.map(s => s.section_name);
           const missingSectionsForThisTest = expectedSections.filter(section => !completedSectionsForThisTest.includes(section));
-          
-          if (missingSectionsForThisTest.length > 0) {
-            console.log(`ℹ️ Test ${i} insights not available - missing ${missingSectionsForThisTest.length} sections: ${missingSectionsForThisTest.join(', ')}`);
-            continue;
+          const isPartiallyComplete = completedSectionsForThisTest.length > 0 && missingSectionsForThisTest.length > 0;
+
+          // Now we show insights even if only partial sections are complete
+          if (isPartiallyComplete) {
+            console.log(`✨ Showing partial practice test ${i} insights - ${completedSectionsForThisTest.length}/${expectedSections.length} sections completed`);
           }
           
           // Process sub-skills using DIAGNOSTIC APPROACH
@@ -2018,7 +2068,12 @@ export class AnalyticsService {
             questionsCorrect: totalQuestionsCorrect,
             overallAccuracy: overallAccuracy,
             totalMaxPoints: totalQuestions, // Use totalQuestions as totalMaxPoints for consistency
-            totalEarnedPoints: totalQuestionsCorrect
+            totalEarnedPoints: totalQuestionsCorrect,
+            // Partial completion tracking
+            isPartiallyComplete,
+            completedSections: completedSectionsForThisTest,
+            missingSections: missingSectionsForThisTest,
+            totalSections: expectedSections.length,
           };
           
           } else {

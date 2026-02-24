@@ -24,9 +24,16 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     },
-    "Numeracy": {
-      "questions": 50,
-      "time": 50,
+    "Numeracy No Calculator": {
+      "questions": 25,
+      "time": 25,
+      "format": "Multiple Choice",
+      "passages": 0,
+      "words_per_passage": 0
+    },
+    "Numeracy Calculator": {
+      "questions": 25,
+      "time": 25,
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0

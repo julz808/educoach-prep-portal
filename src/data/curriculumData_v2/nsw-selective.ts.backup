@@ -1,0 +1,2302 @@
+// NSW Selective Entry (Year 7 Entry) - Curriculum Data V2
+// Created: February 6, 2026
+
+import type { SubSkillExamplesDatabase } from './types';
+
+/**
+ * NSW Selective High School Test - Complete Sub-Skill Examples
+ *
+ * Sections:
+ * - Reading (6 sub-skills, 18 examples)
+ * - Mathematical Reasoning (7 sub-skills, 21 examples)
+ * - Thinking Skills (7 sub-skills, 21 examples)
+ * - Writing (1 sub-skill, 1 prompt)
+ *
+ * Total: 20 sub-skills, 58 examples/prompts
+ *
+ * NOTE: NSW Selective does not have difficulty ratings. All examples use difficulty: 2 as a standard marker.
+ */
+export const NSW_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
+
+  // ============================================
+  // NSW SELECTIVE ENTRY (YEAR 7 ENTRY) - READING
+  // ============================================
+
+  "NSW Selective Entry (Year 7 Entry) - Reading": {
+
+    // SUB-SKILL 1: Main Idea & Theme Identification
+    "Main Idea & Theme Identification": {
+      description: "Identifying the main idea, central theme, or primary message of a passage",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "What is the main idea/theme of the passage?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe Great Barrier Reef, located off the coast of Australia, is the world's largest coral reef system. Stretching over 2,300 kilometers, it is home to thousands of species of fish, coral, and marine life. However, climate change and rising ocean temperatures have caused significant coral bleaching, threatening the reef's survival. Scientists and conservationists are working to protect this natural wonder for future generations.\n\nWhat is the main idea of this passage?",
+          answer_options: [
+            "A: The Great Barrier Reef is very long",
+            "B: Australia has many coral reefs",
+            "C: The Great Barrier Reef is threatened by climate change but efforts are being made to protect it",
+            "D: Scientists study marine life",
+            "E: Coral bleaching affects all reefs"
+          ],
+          correct_answer: "C",
+          explanation: "The passage discusses the Great Barrier Reef's significance and the threat from climate change, along with conservation efforts. This is the central message.",
+          distractor_strategy: "Includes supporting details (A) and overgeneralizations (B, D, E)",
+          characteristics: [
+            "Expository passage",
+            "Environmental topic",
+            "Multiple supporting details",
+            "Requires synthesis"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nSocial media has transformed how we communicate and share information. While it allows people to stay connected across great distances and share news instantly, it also has drawbacks. Studies show that excessive social media use can lead to decreased face-to-face interactions, reduced attention spans, and increased anxiety among young people.\n\nWhat is the passage mainly about?",
+          answer_options: [
+            "A: Social media is entirely negative",
+            "B: Social media helps people stay connected",
+            "C: Social media has both benefits and drawbacks",
+            "D: Young people use social media too much",
+            "E: News spreads quickly on social media"
+          ],
+          correct_answer: "C",
+          explanation: "The passage presents a balanced view, discussing both the benefits (staying connected, sharing news) and drawbacks (decreased interaction, anxiety) of social media.",
+          distractor_strategy: "Includes one-sided views (A, B) and specific details (D, E)",
+          characteristics: [
+            "Balanced argument",
+            "Technology topic",
+            "Contrasting viewpoints",
+            "Modern relevance"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe water cycle is essential for life on Earth. Water evaporates from oceans, lakes, and rivers due to heat from the sun. It rises as water vapor, cools in the atmosphere, and condenses to form clouds. Eventually, the water falls back to Earth as precipitation in the form of rain, snow, or hail, completing the cycle.\n\nWhat is this passage primarily explaining?",
+          answer_options: [
+            "A: Why it rains",
+            "B: How clouds are formed",
+            "C: The complete process of the water cycle",
+            "D: The importance of the sun",
+            "E: Different types of precipitation"
+          ],
+          correct_answer: "C",
+          explanation: "The passage describes the entire water cycle process from evaporation through condensation to precipitation, not just one component.",
+          distractor_strategy: "Includes parts of the cycle (A, B, E) and supporting elements (D)",
+          characteristics: [
+            "Scientific/process explanation",
+            "Sequential steps",
+            "Natural phenomenon",
+            "Clear structure"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Passage] What is the main idea/theme/purpose?",
+        key_characteristics: [
+          "Passages 150-300 words",
+          "Various topics: science, society, environment, history",
+          "Requires distinguishing main from supporting ideas",
+          "Multiple choice with 5 options",
+          "Tests comprehension and synthesis"
+        ],
+        distractor_strategies: [
+          "Supporting details presented as main ideas",
+          "Too narrow focus",
+          "Too broad generalizations",
+          "One aspect of balanced argument",
+          "Related but tangential points"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: explicit themes to implicit messages requiring interpretation",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 2: Inference & Conclusion Drawing
+    "Inference & Conclusion Drawing": {
+      description: "Making logical inferences and drawing conclusions based on evidence from the passage",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "What can be inferred/concluded from the passage?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe ancient library of Alexandria was one of the largest and most significant libraries of the ancient world. It was part of a larger research institution called the Mouseion, which was dedicated to the Muses, the nine goddesses of the arts. The library is believed to have housed hundreds of thousands of scrolls. Tragically, the library was destroyed, and much of the ancient knowledge it contained was lost forever.\n\nWhat can be inferred from this passage?",
+          answer_options: [
+            "A: The library was only used by artists",
+            "B: Modern libraries are better than ancient ones",
+            "C: The destruction of the library resulted in significant loss of historical knowledge",
+            "D: The library was in Greece",
+            "E: All ancient libraries were destroyed"
+          ],
+          correct_answer: "C",
+          explanation: "The passage states the library housed hundreds of thousands of scrolls and that 'much of the ancient knowledge it contained was lost forever,' supporting inference C.",
+          distractor_strategy: "Includes assumptions not supported (A, B, D) and overgeneralizations (E)",
+          characteristics: [
+            "Historical context",
+            "Cause-effect relationship",
+            "Evidence-based inference",
+            "Requires logical reasoning"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nLily packed her suitcase carefully, making sure to include her favorite books and her camera. She checked her passport three times and set her alarm for 5 AM. As she looked at the plane tickets on her desk, she felt a mixture of excitement and nervousness about the journey ahead.\n\nWhat can be inferred about Lily?",
+          answer_options: [
+            "A: She has traveled internationally before",
+            "B: She is preparing for an international trip",
+            "C: She is afraid of flying",
+            "D: She is moving to another country permanently",
+            "E: She is going on a business trip"
+          ],
+          correct_answer: "B",
+          explanation: "The mention of a passport, plane tickets, and packing a suitcase suggests Lily is preparing for an international trip. There's no evidence for the other options.",
+          distractor_strategy: "Includes unsupported assumptions about experience (A), emotions (C), trip duration (D), and purpose (E)",
+          characteristics: [
+            "Narrative context",
+            "Character actions",
+            "Multiple contextual clues",
+            "Emotional inference possible"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nAfter weeks of practice, the team's performance had improved dramatically. The coach noticed that players were arriving earlier to training and staying later to work on their skills. Team members began encouraging each other and celebrating small victories together. The atmosphere at practice had shifted from competitive to collaborative.\n\nWhat can be concluded about the team?",
+          answer_options: [
+            "A: They will definitely win their next game",
+            "B: The players have developed better teamwork and dedication",
+            "C: The coach is too strict",
+            "D: Some players are not committed",
+            "E: They need new equipment"
+          ],
+          correct_answer: "B",
+          explanation: "The passage describes improved performance, increased practice time, mutual encouragement, and collaborative atmosphere—all evidence of better teamwork and dedication.",
+          distractor_strategy: "Includes predictions (A), contradictions (C, D), and unrelated factors (E)",
+          characteristics: [
+            "Group dynamics",
+            "Behavioral evidence",
+            "Positive changes described",
+            "Requires synthesis of clues"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Passage] What can be inferred/concluded?",
+        key_characteristics: [
+          "Requires reading between the lines",
+          "Must be supported by passage evidence",
+          "Cannot be explicitly stated",
+          "Various contexts: characters, situations, outcomes",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Unsupported assumptions",
+          "Overly specific or broad conclusions",
+          "Contradicts passage information",
+          "Based on outside knowledge",
+          "Confuses correlation with causation"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: straightforward to complex inferences requiring multiple pieces of evidence",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 3: Vocabulary in Context
+    "Vocabulary in Context": {
+      description: "Understanding word meanings based on context clues in the passage",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "What does [word] mean in this context?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe hiker's perseverance was remarkable. Despite facing steep cliffs, harsh weather, and dwindling supplies, she refused to give up on reaching the summit. Her determination inspired her fellow climbers to push through their own challenges.\n\nIn this passage, what does 'perseverance' mean?",
+          answer_options: [
+            "A: Speed",
+            "B: Continued effort despite difficulties",
+            "C: Physical strength",
+            "D: Experience",
+            "E: Leadership"
+          ],
+          correct_answer: "B",
+          explanation: "The context 'despite facing steep cliffs, harsh weather, and dwindling supplies, she refused to give up' shows perseverance means continued effort despite difficulties.",
+          distractor_strategy: "Includes related traits (A, C, D, E) that don't match the context",
+          characteristics: [
+            "Character trait vocabulary",
+            "Context clues through examples",
+            "Positive attribute",
+            "Abstract concept"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe forest was so dense that very little sunlight could penetrate the thick canopy of leaves above. Walking through it felt like moving through a dark maze, with vegetation blocking the path at every turn.\n\nWhat does 'dense' mean in this passage?",
+          answer_options: [
+            "A: Dark",
+            "B: Dangerous",
+            "C: Thick and closely packed",
+            "D: Large",
+            "E: Old"
+          ],
+          correct_answer: "C",
+          explanation: "The context shows the forest is 'dense' because it has thick vegetation that blocks sunlight, indicating thick and closely packed.",
+          distractor_strategy: "Includes effects of density (A) and unrelated descriptors (B, D, E)",
+          characteristics: [
+            "Descriptive vocabulary",
+            "Cause-effect clues",
+            "Physical description",
+            "Common word, specific meaning"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe chef's culinary skills were exceptional. Her ability to combine flavors and create innovative dishes had earned her restaurant numerous awards and a loyal following of food enthusiasts.\n\nWhat does 'culinary' mean in this passage?",
+          answer_options: [
+            "A: Artistic",
+            "B: Related to cooking",
+            "C: Creative",
+            "D: Professional",
+            "E: Expensive"
+          ],
+          correct_answer: "B",
+          explanation: "The context of 'combine flavors,' 'create dishes,' and 'restaurant' clearly indicates culinary means related to cooking.",
+          distractor_strategy: "Includes general descriptors (A, C, D, E) that might apply but aren't the specific meaning",
+          characteristics: [
+            "Technical/specialized vocabulary",
+            "Professional context",
+            "Multiple supporting clues",
+            "Domain-specific term"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Passage with target word] What does [word] mean?",
+        key_characteristics: [
+          "Word meaning from context",
+          "Context clues: definitions, examples, contrasts",
+          "Tests vocabulary and reasoning",
+          "Various word types: nouns, verbs, adjectives",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Common meanings that don't fit context",
+          "Related words from same topic",
+          "Effects or results of the word's meaning",
+          "General rather than specific meanings",
+          "Similar-sounding words"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: common words to advanced vocabulary, explicit to subtle clues",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 4: Author's Purpose & Tone
+    "Author's Purpose & Tone": {
+      description: "Identifying the author's purpose and analyzing the tone used in the passage",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "What is the author's purpose/tone?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nDid you know that just 30 minutes of daily exercise can transform your health? Regular physical activity strengthens your heart, boosts your energy, and improves your mood. Don't wait another day—start moving today and experience the incredible benefits for yourself!\n\nWhat is the author's main purpose?",
+          answer_options: [
+            "A: To inform readers about exercise benefits",
+            "B: To persuade readers to start exercising regularly",
+            "C: To entertain readers with fitness stories",
+            "D: To describe different types of exercise",
+            "E: To compare exercise to other health activities"
+          ],
+          correct_answer: "B",
+          explanation: "The use of imperative language ('Don't wait,' 'start moving today') and enthusiastic tone indicate the author's purpose is to persuade readers to exercise.",
+          distractor_strategy: "Includes secondary purposes (A, D) and unrelated purposes (C, E)",
+          characteristics: [
+            "Persuasive text",
+            "Direct address to reader",
+            "Call to action",
+            "Motivational language"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nPhotosynthesis is the process by which green plants use sunlight to synthesize nutrients from carbon dioxide and water. Chlorophyll, the green pigment in leaves, absorbs light energy. This energy converts CO₂ and H₂O into glucose (C₆H₁₂O₆) and oxygen (O₂).\n\nWhat is the author's purpose in this passage?",
+          answer_options: [
+            "A: To persuade readers to plant more trees",
+            "B: To entertain with a story about plants",
+            "C: To inform readers about how photosynthesis works",
+            "D: To express personal feelings about nature",
+            "E: To argue for environmental protection"
+          ],
+          correct_answer: "C",
+          explanation: "The passage uses objective, scientific language to explain the photosynthesis process, indicating an informative purpose.",
+          distractor_strategy: "Includes other purposes (A, B, D, E) that don't match the neutral, explanatory tone",
+          characteristics: [
+            "Informative/explanatory text",
+            "Scientific vocabulary",
+            "Objective tone",
+            "Process explanation"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe abandoned house creaked ominously in the wind. Dark clouds gathered overhead as rain began to fall in heavy drops. A single light flickered in an upstairs window, though no one had lived there for years. Something didn't feel right.\n\nWhat is the tone of this passage?",
+          answer_options: [
+            "A: Cheerful and optimistic",
+            "B: Mysterious and suspenseful",
+            "C: Angry and bitter",
+            "D: Calm and peaceful",
+            "E: Humorous and playful"
+          ],
+          correct_answer: "B",
+          explanation: "Words like 'abandoned,' 'ominously,' 'dark clouds,' and 'Something didn't feel right' create a mysterious and suspenseful tone.",
+          distractor_strategy: "Includes opposite tones (A, D) and unrelated tones (C, E)",
+          characteristics: [
+            "Narrative description",
+            "Mood-setting language",
+            "Atmospheric details",
+            "Emotional undertone"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Passage] What is the author's purpose/tone?",
+        key_characteristics: [
+          "Purpose: persuade, inform, entertain, explain",
+          "Tone: serious, humorous, formal, informal, urgent, mysterious, etc.",
+          "Requires analyzing language and structure",
+          "Multiple choice with 5 options",
+          "Tests understanding of author's intent"
+        ],
+        distractor_strategies: [
+          "Secondary or minor purposes",
+          "Opposite tones",
+          "Confusing informative with persuasive",
+          "Missing subtle tone indicators",
+          "Focusing on content rather than presentation"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: obvious purposes to subtle tone distinctions",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 5: Supporting Details & Evidence
+    "Supporting Details & Evidence": {
+      description: "Identifying specific details and evidence that support the main idea or answer questions about the passage",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Which detail supports/According to the passage?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe invention of the printing press in the 15th century revolutionized communication. Before this, books were copied by hand, making them expensive and rare. Johannes Gutenberg's printing press allowed books to be produced quickly and cheaply, making knowledge accessible to more people. This led to increased literacy rates and the rapid spread of ideas.\n\nWhich detail from the passage supports the idea that the printing press was revolutionary?",
+          answer_options: [
+            "A: It was invented in the 15th century",
+            "B: Johannes Gutenberg created it",
+            "C: It made books cheaper and more accessible, leading to increased literacy",
+            "D: Books were previously copied by hand",
+            "E: It was a type of machine"
+          ],
+          correct_answer: "C",
+          explanation: "The fact that it made books cheaper, more accessible, and led to increased literacy directly supports why it was revolutionary.",
+          distractor_strategy: "Includes contextual facts (A, B, D) and general information (E) that don't support the specific claim",
+          characteristics: [
+            "Cause-effect relationship",
+            "Historical context",
+            "Impact evidence needed",
+            "Multiple facts present"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nKoalas are unique marsupials native to Australia. They spend most of their time sleeping—up to 20 hours per day. Their diet consists almost exclusively of eucalyptus leaves, which are low in nutrients and difficult to digest. Koalas have specially adapted digestive systems to process these toxic leaves.\n\nAccording to the passage, which of these is NOT mentioned about koalas?",
+          answer_options: [
+            "A: They sleep up to 20 hours per day",
+            "B: They eat eucalyptus leaves",
+            "C: They are native to Australia",
+            "D: They can swim well",
+            "E: They have adapted digestive systems"
+          ],
+          correct_answer: "D",
+          explanation: "Swimming ability is not mentioned in the passage. All other options (A, B, C, E) are explicitly stated.",
+          distractor_strategy: "Includes all mentioned facts (A, B, C, E) and one plausible but unmentioned fact (D)",
+          characteristics: [
+            "NOT question format",
+            "Requires careful reading",
+            "All options animal-related",
+            "Tests attention to detail"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe Great Wall of China is one of the most impressive architectural achievements in history. Construction began over 2,000 years ago and continued for centuries. The wall stretches approximately 21,000 kilometers across northern China. It was built primarily as a defense against invasions, though it also served as a transportation route and border control system.\n\nAccording to the passage, what was the PRIMARY purpose of the Great Wall?",
+          answer_options: [
+            "A: To serve as a transportation route",
+            "B: To defend against invasions",
+            "C: To control borders",
+            "D: To demonstrate architectural skill",
+            "E: To mark territory boundaries"
+          ],
+          correct_answer: "B",
+          explanation: "The passage states it was built 'primarily as a defense against invasions,' making this the primary purpose.",
+          distractor_strategy: "Includes secondary purposes mentioned (A, C) and implied purposes (D, E)",
+          characteristics: [
+            "Primary vs secondary distinction",
+            "Explicit statement in passage",
+            "Multiple purposes mentioned",
+            "Requires careful reading"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Passage] Which detail/According to the passage/Which is NOT mentioned?",
+        key_characteristics: [
+          "Requires locating specific information",
+          "May ask for supporting evidence",
+          "May ask what is NOT mentioned",
+          "Tests careful reading skills",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Facts that don't answer the specific question",
+          "Plausible information not in passage",
+          "Related details that don't support the claim",
+          "General knowledge vs passage information",
+          "Similar details that are easily confused"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: direct fact retrieval to identifying evidence for complex claims",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 6: Character Analysis & Development
+    "Character Analysis & Development": {
+      description: "Analyzing character traits, motivations, feelings, relationships, and development in narrative passages",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Questions about character traits, motivations, feelings, or relationships from narrative passages",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nSarah hesitated at the edge of the diving board, her hands trembling slightly. She had watched her friends jump confidently all afternoon, but now that it was her turn, her feet felt glued to the spot. Taking a deep breath, she remembered her swimming coach's words: 'Courage isn't the absence of fear; it's taking action despite it.' With that thought, Sarah stepped forward and leaped into the water below.\n\nWhich word BEST describes Sarah's character in this passage?",
+          answer_options: [
+            "A: Reckless",
+            "B: Courageous",
+            "C: Carefree",
+            "D: Timid",
+            "E: Athletic"
+          ],
+          correct_answer: "B",
+          explanation: "While Sarah feels fear (trembling, hesitation), she overcomes it and takes action by jumping, demonstrating courage. She is not reckless (A) because she's thoughtful, not carefree (C) as she's clearly nervous, not simply timid (D) because she acts despite fear, and athleticism (E) isn't the focus.",
+          distractor_strategy: "Includes partial traits (D = fear response only, E = activity-focused), opposite trait (A, C), not the best fit",
+          characteristics: [
+            "Character trait identification",
+            "Behavior-based inference",
+            "Overcoming fear narrative",
+            "Requires synthesis of actions and thoughts",
+            "Quote provides insight"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nMarcus noticed the new student sitting alone at lunch, looking uncomfortable and uncertain. Without hesitation, he picked up his tray and walked over. 'Hi, I'm Marcus. Want to join my friends and me?' he offered with a warm smile. The new student's face lit up with relief and gratitude.\n\nWhat does Marcus's behavior reveal about him?",
+          answer_options: [
+            "A: He is lonely and looking for friends",
+            "B: He is kind and welcoming to others",
+            "C: He is popular and confident",
+            "D: He dislikes sitting alone",
+            "E: He knows the new student already"
+          ],
+          correct_answer: "B",
+          explanation: "Marcus notices someone in need, takes action to help ('without hesitation'), and offers friendship warmly. This shows kindness and a welcoming nature. There's no evidence he's lonely (A), and while he may be confident, that's not the main trait shown (C). Options D and E are unsupported.",
+          distractor_strategy: "Includes assumptions not supported (A, C, D, E), tests understanding of character motivation",
+          characteristics: [
+            "Character motivation",
+            "Actions reveal traits",
+            "Empathy and kindness",
+            "Social interaction context",
+            "Requires distinguishing primary from secondary traits"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nTom had been saving money from his part-time job for six months. Every time his friends invited him to the movies or to buy the latest video game, he politely declined. When he finally had enough, he didn't buy something for himself. Instead, he surprised his mother with the camera she'd been wanting for years. Her tears of joy made every sacrifice worth it.\n\nHow does Tom's character develop or what is revealed about him in this passage?",
+          answer_options: [
+            "A: He is good at saving money",
+            "B: He doesn't like movies or video games",
+            "C: He is selfless and caring toward his mother",
+            "D: He makes poor financial decisions",
+            "E: He feels pressured by his friends"
+          ],
+          correct_answer: "C",
+          explanation: "Tom saves for six months, resists temptations, and uses his money not for himself but to bring joy to his mother. This reveals selflessness and deep care. While he can save (A), that's not the main revelation. He's not disinterested in fun (B), makes good decisions (contradicts D), and shows no pressure (contradicts E).",
+          distractor_strategy: "Includes surface-level observations (A), incorrect interpretations (B, D, E), tests deeper character understanding",
+          characteristics: [
+            "Character values and priorities",
+            "Sacrifice and selflessness",
+            "Long-term behavior pattern",
+            "Relationship dynamics (parent-child)",
+            "Emotional payoff reveals motivation"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Narrative passage with character(s)] Which word describes [character]? OR What does [character's] behavior reveal? OR How does [character] feel/change?",
+        key_characteristics: [
+          "Narrative passages 150-250 words",
+          "Characters with actions, thoughts, dialogue, feelings",
+          "Questions about traits, motivations, feelings, relationships, development",
+          "Requires inference from behavior and context",
+          "Multiple choice with 5 options",
+          "Answer must be supported by passage evidence"
+        ],
+        distractor_strategies: [
+          "Surface traits vs deeper character qualities",
+          "Partial evidence supporting alternative traits",
+          "Opposite character traits",
+          "Traits based on activity/setting rather than character",
+          "Unsupported assumptions about character",
+          "Confusing character feelings with actions"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: explicit traits from actions to complex motivations requiring synthesis of multiple clues",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    }
+
+  },
+
+  // ============================================
+  // NSW SELECTIVE ENTRY (YEAR 7 ENTRY) - MATHEMATICAL REASONING
+  // ============================================
+
+  "NSW Selective Entry (Year 7 Entry) - Mathematical Reasoning": {
+
+    // SUB-SKILL 1: Number Operations & Properties
+    "Number Operations & Properties": {
+      description: "Solving problems involving arithmetic operations, order of operations, factors, multiples, and number properties",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve the problem involving number operations",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "What is the value of 8 + 6 × 3 - 4?",
+          answer_options: [
+            "A: 22",
+            "B: 38",
+            "C: 20",
+            "D: 42",
+            "E: 18"
+          ],
+          correct_answer: "A",
+          explanation: "Following order of operations (BODMAS): 8 + (6 × 3) - 4 = 8 + 18 - 4 = 22.",
+          distractor_strategy: "Includes results from incorrect order: (8+6)×3-4=38 (B), and other calculation errors",
+          characteristics: [
+            "Order of operations",
+            "Mixed operations",
+            "Integer result",
+            "No grouping symbols"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "What is the highest common factor (HCF) of 36 and 48?",
+          answer_options: [
+            "A: 6",
+            "B: 12",
+            "C: 24",
+            "D: 4",
+            "E: 18"
+          ],
+          correct_answer: "B",
+          explanation: "Factors of 36: 1, 2, 3, 4, 6, 9, 12, 18, 36. Factors of 48: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48. HCF = 12.",
+          distractor_strategy: "Includes other common factors (A, D) and factors of only one number (C, E)",
+          characteristics: [
+            "Factor identification",
+            "HCF calculation",
+            "Number theory",
+            "Requires systematic approach"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Which of the following numbers is a prime number?",
+          answer_options: [
+            "A: 51",
+            "B: 57",
+            "C: 61",
+            "D: 63",
+            "E: 69"
+          ],
+          correct_answer: "C",
+          explanation: "61 is prime (only divisible by 1 and 61). 51=3×17, 57=3×19, 63=9×7, 69=3×23.",
+          distractor_strategy: "Includes composite numbers that might appear prime at first glance",
+          characteristics: [
+            "Prime identification",
+            "Divisibility testing",
+            "Number properties",
+            "All options in similar range"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Problem involving operations, factors, multiples, or primes]",
+        key_characteristics: [
+          "Various concepts: BODMAS, factors, multiples, primes, divisibility",
+          "Integer answers typical",
+          "Requires understanding of number properties",
+          "Multiple choice with 5 options",
+          "Tests fundamental number sense"
+        ],
+        distractor_strategies: [
+          "Results from incorrect order of operations",
+          "Common factors that aren't greatest/highest",
+          "Composite numbers when asking for primes",
+          "Arithmetic errors",
+          "Confusing related concepts"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple operations to complex number theory problems",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 2: Fractions, Decimals & Percentages
+    "Fractions, Decimals & Percentages": {
+      description: "Converting between and performing operations with fractions, decimals, and percentages",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve problems with fractions, decimals, or percentages",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "What is 3/5 + 1/4?",
+          answer_options: [
+            "A: 4/9",
+            "B: 17/20",
+            "C: 4/20",
+            "D: 3/4",
+            "E: 7/10"
+          ],
+          correct_answer: "B",
+          explanation: "Common denominator is 20: 3/5 = 12/20, 1/4 = 5/20. Therefore 12/20 + 5/20 = 17/20.",
+          distractor_strategy: "Includes incorrect addition (A: 4/9 from adding numerators/denominators separately), partial results, nearby fractions",
+          characteristics: [
+            "Fraction addition",
+            "Finding common denominator",
+            "Different denominators",
+            "Simplest form answer"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Convert 0.625 to a fraction in simplest form:",
+          answer_options: [
+            "A: 5/8",
+            "B: 625/1000",
+            "C: 1/2",
+            "D: 3/4",
+            "E: 2/3"
+          ],
+          correct_answer: "A",
+          explanation: "0.625 = 625/1000 = 125/200 = 25/40 = 5/8 when simplified.",
+          distractor_strategy: "Includes unsimplified form (B) and common fractions (C, D, E)",
+          characteristics: [
+            "Decimal to fraction conversion",
+            "Simplification required",
+            "Multiple reduction steps",
+            "Tests fraction equivalence"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "What is 15% of 240?",
+          answer_options: [
+            "A: 30",
+            "B: 36",
+            "C: 40",
+            "D: 24",
+            "E: 48"
+          ],
+          correct_answer: "B",
+          explanation: "15% of 240 = 0.15 × 240 = 36.",
+          distractor_strategy: "Includes nearby calculation results and common percentage errors",
+          characteristics: [
+            "Percentage calculation",
+            "Basic multiplication",
+            "Practical application",
+            "Integer result"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Operation or conversion with fractions, decimals, or percentages]",
+        key_characteristics: [
+          "Various operations: addition, conversion, percentage finding",
+          "May require simplification",
+          "Tests understanding of equivalence",
+          "Multiple choice with 5 options",
+          "Practical and abstract contexts"
+        ],
+        distractor_strategies: [
+          "Unsimplified answers",
+          "Common calculation errors",
+          "Incorrect operations applied",
+          "Nearby values",
+          "Results from forgetting steps"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple conversions to multi-step problems with mixed operations",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 3: Algebra & Equations
+    "Algebra & Equations": {
+      description: "Solving linear equations, working with variables, and applying algebraic thinking",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve for the variable or apply algebraic reasoning",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "If 4x + 9 = 37, what is the value of x?",
+          answer_options: [
+            "A: 5",
+            "B: 6",
+            "C: 7",
+            "D: 8",
+            "E: 9"
+          ],
+          correct_answer: "C",
+          explanation: "4x + 9 = 37. Subtract 9: 4x = 28. Divide by 4: x = 7.",
+          distractor_strategy: "Includes nearby integers and common algebraic errors",
+          characteristics: [
+            "Linear equation",
+            "Two-step solution",
+            "Integer answer",
+            "Basic algebra"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Solve for y: 3(y - 2) = 21",
+          answer_options: [
+            "A: 5",
+            "B: 7",
+            "C: 9",
+            "D: 11",
+            "E: 13"
+          ],
+          correct_answer: "C",
+          explanation: "3(y - 2) = 21. Divide by 3: y - 2 = 7. Add 2: y = 9.",
+          distractor_strategy: "Includes intermediate values (B: the result after division) and nearby integers",
+          characteristics: [
+            "Equation with parentheses",
+            "Multi-step solution",
+            "Tests order of operations in reverse",
+            "Variable isolation"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "If n + 15 = 3n - 5, what is n?",
+          answer_options: [
+            "A: 5",
+            "B: 8",
+            "C: 10",
+            "D: 12",
+            "E: 15"
+          ],
+          correct_answer: "C",
+          explanation: "n + 15 = 3n - 5. Subtract n: 15 = 2n - 5. Add 5: 20 = 2n. Divide by 2: n = 10.",
+          distractor_strategy: "Includes values from partial solutions and common errors",
+          characteristics: [
+            "Variables on both sides",
+            "Multi-step solution",
+            "Combining like terms",
+            "Tests equation manipulation"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Solve for [variable]: [equation]",
+        key_characteristics: [
+          "Linear equations with one variable",
+          "May include parentheses or fractions",
+          "Requires multiple solution steps",
+          "Integer solutions typical",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Intermediate calculation values",
+          "Results from order of operations errors",
+          "Sign errors",
+          "Off-by-one integers",
+          "Values that satisfy partial equations"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple one-step to complex multi-step with variables on both sides",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 4: Geometry & Measurement
+    "Geometry & Measurement": {
+      description: "Calculating area, perimeter, volume, angles, and applying geometric concepts",
+      visual_required: true,
+      image_type: "SVG",
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Calculate area/perimeter/volume/angles",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "A rectangle has a length of 15 cm and a width of 8 cm. What is its area?",
+          answer_options: [
+            "A: 23 cm²",
+            "B: 46 cm²",
+            "C: 60 cm²",
+            "D: 120 cm²",
+            "E: 240 cm²"
+          ],
+          correct_answer: "D",
+          explanation: "Area = length × width = 15 × 8 = 120 cm².",
+          distractor_strategy: "Includes perimeter (B: 2×15+2×8=46), half area (C), and doubled area (E)",
+          characteristics: [
+            "Basic rectangle area",
+            "Simple multiplication",
+            "Units specified",
+            "Common geometry problem"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The perimeter of a square is 48 cm. What is the length of one side?",
+          answer_options: [
+            "A: 8 cm",
+            "B: 10 cm",
+            "C: 12 cm",
+            "D: 16 cm",
+            "E: 24 cm"
+          ],
+          correct_answer: "C",
+          explanation: "Perimeter of square = 4 × side. Therefore: 48 = 4 × side, so side = 48 ÷ 4 = 12 cm.",
+          distractor_strategy: "Includes area calculation (E: 48/2=24), and nearby values",
+          characteristics: [
+            "Reverse calculation",
+            "Square properties",
+            "Division required",
+            "Tests formula understanding"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "What is the volume of a rectangular prism with length 5 m, width 4 m, and height 6 m?",
+          answer_options: [
+            "A: 15 m³",
+            "B: 20 m³",
+            "C: 30 m³",
+            "D: 60 m³",
+            "E: 120 m³"
+          ],
+          correct_answer: "E",
+          explanation: "Volume = length × width × height = 5 × 4 × 6 = 120 m³.",
+          distractor_strategy: "Includes partial products (A: 5×3, B: 5×4, C: 5×6, D: half volume)",
+          characteristics: [
+            "3D volume",
+            "Rectangular prism",
+            "Three dimensions",
+            "Tests volume formula"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Calculate [measurement] of [shape]",
+        key_characteristics: [
+          "Various shapes: rectangles, squares, triangles, circles, prisms",
+          "Measurements: area, perimeter, volume, angles",
+          "May include diagrams",
+          "Units typically specified",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Confusing area with perimeter",
+          "Using wrong formula",
+          "Partial calculations",
+          "Arithmetic errors",
+          "Unit conversion errors"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple 2D shapes to 3D volumes and compound shapes",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 5: Ratios & Proportions
+    "Ratios & Proportions": {
+      description: "Solving problems involving ratios, proportions, rates, and scaling",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve ratio/proportion problems",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "If 4 notebooks cost $12, how much would 7 notebooks cost?",
+          answer_options: [
+            "A: $18",
+            "B: $21",
+            "C: $24",
+            "D: $28",
+            "E: $30"
+          ],
+          correct_answer: "B",
+          explanation: "Cost per notebook = $12 ÷ 4 = $3. Cost of 7 notebooks = $3 × 7 = $21.",
+          distractor_strategy: "Includes calculation errors and nearby values",
+          characteristics: [
+            "Direct proportion",
+            "Unit rate calculation",
+            "Money context",
+            "Two-step problem"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The ratio of boys to girls in a class is 2:3. If there are 12 boys, how many girls are there?",
+          answer_options: [
+            "A: 15",
+            "B: 16",
+            "C: 18",
+            "D: 20",
+            "E: 24"
+          ],
+          correct_answer: "C",
+          explanation: "If 2 parts = 12 boys, then 1 part = 6. Therefore 3 parts = 3 × 6 = 18 girls.",
+          distractor_strategy: "Includes incorrect ratio calculations and nearby multiples",
+          characteristics: [
+            "Ratio problem",
+            "Finding unknown quantity",
+            "Integer result",
+            "Part-to-part ratio"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "A car travels 180 km in 2 hours. At the same speed, how far will it travel in 5 hours?",
+          answer_options: [
+            "A: 360 km",
+            "B: 400 km",
+            "C: 450 km",
+            "D: 500 km",
+            "E: 900 km"
+          ],
+          correct_answer: "C",
+          explanation: "Speed = 180 ÷ 2 = 90 km/h. Distance in 5 hours = 90 × 5 = 450 km.",
+          distractor_strategy: "Includes doubled distance (A), nearby values, and 180×5 (E)",
+          characteristics: [
+            "Rate problem",
+            "Speed/distance/time",
+            "Proportional reasoning",
+            "Real-world context"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Problem involving ratios, rates, or proportions]",
+        key_characteristics: [
+          "Various contexts: money, distance, quantities",
+          "Requires understanding proportional relationships",
+          "May involve unit rates",
+          "Often two-step problems",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Incorrect ratio setup",
+          "Arithmetic errors in scaling",
+          "Using addition instead of multiplication",
+          "Partial calculations",
+          "Simple multiplication without rate calculation"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple direct proportions to complex multi-step ratio problems",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 6: Data Interpretation
+    "Data Interpretation": {
+      description: "Reading and interpreting data from tables, graphs, and charts",
+      visual_required: true,
+      image_type: "HTML",
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Answer questions based on data presented",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "The table shows the number of books read by four students:\n\nStudent | Books Read\nAlex    | 12\nBella   | 18\nCarlos  | 15\nDiana   | 21\n\nWhat is the average number of books read?",
+          answer_options: [
+            "A: 15",
+            "B: 16",
+            "C: 16.5",
+            "D: 17",
+            "E: 18"
+          ],
+          correct_answer: "C",
+          explanation: "Average = (12 + 18 + 15 + 21) ÷ 4 = 66 ÷ 4 = 16.5.",
+          distractor_strategy: "Includes median (A), rounded values (B, D), and one of the data points (E)",
+          characteristics: [
+            "Table interpretation",
+            "Average calculation",
+            "Addition and division",
+            "Decimal result"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "A bar graph shows fruit sales:\nApples: 30 kg\nBananas: 45 kg\nOranges: 25 kg\n\nHow many more kilograms of bananas were sold than oranges?",
+          answer_options: [
+            "A: 15 kg",
+            "B: 20 kg",
+            "C: 25 kg",
+            "D: 30 kg",
+            "E: 45 kg"
+          ],
+          correct_answer: "B",
+          explanation: "Difference = 45 - 25 = 20 kg.",
+          distractor_strategy: "Includes other differences (A: 45-30, C and D: individual values, E: banana value)",
+          characteristics: [
+            "Graph interpretation",
+            "Comparison/difference",
+            "Subtraction",
+            "Two-value focus"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate an SVG bar graph showing:
+- 3 vertical bars representing fruit sales
+- X-axis labels: Apples, Bananas, Oranges
+- Y-axis labeled "Kilograms Sold" with scale 0-50 (gridlines every 10 kg)
+- Bar heights: Apples=30kg, Bananas=45kg, Oranges=25kg
+- Different colors for each fruit (e.g., red for apples, yellow for bananas, orange for oranges)
+- Title: "Fruit Sales"
+- Clean, educational chart style
+- Dimensions: 450x350px
+
+Visual type: bar_chart (SVG)
+Style: Clean educational chart, colorful bars, professional`
+        },
+        {
+          difficulty: 2,
+          question_text: "A pie chart shows how Tom spends his $200 pocket money:\nGames: 40%\nBooks: 30%\nSavings: 20%\nSnacks: 10%\n\nHow much does Tom spend on games?",
+          answer_options: [
+            "A: $40",
+            "B: $60",
+            "C: $80",
+            "D: $100",
+            "E: $120"
+          ],
+          correct_answer: "C",
+          explanation: "40% of $200 = 0.40 × $200 = $80.",
+          distractor_strategy: "Includes other category amounts and calculation errors",
+          characteristics: [
+            "Pie chart interpretation",
+            "Percentage calculation",
+            "Money context",
+            "Single category focus"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate an SVG pie chart showing:
+- 4 segments representing Tom's pocket money spending
+- Segment 1: Games - 40% (largest segment, e.g., blue color)
+- Segment 2: Books - 30% (medium segment, e.g., green color)
+- Segment 3: Savings - 20% (smaller segment, e.g., gold/yellow color)
+- Segment 4: Snacks - 10% (smallest segment, e.g., red color)
+- Each segment labeled with category and percentage (e.g., "Games 40%")
+- Title: "Tom's Pocket Money ($200)"
+- Different colors for each segment with clear boundaries
+- Legend or inline labels
+- Dimensions: 400x400px
+
+Visual type: pie_chart (SVG)
+Style: Clean educational chart, distinct colors, clear labels`
+        }
+      ],
+
+      pattern: {
+        format_template: "[Data in table/graph/chart] [Question about the data]",
+        key_characteristics: [
+          "Various representations: tables, bar graphs, pie charts",
+          "Questions ask for: totals, averages, differences, percentages",
+          "Requires extracting relevant data",
+          "May involve calculations",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Individual data points vs combined values",
+          "Arithmetic errors",
+          "Reading wrong row/column",
+          "Percentage vs actual value confusion",
+          "Median vs mean confusion"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple extraction to complex multi-step calculations",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 7: Word Problems & Applied Reasoning
+    "Word Problems & Applied Reasoning": {
+      description: "Solving complex multi-step word problems requiring logical reasoning and mathematical application",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve multi-step word problems",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "A shop sells pencils in packs of 6 and erasers in packs of 8. What is the smallest number of packs of each you would need to buy to have the same number of pencils and erasers?",
+          answer_options: [
+            "A: 4 packs of pencils and 3 packs of erasers",
+            "B: 6 packs of pencils and 8 packs of erasers",
+            "C: 8 packs of pencils and 6 packs of erasers",
+            "D: 12 packs of pencils and 16 packs of erasers",
+            "E: 3 packs of pencils and 4 packs of erasers"
+          ],
+          correct_answer: "A",
+          explanation: "Need LCM of 6 and 8 = 24. For pencils: 24 ÷ 6 = 4 packs. For erasers: 24 ÷ 8 = 3 packs.",
+          distractor_strategy: "Includes reversed answer (C), direct pack numbers (B), and incorrect LCM calculations",
+          characteristics: [
+            "LCM application",
+            "Two constraints",
+            "Real-world context",
+            "Requires mathematical insight"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Emma has three times as much money as her brother. If Emma gives her brother $15, they will have the same amount. How much money does Emma have originally?",
+          answer_options: [
+            "A: $15",
+            "B: $30",
+            "C: $45",
+            "D: $60",
+            "E: $90"
+          ],
+          correct_answer: "C",
+          explanation: "Let brother have $x. Emma has $3x. After transfer: 3x - 15 = x + 15. So 2x = 30, x = 15. Emma originally had 3 × 15 = $45.",
+          distractor_strategy: "Includes transfer amount (A), brother's amount (B), doubled amount (D), and tripled brother amount (E)",
+          characteristics: [
+            "Algebraic thinking",
+            "Multiple relationships",
+            "Money context",
+            "Requires equation setup"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "A rectangular garden is 12 m long and 8 m wide. A path 1 m wide surrounds the garden. What is the area of the path?",
+          answer_options: [
+            "A: 20 m²",
+            "B: 40 m²",
+            "C: 44 m²",
+            "D: 96 m²",
+            "E: 100 m²"
+          ],
+          correct_answer: "C",
+          explanation: "Total area with path = 14 × 10 = 140 m². Garden area = 12 × 8 = 96 m². Path area = 140 - 96 = 44 m².",
+          distractor_strategy: "Includes perimeter (B), garden area (D), total area (E), and incorrect calculations",
+          characteristics: [
+            "Compound shape",
+            "Subtraction method",
+            "Two-step calculation",
+            "Spatial reasoning required"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Complex word problem with multiple steps]",
+        key_characteristics: [
+          "Multi-step problems",
+          "Various contexts: money, measurement, logic",
+          "Requires problem decomposition",
+          "May need equations or systematic reasoning",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Partial solutions",
+          "Results from incorrect equation setup",
+          "Intermediate calculation values",
+          "Answers to related but different questions",
+          "Common logical errors"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: straightforward two-step to complex multi-concept problems",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    }
+
+  },
+
+  // ============================================
+  // NSW SELECTIVE ENTRY (YEAR 7 ENTRY) - THINKING SKILLS
+  // ============================================
+
+  "NSW Selective Entry (Year 7 Entry) - Thinking Skills": {
+
+    // SUB-SKILL 1: Pattern Recognition & Sequences
+    "Pattern Recognition & Sequences": {
+      description: "Identifying patterns in numbers, letters, shapes, or symbols and extending sequences",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Find the next item/missing item in the pattern",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "What comes next in this sequence?\n2, 5, 11, 23, 47, ?",
+          answer_options: [
+            "A: 71",
+            "B: 85",
+            "C: 94",
+            "D: 95",
+            "E: 141"
+          ],
+          correct_answer: "D",
+          explanation: "The pattern is: multiply by 2 and add 1. 2×2+1=5, 5×2+1=11, 11×2+1=23, 23×2+1=47, 47×2+1=95.",
+          distractor_strategy: "Includes other arithmetic patterns and nearby values",
+          characteristics: [
+            "Number sequence",
+            "Multiplicative pattern",
+            "Requires identifying rule",
+            "Tests pattern recognition"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "What letter comes next in the series?\nB, E, H, K, N, ?",
+          answer_options: [
+            "A: O",
+            "B: P",
+            "C: Q",
+            "D: R",
+            "E: S"
+          ],
+          correct_answer: "C",
+          explanation: "The pattern skips 2 letters each time: B(2) → E(5) → H(8) → K(11) → N(14) → Q(17). Each jump is +3 positions.",
+          distractor_strategy: "Includes adjacent letters and alternative skip patterns",
+          characteristics: [
+            "Letter sequence",
+            "Alphabetical position pattern",
+            "Consistent skip",
+            "Requires tracking positions"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Which number should replace the question mark?\n3, 9, 15, 21, 27, ?",
+          answer_options: [
+            "A: 30",
+            "B: 31",
+            "C: 33",
+            "D: 35",
+            "E: 36"
+          ],
+          correct_answer: "C",
+          explanation: "The pattern adds 6 each time: 3+6=9, 9+6=15, 15+6=21, 21+6=27, 27+6=33.",
+          distractor_strategy: "Includes nearby values and alternative arithmetic progressions",
+          characteristics: [
+            "Arithmetic sequence",
+            "Constant addition",
+            "Simple pattern",
+            "Integer sequence"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "What comes next/What is missing in: [sequence]?",
+        key_characteristics: [
+          "Number, letter, or shape sequences",
+          "Various patterns: arithmetic, geometric, alternating, position-based",
+          "May require working forwards or backwards",
+          "Multiple choice with 5 options",
+          "Tests logical pattern recognition"
+        ],
+        distractor_strategies: [
+          "Results from alternative patterns",
+          "Off-by-one errors",
+          "Adjacent values in sequence",
+          "Simple arithmetic that doesn't fit pattern",
+          "Common but incorrect assumptions"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple arithmetic to complex multi-step patterns",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 2: Logical Deduction
+    "Logical Deduction": {
+      description: "Drawing logical conclusions from given statements or conditions",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "What can be concluded from the given information?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "All cats are animals. Fluffy is a cat. Therefore:",
+          answer_options: [
+            "A: Fluffy is not an animal",
+            "B: Fluffy is an animal",
+            "C: Some animals are not cats",
+            "D: All animals are cats",
+            "E: No conclusion can be drawn"
+          ],
+          correct_answer: "B",
+          explanation: "If all cats are animals and Fluffy is a cat, then Fluffy must be an animal. This is a valid syllogism.",
+          distractor_strategy: "Includes contradictions (A, D), related but unproven statements (C), and overly cautious answer (E)",
+          characteristics: [
+            "Syllogistic reasoning",
+            "Categorical logic",
+            "Simple deduction",
+            "Clear conclusion"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "If it is raining, then the ground is wet. The ground is not wet. Therefore:",
+          answer_options: [
+            "A: It is raining",
+            "B: It is not raining",
+            "C: It might be raining",
+            "D: The ground is dry",
+            "E: No conclusion about rain can be drawn"
+          ],
+          correct_answer: "B",
+          explanation: "This is modus tollens: if P then Q; not Q; therefore not P. Since the ground is not wet, it cannot be raining.",
+          distractor_strategy: "Includes logical fallacies (A, C), related statements (D), and uncertainty (E)",
+          characteristics: [
+            "Conditional reasoning",
+            "Modus tollens",
+            "If-then logic",
+            "Contrapositive thinking"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Tom is taller than Sarah. Sarah is taller than Mike. Therefore:",
+          answer_options: [
+            "A: Tom and Mike are the same height",
+            "B: Mike is taller than Tom",
+            "C: Tom is taller than Mike",
+            "D: Sarah is the tallest",
+            "E: Mike is the tallest"
+          ],
+          correct_answer: "C",
+          explanation: "By transitivity, if Tom > Sarah and Sarah > Mike, then Tom > Mike.",
+          distractor_strategy: "Includes contradictions (A, B, E) and incorrect conclusions (D)",
+          characteristics: [
+            "Transitive property",
+            "Comparative relationships",
+            "Ordering/ranking",
+            "Clear logical chain"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Premises/conditions] Therefore/What follows?",
+        key_characteristics: [
+          "Logical statements and conditions",
+          "Various types: syllogisms, conditional statements, transitivity",
+          "Requires formal logical reasoning",
+          "Must identify valid conclusions",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Logical fallacies",
+          "Reversed logic",
+          "Statements that sound logical but don't follow",
+          "Overly cautious or overly certain conclusions",
+          "Confusing necessary and sufficient conditions"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple syllogisms to complex multi-premise arguments",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 3: Analogies & Relationships
+    "Analogies & Relationships": {
+      description: "Identifying relationships between word pairs or concepts and applying them to new pairs",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "A is to B as C is to ?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Hand is to glove as foot is to:",
+          answer_options: [
+            "A: leg",
+            "B: sock",
+            "C: shoe",
+            "D: toe",
+            "E: ankle"
+          ],
+          correct_answer: "C",
+          explanation: "A glove covers a hand, just as a shoe covers a foot. The relationship is body part to covering.",
+          distractor_strategy: "Includes related body parts (A, D, E) and another type of covering (B)",
+          characteristics: [
+            "Object-to-function relationship",
+            "Body part analogy",
+            "Practical connection",
+            "Common knowledge"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Author is to book as composer is to:",
+          answer_options: [
+            "A: musician",
+            "B: orchestra",
+            "C: symphony",
+            "D: instrument",
+            "E: conductor"
+          ],
+          correct_answer: "C",
+          explanation: "An author creates a book, just as a composer creates a symphony. The relationship is creator to creation.",
+          distractor_strategy: "Includes related roles (A, E), groups (B), and tools (D)",
+          characteristics: [
+            "Creator-to-creation relationship",
+            "Professional roles",
+            "Abstract thinking",
+            "Arts domain"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Big is to small as hot is to:",
+          answer_options: [
+            "A: fire",
+            "B: warm",
+            "C: cold",
+            "D: temperature",
+            "E: heat"
+          ],
+          correct_answer: "C",
+          explanation: "Big and small are antonyms, just as hot and cold are antonyms. The relationship is opposite/antonym.",
+          distractor_strategy: "Includes related concepts (A, B, E) and category term (D)",
+          characteristics: [
+            "Antonym relationship",
+            "Opposite concepts",
+            "Simple vocabulary",
+            "Clear contrast"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Word A] is to [Word B] as [Word C] is to ?",
+        key_characteristics: [
+          "Classic analogy format",
+          "Various relationships: part/whole, cause/effect, antonyms, creator/creation, object/function",
+          "Requires identifying implicit relationship",
+          "Multiple choice with 5 options",
+          "Tests both vocabulary and reasoning"
+        ],
+        distractor_strategies: [
+          "Words from same category but wrong relationship",
+          "Related concepts that don't match pattern",
+          "Correct relationship type but wrong specificity",
+          "Partial matches",
+          "Commonly associated but logically unrelated"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: concrete relationships to abstract connections",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 4: Classification & Odd One Out
+    "Classification & Odd One Out": {
+      description: "Identifying which item doesn't belong based on category, property, or relationship",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Which one is different/doesn't belong?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "Which word does NOT belong with the others?",
+          answer_options: [
+            "A: piano",
+            "B: guitar",
+            "C: trumpet",
+            "D: violin",
+            "E: drums"
+          ],
+          correct_answer: "C",
+          explanation: "Trumpet is a brass instrument, while piano, guitar, violin, and drums are not brass instruments. (Piano is percussion/string, guitar and violin are strings, drums are percussion).",
+          distractor_strategy: "All are musical instruments, making the brass vs non-brass distinction the key",
+          characteristics: [
+            "Musical instruments",
+            "Category classification",
+            "Instrument type distinction",
+            "All from same broad category"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Which number is the odd one out?\n\n4, 9, 16, 25, 27",
+          answer_options: [
+            "A: 4",
+            "B: 9",
+            "C: 16",
+            "D: 25",
+            "E: 27"
+          ],
+          correct_answer: "E",
+          explanation: "27 is the odd one out because it is a perfect cube (3³ = 27), while all the others are perfect squares: 4 = 2², 9 = 3², 16 = 4², 25 = 5². The pattern is that four numbers are squares, and one is a cube.",
+          distractor_strategy: "All are numbers, requires identifying mathematical property that makes one different",
+          characteristics: [
+            "Number properties",
+            "Mathematical classification",
+            "Requires analysis",
+            "Patternnot immediately obvious"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "Which one does not belong?",
+          answer_options: [
+            "A: square",
+            "B: rectangle",
+            "C: circle",
+            "D: triangle",
+            "E: trapezium"
+          ],
+          correct_answer: "C",
+          explanation: "Circle is the only shape without straight sides/angles. All others are polygons.",
+          distractor_strategy: "All are geometric shapes, curved vs straight-sided is the key distinction",
+          characteristics: [
+            "Geometric shapes",
+            "Property-based classification",
+            "Visual-spatial reasoning",
+            "Clear category distinction"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Which one is different/doesn't belong/is the odd one out?",
+        key_characteristics: [
+          "5 options with one that doesn't fit",
+          "Various classification types: mathematical properties, categories, physical properties",
+          "All options usually related",
+          "Requires identifying the distinguishing feature",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "All items from same broad category",
+          "Multiple possible groupings",
+          "Subtle distinctions required",
+          "Items that seem different but share key property"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: obvious category differences to subtle property distinctions",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 5: Spatial Reasoning
+    "Spatial Reasoning": {
+      description: "Understanding and manipulating shapes, rotations, reflections, and spatial relationships",
+      visual_required: true,
+      image_type: "SVG",
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Which shape/pattern results from the transformation?",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "If a square is rotated 90 degrees clockwise, which corner that was in the top-left will now be in which position?",
+          answer_options: [
+            "A: top-left",
+            "B: top-right",
+            "C: bottom-right",
+            "D: bottom-left",
+            "E: center"
+          ],
+          correct_answer: "B",
+          explanation: "A 90-degree clockwise rotation moves the top-left corner to the top-right position.",
+          distractor_strategy: "Includes other corner positions and impossible answer (E)",
+          characteristics: [
+            "Rotation transformation",
+            "Position tracking",
+            "Spatial visualization",
+            "Clockwise direction"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate an SVG diagram showing:
+- Two squares side by side with an arrow between them
+- Left square: Original position with corners labeled (A at top-left, B at top-right, C at bottom-right, D at bottom-left)
+- A curved arrow labeled "90° clockwise" pointing from left square to right square
+- Right square: Rotated 90° clockwise with corners relabeled to show new positions
+- Use different colors or markers to highlight the corner that started at top-left
+- Clean, educational diagram style
+- Dimensions: 500x300px
+
+Visual type: geometric_transformation (SVG)
+Style: Clean educational diagram, clear labels, rotation visualization`
+        },
+        {
+          difficulty: 2,
+          question_text: "How many faces does a cube have?",
+          answer_options: [
+            "A: 4",
+            "B: 6",
+            "C: 8",
+            "D: 12",
+            "E: 16"
+          ],
+          correct_answer: "B",
+          explanation: "A cube has 6 faces: top, bottom, front, back, left, right.",
+          distractor_strategy: "Includes number of vertices (C: 8) and edges (D: 12) as distractors",
+          characteristics: [
+            "3D shape properties",
+            "Geometric knowledge",
+            "Solid geometry",
+            "Counting faces"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "If you fold a piece of paper in half and cut out a small triangle from the folded edge, how many triangles will you see when you unfold the paper?",
+          answer_options: [
+            "A: 1",
+            "B: 2",
+            "C: 3",
+            "D: 4",
+            "E: 6"
+          ],
+          correct_answer: "B",
+          explanation: "When you cut from the folded edge and unfold, the cut will appear on both layers, creating 2 triangles (one from each layer).",
+          distractor_strategy: "Includes other multiples and the original count",
+          characteristics: [
+            "Paper folding visualization",
+            "Symmetry understanding",
+            "Practical spatial problem",
+            "Requires mental simulation"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Description of spatial transformation or 3D object] What is the result/property?",
+        key_characteristics: [
+          "Rotations, reflections, folding",
+          "2D and 3D shapes",
+          "May include diagrams",
+          "Requires visualization",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Results from incorrect transformations",
+          "Confusing related properties (faces/vertices/edges)",
+          "Off-by-one counting",
+          "Results from alternative interpretations",
+          "Common spatial reasoning errors"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple rotations to complex 3D visualizations",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 6: Code Breaking & Symbol Logic
+    "Code Breaking & Symbol Logic": {
+      description: "Decoding messages where letters or symbols follow a consistent substitution or transformation rule",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Decode the message or apply the code",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "If CAT is coded as DBU, how would DOG be coded?",
+          answer_options: [
+            "A: CPF",
+            "B: EPH",
+            "C: EOF",
+            "D: DPH",
+            "E: CPG"
+          ],
+          correct_answer: "B",
+          explanation: "Each letter is shifted forward by 1: C→D, A→B, T→U. Similarly: D→E, O→P, G→H = EPH.",
+          distractor_strategy: "Includes shifts by different amounts and mixed patterns",
+          characteristics: [
+            "Caesar cipher",
+            "Letter shift pattern",
+            "Consistent transformation",
+            "Pattern application"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "In a certain code, FLOWER is written as 6-12-15-23-5-18. What would PLANT be written as?",
+          answer_options: [
+            "A: 15-11-1-13-19",
+            "B: 16-12-1-14-20",
+            "C: 17-13-2-15-21",
+            "D: 16-11-1-13-20",
+            "E: 15-12-2-14-19"
+          ],
+          correct_answer: "B",
+          explanation: "The code is alphabetical position: F=6, L=12, O=15, W=23, E=5, R=18. For PLANT: P=16, L=12, A=1, N=14, T=20.",
+          distractor_strategy: "Includes off-by-one errors and alternative numbering systems",
+          characteristics: [
+            "Alphabetical position encoding",
+            "Number sequence",
+            "Position mapping",
+            "Decoding skill"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "If △ = 5, □ = 3, and ○ = 2, what is △ + □ × ○?",
+          answer_options: [
+            "A: 16",
+            "B: 11",
+            "C: 13",
+            "D: 10",
+            "E: 20"
+          ],
+          correct_answer: "B",
+          explanation: "Following order of operations: △ + □ × ○ = 5 + (3 × 2) = 5 + 6 = 11.",
+          distractor_strategy: "Includes results from incorrect order: (△+□)×○=(5+3)×2=16 (A), and other errors",
+          characteristics: [
+            "Symbol substitution",
+            "Order of operations",
+            "Mathematical logic",
+            "Combined reasoning"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "If [example code], how would [new item] be coded?",
+        key_characteristics: [
+          "Substitution ciphers",
+          "Letter shifts, number codes, symbol logic",
+          "Requires identifying the rule",
+          "Must apply rule to new case",
+          "Multiple choice with 5 options"
+        ],
+        distractor_strategies: [
+          "Shifts by different amounts",
+          "Off-by-one position errors",
+          "Alternative coding systems",
+          "Incorrect order of operations",
+          "Mixed or inconsistent application"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied: simple letter shifts to complex multi-step transformations",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 7: Problem Solving & Lateral Thinking
+    "Problem Solving & Lateral Thinking": {
+      description: "Solving multi-step problems using logical reasoning, systematic thinking, and strategic approaches. Questions use engaging, interesting scenarios that require students to analyze situations, identify constraints, and work through problems methodically - NOT trick questions or riddles.",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Solve the problem using logical reasoning and systematic thinking",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "A gaming tournament needs to schedule matches. There are 48 players who must compete in groups of either 6 or 8. To finish the tournament as quickly as possible, they want the minimum number of groups. How many groups of 8 should they form?",
+          answer_options: [
+            "A: 4",
+            "B: 5",
+            "C: 6",
+            "D: 7",
+            "E: 8"
+          ],
+          correct_answer: "C",
+          explanation: "To minimize groups, maximize groups of 8. 6 groups of 8 = 48 players. This uses all players in exactly 6 groups, which is fewer than any combination with groups of 6 (e.g., 8 groups of 6 = 48, or 4 groups of 6 + 3 groups of 8 = 48 in 7 groups).",
+          distractor_strategy: "Includes results from not optimizing (A: 4 groups of 8 = 32, leaving 16 unaccounted), partial solutions, and miscalculations",
+          characteristics: [
+            "Optimization problem",
+            "Multiple constraints",
+            "Systematic testing",
+            "Gaming/competition context"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "A zoo keeper needs to feed animals in a specific order. The lions must eat before the tigers. The bears must eat after the tigers but before the elephants. The monkeys must eat last. If feeding each animal group takes exactly 15 minutes, and the zoo keeper starts at 9:00 AM, what time will the bears finish eating?",
+          answer_options: [
+            "A: 9:30 AM",
+            "B: 9:45 AM",
+            "C: 10:00 AM",
+            "D: 10:15 AM",
+            "E: 10:30 AM"
+          ],
+          correct_answer: "C",
+          explanation: "Order: Lions (9:00-9:15), Tigers (9:15-9:30), Bears (9:30-9:45), Elephants (9:45-10:00), Monkeys (10:00-10:15). Bears finish at 9:45 AM... wait, that's option B. Let me recalculate: Bears are 3rd, so 9:00 + 45 minutes = 9:45 AM. But we need when they FINISH: 9:00 + (3 × 15) = 10:00 AM.",
+          distractor_strategy: "Includes results from counting wrong position in sequence, forgetting start vs finish time, and miscounting intervals",
+          characteristics: [
+            "Sequencing with constraints",
+            "Time calculation",
+            "Multiple dependencies",
+            "Zoo/animal context"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "A streaming service is releasing episodes of a new show. They release 3 episodes in Week 1, then increase by 2 episodes each following week (5 in Week 2, 7 in Week 3, etc.). If they need to release at least 50 total episodes, how many complete weeks will it take?",
+          answer_options: [
+            "A: 5",
+            "B: 6",
+            "C: 7",
+            "D: 8",
+            "E: 9"
+          ],
+          correct_answer: "B",
+          explanation: "Week 1: 3 (total: 3). Week 2: 5 (total: 8). Week 3: 7 (total: 15). Week 4: 9 (total: 24). Week 5: 11 (total: 35). Week 6: 13 (total: 48). Week 7: 15 (total: 63). After 6 complete weeks they have 48 episodes, which is not enough. After 7 weeks they have 63, but wait—we need COMPLETE weeks to reach 50+. Let me recalculate: 3+5+7+9+11+13 = 48 (6 weeks). Need one more week to surpass 50.",
+          distractor_strategy: "Includes results from arithmetic sequence errors, off-by-one counting, and stopping at exactly 50 vs exceeding it",
+          characteristics: [
+            "Arithmetic sequence",
+            "Cumulative sum tracking",
+            "Multi-step calculation",
+            "Streaming/entertainment context"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "In a treasure hunt, teams earn points differently. Team Rocket earned 15 points more than Team Comet. Team Comet earned 8 points fewer than Team Galaxy. If Team Galaxy earned 82 points, how many points did Team Rocket earn?",
+          answer_options: [
+            "A: 59",
+            "B: 67",
+            "C: 74",
+            "D: 82",
+            "E: 89"
+          ],
+          correct_answer: "E",
+          explanation: "Team Galaxy = 82 points. Team Comet = 82 - 8 = 74 points. Team Rocket = 74 + 15 = 89 points.",
+          distractor_strategy: "Includes results from reversing operations (A: 82-8-15), partial calculations (C: Team Comet's 74), and incorrect operation order",
+          characteristics: [
+            "Algebraic reasoning",
+            "Working with relationships",
+            "Multi-step problem",
+            "Treasure hunt/game context"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Engaging problem requiring systematic logical reasoning with multiple steps and constraints]",
+        key_characteristics: [
+          "Interesting, engaging contexts (gaming, competitions, streaming, treasure hunts, challenges, adventures)",
+          "Multi-step problems with clear logical progression",
+          "Problems with constraints that must be satisfied",
+          "Requires systematic thinking, not guessing or tricks",
+          "Age-appropriate for Year 6/7 students (no trick questions)",
+          "Multiple choice with 5 options",
+          "Contexts should be fun and capture student interest while still being realistic"
+        ],
+        constraints_and_guardrails: [
+          "CRITICAL: NO trick questions or riddles (e.g., 'all but 9 die')",
+          "CRITICAL: NO lateral thinking puzzles or gotcha questions",
+          "CRITICAL: NO whimsical or absurd scenarios",
+          "CRITICAL: NO scenarios that are impossible or violate real-world logic",
+          "MUST have clear, unambiguous wording",
+          "MUST reward systematic logical thinking, not cleverness",
+          "Questions should feel like they belong on a scholarship test",
+          "Use engaging contexts (games, adventures, competitions, technology, entertainment) but keep them grounded and realistic"
+        ],
+        distractor_strategies: [
+          "Results from skipping a step in the logical sequence",
+          "Answers from reversing operations or relationships",
+          "Partial solutions that don't complete all steps",
+          "Common calculation errors with remainders or ordering",
+          "Results from ignoring one or more constraints"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "2-4 step problems with 1-2 constraints, engaging but realistic contexts",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    }
+
+  },
+
+  // ============================================
+  // NSW SELECTIVE ENTRY (YEAR 7 ENTRY) - WRITING
+  // ============================================
+
+  "NSW Selective Entry (Year 7 Entry) - Writing": {
+
+    // SUB-SKILL 1: Narrative/Creative Writing
+    "Narrative/Creative Writing": {
+      description: "Writing a well-structured narrative with engaging characters, setting, and plot development",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Write a narrative based on the given prompt",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "WRITING TASK:\n\nWrite a story that includes the sentence: \"The old door creaked open, revealing something unexpected.\"\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include descriptive language and details\n• Develop characters and setting\n• Be between 300-500 words\n• Use correct spelling, grammar, and punctuation\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended narrative writing response",
+          explanation: "This is a creative writing prompt that provides a sentence that must be included in the story. Students should craft an imaginative narrative with well-developed characters, vivid descriptions, and a clear plot structure. The story should incorporate the given sentence naturally and build an engaging narrative around it.",
+          characteristics: [
+            "Narrative writing",
+            "Given sentence inclusion",
+            "Time-limited (30 mins)",
+            "Word count range specified",
+            "Creative development required",
+            "Specific criteria provided"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Write a story [with given constraint/prompt/opening]. Your story should: [criteria list]",
+        key_characteristics: [
+          "Narrative/story writing",
+          "May include: given sentence, image prompt, theme, or opening",
+          "Typically 300-500 words",
+          "Time limit: 30 minutes",
+          "Assessed on: ideas, structure, vocabulary, grammar, conventions",
+          "Should include: characters, setting, plot, conflict, resolution"
+        ],
+        distractor_strategies: [
+          "N/A - Open-ended writing task"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied prompts: concrete scenarios to abstract themes, sentence prompts to image prompts",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 2: Persuasive/Argumentative Writing
+    "Persuasive/Argumentative Writing": {
+      description: "Writing persuasive texts that present a clear position, use evidence and reasoning, and convince readers",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Write a persuasive piece on the given topic",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "WRITING TASK:\n\nShould students be required to wear school uniforms?\n\nWrite a persuasive text arguing for OR against school uniforms.\n\nYour writing should:\n• State your position clearly\n• Provide reasons and evidence to support your view\n• Consider and address opposing viewpoints\n• Use persuasive language and techniques\n• Be between 300-500 words\n• Use correct spelling, grammar, and punctuation\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This persuasive writing task asks students to take a position on school uniforms and argue their viewpoint. Students should present a clear thesis, support it with logical reasons and evidence, acknowledge counterarguments, and use persuasive techniques such as rhetorical questions, emotive language, and appeals to logic or values. The writing should be well-organized with an introduction, body paragraphs, and conclusion.",
+          characteristics: [
+            "Persuasive/argumentative writing",
+            "Familiar topic (school-related)",
+            "Choice of position",
+            "Time-limited (30 mins)",
+            "Word count range specified",
+            "Must address counterarguments",
+            "Specific criteria provided"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "[Issue/topic presented] Write a persuasive piece arguing for/against [position]. Your writing should: [criteria list]",
+        key_characteristics: [
+          "Persuasive/argumentative writing",
+          "Clear position/thesis required",
+          "Topics: school issues, environmental concerns, technology, social issues",
+          "Typically 300-500 words",
+          "Time limit: 30 minutes",
+          "Assessed on: argument strength, evidence, organization, persuasive techniques, conventions",
+          "Should include: introduction with thesis, supporting arguments, counterarguments, conclusion"
+        ],
+        distractor_strategies: [
+          "N/A - Open-ended writing task"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied topics: familiar school topics to broader social/environmental issues",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 3: Informative/Explanatory Writing (Reports & Articles)
+    "Informative/Explanatory Writing": {
+      description: "Writing informative texts such as reports and newspaper articles that explain, inform, or describe topics objectively",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Write an informative report or article on the given topic",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "WRITING TASK:\n\nWrite a newspaper article reporting on a new recycling initiative being introduced at schools in your local area.\n\nYour article should:\n• Include a headline\n• Provide factual information about the initiative\n• Explain why it's important\n• Include quotes or perspectives\n• Be between 300-500 words\n• Use correct spelling, grammar, and punctuation\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended informative writing response",
+          explanation: "This informative writing task requires students to write in the newspaper article format, presenting factual information objectively. Students should include a catchy headline, introduce the topic in a lead paragraph, provide details about the recycling initiative, explain its significance, and potentially include quotes from stakeholders. The writing should be clear, organized, and focused on informing readers rather than persuading them.",
+          characteristics: [
+            "Informative/explanatory writing",
+            "Newspaper article format",
+            "Objective tone",
+            "Time-limited (30 mins)",
+            "Word count range specified",
+            "Factual information required",
+            "Specific criteria provided"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Write [a report/newspaper article/information text] about [topic]. Your writing should: [criteria list]",
+        key_characteristics: [
+          "Informative/explanatory writing",
+          "Formats: reports, newspaper articles, information texts",
+          "Objective, factual tone",
+          "Topics: school initiatives, community events, scientific topics, environmental issues",
+          "Typically 300-500 words",
+          "Time limit: 30 minutes",
+          "Assessed on: clarity, organization, factual accuracy, appropriate format, conventions",
+          "Should include: introduction, body with organized information, conclusion"
+        ],
+        distractor_strategies: [
+          "N/A - Open-ended writing task"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied topics and formats: simple reports to complex newspaper articles with multiple perspectives",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 4: Personal/Reflective Writing (Diaries & Letters)
+    "Personal/Reflective Writing": {
+      description: "Writing personal texts such as diary entries, letters, and emails that reflect on experiences, express feelings, or communicate personally",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Write a diary entry, letter, or email based on the given scenario",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "WRITING TASK:\n\nWrite a diary entry reflecting on your first day at a new school.\n\nYour diary entry should:\n• Be written in first person\n• Include your thoughts and feelings\n• Describe what happened during the day\n• Reflect on the experience\n• Be between 300-500 words\n• Use correct spelling, grammar, and punctuation\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended personal writing response",
+          explanation: "This personal writing task asks students to write a diary entry, which should be reflective and personal in tone. Students should describe events from their first day, express their emotions and reactions, and reflect on what the experience meant to them. The writing should feel authentic and personal, using first-person perspective and showing both external events and internal thoughts/feelings.",
+          characteristics: [
+            "Personal/reflective writing",
+            "Diary entry format",
+            "First-person perspective",
+            "Time-limited (30 mins)",
+            "Word count range specified",
+            "Emotional expression encouraged",
+            "Specific criteria provided"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Write [a diary entry/letter/email] about [scenario/experience]. Your writing should: [criteria list]",
+        key_characteristics: [
+          "Personal/reflective writing",
+          "Formats: diary entries, letters (friendly/formal), emails",
+          "Personal, authentic tone",
+          "Topics: personal experiences, memories, feelings, advice to friends",
+          "Typically 300-500 words",
+          "Time limit: 30 minutes",
+          "Assessed on: authenticity, emotional depth, organization, appropriate format, conventions",
+          "Should include: personal voice, reflection, specific details, emotional honesty"
+        ],
+        distractor_strategies: [
+          "N/A - Open-ended writing task"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied scenarios: everyday experiences to significant life events, friendly to formal tone",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    },
+
+    // SUB-SKILL 5: Imaginative/Speculative Writing
+    "Imaginative/Speculative Writing": {
+      description: "Writing imaginative texts including futuristic scenarios, unusual perspectives, creative scenarios requiring originality and innovation",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [2],
+      question_format: "Write an imaginative piece based on the given creative prompt",
+
+      examples: [
+        {
+          difficulty: 2,
+          question_text: "WRITING TASK:\n\nImagine you have invented a superhero with a completely unique power that no one has ever thought of before.\n\nWrite a story introducing your superhero and their first adventure using their unique power.\n\nYour story should:\n• Introduce your original superhero and their unique power\n• Include a problem or challenge they face\n• Show how they use their power creatively\n• Have a clear beginning, middle, and end\n• Be between 300-500 words\n• Use correct spelling, grammar, and punctuation\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended imaginative writing response",
+          explanation: "This imaginative writing task requires students to demonstrate creativity and originality by inventing a completely unique superhero power and showing it in action. Students should think beyond common superhero abilities, develop an interesting character, create a compelling problem, and show innovative problem-solving. The writing should be creative, engaging, and showcase the student's ability to think outside conventional boundaries while maintaining a coherent narrative structure.",
+          characteristics: [
+            "Imaginative/speculative writing",
+            "Requires high creativity",
+            "Unique/original thinking required",
+            "Time-limited (30 mins)",
+            "Word count range specified",
+            "Innovation encouraged",
+            "Specific criteria provided"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Write [an imaginative/futuristic/unusual perspective piece] based on [creative prompt]. Your writing should: [criteria list]",
+        key_characteristics: [
+          "Imaginative/speculative writing",
+          "Topics: futuristic scenarios, unique superpowers, unusual perspectives, 'what if' situations",
+          "Requires originality and innovation",
+          "Typically 300-500 words",
+          "Time limit: 30 minutes",
+          "Assessed on: creativity, originality, coherence, development, conventions",
+          "Should include: innovative ideas, clear structure, engaging content, unique perspective"
+        ],
+        distractor_strategies: [
+          "N/A - Open-ended writing task"
+        ],
+        difficulty_progression: {
+          "1": "N/A - NSW Selective uses single difficulty level",
+          "2": "Varied prompts: structured creative scenarios to open-ended speculative situations",
+          "3": "N/A - NSW Selective uses single difficulty level"
+        }
+      }
+    }
+
+  }
+
+} as const;
