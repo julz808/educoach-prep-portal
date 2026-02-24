@@ -212,12 +212,12 @@ const Dashboard: React.FC = () => {
           : 'bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 border-2 border-purple-200/50 shadow-xl shadow-purple-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 transition-all duration-300 hover:scale-110 ${
                 dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
-                  ? 'bg-green-500' 
-                  : 'bg-purple-500'
+                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/40'
+                  : 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-purple-500/40'
               }`}>
-                <Activity className="text-white w-6 h-6 sm:w-8 sm:h-8" />
+                <Activity className="text-white w-6 h-6 sm:w-8 sm:h-8 transition-transform duration-300 hover:rotate-12" />
               </div>
               <div className="text-center sm:text-left flex-1">
                 <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
@@ -266,12 +266,12 @@ const Dashboard: React.FC = () => {
           : 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-2 border-orange-200/50 shadow-xl shadow-orange-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 transition-all duration-300 hover:scale-110 ${
                 dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
-                  ? 'bg-green-500' 
-                  : 'bg-orange-500'
+                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/40'
+                  : 'bg-gradient-to-br from-orange-500 to-orange-600 shadow-orange-500/40'
               }`}>
-                <TargetIcon className="text-white w-6 h-6 sm:w-8 sm:h-8" />
+                <TargetIcon className="text-white w-6 h-6 sm:w-8 sm:h-8 transition-transform duration-300 hover:rotate-12" />
               </div>
               <div className="text-center sm:text-left flex-1">
                 <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
@@ -320,12 +320,12 @@ const Dashboard: React.FC = () => {
           : 'bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 border-2 border-rose-200/50 shadow-xl shadow-rose-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 transition-all duration-300 hover:scale-110 ${
                 dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
-                  ? 'bg-green-500' 
-                  : 'bg-rose-500'
+                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/40'
+                  : 'bg-gradient-to-br from-rose-500 to-rose-600 shadow-rose-500/40'
               }`}>
-                <FileText className="text-white w-6 h-6 sm:w-8 sm:h-8" />
+                <FileText className="text-white w-6 h-6 sm:w-8 sm:h-8 transition-transform duration-300 hover:rotate-12" />
               </div>
               <div className="text-center sm:text-left flex-1">
                 <CardTitle className={`text-xl sm:text-2xl font-bold mb-1 ${
