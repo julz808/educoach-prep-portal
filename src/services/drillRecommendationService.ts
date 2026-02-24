@@ -148,8 +148,8 @@ export async function getDrillRecommendations(
     const recommendations: DrillRecommendation[] = [];
 
     subSkillPerformanceMap.forEach((performance) => {
-      // Skip if not enough data (require at least 3 questions for reliable metric)
-      if (performance.totalQuestions < 3) return;
+      // Skip if not enough data (require at least 1 question attempted)
+      if (performance.totalQuestions < 1) return;
 
       // Priority = inverted score (lower score = higher priority)
       // Simple ranking: 100 - averageScore means lowest scores come first

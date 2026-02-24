@@ -795,6 +795,26 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Simple but requires verification against both sides",
             "Single letter answer"
           ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The next two letters in the series\nAB    DE    HI    LM    are:",
+          answer_options: [
+            "A: NO",
+            "B: PQ",
+            "C: OP",
+            "D: QR",
+            "E: MN"
+          ],
+          correct_answer: "B",
+          explanation: "Each pair consists of consecutive letters, and pairs skip letters between them. AB (skip C), DE (skip FG), HI (skip JK), LM (skip NOP). The next consecutive pair after M(13) is P(16)Q(17), skipping NO. Answer: PQ",
+          distractor_strategy: "Includes the skipped pair NO (A), reverse order OP (C), and other nearby pairs (D, E)",
+          characteristics: [
+            "Consecutive letter pairs",
+            "Pairs skip increasing gaps",
+            "Two-letter answer",
+            "Tests recognition of paired progression"
+          ]
         }
       ],
 
@@ -1468,7 +1488,7 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
     // SUB-SKILL 3: Geometry - Area, Perimeter & Volume
     "Geometry - Area, Perimeter & Volume": {
       description: "Calculating area, perimeter, circumference, and volume of 2D and 3D shapes; applying geometric formulas including Pythagoras' theorem; understanding spatial relationships",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [2],
@@ -1741,7 +1761,7 @@ Style: Real-world Pythagoras problem, clear labels, educational`,
     // SUB-SKILL 5: Data Interpretation - Tables & Graphs
     "Data Interpretation - Tables & Graphs": {
       description: "Reading and interpreting data from tables, graphs, charts, and diagrams; extracting information and making calculations based on visual data",
-      visual_required: true,
+      visual_required: false,
       image_type: "HTML",
       llm_appropriate: true,
       difficulty_range: [2],

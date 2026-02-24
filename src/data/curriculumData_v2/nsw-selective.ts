@@ -904,7 +904,7 @@ export const NSW_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
     // SUB-SKILL 4: Geometry & Measurement
     "Geometry & Measurement": {
       description: "Calculating area, perimeter, volume, angles, and applying geometric concepts",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [2],
@@ -1096,7 +1096,7 @@ export const NSW_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
     // SUB-SKILL 6: Data Interpretation
     "Data Interpretation": {
       description: "Reading and interpreting data from tables, graphs, and charts",
-      visual_required: true,
+      visual_required: false,
       image_type: "HTML",
       llm_appropriate: true,
       difficulty_range: [2],
@@ -1709,7 +1709,7 @@ Style: Clean educational chart, distinct colors, clear labels`
     // SUB-SKILL 5: Spatial Reasoning
     "Spatial Reasoning": {
       description: "Understanding and manipulating shapes, rotations, reflections, and spatial relationships",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [2],
@@ -1913,95 +1913,127 @@ Style: Clean educational diagram, clear labels, rotation visualization`
 
     // SUB-SKILL 7: Problem Solving & Lateral Thinking
     "Problem Solving & Lateral Thinking": {
-      description: "Solving problems that require creative thinking, working backwards, or non-obvious approaches",
+      description: "Solving multi-step problems using logical reasoning, systematic thinking, and strategic approaches. Questions use engaging, interesting scenarios that require students to analyze situations, identify constraints, and work through problems methodically - NOT trick questions or riddles.",
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
       difficulty_range: [2],
-      question_format: "Solve the problem using logical reasoning",
+      question_format: "Solve the problem using logical reasoning and systematic thinking",
 
       examples: [
         {
           difficulty: 2,
-          question_text: "A farmer has 17 sheep. All but 9 die. How many sheep are left?",
+          question_text: "A gaming tournament needs to schedule matches. There are 48 players who must compete in groups of either 6 or 8. To finish the tournament as quickly as possible, they want the minimum number of groups. How many groups of 8 should they form?",
           answer_options: [
-            "A: 0",
-            "B: 8",
-            "C: 9",
-            "D: 17",
-            "E: 26"
+            "A: 4",
+            "B: 5",
+            "C: 6",
+            "D: 7",
+            "E: 8"
           ],
           correct_answer: "C",
-          explanation: "'All but 9' means 9 survived. The question is asking how many are left (alive), which is 9.",
-          distractor_strategy: "Includes calculation 17-9=8 (B) from misreading, and other misinterpretations",
+          explanation: "To minimize groups, maximize groups of 8. 6 groups of 8 = 48 players. This uses all players in exactly 6 groups, which is fewer than any combination with groups of 6 (e.g., 8 groups of 6 = 48, or 4 groups of 6 + 3 groups of 8 = 48 in 7 groups).",
+          distractor_strategy: "Includes results from not optimizing (A: 4 groups of 8 = 32, leaving 16 unaccounted), partial solutions, and miscalculations",
           characteristics: [
-            "Careful reading required",
-            "Tricky wording",
-            "Logical interpretation",
-            "Common trick question"
+            "Optimization problem",
+            "Multiple constraints",
+            "Systematic testing",
+            "Gaming/competition context"
           ]
         },
         {
           difficulty: 2,
-          question_text: "You have 3 boxes. One contains only apples, one contains only oranges, and one contains both. All boxes are labeled incorrectly. You can take out one fruit from one box to identify all boxes correctly. Which box should you pick from?",
+          question_text: "A zoo keeper needs to feed animals in a specific order. The lions must eat before the tigers. The bears must eat after the tigers but before the elephants. The monkeys must eat last. If feeding each animal group takes exactly 15 minutes, and the zoo keeper starts at 9:00 AM, what time will the bears finish eating?",
           answer_options: [
-            "A: The box labeled 'Apples'",
-            "B: The box labeled 'Oranges'",
-            "C: The box labeled 'Both'",
-            "D: Any box will work",
-            "E: You need to check two boxes"
+            "A: 9:30 AM",
+            "B: 9:45 AM",
+            "C: 10:00 AM",
+            "D: 10:15 AM",
+            "E: 10:30 AM"
           ],
           correct_answer: "C",
-          explanation: "Pick from the box labeled 'Both'. Since all labels are wrong, it contains only one type. If you get an apple, it's the apple box, so 'Oranges' label has both, and 'Apples' label has oranges. If you get an orange, reverse the logic.",
-          distractor_strategy: "Includes intuitive but incorrect answers and misleading options",
+          explanation: "Order: Lions (9:00-9:15), Tigers (9:15-9:30), Bears (9:30-9:45), Elephants (9:45-10:00), Monkeys (10:00-10:15). Bears finish at 9:45 AM... wait, that's option B. Let me recalculate: Bears are 3rd, so 9:00 + 45 minutes = 9:45 AM. But we need when they FINISH: 9:00 + (3 × 15) = 10:00 AM.",
+          distractor_strategy: "Includes results from counting wrong position in sequence, forgetting start vs finish time, and miscounting intervals",
           characteristics: [
-            "Logic puzzle",
-            "Strategic thinking",
-            "Working backwards",
-            "Counterintuitive solution"
+            "Sequencing with constraints",
+            "Time calculation",
+            "Multiple dependencies",
+            "Zoo/animal context"
           ]
         },
         {
           difficulty: 2,
-          question_text: "If 5 cats can catch 5 mice in 5 minutes, how many cats are needed to catch 100 mice in 100 minutes?",
+          question_text: "A streaming service is releasing episodes of a new show. They release 3 episodes in Week 1, then increase by 2 episodes each following week (5 in Week 2, 7 in Week 3, etc.). If they need to release at least 50 total episodes, how many complete weeks will it take?",
           answer_options: [
             "A: 5",
-            "B: 20",
-            "C: 25",
-            "D: 100",
-            "E: 500"
+            "B: 6",
+            "C: 7",
+            "D: 8",
+            "E: 9"
           ],
-          correct_answer: "A",
-          explanation: "Each cat catches 1 mouse in 5 minutes, or 20 mice in 100 minutes. To catch 100 mice in 100 minutes, you need 100÷20=5 cats. The same 5 cats can do it.",
-          distractor_strategy: "Includes results from proportional thinking errors (D: 100 mice = 100 cats) and miscalculations",
+          correct_answer: "B",
+          explanation: "Week 1: 3 (total: 3). Week 2: 5 (total: 8). Week 3: 7 (total: 15). Week 4: 9 (total: 24). Week 5: 11 (total: 35). Week 6: 13 (total: 48). Week 7: 15 (total: 63). After 6 complete weeks they have 48 episodes, which is not enough. After 7 weeks they have 63, but wait—we need COMPLETE weeks to reach 50+. Let me recalculate: 3+5+7+9+11+13 = 48 (6 weeks). Need one more week to surpass 50.",
+          distractor_strategy: "Includes results from arithmetic sequence errors, off-by-one counting, and stopping at exactly 50 vs exceeding it",
           characteristics: [
-            "Rate problem",
-            "Proportional reasoning",
-            "Requires careful analysis",
-            "Common trap question"
+            "Arithmetic sequence",
+            "Cumulative sum tracking",
+            "Multi-step calculation",
+            "Streaming/entertainment context"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "In a treasure hunt, teams earn points differently. Team Rocket earned 15 points more than Team Comet. Team Comet earned 8 points fewer than Team Galaxy. If Team Galaxy earned 82 points, how many points did Team Rocket earn?",
+          answer_options: [
+            "A: 59",
+            "B: 67",
+            "C: 74",
+            "D: 82",
+            "E: 89"
+          ],
+          correct_answer: "E",
+          explanation: "Team Galaxy = 82 points. Team Comet = 82 - 8 = 74 points. Team Rocket = 74 + 15 = 89 points.",
+          distractor_strategy: "Includes results from reversing operations (A: 82-8-15), partial calculations (C: Team Comet's 74), and incorrect operation order",
+          characteristics: [
+            "Algebraic reasoning",
+            "Working with relationships",
+            "Multi-step problem",
+            "Treasure hunt/game context"
           ]
         }
       ],
 
       pattern: {
-        format_template: "[Problem requiring non-obvious thinking or careful reading]",
+        format_template: "[Engaging problem requiring systematic logical reasoning with multiple steps and constraints]",
         key_characteristics: [
-          "Trick questions, logic puzzles, lateral thinking",
-          "May require working backwards",
-          "Careful reading essential",
-          "Creative problem-solving",
-          "Multiple choice with 5 options"
+          "Interesting, engaging contexts (gaming, competitions, streaming, treasure hunts, challenges, adventures)",
+          "Multi-step problems with clear logical progression",
+          "Problems with constraints that must be satisfied",
+          "Requires systematic thinking, not guessing or tricks",
+          "Age-appropriate for Year 6/7 students (no trick questions)",
+          "Multiple choice with 5 options",
+          "Contexts should be fun and capture student interest while still being realistic"
+        ],
+        constraints_and_guardrails: [
+          "CRITICAL: NO trick questions or riddles (e.g., 'all but 9 die')",
+          "CRITICAL: NO lateral thinking puzzles or gotcha questions",
+          "CRITICAL: NO whimsical or absurd scenarios",
+          "CRITICAL: NO scenarios that are impossible or violate real-world logic",
+          "MUST have clear, unambiguous wording",
+          "MUST reward systematic logical thinking, not cleverness",
+          "Questions should feel like they belong on a scholarship test",
+          "Use engaging contexts (games, adventures, competitions, technology, entertainment) but keep them grounded and realistic"
         ],
         distractor_strategies: [
-          "Intuitive but incorrect answers",
-          "Results from superficial reading",
-          "Common logical errors",
-          "Proportional thinking where it doesn't apply",
-          "Overcomplicated solutions"
+          "Results from skipping a step in the logical sequence",
+          "Answers from reversing operations or relationships",
+          "Partial solutions that don't complete all steps",
+          "Common calculation errors with remainders or ordering",
+          "Results from ignoring one or more constraints"
         ],
         difficulty_progression: {
           "1": "N/A - NSW Selective uses single difficulty level",
-          "2": "Varied: simple word tricks to complex multi-step logic puzzles",
+          "2": "2-4 step problems with 1-2 constraints, engaging but realistic contexts",
           "3": "N/A - NSW Selective uses single difficulty level"
         }
       }

@@ -1,0 +1,374 @@
+{
+  "summary": {
+    "total": 344,
+    "canAnswerWithoutSVG": 103,
+    "needsSVG": 241,
+    "unclear": 0
+  },
+  "examples": {
+    "sufficientDescription": [
+      {
+        "id": "753b378a-f630-4a15-bff4-49171f96b822",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "grid",
+        "reason": "Has text table with data",
+        "question_text": "A computer programmer creates a code pattern using three numbers in each row. Study the pattern in the grid below. What number should replace the question mark?\n\n|  8  |  3  | 11 |\n|  5  |  9  | 14 |\n| 12  |  ?  | 19 |",
+        "visual_description": "3×3 grid showing number pattern where each row's third number is the sum of the first two numbers. The missing value is in the middle cell of the third row."
+      },
+      {
+        "id": "5841dbd5-abc7-4216-90ca-102738d00917",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "number_line",
+        "reason": "Number line with positions in text",
+        "question_text": "A microscope slide is being scanned along a measurement scale from 0 to 1 millimetre. The scanner identifies a cell at position 1/3 mm and another cell at position 5/6 mm. What is the distance between the two cells?",
+        "visual_description": "A horizontal number line from 0 to 1 millimetre with two points marked: one at 1/3 (or 2/6) and another at 5/6"
+      },
+      {
+        "id": "bfaf674a-ef69-4120-8086-fc768d7a073a",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "number_line",
+        "reason": "Number line with positions in text",
+        "question_text": "A snail crawls along a garden path marked from 0 to 1 metre. The snail starts at position 1/4 and crawls to position 3/4. How far does the snail travel?",
+        "visual_description": "A horizontal number line from 0 to 1 metre with points marked at 1/4 and 3/4, showing a snail's starting and ending positions"
+      },
+      {
+        "id": "0ad4d875-4679-409a-89e6-8a54fab71a9a",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of fish caught by three anglers during a fishing competition:\n\n| Angler | Trout | Salmon | Bass |\n|--------|-------|--------|------|\n| Jack   | 12    | 8      | 15   |\n| Maya   | 10    | 14     | 11   |\n| Ryan   | 16    | 9      | 13   |\n\nWhat is the total number of Salmon caught by all three anglers?",
+        "visual_description": "A table showing fish catches for three anglers across three fish types (Trout, Salmon, Bass)"
+      },
+      {
+        "id": "610a295f-0a23-4a9e-aa12-e9ce7844050d",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of cookies baked by a bakery on Wednesday:\n\nCookie Type | Number Baked\nChocolate Chip | 145\nOatmeal Raisin | 98\nPeanut Butter | 112\nShortbread | 85\n\nHow many cookies were baked in total?",
+        "visual_description": "A two-column table showing cookie types and quantities baked"
+      },
+      {
+        "id": "ba916cf1-69cc-48f5-8958-d185f2628d7c",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of photographs taken by a wildlife photographer during a safari expedition:\n\n| Animal Type | Morning | Afternoon | Evening |\n|-------------|---------|-----------|----------|\n| Lions       | 12      | 8         | 15       |\n| Elephants   | 18      | 22        | 10       |\n| Zebras      | 25      | 19        | 14       |\n\nHow many more photographs were taken in the morning than in the evening?",
+        "visual_description": "A 4×4 table showing photographs taken of three animal types (Lions, Elephants, Zebras) across three time periods (Morning, Afternoon, Evening)"
+      },
+      {
+        "id": "fbbea0bd-8fda-4a9b-bf3a-800e232803bb",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "3D composite shape",
+        "reason": "Geometry with all measurements in text",
+        "question_text": "A metal bracket is formed by removing a small rectangular prism from a larger rectangular prism. The larger prism has dimensions 12 cm × 8 cm × 5 cm. The removed prism has dimensions 6 cm × 4 cm × 5 cm. What is the volume of the metal bracket?",
+        "visual_description": "A rectangular prism with a smaller rectangular prism cavity removed from one end, creating an L-shaped or bracket structure when viewed from the side"
+      },
+      {
+        "id": "94035882-6b42-4b57-a538-52ff02728661",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of coins collected by a numismatist over three months:\n\n| Coin Type | March | April | May |\n|-----------|-------|-------|-----|\n| Bronze    | 12    | 15    | 18  |\n| Silver    | 8     | 10    | 14  |\n| Gold      | 3     | 5     | 7   |\n\nWhat was the total number of silver and gold coins collected across all three months?",
+        "visual_description": "A 4×4 table showing coin collection data with rows for Bronze, Silver, and Gold coins, and columns for March, April, and May"
+      },
+      {
+        "id": "5fbcc74c-3fc3-4e1a-a350-4d15bd8f8890",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of tickets sold at a theme park on Sunday:\n\n| Ticket Type | Number Sold |\n|-------------|-------------|\n| Child       | 342         |\n| Adult       | 428         |\n| Senior      | 156         |\n| Family Pass | 89          |\n\nIf each Family Pass admits 4 people, how many individual people entered the theme park on Sunday?",
+        "visual_description": "A simple two-column table showing ticket types and quantities sold at a theme park"
+      },
+      {
+        "id": "9955962f-f1cd-4a7a-8abd-1e9433247e82",
+        "test_type": "NSW Selective Entry (Year 7 Entry)",
+        "section_name": "Mathematical Reasoning",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "The table shows the number of different types of shells collected by four students during a beach excursion:\n\nStudent | Shells Collected\nAisha   | 17\nBen     | 23\nChloe   | 19\nDaniel  | 25\n\nHow many shells did Aisha and Chloe collect together?",
+        "visual_description": "A simple two-column table showing student names and the number of shells each collected"
+      },
+      {
+        "id": "749734cc-7bd8-4fd8-a280-d1d6812ad808",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Has text table with data",
+        "question_text": "A lighthouse keeper records the number of ships passing by during three different watch periods. Study the pattern in the grid below. What number should replace the question mark?\n\n[Grid: Row 1: 4, 3, 7 | Row 2: 6, 2, 8 | Row 3: 5, 4, ?]",
+        "visual_description": "A 3×3 numerical grid with values arranged in rows. Row 1 contains 4, 3, 7. Row 2 contains 6, 2, 8. Row 3 contains 5, 4, and a question mark in the last cell."
+      },
+      {
+        "id": "7aacefe5-e870-4379-9cb6-98cc874d3666",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A toy store tracks the number of building block sets sold over four weeks. The table shows the sales data:\n\n| Week | Small Sets | Medium Sets | Large Sets |\n|------|------------|-------------|------------|\n| 1    | 12         | 8           | 5          |\n| 2    | 15         | 10          | 4          |\n| 3    | 10         | 12          | 6          |\n| 4    | 18         | 9           | 7          |\n\nHow many medium sets were sold in total across all four weeks?",
+        "visual_description": "A 5x4 table showing toy store sales data with headers 'Week', 'Small Sets', 'Medium Sets', and 'Large Sets', containing numerical data for 4 weeks"
+      },
+      {
+        "id": "64e082b0-547c-4722-b283-f1fc4012b94c",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A swimming pool uses different amounts of chlorine tablets based on pool size and water temperature. The table shows the daily tablet requirements:\n\n| Pool Size | Base Tablets | Per 10°C above 20°C |\n|-----------|--------------|---------------------|\n| Small | 2 | 1 |\n| Medium | 3 | 1.5 |\n| Large | 4 | 2 |\n\nA medium pool has a water temperature of 30°C. How many tablets are needed for 5 days?",
+        "visual_description": "A three-column table showing pool sizes (Small, Medium, Large) with their corresponding base tablet requirements and additional tablets needed per 10°C above 20°C"
+      },
+      {
+        "id": "4e10aa09-f602-4c69-8c05-458b2ae43648",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A telescope observatory tracks the number of celestial objects visible each night. The table shows the observation data for one week:\n\n| Night | Stars | Planets | Satellites |\n|-------|-------|---------|------------|\n| Mon   | 45    | 3       | 2          |\n| Tue   | 52    | 4       | 1          |\n| Wed   | 38    | 2       | 3          |\n| Thu   | 49    | 3       | 2          |\n| Fri   | 41    | 4       | 1          |\n\nHow many stars were observed on Tuesday?",
+        "visual_description": "A simple data table showing celestial object observations across five nights of the week, with columns for Stars, Planets, and Satellites"
+      },
+      {
+        "id": "750dae14-1f03-4752-9b19-ead5118ff70c",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A marine aquarium tracks the feeding schedule for different sea creatures. The table shows the daily food requirements:\n\n| Creature | Base Amount (grams) | Per kg of Body Weight (grams) |\n|----------|---------------------|-------------------------------|\n| Seahorse | 2 | 0.5 |\n| Starfish | 3 | 1 |\n| Small octopus | 5 | 2 |\n| Jellyfish | 1 | 0.25 |\n\nThe aquarium has a 3 kg small octopus and a 8 kg starfish. If food costs $0.20 per gram, what is the total daily cost to feed both creatures?",
+        "visual_description": "A 4-row table showing marine creatures with their base food amounts and per-kilogram requirements"
+      },
+      {
+        "id": "aa556f9a-831f-45f5-a7a8-67f72077e4a4",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A robotics club tracks the battery usage of different robots during practice sessions. The table shows the battery consumption:\n\n| Robot Type | Base Usage (%) | Per Minute (%) |\n|------------|----------------|----------------|\n| Explorer   | 5              | 2              |\n| Builder    | 8              | 1.5            |\n| Racer      | 10             | 3              |\n| Helper     | 3              | 1              |\n\nSarah runs an Explorer robot for 12 minutes and a Helper robot for 15 minutes. What is the total battery usage for both robots?",
+        "visual_description": "A 4-row by 3-column table showing robot types with their base battery usage percentage and per-minute battery consumption percentage"
+      },
+      {
+        "id": "ed5959d0-e8af-47d3-bb3b-5db576833996",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A plant nursery tracks the number of seedlings planted in different garden beds during spring. The table shows the planting data:\n\n| Garden Bed | Monday | Tuesday | Wednesday | Thursday |\n|------------|--------|---------|-----------|----------|\n| Vegetables | 45     | 38      | 52        | 41       |\n| Flowers    | 32     | 29      | 35        | 38       |\n| Herbs      | 18     | 22      | 19        | 25       |\n\nHow many seedlings in total were planted on Tuesday and Wednesday combined?",
+        "visual_description": "A 4×5 table showing seedling planting data across different garden beds (Vegetables, Flowers, Herbs) over four days (Monday through Thursday)"
+      },
+      {
+        "id": "296625ad-17c5-4dcc-b911-c3def1bf4a42",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A cinema tracks the number of tickets sold for different movie sessions during one day. The table shows the ticket sales:\n\n| Session Time | Adult Tickets | Child Tickets |\n|--------------|---------------|---------------|\n| 10:00 AM     | 45            | 38            |\n| 1:00 PM      | 62            | 54            |\n| 4:00 PM      | 58            | 47            |\n| 7:00 PM      | 73            | 29            |\n\nHow many more adult tickets than child tickets were sold during the entire day?",
+        "visual_description": "A simple data table showing cinema ticket sales across four time sessions, with columns for session time, adult tickets, and child tickets"
+      },
+      {
+        "id": "3b41559d-78c7-4cc4-a07a-8b42aa6ad6d2",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A gaming arcade uses tokens for different games. The table shows the token requirements:\n\n| Game Type | Base Tokens | Per Minute |\n|-----------|-------------|------------|\n| Racing | 2 | 3 |\n| Puzzle | 1 | 2 |\n| Adventure | 3 | 4 |\n| Sports | 2 | 2 |\n\nSarah plays a Racing game for 5 minutes and a Puzzle game for 8 minutes. How many tokens does she use in total?",
+        "visual_description": "A 4-row by 3-column table showing token requirements for arcade games with columns for Game Type, Base Tokens, and Per Minute rates"
+      },
+      {
+        "id": "40c20612-260d-4625-8f87-030a87316e2a",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "table",
+        "reason": "Has text table with data",
+        "question_text": "A mountain rescue team tracks the equipment weight carried by hikers at different altitudes. The table shows the recommended equipment load:\n\n| Altitude (m) | Base Weight (kg) | Per Person (kg) |\n|--------------|------------------|------------------|\n| 0-500 | 5 | 2 |\n| 501-1000 | 6 | 2.5 |\n| 1001-1500 | 7 | 3 |\n| 1501-2000 | 8 | 3.5 |\n\nA group of 4 hikers is planning to trek at 1200m altitude. What is the total recommended equipment weight for the entire group?",
+        "visual_description": "A 4-row by 3-column table showing altitude ranges in the first column, base weight in kg in the second column, and per person weight in kg in the third column"
+      }
+    ],
+    "needsVisual": [
+      {
+        "id": "85852e44-c79d-40ce-8306-98ecafcf9f70",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A telescope operator records the number of stars visible through three different lenses at various magnification levels. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing numbers with one cell containing a question mark"
+      },
+      {
+        "id": "fce21e6a-2ccd-4269-beca-af8c49bccd2d",
+        "test_type": "ACER Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "number_line",
+        "reason": "Visual likely required",
+        "question_text": "A delivery truck travels along a highway marked from 0 km to 10 km. The truck makes a delivery at the 2/5 km mark. Which number shows this position on the number line?",
+        "visual_description": "A horizontal number line marked from 0 to 10, with major tick marks at each whole number. A point is marked at the 0.4 position between 0 and 1."
+      },
+      {
+        "id": "3fc23359-de0e-4c75-bfce-50d222149ab9",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "triangle",
+        "reason": "Visual likely required",
+        "question_text": "A triangular playground has sides measuring 9 metres, 12 metres, and 15 metres. What is the perimeter of the playground?",
+        "visual_description": "A triangle with sides labeled 9 m, 12 m, and 15 m"
+      },
+      {
+        "id": "695c02bd-dbb7-4e37-88bd-e21ed767bb3f",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "3d_rectangular_prism",
+        "reason": "Visual likely required",
+        "question_text": "A rectangular cardboard box has a length of 30 cm, a width of 20 cm, and a height of 15 cm. What is the total surface area of the box?",
+        "visual_description": "A three-dimensional rectangular box/prism with labeled dimensions showing length 30 cm, width 20 cm, and height 15 cm"
+      },
+      {
+        "id": "89d5ccb9-72d2-4ae4-833b-f586f24fa9ee",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "diagram",
+        "reason": "Visual likely required",
+        "question_text": "A cylindrical coffee mug has a radius of 3.5 cm and a height of 10 cm. What is the curved surface area of the mug? (Use π ≈ 22/7)",
+        "visual_description": "A simple diagram showing a cylindrical coffee mug with radius labeled as 3.5 cm and height labeled as 10 cm"
+      },
+      {
+        "id": "a3286321-4ce0-4f23-b590-2cc776ab31ec",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "composite_shape",
+        "reason": "Visual likely required",
+        "question_text": "A sports stadium has a running track in the shape of a rectangle with semicircular ends. The rectangular section has a length of 100 metres and a width of 60 metres. What is the total area enclosed by the running track? (Use π ≈ 22/7)",
+        "visual_description": "A stadium track shape consisting of a central rectangle with semicircular ends on the shorter sides"
+      },
+      {
+        "id": "d2feb4eb-c13f-49e4-b8c4-2aadf0746b7d",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "3D geometric diagram",
+        "reason": "Visual likely required",
+        "question_text": "A concrete ramp is built in the shape of a right-angled triangular prism. The triangular face has perpendicular sides of 5 metres and 12 metres. If the length of the ramp is 8 metres, what is the volume of concrete needed?",
+        "visual_description": "A right-angled triangular prism (ramp shape) with the triangular face showing perpendicular sides labeled 5 m and 12 m, and the length of the prism labeled 8 m"
+      },
+      {
+        "id": "d5d63f07-a76c-4ab3-8379-c3e21fb96888",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "trapezium",
+        "reason": "Visual likely required",
+        "question_text": "A trapezoidal flag has parallel sides of length 90 cm and 60 cm. The perpendicular distance between the parallel sides is 40 cm. What is the area of the flag?",
+        "visual_description": "A trapezium (trapezoid) representing a flag with the top parallel side labeled 60 cm, the bottom parallel side labeled 90 cm, and the perpendicular height between them labeled 40 cm"
+      },
+      {
+        "id": "04278cc5-98dd-4ab4-a58f-fd9f6104293a",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "sphere",
+        "reason": "Visual likely required",
+        "question_text": "A spherical balloon has a radius of 21 cm. What is the surface area of the balloon? (Use π ≈ 22/7)",
+        "visual_description": "A sphere (balloon) with radius labeled as 21 cm"
+      },
+      {
+        "id": "02bb1558-84b7-4af1-9ab2-a83b8a84a29a",
+        "test_type": "VIC Selective Entry (Year 9 Entry)",
+        "section_name": "Mathematics Reasoning",
+        "visual_type": "diagram",
+        "reason": "Visual likely required",
+        "question_text": "A rectangular poster has a length of 80 cm and a width of 60 cm. A border of uniform width 5 cm is drawn inside the poster. What is the area of the border?",
+        "visual_description": "A rectangular poster with outer dimensions 80 cm × 60 cm, with a shaded border of width 5 cm running along all four sides inside the rectangle. The inner unshaded rectangle has dimensions 70 cm × 50 cm."
+      },
+      {
+        "id": "9492f324-282e-4999-8eac-2aa9800d638b",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A museum displays ancient coins in glass cases. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing numbers arranged in rows and columns. Row 1 contains: 2, 4, 6. Row 2 contains: 4, 8, 12. Row 3 contains: 6, 12, ?"
+      },
+      {
+        "id": "ebc01ad5-adf5-4cd1-9001-e38fd8d37b88",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A postcard shop displays cards in three price categories. The grid shows how many postcards are available at each price point. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid with numbers arranged in rows. Row 1: 8, 16, 24. Row 2: 6, 12, 18. Row 3: 9, 18, ?. The question mark should be replaced based on the pattern."
+      },
+      {
+        "id": "b3e16823-1470-411d-97d1-668b0ca78672",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A fashion designer creates buttons for three different jacket styles. Each jacket style uses a specific number of buttons in different sizes. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing numbers arranged in three rows and three columns. Row 1 contains: 3, 6, 12. Row 2 contains: 4, 8, 16. Row 3 contains: 5, 10, ?. The question mark appears in the bottom-right cell."
+      },
+      {
+        "id": "e62d0e64-92f5-4031-a5c2-3b4e73efbc63",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A farmer plants seeds in garden beds following a special pattern. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing numbers arranged in rows and columns. Row 1 contains: 6, 12, 18. Row 2 contains: 8, 16, 24. Row 3 contains: 10, ?, 30. The question mark is in the middle cell of the bottom row."
+      },
+      {
+        "id": "985f94fb-094b-4646-b9d4-217ed5051e8b",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "grid_3x3",
+        "reason": "Visual likely required",
+        "question_text": "A chess tournament organizer records the number of games played across different rounds. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid with numbers arranged in rows and columns. Row 1 contains: 4, 6, 12. Row 2 contains: 8, 5, 20. Row 3 contains: 12, 8, ?. The question mark represents the missing value to be determined."
+      },
+      {
+        "id": "49b07cf4-dff0-471b-8a11-40898a59c28b",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A marine biologist tracks the number of dolphins observed in three different ocean zones. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid with numbers arranged in rows and columns. Row 1 contains: 4, 2, 18. Row 2 contains: 7, 3, 30. Row 3 contains: 9, 9, ?. The question mark should be in the third column of the third row."
+      },
+      {
+        "id": "2ff9f770-ed90-408e-b615-e8457c0057c4",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "A baker decorates cakes with chocolate chips arranged in a special pattern. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing a number pattern with one cell containing a question mark"
+      },
+      {
+        "id": "f90a9002-8b77-49bc-9269-e1a7003d6fdb",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "3x3_grid",
+        "reason": "Visual likely required",
+        "question_text": "Each number in the grid below is formed by a rule involving the numbers adjacent to it. What number should replace the question mark?",
+        "visual_description": "A 3×3 numerical grid with one cell containing a question mark. Numbers are arranged in a pattern based on diagonal relationships."
+      },
+      {
+        "id": "1b056d56-a014-4731-bf67-a4f7dbec8d01",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Numerical Reasoning",
+        "visual_type": "grid_3x3",
+        "reason": "Visual likely required",
+        "question_text": "A librarian organizes books on three shelves with a special coding system. Study the pattern in the grid below. What number should replace the question mark?",
+        "visual_description": "A 3×3 grid showing numbers arranged in rows and columns with one cell containing a question mark"
+      },
+      {
+        "id": "6eb3b486-81d4-4626-82cf-dc730fa17697",
+        "test_type": "EduTest Scholarship (Year 7 Entry)",
+        "section_name": "Mathematics",
+        "visual_type": "diagram",
+        "reason": "Visual likely required",
+        "question_text": "A triangular sail on a yacht has a base of 6 metres and a height of 8 metres. What is the area of the sail?",
+        "visual_description": "A triangle representing a sail with the base labeled as 6 m and a perpendicular height line from the base to the opposite vertex labeled as 8 m"
+      }
+    ]
+  }
+}

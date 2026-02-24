@@ -14,7 +14,12 @@ import type { SubSkillExamplesDatabase } from './types';
  * - Numeracy No Calculator (30 questions, 30 minutes)
  * - Numeracy Calculator (35 questions, 35 minutes)
  *
- * Difficulty Levels: 1-6 (based on sample question tags)
+ * Difficulty Levels: 1-3 (Easy, Medium, Hard) - mapped from original NAPLAN levels
+ *
+ * Difficulty Mapping:
+ *   - Level 1 (Easy): Covers original NAPLAN levels 1-2
+ *   - Level 2 (Medium): Covers original NAPLAN levels 3-4
+ *   - Level 3 (Hard): Covers original NAPLAN levels 5-6
  * Age Group: 12-13 years old (Year 7 students)
  *
  * Key Differences from Year 5:
@@ -38,11 +43,27 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "NAPLAN WRITING TASK:\n\n[Narrative prompt providing a scenario, opening sentence, or theme]\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include well-developed characters and setting\n• Use a variety of sentence structures\n• Include descriptive and engaging language\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your story.",
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "NAPLAN WRITING TASK:\n\nWrite a story about a memorable day at school.\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include well-developed characters and setting\n• Use a variety of sentence structures\n• Include descriptive and engaging language\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your story.",
+          correct_answer: "[Student response - evaluated on narrative structure, character development, vocabulary, sentence variety, and technical accuracy]",
+          explanation: "This simple, concrete prompt asks Year 7 students to write about a familiar, everyday experience. Students can draw on personal memories to create a narrative with clear structure. The topic is straightforward and accessible, allowing students to focus on developing good writing techniques.",
+          characteristics: [
+            "Simple, concrete everyday topic",
+            "Familiar school experience",
+            "Clear narrative structure required",
+            "42-minute time limit including planning",
+            "Assessed on basic narrative elements",
+            "Accessible to all Year 7 students"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "NAPLAN WRITING TASK:\n\nWrite a story that begins with the sentence:\n\"The moment I stepped through the doorway, I knew nothing would ever be the same.\"\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include well-developed characters and setting\n• Use a variety of sentence structures\n• Include descriptive and engaging language\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your story.",
           correct_answer: "[Student response - evaluated on narrative structure, character development, vocabulary, sentence variety, and technical accuracy]",
           explanation: "This narrative prompt provides an intriguing opening sentence that suggests transformation or change, allowing students to demonstrate creativity while maintaining a clear narrative arc. Year 7 students should show sophisticated vocabulary, varied sentence structures, effective use of dialogue, and well-developed paragraphs.",
@@ -56,7 +77,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "NAPLAN WRITING TASK:\n\nWrite a story about a time when someone had to make a difficult choice between two important things.\n\nYour story should:\n• Have a clear beginning, middle, and end\n• Include well-developed characters and setting\n• Use a variety of sentence structures\n• Include descriptive and engaging language\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your story.",
           correct_answer: "[Student response - evaluated on narrative structure, thematic depth, character development, vocabulary, sentence variety, and technical accuracy]",
           explanation: "This higher-difficulty prompt requires students to explore internal conflict and decision-making, demonstrating emotional depth and sophisticated narrative development. Students should create believable characters facing genuine dilemmas, use advanced vocabulary, and maintain consistent point of view.",
@@ -89,36 +111,9 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, concrete prompts with everyday experiences (e.g., 'Write about a memorable day at school')",
-          "2": "Familiar scenarios requiring some imagination (e.g., 'Write about finding something unusual in your backyard')",
-          "3": "Moderately creative prompts with clear narrative focus (e.g., opening sentence provided, clear transformation theme)",
-          "4": "Abstract scenarios requiring developed creativity (e.g., 'Write about a time when things were not as they seemed')",
-          "5": "Complex prompts requiring sophisticated narrative development and thematic exploration (e.g., difficult choices, moral dilemmas)",
-          "6": "Highly abstract or challenging prompts requiring advanced storytelling, complex characterization, and thematic depth (e.g., multiple perspectives, non-linear narratives)"
-        },
-        common_mistakes: [
-          "Poor time management - spending too long on planning",
-          "Weak narrative structure - no clear beginning/middle/end",
-          "Underdeveloped characters and settings",
-          "Limited vocabulary and repetitive sentence structures",
-          "Poor paragraph organization",
-          "Lack of descriptive language",
-          "Technical errors (spelling, grammar, punctuation)",
-          "Inappropriate content or length",
-          "Straying from the prompt",
-          "Inconsistent point of view or verb tense"
-        ],
-        style_notes: [
-          "Year 7 students should demonstrate more sophisticated writing than Year 5",
-          "Expect advanced vocabulary and literary techniques (metaphor, simile, personification)",
-          "Varied sentence structures including complex and compound-complex sentences",
-          "Effective use of dialogue to develop character and advance plot",
-          "Well-developed paragraphs with clear topic sentences",
-          "Consistent narrative voice and point of view",
-          "Appropriate pacing and tension building",
-          "Strong opening that engages reader",
-          "Satisfying conclusion that resolves narrative arc",
-          "Technical accuracy expected at Year 7 level"
-        ]
+          "2": "Moderately creative prompts with clear narrative focus (e.g., opening sentence provided, clear transformation theme)",
+          "3": "Complex prompts requiring sophisticated narrative development and thematic exploration (e.g., difficult choices, moral dilemmas)"
+        }
       }
     },
 
@@ -128,11 +123,27 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "NAPLAN WRITING TASK:\n\n[Persuasive topic/question]\n\nWrite to persuade others to agree with your point of view.\n\nYour persuasive text should:\n• Have a clear opinion/position\n• Include arguments supported by reasons and evidence\n• Consider your audience\n• Use persuasive language techniques\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your persuasive text.",
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "NAPLAN WRITING TASK:\n\nShould students have longer lunch breaks at school?\n\nWrite to persuade others to agree with your point of view.\n\nYour persuasive text should:\n• Have a clear opinion/position\n• Include arguments supported by reasons and evidence\n• Consider your audience\n• Use persuasive language techniques\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your persuasive text.",
+          correct_answer: "[Student response - evaluated on argument strength, evidence quality, persuasive techniques, organization, and technical accuracy]",
+          explanation: "This simple, concrete topic presents a clear for/against position that Year 7 students can easily relate to. Students can draw on personal experience to support their arguments (for: time to relax, socialize, eat properly; against: less learning time, harder to refocus). The topic is straightforward and accessible.",
+          characteristics: [
+            "Simple, concrete school-related topic",
+            "Clear for/against positions",
+            "Familiar everyday experience",
+            "Easy to generate personal reasons",
+            "42-minute time limit including planning",
+            "Accessible to all Year 7 students"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "NAPLAN WRITING TASK:\n\nShould social media platforms have age restrictions?\n\nWrite to persuade others to agree with your point of view.\n\nYour persuasive text should:\n• Have a clear opinion/position\n• Include arguments supported by reasons and evidence\n• Consider your audience\n• Use persuasive language techniques\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your persuasive text.",
           correct_answer: "[Student response - evaluated on argument strength, evidence quality, persuasive techniques, organization, and technical accuracy]",
           explanation: "This persuasive prompt addresses a topic relevant to Year 7 students (12-13 years old) - social media use. Students should present a clear position (for or against age restrictions), support their arguments with logical reasons and evidence, use persuasive techniques (rhetorical questions, emotive language, statistics), and address counterarguments.",
@@ -147,7 +158,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "NAPLAN WRITING TASK:\n\nSome people believe that students should have a say in deciding what subjects they study at school. Others believe that the curriculum should be determined by education experts.\n\nWhat is your opinion?\n\nWrite to persuade others to agree with your point of view.\n\nYour persuasive text should:\n• Have a clear opinion/position\n• Include arguments supported by reasons and evidence\n• Consider your audience\n• Use persuasive language techniques\n• Address opposing viewpoints\n• Be well-organized with paragraphs\n• Use correct spelling, grammar, and punctuation\n\nYou have 42 minutes to plan and write your persuasive text.",
           correct_answer: "[Student response - evaluated on argument sophistication, evidence quality, counterargument addressing, persuasive techniques, organization, and technical accuracy]",
           explanation: "This higher-difficulty prompt requires students to navigate a more nuanced debate about educational autonomy. Students must understand multiple perspectives, construct sophisticated arguments, provide strong evidence, address counterarguments effectively, and use advanced persuasive techniques. The complexity of the issue requires higher-order thinking.",
@@ -181,36 +193,9 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, concrete topics with clear for/against positions (e.g., 'Should students have longer lunch breaks?')",
-          "2": "Familiar topics requiring basic reasoning (e.g., 'Should schools have a dress code?')",
-          "3": "Moderately complex topics relevant to students (e.g., social media age restrictions, homework amounts)",
-          "4": "Abstract or nuanced topics requiring developed reasoning (e.g., environmental responsibility, technology in education)",
-          "5": "Complex topics requiring sophisticated argumentation and counterargument addressing (e.g., curriculum choices, multiple perspectives)",
-          "6": "Highly abstract or controversial topics requiring advanced critical thinking, nuanced arguments, and effective counterargument rebuttal"
-        },
-        common_mistakes: [
-          "No clear position stated",
-          "Weak or unsupported arguments",
-          "Lack of evidence or examples",
-          "Not considering audience",
-          "Failure to use persuasive techniques",
-          "Poor organization (no clear introduction/body/conclusion)",
-          "Not addressing counterarguments at higher levels",
-          "Overly emotional without logical reasoning",
-          "Technical errors (spelling, grammar, punctuation)",
-          "Too short or off-topic"
-        ],
-        style_notes: [
-          "Year 7 students should use more sophisticated persuasive techniques than Year 5",
-          "Expect rhetorical questions, emotive language, statistics/facts, expert opinions",
-          "Strong introduction with clear thesis statement",
-          "Body paragraphs with topic sentences and supporting evidence",
-          "At higher difficulties, acknowledge and refute counterarguments",
-          "Logical connectives (furthermore, however, consequently, therefore)",
-          "Formal or semi-formal tone appropriate for audience",
-          "Conclusion that reinforces position and includes call to action",
-          "Varied sentence structures for emphasis",
-          "Technical accuracy expected at Year 7 level"
-        ]
+          "2": "Moderately complex topics relevant to students (e.g., social media age restrictions, homework amounts)",
+          "3": "Complex topics requiring sophisticated argumentation and counterargument addressing (e.g., curriculum choices, multiple perspectives)"
+        }
       }
     }
   },
@@ -227,11 +212,32 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Read the following passage and answer the question.\n\n[Passage: 200+ words - literary, informational, or persuasive text]\n\n[Question about explicit or implicit information]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Read this passage:\n\n\"The school library is open every weekday from 8:00 AM to 4:00 PM. Students can borrow up to three books at a time for two weeks. If you need a book for longer, you can renew it by asking the librarian. The library has a large collection of fiction and non-fiction books, as well as computers for research.\n\nMrs. Chen, the head librarian, is always happy to help students find books they'll enjoy. She runs a book club every Thursday after school for students who love reading. The library also has quiet study areas where students can do their homework.\"\n\nAccording to the passage, how many books can students borrow at once?\n\nA: Two books\nB: Three books\nC: Four books\nD: As many as they want",
+          answer_options: ["A: Two books", "B: Three books", "C: Four books", "D: As many as they want"],
+          correct_answer: "B",
+          explanation: "This is a literal comprehension question with the answer directly stated in the text: 'Students can borrow up to three books at a time.' The information is explicit and requires simple recall from the passage.",
+          distractor_strategy: "Option A (two) relates to the two-week borrowing period. Option C (four) is close to the correct number. Option D contradicts the specific limit stated.",
+          characteristics: [
+            "Simple informational text about familiar topic (school library)",
+            "Literal question with direct text match",
+            "Straightforward passage structure",
+            "Answer explicitly stated in second sentence",
+            "Common vocabulary appropriate for Year 7",
+            "Difficulty 1: Basic literal comprehension",
+            "Clear correct answer",
+            "Age-appropriate everyday context"
+          ],
+          passage_text: "The school library is open every weekday from 8:00 AM to 4:00 PM. Students can borrow up to three books at a time for two weeks. If you need a book for longer, you can renew it by asking the librarian. The library has a large collection of fiction and non-fiction books, as well as computers for research.\n\nMrs. Chen, the head librarian, is always happy to help students find books they'll enjoy. She runs a book club every Thursday after school for students who love reading. The library also has quiet study areas where students can do their homework."
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "Read this passage:\n\n\"As climate scientists gather more data about global temperature patterns, the evidence becomes increasingly clear. Over the past century, average temperatures have risen by approximately 1.1 degrees Celsius, with most of the warming occurring in the past 40 years. While this might seem like a small change, even minor shifts in global temperature can have significant impacts on weather patterns, sea levels, and ecosystems.\n\nOne of the most concerning effects is the melting of polar ice caps. As these massive ice sheets lose volume, sea levels rise, threatening coastal communities worldwide. Scientists estimate that if current trends continue, sea levels could rise by up to one meter by the end of this century.\n\nHowever, it's not all doom and gloom. Many countries have committed to reducing their carbon emissions, and renewable energy technologies are becoming more efficient and affordable. Solar and wind power are now competitive with traditional fossil fuels in many markets. The question is whether these changes are happening fast enough to prevent the most severe impacts.\"\n\nWhat does the passage suggest about climate models?\n\nA: They are becoming less accurate over time\nB: They show warming is happening more slowly than expected\nC: They are supported by increasing amounts of data\nD: They cannot predict sea level changes accurately",
           answer_options: ["A: They are becoming less accurate over time", "B: They show warming is happening more slowly than expected", "C: They are supported by increasing amounts of data", "D: They cannot predict sea level changes accurately"],
           correct_answer: "C",
@@ -250,7 +256,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           passage_text: "As climate scientists gather more data about global temperature patterns, the evidence becomes increasingly clear. Over the past century, average temperatures have risen by approximately 1.1 degrees Celsius, with most of the warming occurring in the past 40 years. While this might seem like a small change, even minor shifts in global temperature can have significant impacts on weather patterns, sea levels, and ecosystems.\n\nOne of the most concerning effects is the melting of polar ice caps. As these massive ice sheets lose volume, sea levels rise, threatening coastal communities worldwide. Scientists estimate that if current trends continue, sea levels could rise by up to one meter by the end of this century.\n\nHowever, it's not all doom and gloom. Many countries have committed to reducing their carbon emissions, and renewable energy technologies are becoming more efficient and affordable. Solar and wind power are now competitive with traditional fossil fuels in many markets. The question is whether these changes are happening fast enough to prevent the most severe impacts."
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Read this passage:\n\n\"The author's use of fragmentary sentences in the final paragraph serves several purposes. By breaking conventional sentence structure, she creates a sense of urgency and immediacy that mirrors the protagonist's emotional state. The short, sharp phrases – 'No time. No choice. No way back.' – function like hammer blows, each one reinforcing the desperate situation.\n\nThis stylistic choice also reflects a broader shift in contemporary literature toward experimental narrative techniques. Rather than adhering to traditional grammar rules, modern authors often manipulate language to achieve specific effects. In this case, the fragments emphasize the character's inability to think in complete thoughts during a crisis.\n\nInterestingly, the author returns to standard sentence structure in the epilogue, suggesting a return to stability and rational thought. This grammatical choice is as deliberate as the earlier fragments, demonstrating that what some might dismiss as 'incorrect' writing is actually a sophisticated literary device.\"\n\nWhat is the author's main purpose in this passage?\n\nA: To criticize modern authors for using poor grammar\nB: To explain how sentence fragments can be an effective literary technique\nC: To argue that all writing should follow traditional grammar rules\nD: To show that experimental writing is always better than traditional writing",
           answer_options: ["A: To criticize modern authors for using poor grammar", "B: To explain how sentence fragments can be an effective literary technique", "C: To argue that all writing should follow traditional grammar rules", "D: To show that experimental writing is always better than traditional writing"],
           correct_answer: "B",
@@ -293,11 +300,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Literal questions with direct text matches, simple vocabulary, straightforward passages",
-          "2": "Simple inferences, familiar topics, clear main ideas",
-          "3": "Moderate inferences requiring connection of ideas across paragraphs, some complex vocabulary",
-          "4": "Complex inferences, abstract concepts, author's purpose questions",
-          "5": "Sophisticated inference requiring synthesis of multiple ideas, literary analysis, nuanced understanding",
-          "6": "Highly complex passages with abstract themes, multiple valid interpretations, advanced critical thinking"
+          "2": "Moderate inferences requiring connection of ideas across paragraphs, some complex vocabulary",
+          "3": "Sophisticated inference requiring synthesis of multiple ideas, literary analysis, nuanced understanding",
         }
       }
     },
@@ -308,12 +312,34 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Determine word meaning from context or identify relationships",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Read this sentence:\n\n'After running the marathon, Sarah was exhausted and needed to rest.'\n\nWhat does 'exhausted' mean in this sentence?",
+          answer_options: [
+            "A: Excited",
+            "B: Very tired",
+            "C: Happy",
+            "D: Hungry"
+          ],
+          correct_answer: "B",
+          explanation: "The context 'After running the marathon' and 'needed to rest' makes it clear that 'exhausted' means very tired. This is a common word with clear context clues.",
+          distractor_strategy: "Includes other feelings/states that might occur after running (A: excited, C: happy, D: hungry) but don't match the meaning of exhausted",
+          characteristics: [
+            "Common, everyday vocabulary",
+            "Clear context clues in sentence",
+            "Familiar situation (running, being tired)",
+            "Year 7 appropriate",
+            "Difficulty 1: Common word with clear context"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "Read this sentence:\n\n'The archaeologist's discovery was unprecedented; nothing like it had ever been found before.'\n\nWhat does 'unprecedented' mean?",
           answer_options: [
             "A: Very old",
@@ -332,7 +358,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Read this passage:\n\n'The politician's speech was filled with ambiguous statements that could be interpreted in multiple ways, leaving voters uncertain about her actual positions.'\n\nWhat does 'ambiguous' mean?",
           answer_options: [
             "A: Very clear and direct",
@@ -370,11 +397,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Common words with clear context",
-          "2": "Familiar academic vocabulary",
-          "3": "Moderately challenging words, good context support",
-          "4": "Advanced vocabulary, inference required",
-          "5": "Sophisticated vocabulary, subtle clues",
-          "6": "Complex figurative language, nuanced meanings"
+          "2": "Moderately challenging words, good context support",
+          "3": "Sophisticated vocabulary, subtle clues",
         }
       }
     },
@@ -385,12 +409,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify text structure, purpose of features, or organizational patterns",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "A story is told in the order that events happened:\n\nFirst, Tom woke up and got dressed.\nNext, he ate breakfast.\nThen, he walked to school.\nFinally, he arrived at his classroom.\n\nWhat organizational pattern does this story use?",
+          answer_options: [
+            "A: Chronological order (time order)",
+            "B: Problem-solution structure",
+            "C: Compare-contrast structure",
+            "D: Cause-effect structure"
+          ],
+          correct_answer: "A",
+          explanation: "The story presents events in the order they happened (time order), using words like 'First,' 'Next,' 'Then,' and 'Finally.' This is chronological organization - the simplest and most obvious text structure.",
+          distractor_strategy: "Includes other text structures (B: problem-solution, C: compare-contrast, D: cause-effect) that don't match the sequential time pattern",
+          characteristics: [
+            "Simple narrative sequence",
+            "Obvious time order words (First, Next, Then, Finally)",
+            "Everyday familiar events",
+            "Clear chronological pattern",
+            "Difficulty 1: Simple, obvious structure",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "An article about climate change is organized with these sections:\n\n1. Introduction: Current climate situation\n2. Causes: Human activities contributing to climate change\n3. Effects: Impacts on weather, ecosystems, and society\n4. Solutions: Actions to address climate change\n5. Conclusion: Call to action\n\nWhat organizational pattern does this article use?",
           answer_options: [
             "A: Chronological order",
@@ -409,7 +456,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "In a narrative, the author uses flashbacks to reveal the protagonist's childhood, while the main story takes place in the present. This alternating structure creates:\n\nWhat effect does this structure create?",
           answer_options: [
             "A: Confusion about the timeline",
@@ -447,11 +495,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple, obvious structures",
-          "2": "Clear organizational patterns",
-          "3": "Moderately complex structures, identifying patterns",
-          "4": "Sophisticated structures, understanding purpose",
-          "5": "Complex literary structures, analyzing effects",
-          "6": "Nuanced structural analysis, multiple organizational layers"
+          "2": "Moderately complex structures, identifying patterns",
+          "3": "Complex literary structures, analyzing effects",
         }
       }
     },
@@ -462,12 +507,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Evaluate arguments, evidence, or reasoning in texts",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Read this argument:\n\n'All students love mathematics because I love mathematics.'\n\nWhat is wrong with this argument?",
+          answer_options: [
+            "A: Mathematics is a difficult subject",
+            "B: The argument is based on one person's opinion, not evidence about all students",
+            "C: The argument is too short",
+            "D: Nothing is wrong with it"
+          ],
+          correct_answer: "B",
+          explanation: "This argument makes an obvious error: it claims something about ALL students based only on one person's experience. This is an unsupported generalization - the claim is not backed by evidence.",
+          distractor_strategy: "Option A is irrelevant to the logic. Option C focuses on length rather than logic. Option D denies the obvious flaw.",
+          characteristics: [
+            "Simple, obvious logical flaw",
+            "Unsupported claim clearly visible",
+            "One person's experience generalized to everyone",
+            "Basic critical thinking",
+            "Difficulty 1: Obvious unsupported claim",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "Read this argument:\n\n'Students should have longer lunch breaks. My friend Sarah says she's always hungry in the afternoon, and I read on a blog that students need more time to eat properly.'\n\nWhat is the main weakness of this argument?",
           answer_options: [
             "A: The conclusion is unclear",
@@ -486,7 +554,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 6,
+          difficulty: 3,  // Hard (mapped from old level 6)
+          requires_visual: false,
           question_text: "Read these two claims:\n\nClaim A: 'Studies show that 78% of teenagers use social media daily, suggesting it's an important part of modern teenage life.'\n\nClaim B: 'Because most teenagers use social media, all schools should teach social media literacy.'\n\nWhat logical issue exists in moving from Claim A to Claim B?",
           answer_options: [
             "A: Claim A's statistics are incorrect",
@@ -524,11 +593,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Obvious unsupported claims",
-          "2": "Clear weak evidence",
-          "3": "Identifying anecdotal vs. factual evidence",
-          "4": "Evaluating source reliability and argument quality",
-          "5": "Recognizing subtle logical flaws",
-          "6": "Complex logical analysis, identifying sophisticated fallacies"
+          "2": "Identifying anecdotal vs. factual evidence",
+          "3": "Recognizing subtle logical flaws",
         }
       }
     }
@@ -547,11 +613,30 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Choose the sentence that is grammatically correct.\n\nOR\n\nWhich word or words best complete this sentence?\n\n[Sentence with blank or multiple versions]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which sentence is grammatically correct?\n\nA: The students was playing soccer.\nB: The students were playing soccer.\nC: The students is playing soccer.\nD: The students be playing soccer.",
+          answer_options: ["A: The students was playing soccer.", "B: The students were playing soccer.", "C: The students is playing soccer.", "D: The students be playing soccer."],
+          correct_answer: "B",
+          explanation: "This tests basic subject-verb agreement. 'Students' is plural, so it requires the plural verb 'were.' Option A incorrectly uses singular 'was.' Option C incorrectly uses singular 'is.' Option D uses the incorrect form 'be.'",
+          distractor_strategy: "Options use common errors: singular verbs with plural subjects (A: was, C: is) and incorrect verb form (D: be)",
+          characteristics: [
+            "Basic subject-verb agreement",
+            "Plural subject requires plural verb",
+            "Common grammar concept",
+            "Simple past continuous tense",
+            "Difficulty 1: Basic grammar rule",
+            "Clear correct answer",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "Which sentence is grammatically correct?\n\nA: If I was the principal, I would change the school uniform policy.\nB: If I were the principal, I would change the school uniform policy.\nC: If I am the principal, I would change the school uniform policy.\nD: If I be the principal, I would change the school uniform policy.",
           answer_options: ["A: If I was the principal, I would change the school uniform policy.", "B: If I were the principal, I would change the school uniform policy.", "C: If I am the principal, I would change the school uniform policy.", "D: If I be the principal, I would change the school uniform policy."],
           correct_answer: "B",
@@ -568,7 +653,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Which sentence maintains parallel structure?\n\nA: The committee recommended improving facilities, hiring more staff, and that we should update technology.\nB: The committee recommended improving facilities, hiring more staff, and to update technology.\nC: The committee recommended improving facilities, hiring more staff, and updating technology.\nD: The committee recommended to improve facilities, hiring more staff, and updating technology.",
           answer_options: ["A: The committee recommended improving facilities, hiring more staff, and that we should update technology.", "B: The committee recommended improving facilities, hiring more staff, and to update technology.", "C: The committee recommended improving facilities, hiring more staff, and updating technology.", "D: The committee recommended to improve facilities, hiring more staff, and updating technology."],
           correct_answer: "C",
@@ -608,11 +694,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic subject-verb agreement, simple tenses, common punctuation",
-          "2": "Pronoun agreement, compound sentences, basic comma rules",
-          "3": "Complex sentences, advanced punctuation, less common tenses",
-          "4": "Subjunctive mood, conditional sentences, sophisticated punctuation",
-          "5": "Parallel structure, complex clauses, subtle grammatical distinctions",
-          "6": "Highly nuanced grammar, sophisticated punctuation in complex contexts, formal vs. informal register"
+          "2": "Complex sentences, advanced punctuation, less common tenses",
+          "3": "Parallel structure, complex clauses, subtle grammatical distinctions",
         }
       }
     },
@@ -623,12 +706,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify correct spelling or word formation",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which word is spelled correctly?",
+          answer_options: [
+            "A: becaus",
+            "B: becuase",
+            "C: because",
+            "D: becouse"
+          ],
+          correct_answer: "C",
+          explanation: "'Because' is the correct spelling. This is a common, basic word that Year 7 students should know. The distractors show typical misspellings based on pronunciation.",
+          distractor_strategy: "Includes common phonetic misspellings (A: missing e, B: vowel reversal, D: wrong vowel)",
+          characteristics: [
+            "Common everyday word",
+            "Basic spelling",
+            "High-frequency word",
+            "Phonetic distractors",
+            "Difficulty 1: Basic spelling",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "Which word is spelled correctly?",
           answer_options: [
             "A: definately",
@@ -647,7 +753,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Which word correctly completes this sentence?\n\nThe scientist's research was considered _____; it could not be trusted or verified.",
           answer_options: [
             "A: reliable",
@@ -685,11 +792,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic spelling, simple prefixes/suffixes",
-          "2": "Common words, straightforward affixes",
-          "3": "Frequently misspelled words, moderate word formation",
-          "4": "Challenging spelling, complex affixes",
-          "5": "Sophisticated vocabulary, nuanced word formation",
-          "6": "Very difficult spelling, advanced morphology"
+          "2": "Frequently misspelled words, moderate word formation",
+          "3": "Sophisticated vocabulary, nuanced word formation",
         }
       }
     },
@@ -700,12 +804,36 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Identify correct punctuation",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which sentence uses punctuation correctly?",
+          answer_options: [
+            "A: What time is lunch.",
+            "B: What time is lunch?",
+            "C: What time is lunch!",
+            "D: What time is lunch"
+          ],
+          correct_answer: "B",
+          explanation: "This is a question, so it needs a question mark at the end. Option A incorrectly uses a period. Option C incorrectly uses an exclamation mark. Option D has no punctuation at all.",
+          distractor_strategy: "Tests basic end punctuation: period (A), exclamation mark (C), and no punctuation (D) versus correct question mark",
+          characteristics: [
+            "Basic end punctuation",
+            "Question sentence",
+            "Simple comma rule",
+            "Common everyday sentence",
+            "Difficulty 1: Basic end marks",
+            "Clear correct answer",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "Which sentence uses punctuation correctly?",
           answer_options: [
             "A: The team's victory was impressive: they scored 15 goals.",
@@ -724,7 +852,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Which sentence demonstrates correct comma usage with a non-restrictive clause?",
           answer_options: [
             "A: My brother who lives in Sydney is a doctor.",
@@ -762,11 +891,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic end marks, simple comma rules",
-          "2": "Apostrophes, simple comma usage",
-          "3": "Commas in complex sentences, quotation marks",
-          "4": "Semicolons, colons, non-restrictive clauses",
-          "5": "Complex comma patterns, sophisticated punctuation",
-          "6": "Nuanced punctuation in complex contexts"
+          "2": "Commas in complex sentences, quotation marks",
+          "3": "Complex comma patterns, sophisticated punctuation",
         }
       }
     },
@@ -777,12 +903,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Choose the best word for the context",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which word best completes this sentence?\n\nThe movie was so _____ that everyone in the cinema was laughing.",
+          answer_options: [
+            "A: sad",
+            "B: funny",
+            "C: boring",
+            "D: scary"
+          ],
+          correct_answer: "B",
+          explanation: "The context 'everyone in the cinema was laughing' makes it clear that the movie was 'funny.' This tests basic word choice with obvious context clues.",
+          distractor_strategy: "Includes opposite emotions (A: sad, C: boring, D: scary) that don't fit the context of laughing",
+          characteristics: [
+            "Basic word choice",
+            "Obvious context (laughing = funny)",
+            "Common everyday vocabulary",
+            "Clear correct answer",
+            "Difficulty 1: Basic word choice with obvious context",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "Which word best completes this formal sentence?\n\nThe committee will _____ the proposal at next week's meeting.",
           answer_options: [
             "A: talk about",
@@ -801,7 +950,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Choose the word that creates the strongest emotional impact:\n\nThe abandoned building was _____ in the moonlight.",
           answer_options: [
             "A: dark",
@@ -839,11 +989,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Basic word choice, obvious contexts",
-          "2": "Simple precision, clear register differences",
-          "3": "Moderate precision, connotation awareness",
-          "4": "Formal register, nuanced vocabulary",
-          "5": "Subtle distinctions, sophisticated tone",
-          "6": "Complex precision, advanced register control"
+          "2": "Moderate precision, connotation awareness",
+          "3": "Subtle distinctions, sophisticated tone",
         }
       }
     }
@@ -862,11 +1009,30 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "[Problem involving integer operations]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "What is -2 + 5?\n\nA: -7\nB: -3\nC: 3\nD: 7",
+          answer_options: ["A: -7", "B: -3", "C: 3", "D: 7"],
+          correct_answer: "C",
+          explanation: "Using a number line or mental math: Start at -2, move 5 places to the right (adding positive number), arriving at 3. This is a simple addition with a small negative number.",
+          distractor_strategy: "Option A (-7) results from subtracting instead of adding. Option B (-3) results from adding incorrectly. Option D (7) ignores the negative sign.",
+          characteristics: [
+            "Simple integer addition",
+            "Small numbers (-2 and 5)",
+            "Number line visualization helpful",
+            "Basic operation with negative number",
+            "Difficulty 1: Simple addition with small integers",
+            "No calculator needed - mental math appropriate",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "The temperature in Melbourne at 6am was -3°C. By midday it had risen 11°C, then dropped 4°C by 6pm.\n\nWhat was the temperature at 6pm?\n\nA: 4°C\nB: 8°C\nC: 12°C\nD: 2°C",
           answer_options: ["A: 4°C", "B: 8°C", "C: 12°C", "D: 2°C"],
           correct_answer: "A",
@@ -884,7 +1050,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "At the start of the month, Emma's bank account had a balance of -$45 (overdrawn). During the month:\n• She deposited $120\n• She withdrew $35\n• She was charged a $15 overdraft fee\n• She deposited $60\n\nWhat was her final balance?\n\nA: $85\nB: $70\nC: $100\nD: $55",
           answer_options: ["A: $85", "B: $70", "C: $100", "D: $55"],
           correct_answer: "A",
@@ -927,11 +1094,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple addition/subtraction with small integers, number line problems",
-          "2": "Two-step problems, ordering integers, simple word problems",
-          "3": "Multi-step problems with real-world contexts, negative starting numbers",
-          "4": "Complex word problems, multiplication/division of integers, abstract problems",
-          "5": "Multi-step problems requiring sustained accuracy, financial contexts, mixed operations",
-          "6": "Highly complex problems with multiple negative numbers, abstract reasoning, efficiency in calculation"
+          "2": "Multi-step problems with real-world contexts, negative starting numbers",
+          "3": "Multi-step problems requiring sustained accuracy, financial contexts, mixed operations",
         }
       }
     },
@@ -942,12 +1106,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve problems involving fractions, decimals, and percentages",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "What is 1/2 as a decimal?",
+          answer_options: [
+            "A: 0.2",
+            "B: 0.5",
+            "C: 2.0",
+            "D: 1.2"
+          ],
+          correct_answer: "B",
+          explanation: "1/2 means 1 divided by 2, which equals 0.5. This is one of the most basic fraction-decimal conversions. Students should know this equivalence: 1/2 = 0.5 = 50%.",
+          distractor_strategy: "Includes decimal place errors (A: 0.2) and incorrect conversions (C: 2.0, D: 1.2)",
+          characteristics: [
+            "Basic fraction to decimal conversion",
+            "Simple, common fraction (1/2)",
+            "Fundamental equivalence",
+            "Mental calculation possible",
+            "Difficulty 1: Simple conversion",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "What is 0.75 as a percentage?",
           answer_options: [
             "A: 7.5%",
@@ -966,7 +1153,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "Which is the largest: 3/5, 0.58, or 62%?",
           answer_options: [
             "A: 3/5",
@@ -1004,11 +1192,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple conversions (1/2 = 0.5 = 50%)",
-          "2": "Basic conversions, common fractions",
-          "3": "Standard conversions, simple comparisons",
-          "4": "Complex conversions, ordering multiple values",
-          "5": "Challenging mixed problems, multiple steps",
-          "6": "Sophisticated conversion and calculation problems"
+          "2": "Standard conversions, simple comparisons",
+          "3": "Challenging mixed problems, multiple steps",
         }
       }
     },
@@ -1019,12 +1204,36 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve algebraic problems or identify patterns",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "What is the next number in this pattern?\n\n2, 4, 6, 8, ___",
+          answer_options: [
+            "A: 9",
+            "B: 10",
+            "C: 12",
+            "D: 16"
+          ],
+          correct_answer: "B",
+          explanation: "This is a simple pattern that increases by 2 each time (counting by 2s). The pattern is: add 2. So 8 + 2 = 10. This is an obvious, basic pattern.",
+          distractor_strategy: "Includes incorrect patterns: A (9) adds 1, C (12) skips ahead, D (16) doubles",
+          characteristics: [
+            "Simple number pattern",
+            "Counting by 2s (even numbers)",
+            "Obvious rule: add 2",
+            "Basic pattern recognition",
+            "Difficulty 1: Simple, obvious pattern",
+            "Mental math appropriate",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "If 3x = 21, what is the value of x?",
           answer_options: [
             "A: 3",
@@ -1043,7 +1252,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "A sequence follows the rule: multiply the position number by 4, then subtract 1.\n\nWhat is the 10th term in the sequence?",
           answer_options: [
             "A: 39",
@@ -1081,11 +1291,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple patterns, obvious rules",
-          "2": "Basic equations (x + a = b)",
-          "3": "Multiplication/division equations, clear patterns",
-          "4": "Two-step equations, complex patterns",
-          "5": "Function rules, sophisticated patterns",
-          "6": "Complex algebraic reasoning, abstract patterns"
+          "2": "Multiplication/division equations, clear patterns",
+          "3": "Function rules, sophisticated patterns",
         }
       }
     },
@@ -1096,12 +1303,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve measurement or spatial problems",
 
       examples: [
         {
-          difficulty: 3,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "How many centimeters are in 1 meter?",
+          answer_options: [
+            "A: 10 cm",
+            "B: 50 cm",
+            "C: 100 cm",
+            "D: 1000 cm"
+          ],
+          correct_answer: "C",
+          explanation: "This is a basic metric conversion that all Year 7 students should know: 1 meter = 100 centimeters. This is fundamental measurement knowledge.",
+          distractor_strategy: "Includes other metric relationships (A: 10, D: 1000 for km/m) and mid-value (B: 50)",
+          characteristics: [
+            "Basic metric conversion",
+            "Fundamental measurement fact",
+            "Meter to centimeter",
+            "Simple recall question",
+            "Difficulty 1: Basic measurement knowledge",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 3)
+          requires_visual: false,
           question_text: "A square has a perimeter of 20 cm. What is the length of one side?",
           answer_options: [
             "A: 4 cm",
@@ -1120,7 +1350,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "How many minutes are there in 2.5 hours?",
           answer_options: [
             "A: 125 minutes",
@@ -1158,11 +1389,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple measurements, basic conversions",
-          "2": "Standard formulas, straightforward conversions",
-          "3": "Moderate complexity, multiple-step conversions",
-          "4": "Complex problems, less common conversions",
-          "5": "Challenging calculations, decimal conversions",
-          "6": "Sophisticated spatial reasoning, complex units"
+          "2": "Moderate complexity, multiple-step conversions",
+          "3": "Challenging calculations, decimal conversions",
         }
       }
     },
@@ -1173,12 +1401,35 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve ratio, rate, or proportion problems",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "A recipe calls for a ratio of 2 cups of flour to 1 cup of sugar. If you use 2 cups of flour, how many cups of sugar do you need?",
+          answer_options: [
+            "A: 1 cup",
+            "B: 2 cups",
+            "C: 3 cups",
+            "D: 4 cups"
+          ],
+          correct_answer: "A",
+          explanation: "The ratio 2:1 means for every 2 cups of flour, you need 1 cup of sugar. Since you're using 2 cups of flour, you need 1 cup of sugar. This is a simple, direct ratio application.",
+          distractor_strategy: "Includes doubling error (B: 2), adding (C: 3), and doubling both (D: 4)",
+          characteristics: [
+            "Simple ratio (2:1)",
+            "Direct application - no scaling needed",
+            "Familiar context (cooking)",
+            "Basic proportional thinking",
+            "Difficulty 1: Simple, basic ratio",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "A car travels 150 km in 2 hours. What is its average speed?",
           answer_options: [
             "A: 50 km/h",
@@ -1197,7 +1448,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "In a class, the ratio of boys to girls is 3:2. If there are 15 boys, how many girls are there?",
           answer_options: [
             "A: 5",
@@ -1235,11 +1487,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple ratios, basic rates",
-          "2": "Straightforward proportions, simple speed problems",
-          "3": "Ratio scaling, standard rate problems",
-          "4": "Complex ratios, multi-step rate problems",
-          "5": "Sophisticated proportional reasoning",
-          "6": "Advanced ratio and rate problems, complex scaling"
+          "2": "Ratio scaling, standard rate problems",
+          "3": "Sophisticated proportional reasoning",
         }
       }
     }
@@ -1258,11 +1507,30 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "[Complex word problem requiring calculator]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Emma has $12. She buys a sandwich for $5 and a drink for $3.\n\nHow much money does she have left?\n\nA: $2\nB: $4\nC: $8\nD: $20",
+          answer_options: ["A: $2", "B: $4", "C: $8", "D: $20"],
+          correct_answer: "B",
+          explanation: "This is a simple two-step problem. First, find the total spent: $5 + $3 = $8. Then subtract from starting amount: $12 - $8 = $4. The problem has straightforward context and obvious operations.",
+          distractor_strategy: "Option A ($2) results from calculation errors. Option C ($8) is the amount spent, not the amount left. Option D ($20) results from adding instead of subtracting.",
+          characteristics: [
+            "Simple two-step problem",
+            "Addition and subtraction",
+            "Familiar context (buying food)",
+            "Small, manageable numbers",
+            "Difficulty 1: Basic calculator use, straightforward context",
+            "Clear operations needed",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "A shop is having a sale. All items are reduced by 35%.\n\nA jacket originally cost $140.\nA pair of shoes originally cost $85.\n\nSara buys both items during the sale and pays with a $200 note.\n\nHow much change should she receive?\n\nA: $53.75\nB: $146.25\nC: $25.00\nD: $78.75",
           answer_options: ["A: $53.75", "B: $146.25", "C: $25.00", "D: $78.75"],
           correct_answer: "A",
@@ -1280,7 +1548,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 6,
+          difficulty: 3,  // Hard (mapped from old level 6)
+          requires_visual: false,
           question_text: "A swimming pool is being filled with water. The pool has a volume of 50,000 litres.\n\n• It starts filling at 9:00 AM at a rate of 125 litres per minute\n• At 10:30 AM, a second hose is added that fills at 180 litres per minute\n• The pool needs to be 95% full before swimmers can use it\n\nAt what time will the pool be ready for swimmers?\n\nA: 1:42 PM\nB: 1:27 PM\nC: 1:35 PM\nD: 2:05 PM",
           answer_options: ["A: 1:42 PM", "B: 1:27 PM", "C: 1:35 PM", "D: 2:05 PM"],
           correct_answer: "C",
@@ -1324,11 +1593,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple two-step problems, basic calculator use, straightforward contexts",
-          "2": "Three-step problems, percentage basics, measurement conversion",
-          "3": "Multi-step problems, discount/markup, rates, ratios",
-          "4": "Complex multi-step (4+ steps), combined percentage problems, real-world complexity",
-          "5": "Sophisticated problems requiring strategic thinking, multiple rates, complex percentages",
-          "6": "Highly complex problems with changing conditions, abstract reasoning, sustained accuracy through many steps"
+          "2": "Multi-step problems, discount/markup, rates, ratios",
+          "3": "Sophisticated problems requiring strategic thinking, multiple rates, complex percentages",
         }
       }
     },
@@ -1339,12 +1605,36 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve percentage and financial problems",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "What is 10% of $50?",
+          answer_options: [
+            "A: $5",
+            "B: $10",
+            "C: $15",
+            "D: $40"
+          ],
+          correct_answer: "A",
+          explanation: "10% means 10 out of 100, or 1/10. To find 10% of $50, multiply: $50 × 0.10 = $5. Or think: 10% is the same as dividing by 10, so $50 ÷ 10 = $5. This is a simple percentage calculation.",
+          distractor_strategy: "Includes calculation errors (B: $10 - using 20%), mid-values (C: $15), and subtraction result (D: $40)",
+          characteristics: [
+            "Simple percentage (10%)",
+            "Round number ($50)",
+            "Basic calculation",
+            "Money context",
+            "Difficulty 1: Simple percentage with round numbers",
+            "Calculator appropriate but mental math also possible",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "A jacket costs $120 and is on sale for 30% off. What is the sale price?",
           answer_options: [
             "A: $36",
@@ -1363,7 +1653,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 6,
+          difficulty: 3,  // Hard (mapped from old level 6)
+          requires_visual: false,
           question_text: "A store marks up items by 40% from wholesale price. If a shirt sells for $84, what was the wholesale price?",
           answer_options: [
             "A: $50.40",
@@ -1401,11 +1692,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple percentages (10%, 50%)",
-          "2": "Basic discounts, straightforward calculations",
-          "3": "Standard percentage problems, multiple steps",
-          "4": "Complex discounts, profit/loss, multi-step",
-          "5": "Reverse percentage problems, sophisticated applications",
-          "6": "Complex financial scenarios, multiple percentages"
+          "2": "Standard percentage problems, multiple steps",
+          "3": "Reverse percentage problems, sophisticated applications",
         }
       }
     },
@@ -1416,12 +1704,36 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve advanced measurement and geometry problems",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "A rectangle has a length of 6 cm and a width of 4 cm. What is its area?",
+          answer_options: [
+            "A: 10 cm²",
+            "B: 20 cm²",
+            "C: 24 cm²",
+            "D: 30 cm²"
+          ],
+          correct_answer: "C",
+          explanation: "The area of a rectangle is length × width. So area = 6 cm × 4 cm = 24 cm². This is a simple, direct application of the basic area formula.",
+          distractor_strategy: "Option A (10) is the perimeter divided by 2. Option B (20) is the perimeter. Option D (30) results from calculation errors.",
+          characteristics: [
+            "Basic area formula (length × width)",
+            "Simple multiplication",
+            "Small numbers (6 and 4)",
+            "Direct formula application",
+            "Difficulty 1: Simple shape, basic formula",
+            "Calculator appropriate",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "A rectangle has an area of 72 cm² and a length of 9 cm. What is its width?",
           answer_options: [
             "A: 6 cm",
@@ -1440,7 +1752,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "A rectangular prism has dimensions 5 cm × 4 cm × 3 cm. What is its volume?",
           answer_options: [
             "A: 12 cm³",
@@ -1478,11 +1791,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple shapes, basic formulas",
-          "2": "Standard shapes, straightforward calculations",
-          "3": "Reverse problems, moderate complexity",
-          "4": "Complex shapes, multi-step problems",
-          "5": "Compound shapes, sophisticated reasoning",
-          "6": "Very complex geometric problems, multiple concepts"
+          "2": "Reverse problems, moderate complexity",
+          "3": "Compound shapes, sophisticated reasoning",
         }
       }
     },
@@ -1493,12 +1803,36 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Analyze data, calculate statistics, or solve probability problems",
 
       examples: [
         {
-          difficulty: 4,
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Look at this simple bar chart showing favorite fruits:\n\nApples: 5 students\nBananas: 8 students\nOranges: 3 students\n\nWhich fruit is the most popular?",
+          answer_options: [
+            "A: Apples",
+            "B: Bananas",
+            "C: Oranges",
+            "D: They are all equally popular"
+          ],
+          correct_answer: "B",
+          explanation: "This is a simple data reading question. Looking at the numbers, bananas have 8 students, which is more than apples (5) and oranges (3). Therefore, bananas are the most popular.",
+          distractor_strategy: "Includes other fruits (A, C) and incorrect interpretation (D)",
+          characteristics: [
+            "Simple data reading",
+            "Finding maximum value",
+            "Familiar context (favorite fruits)",
+            "Small data set (3 categories)",
+            "Difficulty 1: Basic data reading, simple comparison",
+            "Clear correct answer",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium (mapped from old level 4)
+          requires_visual: false,
           question_text: "The temperatures (°C) for a week were: 18, 22, 19, 25, 21, 23, 20.\n\nWhat is the median temperature?",
           answer_options: [
             "A: 19°C",
@@ -1517,7 +1851,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 5,
+          difficulty: 3,  // Hard (mapped from old level 5)
+          requires_visual: false,
           question_text: "A bag contains 5 red marbles, 3 blue marbles, and 2 green marbles. If you draw one marble at random, what is the probability it is NOT red?",
           answer_options: [
             "A: 1/2",
@@ -1555,11 +1890,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple data reading, basic probability",
-          "2": "Mean calculations, straightforward probability",
-          "3": "Median, mode, simple compound probability",
-          "4": "Multiple statistics, ordered data, complement probability",
-          "5": "Complex data sets, sophisticated probability",
-          "6": "Advanced statistics, complex probability scenarios"
+          "2": "Median, mode, simple compound probability",
+          "3": "Complex data sets, sophisticated probability",
         }
       }
     },
@@ -1570,31 +1902,61 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [1, 2, 3, 4, 5, 6],
+      difficulty_range: [1, 2, 3],
       question_format: "Solve complex multi-step problems",
 
       examples: [
         {
-          difficulty: 5,
-          question_text: "A school is organizing a trip. Each bus holds 45 students. There are 387 students going on the trip. Bus rental costs $180 per bus. How much will the buses cost in total?",
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Sarah buys 3 notebooks for $4 each. How much does she spend in total?",
           answer_options: [
-            "A: $1,440",
-            "B: $1,530",
-            "C: $1,620",
-            "D: $1,800"
+            "A: $7",
+            "B: $12",
+            "C: $16",
+            "D: $4"
           ],
-          correct_answer: "C",
-          explanation: "Number of buses needed: 387 ÷ 45 = 8.6, so 9 buses needed (must round up). Cost: 9 × $180 = $1,620.",
-          distractor_strategy: "Tests rounding up concept (can't have partial bus); includes answers from rounding down or calculation errors",
+          correct_answer: "B",
+          explanation: "This is a simple two-step problem with obvious operations. To find the total cost, multiply: 3 notebooks × $4 each = $12. The operations are straightforward and clearly indicated.",
+          distractor_strategy: "Option A ($7) results from adding instead of multiplying. Option C ($16) uses wrong number. Option D ($4) is the cost of one notebook.",
           characteristics: [
-            "Three-step problem",
-            "Division with rounding up",
-            "Multiplication",
-            "Real-world context"
+            "Simple two-step problem",
+            "Basic multiplication",
+            "Small, manageable numbers",
+            "Obvious operation needed",
+            "Familiar shopping context",
+            "Difficulty 1: Simple two-step, obvious operations",
+            "Calculator appropriate but mental math also possible",
+            "Age-appropriate for Year 7"
           ]
         },
         {
-          difficulty: 6,
+          difficulty: 2,  // Medium
+          requires_visual: false,
+          question_text: "A basketball team is buying new uniforms. Each uniform costs $45. The team needs 12 uniforms. They also need to buy 3 basketballs at $25 each.\n\nWhat is the total cost?",
+          answer_options: [
+            "A: $540",
+            "B: $615",
+            "C: $75",
+            "D: $585"
+          ],
+          correct_answer: "B",
+          explanation: "This is a three-step problem with moderate complexity. Step 1: Cost of uniforms = 12 × $45 = $540. Step 2: Cost of basketballs = 3 × $25 = $75. Step 3: Total cost = $540 + $75 = $615. The problem requires organizing information and performing multiple calculations.",
+          distractor_strategy: "Option A ($540) is just the uniform cost. Option C ($75) is just the basketball cost. Option D ($585) results from calculation errors.",
+          characteristics: [
+            "Three-step problem",
+            "Two multiplication steps plus addition",
+            "Multiple items to track",
+            "Real-world context (sports equipment)",
+            "Moderate complexity",
+            "Difficulty 2: Three-step, moderate complexity",
+            "Calculator appropriate",
+            "Age-appropriate for Year 7"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard (mapped from old level 6)
+          requires_visual: false,
           question_text: "A rectangular garden is 12 m long and 8 m wide. A path 1 m wide is built around the outside of the garden. What is the area of the path?",
           answer_options: [
             "A: 40 m²",
@@ -1632,11 +1994,8 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
         ],
         difficulty_progression: {
           "1": "Simple two-step, obvious operations",
-          "2": "Clear two-step, familiar contexts",
-          "3": "Three-step, moderate complexity",
-          "4": "Multi-step requiring planning",
-          "5": "Complex problems with non-obvious steps",
-          "6": "Highly sophisticated problems requiring advanced reasoning"
+          "2": "Three-step, moderate complexity",
+          "3": "Complex problems with non-obvious steps"
         }
       }
     }

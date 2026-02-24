@@ -65,8 +65,10 @@ export function buildPromptWithExamples(context: PromptContext): BuiltPrompt {
     pattern
   } = context;
 
-  // Select 2 examples closest to target difficulty
-  const selectedExamples = selectExamplesForDifficulty(examples, difficulty, 2);
+  // Select examples closest to target difficulty
+  // Pattern-based sub-skills need more examples due to variety of patterns
+  const exampleCount = getExampleCountForSubSkill(subSkill);
+  const selectedExamples = selectExamplesForDifficulty(examples, difficulty, exampleCount);
 
   // Format the recent questions block (up to 20, from DB)
   const recentQuestionsBlock = formatRecentQuestions(context.recentQuestions);
@@ -77,13 +79,20 @@ export function buildPromptWithExamples(context: PromptContext): BuiltPrompt {
   // Passage block (only for reading comprehension)
   const passageBlock = context.passage ? buildPassageContext(context.passage) : '';
 
-  // Visual instruction (only if required)
-  const visualBlock = subSkillData.visual_required ? buildVisualInstruction(subSkillData) : '';
+  // Sub-skill specific guidance
+  const subSkillGuidance = getSubSkillSpecificGuidance(subSkill);
 
   const prompt = `You are an expert question writer for ${testType}.
 
 Generate ONE ${section} question for the sub-skill: "${subSkill}"
 Difficulty: ${difficulty} (${getDifficultyDescriptor(difficulty)})
+
+CRITICAL: This question MUST be answerable from the text alone. NO VISUAL AIDS WILL BE PROVIDED TO STUDENTS.
+- If the question involves a table: Include complete table data in markdown format in question_text
+- If the question involves a grid/pattern: Include ALL grid values as text (e.g., "Row 1: 2, 4, 6. Row 2: 3, 6, 9...")
+- If the question involves geometry: Include ALL measurements and dimensions in question_text
+- If the question involves data/charts: Include ALL necessary data values in question_text
+- Use clear, complete textual descriptions. The student will NOT see any diagram or visual.
 
 DESCRIPTION: ${subSkillData.description}
 FORMAT: ${subSkillData.question_format}
@@ -98,10 +107,17 @@ Pattern:
 - Distractors: ${pattern.distractor_strategies.slice(0, 3).join('; ')}
 
 Be creative with scenarios — use varied contexts (sports, nature, technology, history, everyday life, etc). Never reuse a scenario from the examples above.
-${recentQuestionsBlock}${previousFailuresBlock}
+
+⚠️ CRITICAL: RANDOMIZE CORRECT ANSWER POSITION
+- The correct answer should appear in DIFFERENT positions across questions
+- Do NOT always put the correct answer in position B
+- Vary between A, B, C, D, E positions randomly
+- This is essential for test validity and preventing answer pattern bias
+
+${subSkillGuidance}${recentQuestionsBlock}${previousFailuresBlock}
 Return ONLY valid JSON, no markdown:
 
-${buildOutputFormat(subSkillData.visual_required)}
+${buildOutputFormat(false)}
 
 Generate the question now:`;
 
@@ -117,7 +133,41 @@ Generate the question now:`;
 }
 
 // ============================================================================
-// EXAMPLE SELECTION — prefer exact difficulty match, max 2
+// EXAMPLE COUNT — pattern-based sub-skills need more examples
+// ============================================================================
+
+function getExampleCountForSubSkill(subSkill: string): number {
+  const subSkillLower = subSkill.toLowerCase();
+
+  // Letter Series: most variety, show 4-5 examples
+  if (subSkillLower.includes('letter series') || subSkillLower.includes('letter pattern')) {
+    return 5;
+  }
+
+  // Number Series: multiple pattern types, show 3 examples
+  if (subSkillLower.includes('number series') ||
+      subSkillLower.includes('number pattern') ||
+      subSkillLower.includes('pattern recognition')) {
+    return 3;
+  }
+
+  // Punctuation: many punctuation types, show 3 examples
+  if (subSkillLower.includes('punctuation')) {
+    return 3;
+  }
+
+  // Grid/Matrix patterns: complex 2D patterns, show 3 examples
+  if (subSkillLower.includes('matrix') ||
+      subSkillLower.includes('grid pattern')) {
+    return 3;
+  }
+
+  // Default: 2 examples
+  return 2;
+}
+
+// ============================================================================
+// EXAMPLE SELECTION — prefer exact difficulty match
 // ============================================================================
 
 function selectExamplesForDifficulty(
@@ -246,23 +296,13 @@ Rules: Use "html_table" for any data tables. If a chart asks students to calcula
 // ============================================================================
 
 function buildOutputFormat(visualRequired: boolean): string {
-  const base = `{
-  "question_text": "...",
+  // Visual requirement is now always false - all data must be in question_text
+  return `{
+  "question_text": "Complete question text with ALL data and information needed to answer (tables in markdown, all measurements, all values)",
   "answer_options": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
   "correct_answer": "B",
-  "solution": "• [step 1]\\n• [step 2]\\n• Therefore, the answer is B because [reason]"`;
-
-  if (visualRequired) {
-    return base + `,
-  "visual_spec": {
-    "type": "...",
-    "description": "...",
-    "parameters": {}
-  }
+  "solution": "• [step 1]\\n• [step 2]\\n• Therefore, the answer is B because [reason]"
 }`;
-  }
-
-  return base + '\n}';
 }
 
 // ============================================================================
@@ -454,8 +494,18 @@ export function buildMiniPassagePrompt(
   const guidance = PASSAGE_TYPE_GUIDANCE[passageType] || PASSAGE_TYPE_GUIDANCE['micro'];
 
   const topicDiversityBlock = usedTopics.length > 0
-    ? `\nALREADY USED TOPICS — do NOT use these:
-${usedTopics.slice(0, 10).map((t, i) => `${i + 1}. ${t}`).join('\n')}
+    ? `\n🚨 CRITICAL: ALREADY GENERATED PASSAGES — DO NOT DUPLICATE OR USE SIMILAR:
+${usedTopics.slice(0, 20).map((t, i) => `${i + 1}. ${t}`).join('\n')}
+
+MANDATORY ANTI-DUPLICATION RULES:
+1. Your TITLE must be completely different from all titles above
+2. Your TOPIC/SUBJECT must be clearly distinct from all topics above
+3. Examples of what NOT to do:
+   - If "lighthouses" appears above → NO lighthouses, beacons, navigation systems
+   - If "elephants" appears above → NO elephants, large mammals, animal communication
+   - If "basketball" appears above → NO basketball, court sports, or James Naismith
+4. Choose a topic from a DIFFERENT category entirely
+5. If in doubt, pick something totally unrelated to anything listed above
 `
     : '';
 
@@ -475,11 +525,33 @@ SPELLING: Australian spelling
 DIFFICULTY & READING LEVEL:
 ${difficultyGuidance}
 ${topicDiversityBlock}
-REQUIREMENTS:
+CRITICAL TOPIC DIVERSITY REQUIREMENTS:
+- You will see curriculum examples showing questions about specific topics (e.g., platypuses, koalas, etc.)
+- These examples show the QUESTION PATTERN and DIFFICULTY LEVEL — NOT the topics you should use
+- DO NOT copy topics from curriculum examples — they are just showing the format
+- Choose diverse, varied topics: science, technology, history, culture, sports, arts, nature (NOT just animals), geography, human achievements, etc.
+- Topics can be from ANYWHERE in the world — Australia, Asia, Europe, Africa, Americas, global topics
+- Vary your subject matter: if previous passages were about animals, choose technology or history or culture
+- Be creative and think globally — avoid clustering around one theme (like Australian animals)
+
+FORBIDDEN TITLE PATTERNS (do NOT use these):
+- "The Mystery of..." (overused pattern)
+- "The Birth of..." (overused pattern)
+- "The Silent..." (overused pattern)
+- "The Secret of..." (overused pattern)
+- "The Invention of..." (overused pattern)
+
+GOOD TITLE EXAMPLES (varied and creative):
+- "Hidden Treasures in City Gardens"
+- "When Computers Learned to See"
+- "Floating Markets of Southeast Asia"
+- "Racing Against Time: Emergency Response Teams"
+- "Crystal Caves and Their Secrets"
+
+PASSAGE REQUIREMENTS:
 - The mini-passage must be rich enough to support ONE question testing "${subSkill}"
 - It should be self-contained — a student can answer the question without any other context
-- Topics can be from anywhere in the world
-- Be creative with the topic
+- Choose an engaging, age-appropriate topic for Year ${yearLevel} students
 
 Return ONLY valid JSON:
 {
@@ -490,6 +562,79 @@ Return ONLY valid JSON:
   "setting": "Brief setting description",
   "potential_question_topics": ["${subSkill}"]
 }`;
+}
+
+// ============================================================================
+// SUB-SKILL SPECIFIC GUIDANCE
+// ============================================================================
+
+function getSubSkillSpecificGuidance(subSkill: string): string {
+  const subSkillLower = subSkill.toLowerCase();
+
+  // Letter Series & Patterns
+  if (subSkillLower.includes('letter series') || subSkillLower.includes('letter pattern')) {
+    return `
+
+LETTER SERIES GUIDANCE:
+- For VIC Selective, use this exact format: "The next [one/two] letter(s) in the series\\n[LETTER]    [LETTER]    [LETTER]    are:"
+- Use clear, unambiguous patterns: constant increment (e.g., +3 each time), alternating (+3, -1), or accelerating (+2, +3, +4, +5)
+- For two-letter patterns (e.g., BD EG HJ), both letters should follow the SAME rule consistently
+- Always show the pattern progression in your solution using letter positions: A(1), B(2), ..., Z(26)
+- Example solution format: "B(2)→E(5) is +3, E(5)→H(8) is +3, pattern is +3 each time"
+- Ensure the marked answer is definitively correct by showing clear arithmetic
+- Avoid ambiguous patterns where multiple rules could apply
+`;
+  }
+
+  // Punctuation
+  if (subSkillLower.includes('punctuation')) {
+    return `
+
+PUNCTUATION GUIDANCE:
+- Cover various punctuation types: apostrophes (possessive singular/plural), commas (series, introductory phrases), quotation marks, periods, question marks
+- Make ONE option clearly correct with only ONE valid interpretation
+- Incorrect options should have obvious errors: missing punctuation, misplaced apostrophes, wrong comma placement
+- For possessive apostrophes: singular (dog's), plural not ending in s (children's), plural ending in s (dogs')
+- Format: "Which sentence has correct punctuation?" or "Which sentence uses [specific punctuation] correctly?"
+- Ensure answer is unambiguous - punctuation rules should be clear-cut, not debatable
+`;
+  }
+
+  // Number Series & Pattern Recognition
+  if (subSkillLower.includes('number series') ||
+      subSkillLower.includes('number pattern') ||
+      subSkillLower.includes('pattern recognition')) {
+    return `
+
+NUMBER SERIES GUIDANCE:
+- Pattern types: arithmetic (constant difference), geometric (constant ratio), quadratic (differences form a pattern), Fibonacci-type (sum of previous two)
+- Show clear pattern in solution: "6 → 12 (+6), 12 → 18 (+6), pattern is +6 each time"
+- Distractors should be plausible but wrong: off-by-one errors, alternative patterns, arithmetic mistakes
+- Ensure pattern is unambiguous - only ONE rule should clearly produce the sequence
+- Format: "What is the next number in the sequence? [numbers], ?"
+`;
+  }
+
+  // Grid/Matrix Patterns
+  if (subSkillLower.includes('matrix') ||
+      subSkillLower.includes('grid pattern')) {
+    return `
+
+GRID PATTERN GUIDANCE:
+- Use simple ASCII tables or clearly formatted grids
+- Patterns can be: row sums, column products, diagonal patterns, or position-based rules
+- Example grid format:
+  | 2  | 4  | 6  |
+  | 3  | 6  | 9  |
+  | 4  | 8  | ?  |
+- Make the pattern discoverable from at least 2 complete rows/columns
+- Explain the pattern step-by-step in the solution
+- Ensure only ONE pattern produces the answer
+`;
+  }
+
+  // No specific guidance for other sub-skills
+  return '';
 }
 
 // ============================================================================

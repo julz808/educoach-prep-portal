@@ -7,11 +7,11 @@ import type { SubSkillExamplesDatabase } from './types';
  * ACER Scholarship Test - Complete Sub-Skill Examples
  *
  * Sections:
- * - Mathematics (8 sub-skills, 16 examples)
- * - Humanities (8 sub-skills, 22 examples)
- * - Written Expression (2 sub-skills, 2 prompts)
+ * - Mathematics (8 sub-skills, 23 examples)
+ * - Humanities (8 sub-skills, 34 examples)
+ * - Written Expression (2 sub-skills, 4 prompts)
  *
- * Total: 18 sub-skills, 40 examples/prompts
+ * Total: 18 sub-skills, 61 examples/prompts
  */
 export const ACER_SUB_SKILLS: SubSkillExamplesDatabase = {
 
@@ -172,6 +172,28 @@ export const ACER_SUB_SKILLS: SubSkillExamplesDatabase = {
 
       examples: [
         {
+          difficulty: 1,
+          question_text: "A bag contains 5 red marbles and 3 blue marbles.\n\nIf you pick one marble without looking, what is the probability that it will be red?",
+          answer_options: [
+            "A) 5 out of 8",
+            "B) 3 out of 8",
+            "C) 5 out of 3",
+            "D) 1 out of 2"
+          ],
+          correct_answer: "A",
+          explanation: "There are 5 red marbles out of a total of 8 marbles (5 red + 3 blue = 8 total). The probability of picking red is 5/8 or 5 out of 8.",
+          distractor_strategy: "B uses blue marbles instead of red; C reverses numerator and denominator; D assumes equal chances",
+          characteristics: [
+            "Simple probability calculation",
+            "Single-step problem",
+            "Clear favorable and total outcomes",
+            "Familiar context (marbles in a bag)",
+            "Answers given in words",
+            "Basic fraction understanding"
+          ],
+          requires_visual: false
+        },
+        {
           difficulty: 2,
           question_text: "Michael has 7 green balls and 3 yellow balls in a box, totaling 10 balls. Suppose Michael removes one yellow ball from the box. If he then picks another ball without looking, what is the probability that it will be green?",
           answer_options: [
@@ -212,6 +234,28 @@ export const ACER_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Answers in fraction notation"
           ],
           requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "A spinner has 6 equal sections numbered 1 through 6. Emma spins it twice. What is the probability that both spins result in even numbers?",
+          answer_options: [
+            "A) 1/2",
+            "B) 1/3",
+            "C) 1/4",
+            "D) 1/6"
+          ],
+          correct_answer: "C",
+          explanation: "Even numbers on the spinner: 2, 4, 6 (3 out of 6 options).\nProbability of even on first spin = 3/6 = 1/2.\nProbability of even on second spin = 3/6 = 1/2.\nProbability of both even = 1/2 × 1/2 = 1/4.",
+          distractor_strategy: "A is probability of one even spin; B might come from incorrect reasoning; D is probability of one specific number",
+          characteristics: [
+            "Compound independent events",
+            "Requires multiplication of probabilities",
+            "Multiple step reasoning",
+            "Understanding 'and' in probability",
+            "Tests systematic approach to compound events",
+            "Advanced Year 7 probability"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -249,6 +293,28 @@ export const ACER_SUB_SKILLS: SubSkillExamplesDatabase = {
       question_format: "Problems involving calculating areas, perimeters, or using one to find the other",
 
       examples: [
+        {
+          difficulty: 1,
+          question_text: "A rectangle has a length of 8 cm and a width of 5 cm.\n\nWhat is the perimeter of the rectangle?",
+          answer_options: [
+            "A) 13 cm",
+            "B) 26 cm",
+            "C) 40 cm",
+            "D) 52 cm"
+          ],
+          correct_answer: "B",
+          explanation: "Perimeter of rectangle = 2 × (length + width) = 2 × (8 + 5) = 2 × 13 = 26 cm.",
+          distractor_strategy: "A adds dimensions only; C calculates area (8×5); D doubles incorrectly",
+          characteristics: [
+            "Direct application of perimeter formula",
+            "Simple rectangle problem",
+            "One-step calculation",
+            "Basic formula knowledge",
+            "Clear dimensions given",
+            "Year 7 appropriate"
+          ],
+          requires_visual: false
+        },
         {
           difficulty: 2,
           question_text: "A square has the same perimeter as a rectangle with sides 27 cm and 21 cm. Find the area of the square.",
@@ -643,13 +709,45 @@ export const ACER_SUB_SKILLS: SubSkillExamplesDatabase = {
     // SUB-SKILL 6: Fractions & Number Lines
     "Fractions & Number Lines": {
       description: "Working with fractions on number lines, calculating differences, and understanding fraction relationships",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
       question_format: "Number line problems involving finding values, calculating differences between fractions",
 
       examples: [
+        {
+          difficulty: 1,
+          question_text: "On a number line from 0 to 1, a point is marked at 1/4.\n\nWhich position shows 1/4?",
+          answer_options: [
+            "A) Halfway between 0 and 1/2",
+            "B) Halfway between 1/2 and 1",
+            "C) At 1/2",
+            "D) At 3/4"
+          ],
+          correct_answer: "A",
+          explanation: "1/4 is one quarter of the way from 0 to 1, which is halfway between 0 and 1/2 (since 1/2 = 2/4).",
+          distractor_strategy: "B is position of 3/4; C and D are different fractions",
+          characteristics: [
+            "Basic fraction position",
+            "Understanding fraction location",
+            "Simple number line reading",
+            "Familiar fractions (halves and quarters)",
+            "Visual-spatial understanding",
+            "Year 7 appropriate"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate a horizontal number line from 0 to 1:
+- Mark 0 on the left end, 1 on the right end
+- Divide into 4 equal parts (quarters)
+- Mark and label all quarters: 0, 1/4, 1/2, 3/4, 1
+- Highlight the point at 1/4 with a dot or circle
+- Simple, clean educational design
+
+Visual type: coordinate_grid (SVG)
+Dimensions: 400x150px`
+        },
         {
           difficulty: 2,
           question_text: "On a number line marked from 0 to 1, points X and Y are marked. Point X is at 1/5 and point Y is at 3/5. What is the distance between X and Y?",
@@ -733,6 +831,41 @@ Dimensions: 400x150px`
             "Tests understanding of fraction magnitude"
           ],
           requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "On a number line from 0 to 2, three points are marked: Point P at 2/3, Point Q at 4/3, and Point R at 5/3.\n\nWhat is the total distance from P to Q plus the distance from Q to R?",
+          answer_options: [
+            "A) 1",
+            "B) 4/3",
+            "C) 5/3",
+            "D) 2"
+          ],
+          correct_answer: "A",
+          explanation: "Distance from P to Q = 4/3 - 2/3 = 2/3.\nDistance from Q to R = 5/3 - 4/3 = 1/3.\nTotal distance = 2/3 + 1/3 = 3/3 = 1.",
+          distractor_strategy: "B is distance P to Q plus 2/3; C is position of R; D is endpoint of number line",
+          characteristics: [
+            "Multi-step fraction calculation",
+            "Number line extending beyond 1",
+            "Adding multiple distances",
+            "Requires simplification",
+            "Tests systematic problem-solving",
+            "Advanced Year 7 fraction work"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate a horizontal number line from 0 to 2:
+- Mark 0 on the left, 2 on the right
+- Divide into thirds (showing 0, 1/3, 2/3, 1, 4/3, 5/3, 2)
+- Mark and label point P at 2/3
+- Mark and label point Q at 4/3
+- Mark and label point R at 5/3
+- Highlight P, Q, and R with dots
+- Show mark at 1 to indicate whole number
+- Clean educational design
+
+Visual type: coordinate_grid (SVG)
+Dimensions: 500x150px`
         }
       ],
 
@@ -859,13 +992,46 @@ Dimensions: 400x150px`
     // SUB-SKILL 8: Data Interpretation & Applied Mathematics
     "Data Interpretation & Applied Mathematics": {
       description: "Reading and interpreting tables, charts, and graphs to solve real-world problems",
-      visual_required: true,
+      visual_required: false,
       image_type: "HTML",  // HTML tables for data tables, SVG for charts/graphs
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
       question_format: "Word problems with data tables, requiring extraction of information and multi-step calculations",
 
       examples: [
+        {
+          difficulty: 1,
+          question_text: "A simple bar graph shows the number of books read by four students in January:\n\n- Alex: 3 books\n- Beth: 5 books\n- Carlos: 2 books\n- Dana: 4 books\n\nWho read the most books in January?",
+          answer_options: [
+            "A) Alex",
+            "B) Beth",
+            "C) Carlos",
+            "D) Dana"
+          ],
+          correct_answer: "B",
+          explanation: "Looking at the data, Beth read 5 books, which is more than Alex (3), Carlos (2), and Dana (4).",
+          distractor_strategy: "Other students in the data set",
+          characteristics: [
+            "Direct reading from data",
+            "Simple comparison",
+            "Finding maximum value",
+            "Basic data interpretation",
+            "Straightforward answer",
+            "Year 7 appropriate"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate a simple bar graph showing:
+- Title: "Books Read in January"
+- X-axis: Student names (Alex, Beth, Carlos, Dana)
+- Y-axis: Number of books (0-6)
+- Bars showing: Alex=3, Beth=5, Carlos=2, Dana=4
+- Simple, clear design with grid lines
+- Different color for each bar
+
+Visual type: bar_chart (SVG)
+Dimensions: 400x300px`
+        },
         {
           difficulty: 2,
           question_text: "A veterinarian uses pills to treat animals. The table shows daily pill requirements:\n\n| Animal | Base Dose | Per kg |\n|---------|-----------|--------|\n| Cat | 1 | 1 |\n| Rabbit | 0.5 | 0.5 |\n| Small dog | 1.5 | 1 |\n| Large dog | 2 | 1.5 |\n\nChloe has a 7 kg cat and a 4 kg rabbit. What is the total number of daily pills that Chloe needs for her pets?",
@@ -977,6 +1143,42 @@ Dimensions: 350x350px`
           requires_visual: true,
           llm_visual_appropriate: true,  // Same pie chart as above
           visual_prompt: "Use the same pie chart from the previous question."
+        },
+        {
+          difficulty: 3,
+          question_text: "A line graph shows temperature changes over one week in Melbourne:\n\nMonday: 18°C, Tuesday: 20°C, Wednesday: 22°C, Thursday: 19°C, Friday: 21°C, Saturday: 24°C, Sunday: 23°C\n\nWhat was the average temperature for the week, and on which day was the temperature closest to this average?",
+          answer_options: [
+            "A) 21°C, Friday",
+            "B) 20°C, Tuesday",
+            "C) 21°C, Tuesday",
+            "D) 22°C, Wednesday"
+          ],
+          correct_answer: "A",
+          explanation: "Average = (18+20+22+19+21+24+23) ÷ 7 = 147 ÷ 7 = 21°C.\nComparing each day to 21°C: Monday (-3), Tuesday (-1), Wednesday (+1), Thursday (-2), Friday (0), Saturday (+3), Sunday (+2).\nFriday at 21°C is exactly the average.",
+          distractor_strategy: "B and C use wrong average; D uses a close value but wrong day",
+          characteristics: [
+            "Multi-step calculation",
+            "Average/mean calculation",
+            "Finding closest value to average",
+            "Line graph interpretation",
+            "Real-world weather context",
+            "Requires systematic comparison",
+            "Advanced data analysis for Year 7"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Generate a line graph showing:
+- Title: "Melbourne Temperature - One Week"
+- X-axis: Days (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+- Y-axis: Temperature in °C (15-25°C)
+- Plot points: 18, 20, 22, 19, 21, 24, 23
+- Connect points with lines
+- Add a horizontal dashed line at 21°C labeled "Average"
+- Grid lines for easy reading
+- Clean, educational design
+
+Visual type: line_graph (SVG)
+Dimensions: 500x350px`
         }
       ],
 
@@ -1022,6 +1224,27 @@ Dimensions: 350x350px`
 
       examples: [
         {
+          difficulty: 1,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nBees are essential to our ecosystem and food supply. These tiny insects play a crucial role in pollinating plants, which helps produce many of the fruits and vegetables we eat every day. Without bees, our gardens would look very different, and our supermarket shelves would have far fewer fresh produce options. Scientists estimate that one-third of the food we consume depends on pollination by bees. Beyond food production, bees also help pollinate wildflowers and trees, maintaining the natural beauty of our environment and supporting wildlife habitats. Protecting bee populations is therefore vital for both human survival and environmental health.\n\nWhat is the main idea of this passage?",
+          answer_options: [
+            "A) Bees make honey for humans to eat",
+            "B) Bees are important for pollinating plants and our food supply",
+            "C) Scientists study bees in laboratories",
+            "D) Wildflowers need water to grow"
+          ],
+          correct_answer: "B",
+          explanation: "The passage's main idea is that bees are essential because they pollinate plants, which is crucial for our food supply and environment. This theme runs throughout the entire passage.",
+          distractor_strategy: "A mentions honey which isn't discussed; C mentions scientists but that's a detail; D is unrelated",
+          characteristics: [
+            "Clear main idea",
+            "Environmental topic",
+            "Explicitly stated theme",
+            "Simple passage structure",
+            "Year 7 appropriate",
+            "Real-world relevance"
+          ]
+        },
+        {
           difficulty: 2,
           question_text: "Read the passage and answer the question.\n\nPassage:\nSportsmanship in modern sports is built upon four essential elements: good form, the will to win, equity, and fairness. These principles have long been regarded as the foundation of athletic competition, embodying the spirit of respect and honor that should guide every athlete. Good form refers to displaying proper technique and gracious behavior, both in victory and defeat. The will to win represents the competitive drive that pushes athletes to excel. Equity ensures that all competitors have equal opportunities, while fairness demands that rules are followed and opponents are treated with respect. However, in today's sporting culture, which places enormous emphasis on winning at all costs, sportsmanship often takes a back seat to the pursuit of victory and fame.\n\nThe elements of sportsmanship are:",
           answer_options: [
@@ -1057,6 +1280,27 @@ Dimensions: 350x350px`
             "Opening theme identification",
             "Understanding figurative meaning",
             "Complete passage provided"
+          ]
+        },
+        {
+          difficulty: 3,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe concept of 'home' extends far beyond the physical structure where we live. While a house is made of bricks, wood, and mortar, a home is constructed from memories, relationships, and emotions. Home represents a psychological sanctuary—a place where we feel truly ourselves, unburdened by social expectations or the need to perform for others. This sense of belonging isn't necessarily tied to a specific location. For some, home might be found in the embrace of loved ones, regardless of geographical coordinates. For others, it might be a state of mind achieved through familiar routines or cherished possessions that travel with them. Understanding this distinction between house and home helps us appreciate that our deepest sense of security and identity comes not from material structures, but from the intangible connections and feelings we cultivate.\n\nWhat is the central theme of this passage?",
+          answer_options: [
+            "A) Houses are expensive to build and maintain",
+            "B) Home is an emotional concept beyond physical location",
+            "C) Everyone should own their own house",
+            "D) Moving to a new city is always difficult"
+          ],
+          correct_answer: "B",
+          explanation: "The passage's central theme is that 'home' is more than a physical place—it's constructed from memories, relationships, and emotions, and represents a psychological sanctuary that isn't necessarily tied to a specific location.",
+          distractor_strategy: "A focuses on physical houses (literal interpretation); C and D introduce unrelated ideas about ownership and moving",
+          characteristics: [
+            "Abstract concept analysis",
+            "Distinguishing literal vs. figurative meaning",
+            "Complex theme requiring synthesis",
+            "Philosophical/psychological topic",
+            "Advanced comprehension for Year 7",
+            "Requires understanding implicit messages"
           ]
         }
       ],
@@ -1165,6 +1409,27 @@ Dimensions: 350x350px`
 
       examples: [
         {
+          difficulty: 1,
+          question_text: "Read the sentence and answer the question.\n\nSentence:\n'The student felt anxious before the big exam, but after studying thoroughly, she felt more confident.'\n\nIn this context, the word 'anxious' most closely means:",
+          answer_options: [
+            "A) excited",
+            "B) worried",
+            "C) happy",
+            "D) tired"
+          ],
+          correct_answer: "B",
+          explanation: "In this context, 'anxious' means worried or nervous, especially before an important event like an exam. The contrast with feeling 'confident' after studying supports this meaning.",
+          distractor_strategy: "A is sometimes confused with anxious; C and D are unrelated emotions",
+          characteristics: [
+            "Common vocabulary word",
+            "Clear context clues",
+            "Simple sentence structure",
+            "Everyday scenario",
+            "Year 7 appropriate",
+            "Basic synonym identification"
+          ]
+        },
+        {
           difficulty: 2,
           question_text: "Read the passage and answer the question.\n\nPassage:\nDengue fever has long been a concern in tropical and subtropical regions around the world. In recent years, there has been a notable increase in reported cases of dengue in many countries. While this rise may initially appear alarming, health experts point out that the increase is not entirely due to the actual spread of the disease. A significant factor contributing to the higher numbers is the improvement in testing capabilities and changes in national practices for recording and reporting dengue cases, and therefore the relevance of reporting dengue disease cannot be understated. Many countries have implemented more comprehensive surveillance systems and better diagnostic tools, meaning that cases which might have gone undetected or unreported in the past are now being identified and documented.\n\nThe word 'relevance' DOES NOT mean:",
           answer_options: [
@@ -1199,6 +1464,27 @@ Dimensions: 350x350px`
             "Fill-in-the-blank format",
             "Requires understanding relationship described in passage",
             "Tests nuanced word choice"
+          ]
+        },
+        {
+          difficulty: 3,
+          question_text: "Read the passage and answer the question.\n\nPassage:\nThe scientist approached the problem with meticulous care, examining every detail with painstaking precision. Her methodology was so thorough that colleagues often marveled at her ability to identify patterns others overlooked. This scrupulous attention to detail, while time-consuming, had led to several groundbreaking discoveries in her field. She believed that hasty conclusions were the enemy of true scientific progress.\n\nBased on the context, which word is OPPOSITE in meaning to 'meticulous'?",
+          answer_options: [
+            "A) careful",
+            "B) careless",
+            "C) precise",
+            "D) thorough"
+          ],
+          correct_answer: "B",
+          explanation: "'Meticulous' means extremely careful and precise. The passage emphasizes thoroughness, painstaking precision, and scrupulous attention to detail. The opposite would be 'careless.' Options A, C, and D are all synonyms of meticulous.",
+          distractor_strategy: "A, C, D are all synonyms used in the passage context; B is the antonym",
+          characteristics: [
+            "Advanced vocabulary",
+            "Antonym identification",
+            "Multiple context clues in passage",
+            "Academic/scientific context",
+            "Requires understanding nuanced meaning",
+            "Sophisticated for Year 7"
           ]
         }
       ],
@@ -1235,6 +1521,27 @@ Dimensions: 350x350px`
       question_format: "Questions about the order or arrangement of ideas in a passage",
 
       examples: [
+        {
+          difficulty: 2,
+          question_text: "Read the instructions and answer the question.\n\nTo make a sandwich:\n1. Get two slices of bread\n2. Spread butter on one slice\n3. Add your favorite filling (cheese, ham, or vegetables)\n4. Place the second slice of bread on top\n5. Cut the sandwich in half\n\nWhat should you do immediately after adding the filling?",
+          answer_options: [
+            "A) Spread butter on one slice",
+            "B) Cut the sandwich in half",
+            "C) Place the second slice of bread on top",
+            "D) Get two slices of bread"
+          ],
+          correct_answer: "C",
+          explanation: "According to the sequence, after step 3 (adding filling) comes step 4 (placing the second slice on top). This tests understanding of procedural order.",
+          distractor_strategy: "Other steps from the sequence; some before and some after the filling step",
+          characteristics: [
+            "Simple sequential process",
+            "Clear numbered steps",
+            "Everyday familiar task",
+            "Direct sequencing question",
+            "Tests ability to follow order",
+            "Year 7 appropriate"
+          ]
+        },
         {
           difficulty: 3,
           question_text: "Read the passage and answer the question.\n\nPassage:\nBooks are fundamentally about our pasts—they preserve our memories, stories, and histories for future generations. I remember one particular book from my childhood that kept me awake, aware, and cheerful through many difficult nights. It was a worn copy with a faded cover that sat on my shelf alongside dozens of others. The old hardback novels from that era would blend together beautifully, their spines creating a harmonious rainbow of muted colors and elegant fonts. Those books felt like old friends. Today's publishing landscape is markedly different. E-books, with their cold digital screens and generic interfaces, don't connect to the heart in the same way that physical books once did. There's something irreplaceable about the tactile experience of turning pages and seeing a beloved book on your shelf.\n\nBased on your understanding of the passage, choose the option that lists the correct sequence of thoughts as expressed by the author:\n1. E-books don't connect to heart\n2. The old hard back novels blend together\n3. Books are about our pasts\n4. The book kept us awake, aware, and cheerful",
@@ -1395,6 +1702,27 @@ Dimensions: 350x350px`
             "Understanding author's tone",
             "Recognizing paraphrased ideas"
           ]
+        },
+        {
+          difficulty: 3,
+          question_text: "Read both passages and answer the question.\n\nPassage A:\nUrban gardens provide city residents with access to fresh vegetables and create community gathering spaces. They transform vacant lots into productive green areas that benefit neighborhoods through improved air quality and reduced urban heat.\n\nPassage B:\nWhile urban gardens offer benefits, they face significant challenges including limited space, soil contamination from previous industrial use, and high water costs. Many city gardeners struggle with vandalism and theft, making sustainable food production difficult in dense urban environments.\n\nWhat is the main difference in perspective between the two passages?",
+          answer_options: [
+            "A) Passage A discusses rural farming while B discusses city farming",
+            "B) Passage A focuses on benefits while B focuses on challenges",
+            "C) Passage A is about vegetables while B is about flowers",
+            "D) Passage A supports gardens while B opposes them completely"
+          ],
+          correct_answer: "B",
+          explanation: "Passage A highlights the positive aspects of urban gardens (fresh vegetables, community spaces, environmental benefits) while Passage B discusses the difficulties and challenges (limited space, contamination, vandalism). Both discuss urban gardens, but from different perspectives.",
+          distractor_strategy: "A incorrectly states rural vs. city; C focuses on wrong detail; D overstates B's position as complete opposition",
+          characteristics: [
+            "Comparing two passages",
+            "Identifying contrasting perspectives",
+            "Synthesizing information from multiple texts",
+            "Understanding nuanced differences",
+            "Advanced comprehension for Year 7",
+            "Requires analytical thinking"
+          ]
         }
       ],
 
@@ -1423,13 +1751,47 @@ Dimensions: 350x350px`
     // SUB-SKILL 7: Visual Interpretation
     "Visual Interpretation": {
       description: "Interpreting meaning from images, posters, and visual representations",
-      visual_required: true,
+      visual_required: false,
       image_type: "Image Generation",
       llm_appropriate: true,  // Image generation (DALL-E/Imagen) is appropriate for creating interpretive images
       difficulty_range: [1, 2, 3],
       question_format: "Questions about the meaning, message, or interpretation of visual images",
 
       examples: [
+        {
+          difficulty: 1,
+          question_text: "A poster shows a lightbulb with a brain inside it, glowing brightly against a dark background.\n\nWhat message does this image most likely convey?",
+          answer_options: [
+            "A) Save electricity",
+            "B) Ideas and creative thinking",
+            "C) Study at night",
+            "D) Light is important"
+          ],
+          correct_answer: "B",
+          explanation: "The combination of a brain inside a lightbulb is a common visual metaphor for ideas, innovation, and creative thinking. The glowing represents a 'bright idea.'",
+          distractor_strategy: "Literal interpretations of lightbulb or brain separately",
+          characteristics: [
+            "Common visual metaphor",
+            "Clear symbolic meaning",
+            "Simple image interpretation",
+            "Familiar iconography",
+            "Year 7 appropriate",
+            "Basic visual literacy"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Create a simple poster-style image showing:
+- A standard lightbulb outline in white/yellow
+- Inside the bulb, a stylized brain (can be anatomical or simplified)
+- The lightbulb is glowing/illuminated with bright light rays
+- Dark or black background to make the glowing effect prominent
+- Clean, modern design
+- Style: Minimalist poster, inspirational, educational
+
+Visual type: image_generation (DALL-E/Imagen)
+Aspect ratio: 3:4 (600x800px)
+Style: Minimalist poster art, clean lines, symbolic`
+        },
         {
           difficulty: 2,
           question_text: "Image shows a tiger with sad expression and objects representing entertainment/circus:\n\nIn this picture, the tiger seems to be in:",
@@ -1506,6 +1868,40 @@ Style: Poster art, emotional advocacy, semi-realistic illustration`
           requires_visual: true,
           llm_visual_appropriate: true,
           visual_prompt: "Use the same tiger image from the previous question."
+        },
+        {
+          difficulty: 3,
+          question_text: "An image shows a tree with half its leaves green and healthy, while the other half is bare and dying. The tree is split down the middle by a vertical line. On the green side, there is clean water and sunshine. On the dying side, there is pollution and darkness.\n\nWhat complex message does this image convey?",
+          answer_options: [
+            "A) Trees need water to survive",
+            "B) The stark contrast between environmental health and degradation",
+            "C) Autumn is when leaves fall",
+            "D) Different tree species have different characteristics"
+          ],
+          correct_answer: "B",
+          explanation: "The split-image design is a powerful visual metaphor showing the dramatic difference between a healthy environment (green, clean, sunlight) and a degraded one (dying, polluted, dark). This symbolizes the environmental choices humanity faces.",
+          distractor_strategy: "A and C are literal interpretations; D misses the environmental message entirely",
+          characteristics: [
+            "Complex symbolic imagery",
+            "Environmental advocacy",
+            "Before/after or choice visualization",
+            "Requires understanding metaphor",
+            "Multiple layers of meaning",
+            "Sophisticated visual literacy for Year 7"
+          ],
+          requires_visual: true,
+          llm_visual_appropriate: true,
+          visual_prompt: `Create a powerful environmental poster showing:
+- A single tree split vertically down the middle
+- LEFT SIDE: Healthy tree with full green leaves, bright sunshine, blue sky, clean water at roots, vibrant colors
+- RIGHT SIDE: Same tree but dying - bare branches, wilted/brown leaves falling, dark polluted sky, contaminated water, factory smoke in background, muted/gray colors
+- Clear vertical division line splitting the image
+- Style: Environmental advocacy poster, dramatic contrast, artistic illustration
+- Message should be clear: environmental health vs. degradation
+
+Visual type: image_generation (DALL-E/Imagen)
+Aspect ratio: 1:1 (800x800px)
+Style: Environmental advocacy art, symbolic, dramatic contrast`
         }
       ],
 
@@ -1597,6 +1993,28 @@ Style: Poster art, emotional advocacy, semi-realistic illustration`
             "Understanding from usage in poem",
             "Action/behavior words"
           ]
+        },
+        {
+          difficulty: 3,
+          question_text: "Read the poem and answer the question.\n\nPoem: 'The Road Not Taken' (excerpt)\n\nTwo roads diverged in a yellow wood,\nAnd sorry I could not travel both\nAnd be one traveler, long I stood\nAnd looked down one as far as I could\nTo where it bent in the undergrowth;\n\nThen took the other, as just as fair,\nAnd having perhaps the better claim,\nBecause it was grassy and wanted wear;\nThough as for that the passing there\nHad worn them really about the same,\n\nAnd both that morning equally lay\nIn leaves no step had trodden black.\nOh, I kept the first for another day!\nYet knowing how way leads on to way,\nI doubted if I should ever come back.\n\nWhat deeper meaning does the 'road' symbolize in this poem?",
+          answer_options: [
+            "A) Actual roads for walking",
+            "B) Life choices and decisions",
+            "C) Different forests to explore",
+            "D) The speaker's daily commute"
+          ],
+          correct_answer: "B",
+          explanation: "The poem uses the metaphor of two diverging roads to represent life choices and decisions. The speaker must choose one path, knowing they cannot go back and try the other—just as in life, we must make choices and live with their consequences. The contemplation, doubt, and permanence ('I doubted if I should ever come back') all point to this deeper meaning about life decisions.",
+          distractor_strategy: "A and D are literal interpretations; C partially misses the metaphor",
+          characteristics: [
+            "Famous poem analysis",
+            "Understanding extended metaphor",
+            "Symbolic interpretation",
+            "Complex poetic meaning",
+            "Philosophical theme",
+            "Advanced literary analysis for Year 7",
+            "Requires moving beyond literal meaning"
+          ]
         }
       ],
 
@@ -1642,6 +2060,24 @@ Style: Poster art, emotional advocacy, semi-realistic illustration`
 
       examples: [
         {
+          difficulty: 2,
+          question_text: "Some people believe that students should wear school uniforms, while others think students should be allowed to wear whatever they want.\n\nWrite a persuasive essay explaining your position on school uniforms. Use specific reasons and examples to support your argument.",
+          answer_options: [],
+          correct_answer: "N/A - Writing Task",
+          explanation: "This is a persuasive writing task on a familiar topic for Year 7 students. Students should take a clear position (for or against uniforms), provide 2-3 supporting reasons, and organize their essay with introduction, body paragraphs, and conclusion.",
+          distractor_strategy: "N/A",
+          characteristics: [
+            "Familiar school-related topic",
+            "Clear two-sided issue",
+            "Requires personal position",
+            "Age-appropriate subject matter",
+            "Allows for personal experience",
+            "Multiple valid arguments possible",
+            "Moderate complexity for Year 7",
+            "Clear structure expected"
+          ]
+        },
+        {
           difficulty: 3,
           question_text: "Do you think that manufacturers are responsible for the effects of the chemicals used in creating their products?",
           answer_options: [],
@@ -1684,13 +2120,31 @@ Style: Poster art, emotional advocacy, semi-realistic illustration`
     // SUB-SKILL 2: Creative & Imaginative Writing
     "Creative & Imaginative Writing": {
       description: "Creating original narratives, descriptions, or creative pieces inspired by stimuli",
-      visual_required: true,
+      visual_required: false,
       image_type: "Image Generation",
       llm_appropriate: true,  // Image generation is perfect for creating surreal/artistic stimuli for creative writing
       difficulty_range: [2, 3],
       question_format: "Visual or textual stimulus with open-ended writing prompt",
 
       examples: [
+        {
+          difficulty: 2,
+          question_text: "Write a creative story that begins with this sentence:\n\n'When I opened the mysterious old box in the attic, I couldn't believe what I found inside...'\n\nYour story should be interesting and imaginative. You may write in any style you choose (adventure, mystery, fantasy, realistic fiction, etc.).",
+          answer_options: [],
+          correct_answer: "N/A - Writing Task",
+          explanation: "This is a creative writing task with a provided opening sentence. Students should develop an imaginative narrative with clear plot, characters, setting, and creative resolution. The open-ended nature allows for various genres and approaches.",
+          distractor_strategy: "N/A",
+          characteristics: [
+            "Provided opening sentence",
+            "Familiar scenario (finding something in attic)",
+            "Genre flexibility",
+            "Encourages imagination",
+            "Age-appropriate premise",
+            "Clear starting point reduces anxiety",
+            "Narrative structure expected",
+            "Moderate complexity for Year 7"
+          ]
+        },
         {
           difficulty: 3,
           question_text: "Use the provided image as a stimulus for a piece of writing. You can write in any format or text type which you think is appropriate.\n\n[Image shows a person standing in water near a chair, surreal/artistic composition]",

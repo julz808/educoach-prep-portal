@@ -1,0 +1,3466 @@
+{
+  "summary": {
+    "totalQuestions": 344,
+    "canAnswerWithoutVisual": 237,
+    "needsVisualSupport": 107,
+    "percentageCanAnswer": "68.9"
+  },
+  "categoryBreakdown": {
+    "tables": {
+      "withTextData": 89,
+      "needsSVG": 31
+    },
+    "grids": {
+      "withData": 46,
+      "needsSVG": 20
+    },
+    "geometry": {
+      "complete": 40,
+      "missingData": 30
+    },
+    "chartsGraphs": 10,
+    "other": 54
+  },
+  "detailedAnalysis": [
+    {
+      "id": "750dae14-1f03-4752-9b19-ead5118ff70c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "07154384-e87c-4d37-af4e-dacf93d6c21d",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "da460e0f-be93-4857-a805-cd14261ac805",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "d0904d96-22d3-466c-a917-a7649dd3a6aa",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "31a9ca9f-da90-40dd-a9c1-453cff31e110",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "4e10aa09-f602-4c69-8c05-458b2ae43648",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "f30dc4c6-7065-4b9d-94be-3c38d3147170",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Humanities",
+      "visual_type": "historical_poster",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "ed5959d0-e8af-47d3-bb3b-5db576833996",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 5 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "3266ee1e-3993-4d97-a6fe-fda738c04a44",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Positions stated (may need to infer range)",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "3b41559d-78c7-4cc4-a07a-8b42aa6ad6d2",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "aa556f9a-831f-45f5-a7a8-67f72077e4a4",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "7a637381-5da1-4ea4-b6ce-fee638645c31",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "ab94e893-36ae-45e5-8682-25b504aa43bb",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Humanities",
+      "visual_type": "historical_poster",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "11b25677-e55f-4623-b1c7-9fe6086d9b34",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 6 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "40c20612-260d-4625-8f87-030a87316e2a",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "ff60104a-17d4-4961-a64b-99267d730727",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "5841dbd5-abc7-4216-90ca-102738d00917",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "4dcfd5d8-8aa4-4b86-8355-7660d1cb9731",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "bfaf674a-ef69-4120-8086-fc768d7a073a",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "7ad47fe2-35e7-4916-9f96-d83453f77b0f",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "24e0228b-2275-40f6-9bd5-f1c47e7fc774",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "2d522c73-3a5f-4732-ab8b-6e5fdb4fd881",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "296625ad-17c5-4dcc-b911-c3def1bf4a42",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "d6c7d5a6-fe14-442f-9177-ce93592a9859",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "8ed93682-775e-45d6-84c7-cbfa9c2eb130",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "fce21e6a-2ccd-4269-beca-af8c49bccd2d",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Positions stated (may need to infer range)",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "15c10791-ec3c-48c1-92a9-ba16afa98381",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "4bdf4156-dcfa-4b7d-a2a8-50074563e9e6",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "40763a42-3d87-40aa-a14c-7c56a6f90252",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "24fd6442-ba87-4416-bc1a-46b95d4b3cce",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "7863ec86-2d4e-4eb1-9ed3-e49dca3268fa",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "987c40ba-bcb4-4f3a-ab2e-685b35c8d621",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "1c7f129c-dd17-45d1-951b-b70453733f3c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "d3157891-d7e6-4b39-bed2-4e29858157be",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "171e697a-547d-42f2-b456-1c28e1d1f441",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "1fc3572c-dab4-4ef8-a27a-fc5c62866efc",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "0499fd59-09b8-4f44-95e9-d26a3f1b27f9",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "c97c80a4-5329-4bb6-9f5a-10de7b6a80ae",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Positions stated (may need to infer range)",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "2d814c97-4f6a-4c86-b291-bebb22f57345",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "13851b57-8cf7-4892-86aa-ca07915fa3ef",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "cf4a33e9-27a7-4618-892b-91c480d630f4",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "856487d3-fbe3-477d-9218-67d92a6a6e17",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "35154f67-2466-496d-87d6-202c7c012c1f",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "b6b68a68-e433-4920-8812-13cdc840edf2",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "a34530d3-a394-4515-8611-f1f50d25a527",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Number line range and positions clearly stated",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "8d036634-24bc-4e24-837a-2110f8908115",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "number_line",
+      "category": "Number Line",
+      "canAnswer": true,
+      "reason": "Positions stated (may need to infer range)",
+      "actionNeeded": "No action needed - positions clearly stated"
+    },
+    {
+      "id": "7aacefe5-e870-4379-9cb6-98cc874d3666",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "64e082b0-547c-4722-b283-f1fc4012b94c",
+      "test_type": "ACER Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "49077850-41e9-4eed-9efa-8cc6f79f9331",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "543d636a-37d4-466f-8a72-45302c04dc2c",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "c72d9164-b71c-4eb2-aa08-343ef042ade0",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "bar_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "cdf4be23-4ef0-4b52-8bb2-ff7929f159f5",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "6c48f88b-e2ed-4740-afde-a9c9245d88af",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "69f71321-e98d-48db-b7de-f3a1b6df5c8e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "d2d9bbab-40ff-48a7-83c9-59ffeb224b1b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "ac4301f1-ceb6-4174-a387-74f60cf0d3bc",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "46c21cd9-dc42-4c4f-a7e0-990bccfa371e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "92c4a120-d709-4269-9524-95cccab36091",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "9f150b19-43f1-4d08-bd0b-33219a6a7835",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "aa934460-dcd4-4701-8c60-16daec3abc20",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "9ceb6561-1788-48d5-b02c-6c5db6d020d9",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "bd35ce1c-358e-44f0-a052-bad210a2bfad",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "f306671a-a9a5-4252-a215-aff3b9e1e200",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "e94339e3-cff4-47f7-a848-52bd162c4ede",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "6e4fd3b7-0426-41c4-b685-bdf0897e7083",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "12618633-0144-4b62-958e-3fde14e173d6",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "50ce52ec-12d8-4c21-ab09-3bd871bd5e46",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "03e11dde-6b5f-4b94-abf3-37c88b04862f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "025476fe-9ea6-4928-8c7f-81f703723177",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "f40e2cda-708b-499e-ace1-7811f9b27895",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "d0b21c9b-0fae-4931-a37c-455676b81070",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "bar_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "bd60f3c1-7abd-46fd-98fa-a23f729ff3e6",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "text_table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "634355ff-ade4-4b61-b38a-08244c22a604",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "line_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "4fd66bfd-ab4c-4931-9347-76ac7aab5abf",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "pie_chart",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "a4ab30cc-1573-48fa-b11c-21f5064e7cca",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "e1f17442-3ff5-4831-9032-f289249f155f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "9ffb84e4-7abf-4bbc-8a2b-4d3373c37d27",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "f8e8b677-1658-430a-be24-3be17c2828f9",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "f07b57f7-d0e6-4e79-a684-aa843b09c8e4",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "24b2a093-766e-4ecf-a656-ed160ae20437",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "30689ae2-2413-4961-b742-1afbde61ba9b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "19118932-c3f5-40e0-804d-957956b214ac",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "d186c0bf-abff-486c-a487-790092f1e0b6",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "e82c358c-10c8-4911-95b1-f1218620aa86",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "68f69a56-1c59-40b3-b7fc-344c6519b805",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "885270d1-8329-4969-b0a3-381fda9c81a3",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "14cd73cf-aa50-4afe-ba31-af09ff55c777",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "358a3b3a-9c70-4b0d-bbb9-893e441e8cb3",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "circle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "367e3f89-b104-4506-b075-040ac5b20c66",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "d27ec56d-02c2-44e6-96da-07258ba4a326",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "5d2fd665-2803-4d68-afbf-a67c60399f98",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "057b3075-610d-461a-9ac5-11690ac38a18",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "2d3584d4-c858-47fb-a2d8-fe0c8273b7c8",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "1a859a8f-28d3-4e04-96f6-4cc8e0492214",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "7911a887-cedf-4b43-9c00-2ea65c5b7947",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "bar_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "d5add6a5-69a2-4530-984f-877e7b428d20",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "d7fa9002-9ca0-40ca-87ca-d02383b3c0b4",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "962c5aec-4c47-47b5-be07-298458acbe92",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "c474660e-2e6b-4cda-a0a8-4561b95f4568",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "8e991c1c-983f-4787-a45a-5cefa70aae0a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "b0ed980b-a733-4624-9ca3-508b25efb8d6",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "57175474-c167-42e5-9838-d6da6f2485d2",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "584fb7c1-61e6-45fc-9f7e-e58e4a84333d",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "2cd411f2-7115-4b2e-8c69-ae8ebbefa275",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "10838d35-0fe1-4edb-91fa-dd36a7851e7b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "6718bc3d-723a-47d3-985e-0ed3977d8d2e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "line_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "8c910089-fb47-428d-bb33-edf7b93771c2",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "1c98270a-7990-455e-a72b-bd3ffc15ca49",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "clock_diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "64ebc59a-1d50-445a-ba57-0b36941482b7",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "7c6cbd18-20b6-487c-a5fb-e4cb3fcc9408",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "dee7b6c8-0059-4e72-9c93-b46993785a9a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "rectangle_with_diagonal",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "6f5cdc89-6cfa-4305-b499-9cca7e92e7a4",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "4f8303b9-eda2-484e-9c1c-2442e530032a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "2bf8505f-4707-4050-b726-43dc3123b875",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "7ae167ff-7b94-4e9e-b6fc-be858b98602f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "bar_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "2d5a15c1-4667-4e2f-bf37-27336da6d7fd",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "5700a60e-b370-4969-9a04-51983f346eec",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "histogram",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "864922fc-fed4-4856-8d61-4b1721bcf00c",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "4731296d-c6e3-4b6e-9757-6a691f4750e6",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "44560f92-2bde-47cb-97e4-9cbfc7d3acc4",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "fae6aa18-3b6d-494a-b79f-cd734d64380b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "1c59dcc7-9255-4cc1-8249-957113b307fb",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "f759c445-1f05-4090-991f-ca794384d7b8",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "a223c863-583d-4672-bbca-dc68d3106c4f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "c5d3014d-e230-4650-a038-a8f0f43bcc96",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "910eccce-4ead-44d0-9f62-df97c634e085",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "48160dfa-7bf1-4d5a-9991-e197f9e00548",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "71bb55fa-d327-481d-9aec-2a4996c37751",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "a10cab99-d74e-4d83-b811-472113ad5095",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "c2c2b717-209a-40e7-8ef2-6fc125281a0d",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "0dded3bd-bbf0-4079-8e44-c4edcbc7782a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "cff9d1bc-58e2-455d-9565-d1f3e3886b23",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "3a226fa8-de15-46d5-8890-9c1eb302cc3e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "650465b6-3f84-4a65-8b4b-1ff7db231319",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "30040119-1e55-4e55-8e0b-8fd7ee6ee06f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "87bbf0ba-01f8-4494-a2cb-d4b4659b2389",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "circle_division",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "e0390c49-431a-47f3-a08a-bc4324c2fb10",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "0095aec7-4445-4457-afbc-2fef3522abd3",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "2f8f4f51-bfd3-4b32-b73a-d98eaabecd10",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "9290ba0c-dee6-46e7-a402-9d3924a0f48d",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "418ff4ee-35dd-4569-86b6-24abf81cc60e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "871ce9d9-4f94-4b70-acfc-27aba17a5d39",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "8d31fba1-c52a-414a-ad85-fd61be7a2389",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "0b964a7a-5d4d-487f-99cf-3ddedfa4776a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "bar_graph",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "bdd57fc4-dd86-4c0d-8a27-9d6321b07fe2",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "acaa6194-6898-4489-87d6-49b052b2c78a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "504760ad-1ba2-41c3-9c2d-788d63363950",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "67876501-bdce-4012-b2e3-c9b6b41cb866",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "7f5dcb28-2c6b-4867-bd14-8253c31271a1",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "77c82549-6a0e-47b5-a0bb-47f3963f33ba",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "92af6fe1-c391-4fbd-b786-a738fb691860",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "f6fc3046-d679-453b-8960-9e2800e09b3e",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "e6e755f7-ddb0-4a51-b585-e3484a1e21cb",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "fe8b90e7-fdcc-44fc-a161-83a87e262b50",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "701de880-4057-4bf7-9094-f979bb983097",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "c9bfca3f-7571-46a0-a467-771a3480689d",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "d462d6bc-bd4e-4eec-95c5-1a55e5614e06",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "b9592e3c-24ef-4e1c-9b4b-b29bc0078e14",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "949aba0b-662a-4535-b4f4-533717ee65d7",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "trapezoid",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "5b9e3596-5ece-49fe-969e-5b4644e14f3a",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "ce1bed87-4df6-44a0-a2e3-1d9730d92722",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "fb9cabce-cefb-4ede-ac72-bcd62c69f943",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "cb72f283-009f-4822-8c50-f8789fb7361f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "circle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "65d0dffe-05a8-46a3-ac75-054b36e41cf3",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "2b554589-7132-4fb4-bad0-ab7f176b5579",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "3d_shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "80dae930-deab-470d-a2c2-782a56a26363",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "ba225d7f-35dc-4ed1-ad46-7e0f89f1d06d",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "a6ca4ac0-26e8-4ed9-ab7d-779dda5c76d1",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "2647abbc-9545-4c83-9f23-aeeacaf995a0",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "0804e3d8-ecca-4d74-8308-998022f3c8fd",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "0ccc55be-c14b-4870-8f9a-b99f30f9804f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "e1413dc8-0f9f-4ef7-936c-190d045afd95",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "75b8ff75-5db3-4c99-bd3b-363aada568f5",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "a9f39334-387d-4c19-bbac-5c0c6238996f",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "79f2b7b5-027a-484e-80b5-148829bbc3e7",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "4a00ecb0-f286-4352-8607-65e91ccca2a5",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "9e30d846-a6be-49b8-b6a4-2acab4f2b575",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "b02fdc8d-677e-4e31-93f7-d72630c1df69",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": false,
+      "reason": "Table structure mentioned but data not in text",
+      "actionNeeded": "ADD: Complete table data to question text OR keep SVG"
+    },
+    {
+      "id": "b3e16823-1470-411d-97d1-668b0ca78672",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "ebc01ad5-adf5-4cd1-9001-e38fd8d37b88",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "9492f324-282e-4999-8eac-2aa9800d638b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "7893624f-598e-4424-9f03-d40ab7a70fe1",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "pie_chart",
+      "category": "Chart/Graph",
+      "canAnswer": false,
+      "reason": "Chart/graph typically requires visual representation",
+      "actionNeeded": "CONSIDER: Add data table to text OR keep visual for interpretation"
+    },
+    {
+      "id": "d0292ef3-8ed8-407c-bebf-a5b9e698f297",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "6eb3b486-81d4-4626-82cf-dc730fa17697",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Mathematics",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "749734cc-7bd8-4fd8-a280-d1d6812ad808",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "1b056d56-a014-4731-bf67-a4f7dbec8d01",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "grid_3x3",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in description (partial)",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "f90a9002-8b77-49bc-9269-e1a7003d6fdb",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "2ff9f770-ed90-408e-b615-e8457c0057c4",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "49b07cf4-dff0-471b-8a11-40898a59c28b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "985f94fb-094b-4646-b9d4-217ed5051e8b",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "grid_3x3",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "e62d0e64-92f5-4031-a5c2-3b4e73efbc63",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Complete grid data in visual description",
+      "actionNeeded": "Add grid data from visual description to question text"
+    },
+    {
+      "id": "753b378a-f630-4a15-bff4-49171f96b822",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "grid",
+      "category": "Grid/Pattern",
+      "canAnswer": true,
+      "reason": "Grid data in question text as table",
+      "actionNeeded": "Convert text table to HTML or keep as formatted text"
+    },
+    {
+      "id": "85852e44-c79d-40ce-8306-98ecafcf9f70",
+      "test_type": "EduTest Scholarship (Year 7 Entry)",
+      "section_name": "Numerical Reasoning",
+      "visual_type": "3x3_grid",
+      "category": "Grid/Pattern",
+      "canAnswer": false,
+      "reason": "No grid data found in text or description",
+      "actionNeeded": "ADD: Complete grid data to question text (e.g., Row 1: 2, 4, 6...)"
+    },
+    {
+      "id": "ab588e7e-26c4-4469-89a7-41f549966807",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "0319fd2c-f740-48b1-8ba5-944dcc57822c",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "40406f3b-94a9-4e80-b6d1-4656225e466d",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "e0edb5b7-2f31-49f2-9175-4ce88c72d427",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "ce9316e4-b4cf-484b-a30b-2ac088c2d63d",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "3D diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "d475ecb7-200e-418a-98fb-d3aa97ec9c69",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "a08d3f79-4d07-40ab-af12-e745cab095bd",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "3D_transformation",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "e6d053fc-ad2b-4a66-be85-31f9b0e83dae",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "1ff0091f-7c38-4443-a8b1-db9f96274769",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "c897e420-6812-45fa-863e-db871c887383",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "2D shape rotation",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "8b292c14-52aa-4607-a1b7-ff2a320052c8",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "2c28a26d-5542-4934-99b7-0fc0280a60bf",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "37a10aaf-089f-4998-854a-b01a858dd99a",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "f34079e0-2542-44fa-925f-9da72d838fcc",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "c27df444-471b-42d9-a193-748f55a24106",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "c3eaf9b7-10ef-4abb-9f03-f48e57bc419a",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "74d06c36-ccf3-48ea-97df-5193341fec22",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "3D diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "a08f4e6e-f67b-4cb3-9c9f-bc51d3f64ffb",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "c62cb9bc-c692-4d8c-9481-1d9fc2df260e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "f056762d-0f57-44db-8265-d208d34a1d1d",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "08493f42-8786-40b5-9a04-49e21bb7aed7",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "64b826ad-a3bb-42eb-8954-7b8c99d283c2",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "f010a1fc-f25b-46bf-9c74-e203d7870230",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "circle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "8eedcf76-6338-44f1-9402-848ccbe6a46e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "866758e4-2251-49d8-beed-d1828cd11693",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "33352bd2-4d28-4816-add5-8bbe014a06fe",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "2c6b4101-97f0-4b8c-9a40-5f370aae721d",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "fd7fe1ed-b850-4cfc-9667-9e572489a984",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "6f64c5b9-307a-4364-956c-dc1ad8878adb",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "45013fe1-8fa3-4c2e-99a5-4261e5eecc57",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "b3695b6b-0e05-4f9f-8d0b-cc3c5d694694",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "43c699f5-129f-40e5-bbb7-042b55ea6ae2",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "3D geometry",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "f08bb89a-eaba-4756-8feb-5ede70d1db5a",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "bef2a03d-48b6-442d-9ba7-8e5f52b05c81",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "e2938060-0935-4ce6-a82a-0285a187789b",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "059bdbfd-2a44-4168-bb31-7dc1b7351c88",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "9955962f-f1cd-4a7a-8abd-1e9433247e82",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "5ffa6df5-c595-4c88-b4f7-c1062100ed39",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "b79e639b-99cf-4eaa-a980-22e694b182ad",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "0c06226b-e793-4661-90e8-6f21fb1dcc7c",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "3482da05-eb70-4f2a-a005-540a5c9e6f68",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "02a557d4-d0b2-4915-a50c-fd00f897b2bd",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 5 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "926dfedc-c0a0-42b1-853e-19abf4ee07fd",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "9498df07-b7d7-4ca5-94a4-1948f67e9a28",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "2D rotation diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "8ec258cb-8a0f-4417-babb-9a49e8d641f7",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "0c3da581-6be7-4e12-9214-fde1bfc9340b",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "9d82e72e-d7d4-4b43-85fe-9bbcdff7be8f",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "1140819e-48c9-4651-b582-7c28cf23df53",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "edcf70b3-0753-4abe-a7bd-f992e4e70857",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "fb72bbf8-6fa9-4dff-b141-ba6a7c6cfe76",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "6385f45e-da03-44f0-98bc-c47fcc735397",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "99cb2698-6a34-41de-a72d-86ce8a2a9029",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "47e437f9-6656-4d27-89b2-5bc2455c712b",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "447f03fc-c08d-4509-9097-3579146edc8e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "ca130bb8-b97e-4981-8023-9dde5567d181",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "2D rotation",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "77485bc2-da35-4a36-a225-f7a79ac3de66",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "be01be46-6d69-4cf2-9591-64f40f6ac02e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "3c8d6bfd-3377-4af9-90df-6da7b1daea98",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "ce5c5cd8-9cf4-43d3-8c73-ca6872d0a399",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "4a58c5ae-6ad5-48fe-9291-41f5dddcac71",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "4dae0b14-22c7-4258-bfef-d62aceea51ba",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "d2b4f37a-351a-4f9c-8fc0-71af31045bcb",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "b8d39fdb-8db7-45a8-8eda-43f43b4a009e",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 4 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "3a328cbf-0dd2-42f3-99e1-38504e590daa",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "3503d105-f340-40ac-a1fd-075042c8b7dc",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Mathematical Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "41cd823e-a8dc-4e43-8d97-da90a82b37d5",
+      "test_type": "NSW Selective Entry (Year 7 Entry)",
+      "section_name": "Thinking Skills",
+      "visual_type": "3D shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "40e25ea8-3f6c-4818-98ff-dc39c4bae4f4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "a2e48daa-1869-4f53-8f25-2491f001277a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "dd8aff52-0405-499c-8522-9315dbc2d957",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "9cfbb542-5e35-42e0-8d0b-7e3dacbd321f",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 5 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "9358134e-b8c4-41d0-b626-979173acf81f",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "d5d63f07-a76c-4ab3-8379-c3e21fb96888",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "trapezium",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "d2feb4eb-c13f-49e4-b8c4-2aadf0746b7d",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3D geometric diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "89d5ccb9-72d2-4ae4-833b-f586f24fa9ee",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "a3286321-4ce0-4f23-b590-2cc776ab31ec",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "composite_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "695c02bd-dbb7-4e37-88bd-e21ed767bb3f",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_rectangular_prism",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "3fc23359-de0e-4c75-bfce-50d222149ab9",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "fbbea0bd-8fda-4a9b-bf3a-800e232803bb",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3D composite shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "ba916cf1-69cc-48f5-8958-d185f2628d7c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "0ad4d875-4679-409a-89e6-8a54fab71a9a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "610a295f-0a23-4a9e-aa12-e9ce7844050d",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "5fbcc74c-3fc3-4e1a-a350-4d15bd8f8890",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "02bb1558-84b7-4af1-9ab2-a83b8a84a29a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "94035882-6b42-4b57-a538-52ff02728661",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "04278cc5-98dd-4ab4-a58f-fd9f6104293a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "sphere",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "4b362bed-5caf-4e82-ba4c-89c6f63736a6",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "2b52528e-7b37-416e-8b77-a4c0efd34a5a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": false,
+      "reason": "Visual description too vague or missing data",
+      "actionNeeded": "ADD: Complete visual information to question text OR keep SVG"
+    },
+    {
+      "id": "7d6fe872-e777-49bb-a087-01090f1720ac",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_geometric_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "153b7b90-fb41-46f4-99ab-4cbf369e6670",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "30ac5694-f5d1-4806-b753-6feef5b07380",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "8cabeb01-038a-4239-885e-1be4baac7954",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "d81a6535-900e-4f35-897b-2d1b44355a2e",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "7f79ef2c-9322-46c2-b34e-882d40ec27f7",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "bcfd5b65-1617-4f40-aa5b-47dbcf75a31b",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "circle_with_divisions",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "c67c273d-9faf-470c-90f3-70dae37b7b87",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "8c83d859-587d-49e5-bdb5-0f7b2598e1bf",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "72fd215d-23af-462e-befc-655daf982d98",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "bf04100b-8a4a-4cc8-8552-75f04f4d6562",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "fe304916-4d7e-497d-9dc9-b80691b22baa",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "6156079d-07fb-4dcd-9a64-362018bb802d",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "f46864b8-3aa6-44e3-bb9c-86b15b84c5ac",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "bc771359-2254-4394-9495-618dc28e4e69",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3D rectangular prism",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "1c5743a4-c53c-41e7-8cfd-e10f5542f383",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "014e846c-c7fe-4973-a569-4e2dde5cc2f3",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "405053ca-5281-47cc-a78e-79f72332006b",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "d10c6d31-cea9-4c4e-99e9-3ef4df4a1ef4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_shape",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "fccb6e5a-5127-475a-856d-ac02ad2164b8",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "cylinder",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "10869dcb-7fdb-4b63-8cc7-f6605c4d6157",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "6a07e587-3d1e-4145-a6da-c086b4fbd294",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "ccc6bb14-3d23-441d-a0ee-6d022f07ca6e",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "9de3109a-d5b9-4814-bd5e-eaa2442f737a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "938b5983-e754-4a45-bb88-7180fdd1d6c4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "7c0ed87b-6620-40e5-b2ed-cd7ca4baf6d1",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "096c9567-c5f9-4878-925e-c0bbb48df261",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "0b2efa6a-d9d9-4669-8793-e360cfc226a1",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "f4478bb9-1d07-4024-b43a-a23a1d27c8cb",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "068f5449-04f0-4673-9212-a98eaffe3d48",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "circle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "879f93e1-e8cc-49bb-9cc3-a2e0bc43d109",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3D composite shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "7bcdc100-efe8-44e4-89b3-1887fe194e92",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "46e96e26-aa4e-4e8e-a420-d336aeec7bec",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "095cb1ef-ddb0-44fc-8a70-ed1f9eb8337c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "e2ee59fe-3583-4382-93dc-3b898e69d8d7",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "771dfb62-8d8f-4a37-96b9-7d7984df1304",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "802eddca-fa8f-4f1c-87a2-faa4ecf9e1d8",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "e120236e-e9d9-4f14-9316-8702322f17cc",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "9732a589-b842-41c8-907e-d93e1f629ff5",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 5 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "48c0e822-1fa8-49c6-a980-063088a3ca7b",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "38bf4f64-2d81-4404-9a15-139bf20e3adf",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3D shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "9c891f65-d72b-4fb8-9f11-a6e4aa094647",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "composite_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "c24ca37b-39ca-4d80-b8fc-8c4a608cf027",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "02a8f7e4-52cd-4718-aee6-79c4de4e9085",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "composite_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "41a76102-d334-4626-98b8-f552acb6c454",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "bf6f01a9-70c5-411b-89fa-fd1813dfddf0",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "62f0c94e-a335-432e-aac2-30f364f6f7d0",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "rectangle",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "293e042f-da20-479e-bb77-1c7bd0ffd4d9",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "diagram",
+      "category": "Diagram/Other",
+      "canAnswer": true,
+      "reason": "Detailed visual description with data provided",
+      "actionNeeded": "REVIEW: Consider moving description content to question text"
+    },
+    {
+      "id": "83c4cb63-c95e-4fd1-9ed9-96d273045e56",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "6b695ecb-157d-4fd9-ba98-1ba7dd40019c",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "cbacf8c8-b8ec-4733-890b-72da1c9fef09",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "5112a7de-1b29-410b-8ee9-3219fb9cdace",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "8c25092c-a619-4153-bc1d-58a199b7f592",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 3 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "b538148d-27da-4b1b-af9c-3bcefd206db5",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 7 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "39a2b9d9-1670-4d5d-8b2c-6c3ae183af72",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 6 rows and 2 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "ee58d945-6cfe-4f2a-a27b-99b8037037bd",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "191fbbce-9dba-426f-b2c2-84ffd51a3967",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "2D shape",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "b4cfe4f2-45e5-4542-bc9d-af94673fe51e",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "3d_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "0bde3f54-7546-4393-b84c-d3f0fbe79cf4",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "fd98580e-9e67-4f62-aa43-eb832378bc27",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "geometric_diagram",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "68f0d16d-65ec-4c15-bdfe-59183aac442a",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "cylinder",
+      "category": "Geometry",
+      "canAnswer": true,
+      "reason": "All measurements provided in question text",
+      "actionNeeded": "No action needed - question is self-contained"
+    },
+    {
+      "id": "d58f1c84-9047-41f8-868e-61e65cea1dd1",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "triangle",
+      "category": "Geometry",
+      "canAnswer": false,
+      "reason": "Missing some measurements in text",
+      "actionNeeded": "ADD: All shape measurements to question text"
+    },
+    {
+      "id": "ba233091-260e-4ec9-8b87-c9908c42b141",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 4 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    },
+    {
+      "id": "80bcb247-da53-4de7-80f4-e7a34606de40",
+      "test_type": "VIC Selective Entry (Year 9 Entry)",
+      "section_name": "Mathematics Reasoning",
+      "visual_type": "table",
+      "category": "Table",
+      "canAnswer": true,
+      "reason": "Table with 5 rows and 5 columns in text",
+      "actionNeeded": "Convert text table to HTML table rendering"
+    }
+  ]
+}

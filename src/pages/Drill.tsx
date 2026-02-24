@@ -108,9 +108,6 @@ const Drill: React.FC = () => {
   const [selectedSubSkillId, setSelectedSubSkillId] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
 
-  // Progressive disclosure state for "View All Skills"
-  const [showAllSkills, setShowAllSkills] = useState<boolean>(false);
-
   const { selectedProduct } = useProduct();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -361,15 +358,20 @@ const Drill: React.FC = () => {
   // Load recommendations based on test performance
   const loadRecommendations = async () => {
     if (!user) {
+      console.log('🎯 DRILL: No user logged in, skipping recommendations');
       setRecommendations([]);
       return;
     }
 
+    console.log('🎯 DRILL: Loading recommendations for user:', user.id, 'product:', selectedProduct);
     setLoadingRecommendations(true);
     try {
-      const recs = await getDrillRecommendations(user.id, selectedProduct, 3);
+      const recs = await getDrillRecommendations(user.id, selectedProduct, 5);
       setRecommendations(recs);
-      console.log('🎯 DRILL: Loaded', recs.length, 'recommendations (top 3 worst-performing)');
+      console.log('🎯 DRILL: Loaded', recs.length, 'recommendations (top 5 worst-performing)');
+      if (recs.length === 0) {
+        console.log('🎯 DRILL: No recommendations returned - check drillRecommendationService logs above');
+      }
     } catch (error) {
       console.error('🎯 DRILL: Error loading recommendations:', error);
       setRecommendations([]);
@@ -1065,65 +1067,44 @@ const Drill: React.FC = () => {
       />
 
       {/* Recommended Drills Section */}
-      {recommendations.length > 0 && (
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <Sparkles className="w-6 h-6 text-orange-600" />
-            <h2 className="text-2xl font-bold text-slate-900">
-              Focus on Your Weakest Areas
-            </h2>
-          </div>
-          <p className="text-slate-600 mb-6">
-            Based on all your completed tests, here are the 3 sub-skills where you need the most practice:
-          </p>
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <Sparkles className="w-6 h-6 text-orange-600" />
+          <h2 className="text-2xl font-bold text-slate-900">
+            Recommended Drills Based on Your Performance
+          </h2>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {recommendations.map((rec, index) => (
+        {recommendations.length > 0 ? (
+          <>
+            <p className="text-slate-600 mb-6">
+              Based on all your completed tests, here are your 5 weakest sub-skills that need the most practice:
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+              {recommendations.map((rec, index) => (
               <Card
                 key={index}
-                className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200"
+                className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 bg-white border-2 border-slate-200"
                 onClick={() => handleRecommendationClick(rec)}
               >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-red-100 text-red-700 border-red-200 text-xs font-bold">
-                        #{index + 1}
-                      </Badge>
-                      <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                        {rec.section}
-                      </Badge>
-                    </div>
-                    <TrendingDown className="w-4 h-4 text-orange-600" />
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs font-bold">
+                      #{index + 1}
+                    </Badge>
+                    <Badge className="bg-slate-100 text-slate-700 border-slate-200 text-xs">
+                      {rec.section}
+                    </Badge>
                   </div>
 
-                  <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2">
+                  <h3 className="font-semibold text-slate-900 mb-4 line-clamp-2 min-h-[2.5rem]">
                     {rec.subSkill}
                   </h3>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">Current Score:</span>
-                      <span className="font-bold text-slate-900">
-                        {rec.averageScore !== null ? `${rec.averageScore}%` : 'N/A'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">Suggested:</span>
-                      <Badge variant="outline" className="text-xs capitalize">
-                        {rec.difficulty}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-600 mt-3 italic">
-                    {rec.reason}
-                  </p>
-
                   <Button
                     size="sm"
-                    className="w-full mt-4 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
+                    className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRecommendationClick(rec);
@@ -1134,10 +1115,31 @@ const Drill: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </div>
-      )}
+              ))}
+            </div>
+          </>
+        ) : (
+          <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-2 border-slate-200 mb-8">
+            <CardContent className="p-8 text-center">
+              <Target className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                Complete Tests to Get Recommendations
+              </h3>
+              <p className="text-slate-600 max-w-2xl mx-auto mb-4">
+                Once you complete diagnostic or practice tests, we'll analyze your performance and recommend specific sub-skills to focus on for maximum improvement.
+              </p>
+              {import.meta.env.DEV && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-left text-xs">
+                  <p className="font-semibold mb-2">Debug Info (dev only):</p>
+                  <p>Loading: {loadingRecommendations ? 'Yes' : 'No'}</p>
+                  <p>Recommendations found: {recommendations.length}</p>
+                  <p>Check console for 🎯 RECOMMENDATIONS messages</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Browse All Drills - Dropdown Selectors */}
       <div>
@@ -1152,335 +1154,92 @@ const Drill: React.FC = () => {
             <p className="text-slate-600">Drill questions for this test type are coming soon.</p>
           </Card>
         ) : (
-          <>
-            {/* Cascading Dropdown Selectors */}
-            <Card className="bg-white border border-slate-200 mb-6">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {/* Test Section Selector */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      Test Section
-                    </label>
-                    <Select value={selectedSectionId} onValueChange={(value) => {
-                      setSelectedSectionId(value);
-                      setSelectedSubSkillId(''); // Reset sub-skill when section changes
-                    }}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select section..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {skillAreas.map((area) => (
-                          <SelectItem key={area.id} value={area.id}>
-                            {area.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Sub-Skill Selector */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      Sub-Skill
-                    </label>
-                    <Select
-                      value={selectedSubSkillId}
-                      onValueChange={setSelectedSubSkillId}
-                      disabled={!selectedSectionId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select sub-skill..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getFilteredSubSkills().map((subSkill) => (
-                          <SelectItem key={subSkill.id} value={subSkill.id}>
-                            {subSkill.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Difficulty Selector */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      Difficulty
-                    </label>
-                    <Select
-                      value={selectedDifficulty}
-                      onValueChange={(value) => setSelectedDifficulty(value as 'easy' | 'medium' | 'hard')}
-                      disabled={!selectedSubSkillId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="easy">Easy</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="hard">Hard</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Start Button */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 invisible">
-                      Action
-                    </label>
-                    <Button
-                      className="w-full h-10 bg-gradient-to-r from-edu-teal to-teal-600 hover:from-edu-teal/90 hover:to-teal-600/90"
-                      onClick={handleDropdownDrillStart}
-                      disabled={!selectedSectionId || !selectedSubSkillId}
-                    >
-                      <Play size={16} className="mr-2" />
-                      Start Drill
-                    </Button>
-                  </div>
+          <Card className="bg-white border border-slate-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Test Section Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Test Section
+                  </label>
+                  <Select value={selectedSectionId} onValueChange={(value) => {
+                    setSelectedSectionId(value);
+                    setSelectedSubSkillId(''); // Reset sub-skill when section changes
+                  }}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select section..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {skillAreas.map((area) => (
+                        <SelectItem key={area.id} value={area.id}>
+                          {area.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Progressive Disclosure: View All Skills */}
-            <Card
-              className="bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200 cursor-pointer hover:shadow-md transition-all"
-              onClick={() => setShowAllSkills(!showAllSkills)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-slate-600" />
-                    <div>
-                      <h3 className="font-semibold text-slate-900">View All Available Skills</h3>
-                      <p className="text-sm text-slate-600">
-                        See complete list of all drills and track your progress
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAllSkills(!showAllSkills);
-                    }}
+                {/* Sub-Skill Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Sub-Skill
+                  </label>
+                  <Select
+                    value={selectedSubSkillId}
+                    onValueChange={setSelectedSubSkillId}
+                    disabled={!selectedSectionId}
                   >
-                    {showAllSkills ? (
-                      <>
-                        <span>Hide</span>
-                        <ChevronUp className="w-4 h-4" />
-                      </>
-                    ) : (
-                      <>
-                        <span>Show All</span>
-                        <ChevronDown className="w-4 h-4" />
-                      </>
-                    )}
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select sub-skill..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getFilteredSubSkills().map((subSkill) => (
+                        <SelectItem key={subSkill.id} value={subSkill.id}>
+                          {subSkill.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Difficulty Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Difficulty
+                  </label>
+                  <Select
+                    value={selectedDifficulty}
+                    onValueChange={(value) => setSelectedDifficulty(value as 'easy' | 'medium' | 'hard')}
+                    disabled={!selectedSubSkillId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Start Button */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700 invisible">
+                    Action
+                  </label>
+                  <Button
+                    className="w-full h-10 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
+                    onClick={handleDropdownDrillStart}
+                    disabled={!selectedSectionId || !selectedSubSkillId}
+                  >
+                    <Play size={16} className="mr-2" />
+                    Start Drill
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Collapsible Skill Areas Section */}
-            {showAllSkills && (
-              <div className="space-y-6 mt-6">
-                {skillAreas.map((skillArea) => (
-              <Card 
-                key={skillArea.id} 
-                className={cn(
-                  "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-xl sm:rounded-2xl overflow-hidden",
-                  "mx-2 sm:mx-0",
-                  skillArea.totalQuestions > 0 ? "hover:border-orange-300 sm:hover:-translate-y-1" : "opacity-60",
-                  getStatusColor(skillArea.completedQuestions, skillArea.totalQuestions)
-                )}
-              >
-                <CardHeader className="p-3 sm:p-4 md:pb-4 bg-gradient-to-r from-slate-50/30 to-white">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 truncate">{skillArea.name}</CardTitle>
-                      <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 mt-2">
-                        <div className="flex items-center gap-1.5 text-edu-navy bg-edu-teal/10 rounded-full px-2.5 py-1 text-xs">
-                          <Users size={12} className="flex-shrink-0" />
-                          <span className="font-medium">{skillArea.subSkills.length} sub-skills</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-edu-navy bg-edu-teal/10 rounded-full px-2.5 py-1 text-xs">
-                          <CheckCircle2 size={12} className="flex-shrink-0" />
-                          <span className="font-medium">{skillArea.totalQuestions} questions</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-                      {skillArea.completedQuestions === skillArea.totalQuestions && skillArea.totalQuestions > 0 && (
-                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
-                          <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
-                          <span className="hidden xs:inline">Completed</span>
-                          <span className="xs:hidden">✓</span>
-                        </Badge>
-                      )}
-                      {skillArea.completedQuestions > 0 && skillArea.completedQuestions < skillArea.totalQuestions && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
-                          <Timer size={10} className="mr-1 sm:w-3 sm:h-3" />
-                          <span className="hidden xs:inline">In Progress</span>
-                          <span className="xs:hidden">⏱</span>
-                        </Badge>
-                      )}
-                      {skillArea.completedQuestions === 0 && !skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
-                        <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
-                          <span className="hidden xs:inline">Not Started</span>
-                          <span className="xs:hidden">○</span>
-                        </Badge>
-                      )}
-                      {skillArea.completedQuestions === 0 && skillArea.subSkills.some(subSkill => hasAnyProgress(subSkill.progress)) && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 rounded-full text-xs px-2 py-1 flex-shrink-0">
-                          <Timer size={10} className="mr-1 sm:w-3 sm:h-3" />
-                          <span className="hidden xs:inline">In Progress</span>
-                          <span className="xs:hidden">⏱</span>
-                        </Badge>
-                      )}
-                      {skillArea.totalQuestions > 0 && (
-                        <Button 
-                          size="sm"
-                          variant="ghost"
-                          className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSkillArea(skillArea);
-                          }}
-                        >
-                          {skillArea.isExpanded ? 
-                            <ChevronUp size={16} className="text-slate-600 sm:w-5 sm:h-5" /> : 
-                            <ChevronDown size={16} className="text-slate-600 sm:w-5 sm:h-5" />
-                          }
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="bg-white p-3 sm:p-6">
-                  {skillArea.totalQuestions === 0 ? (
-                    <div className="text-center py-8">
-                      <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                      <p className="text-slate-500 font-medium">Questions coming soon</p>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Collapsed View - Summary */}
-                      {!skillArea.isExpanded && (
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                          <div className="text-sm text-slate-600">
-                            <span>Progress: {getProgressPercentage(skillArea.completedQuestions, skillArea.totalQuestions)}% complete</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Expanded View - Sub-Skills */}
-                      {skillArea.isExpanded && (
-                        <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4 border-t border-slate-100 px-2 sm:px-0">
-                          <div className="space-y-3 sm:space-y-4">
-                            <h4 className="font-semibold text-slate-900 text-sm sm:text-base">Sub-Skills</h4>
-                            <div className="grid gap-3 sm:gap-4">
-                              {skillArea.subSkills.map((subSkill, index) => (
-                                <div 
-                                  key={subSkill.id}
-                                  className={cn(
-                                    "p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 relative",
-                                    "mx-1 sm:mx-0",
-                                    subSkill.totalQuestions > 0 ? "sm:hover:shadow-md cursor-pointer" : "opacity-60",
-                                    subSkill.isComplete
-                                      ? "border-emerald-200 bg-emerald-50/30"
-                                      : subSkill.completedQuestions > 0
-                                      ? "border-amber-200 bg-amber-50/30"
-                                      : "border-slate-200 bg-white"
-                                  )}
-                                  onClick={() => selectSubSkill(skillArea, subSkill)}
-                                >
-                                  {subSkill.isRecommended && (
-                                    <Badge className="absolute top-2 left-2 bg-rose-100 text-rose-700 border-rose-200 text-xs px-1.5 py-0.5">
-                                      <span className="hidden xs:inline">Recommended</span>
-                                      <span className="xs:hidden">★</span>
-                                    </Badge>
-                                  )}
-                                  <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-0">
-                                    <div className="flex-1 min-w-0">
-                                      <div className={cn("mb-2", subSkill.isRecommended && "mt-6 xs:mt-8")}>
-                                        <div>
-                                          <h5 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{subSkill.name}</h5>
-                                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 mt-1">
-                                            <CheckCircle2 size={10} className="text-emerald-500 flex-shrink-0 sm:w-3 sm:h-3" />
-                                            <span className="truncate">{subSkill.completedQuestions} of {subSkill.totalQuestions} completed</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-2 xs:gap-3 flex-wrap xs:flex-nowrap justify-end xs:justify-start">
-                                      {subSkill.isComplete && (
-                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-1 flex-shrink-0">
-                                          <CheckCircle2 size={10} className="mr-1 sm:w-3 sm:h-3" />
-                                          <span className="hidden xs:inline">Complete</span>
-                                          <span className="xs:hidden">✓</span>
-                                        </Badge>
-                                      )}
-                                      {!subSkill.isComplete && hasAnyProgress(subSkill.progress) && (
-                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-1 flex-shrink-0">
-                                          <span className="hidden xs:inline">In Progress</span>
-                                          <span className="xs:hidden">⏱</span>
-                                        </Badge>
-                                      )}
-                                      
-                                      {subSkill.totalQuestions === 0 ? (
-                                        <div className="text-center py-1 flex-shrink-0">
-                                          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 mx-auto mb-1" />
-                                          <p className="text-xs text-slate-500">Soon</p>
-                                        </div>
-                                      ) : (
-                                        <Button 
-                                          size="sm"
-                                          className={cn(
-                                            "font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0",
-                                            "px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 text-xs xs:text-sm min-w-0",
-                                            !hasAnyProgress(subSkill.progress) && !subSkill.isComplete
-                                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white' 
-                                              : subSkill.isComplete
-                                              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white'
-                                              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
-                                          )}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            selectSubSkill(skillArea, subSkill);
-                                          }}
-                                        >
-                                          <div className="flex items-center min-w-0">
-                                            <Play size={10} className="mr-1 xs:mr-1.5 flex-shrink-0 xs:w-3 xs:h-3 sm:w-4 sm:h-4" />
-                                            <span className="truncate text-xs xs:text-sm">
-                                              {!hasAnyProgress(subSkill.progress) && !subSkill.isComplete ? 
-                                                (<><span className="hidden xs:inline">Start Practice</span><span className="xs:hidden">Start</span></>) : 
-                                               subSkill.isComplete ? 
-                                                (<><span className="hidden xs:inline">View Results</span><span className="xs:hidden">View</span></>) : 
-                                                (<><span className="hidden xs:inline">Continue Practice</span><span className="xs:hidden">Continue</span></>)}
-                                            </span>
-                                          </div>
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-                ))}
               </div>
-            )}
-          </>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

@@ -534,7 +534,7 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
 
-        // DIFFICULTY 2-3
+        // DIFFICULTY 2
         {
           difficulty: 2,
           question_text: "If in a certain code: 1=A, 2=B, 3=C... 26=Z, what word is represented by 8-5-12-12-15?",
@@ -554,6 +554,31 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
             "5-letter word",
             "Shows full decode in explanation"
           ]
+        },
+
+        // DIFFICULTY 3
+        {
+          difficulty: 3,
+          question_text: "In a certain code, each letter is replaced by the letter that comes two positions after it in the alphabet, and then the entire word is reversed. For example, DOG becomes IQF (D→F, O→Q, G→I), which reversed is FQI. Using this code, what does the coded word TGXKT represent?",
+          answer_options: [
+            "A) RIVER",
+            "B) BEACH",
+            "C) BREAK",
+            "D) TRADE",
+            "E) FROST"
+          ],
+          correct_answer: "A",
+          explanation: "To decode TGXKT, first reverse it to get TKXGT. Then shift each letter back two positions in the alphabet: T→R, K→I, X→V, G→E, T→R, which spells RIVER. This multi-step process requires applying both transformations in reverse order.",
+          distractor_strategy: "Included common 5-letter words; requires students to apply both transformation steps (shift +2 and reversal) correctly in sequence",
+          characteristics: [
+            "Multi-step code transformation",
+            "Combines letter substitution (+2 shift) with reversal",
+            "Requires working backwards to decode",
+            "Complex reasoning with two operations",
+            "Must apply transformations in correct order",
+            "Tests systematic problem-solving"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -621,7 +646,7 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
 
-        // DIFFICULTY 2-3
+        // DIFFICULTY 2
         {
           difficulty: 2,
           question_text: "Rearrange the letters in SECTION to form a new 7-letter word.",
@@ -641,6 +666,31 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
             "More challenging vocabulary",
             "Explanation confirms anagram relationship"
           ]
+        },
+
+        // DIFFICULTY 3
+        {
+          difficulty: 3,
+          question_text: "Look closely at the following word: ORCHESTRATE. A single word of eleven letters can be made by re-sorting all the letters. Choose the correct eleven letter word from the list below.",
+          answer_options: [
+            "A) CHATTERORSE",
+            "B) RETHATCHERS",
+            "C) REATTORCHES",
+            "D) TORCHBEARER",
+            "E) None of these"
+          ],
+          correct_answer: "E",
+          explanation: "Process of elimination reveals that none of the options correctly use all 11 letters from ORCHESTRATE to form a valid word. ORCHESTRATE contains: O, R, C, H, E, S, T, R, A, T, E. While option D (TORCHBEARER) is a real word, it requires different letters (needs B and two R's, but ORCHESTRATE only has two R's and no B).",
+          distractor_strategy: "Included plausible-sounding words and one real word (TORCHBEARER) that doesn't match the available letters; tests careful letter counting and verification",
+          characteristics: [
+            "11-letter anagram (longest difficulty)",
+            "Includes real word as distractor",
+            "Answer is 'None of these'",
+            "Requires careful letter inventory",
+            "Tests attention to detail and systematic checking",
+            "Advanced vocabulary"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -729,7 +779,7 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
 
-        // DIFFICULTY 2-3
+        // DIFFICULTY 2
         {
           difficulty: 2,
           question_text: "In a foreign language: PO LIM TAK means BEAUTIFUL RED ROSE. TAK VINO PO means ROSE IN GARDEN. SHEM LIM VINO means BEAUTIFUL GARDEN FENCE. Which word means RED?",
@@ -749,6 +799,31 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Word appears in multiple phrases",
             "More detailed explanation of logic"
           ]
+        },
+
+        // DIFFICULTY 3
+        {
+          difficulty: 3,
+          question_text: "In a foreign language: MIK TAO GREN SELV means THE QUICK BROWN FOX. SELV JUMP GREN HOOP means FOX JUMP OVER FENCE. TAO HOOP MIK DORM means THE FENCE IS QUICK. DORM SELV NAK means FOX IS SLEEPING. Which word means QUICK?",
+          answer_options: [
+            "A) TAO",
+            "B) MIK",
+            "C) GREN",
+            "D) SELV",
+            "E) DORM"
+          ],
+          correct_answer: "A",
+          explanation: "Through systematic elimination across all four phrases: TAO appears in phrase 1 (THE QUICK BROWN FOX) and phrase 3 (THE FENCE IS QUICK). The common English word between these phrases is QUICK and THE. MIK also appears in both, so we must eliminate further. Phrase 1 has TAO, MIK, GREN, SELV and means THE, QUICK, BROWN, FOX. Phrase 3 has TAO, HOOP, MIK, DORM and means THE, FENCE, IS, QUICK. Comparing: TAO and MIK appear in both. THE and QUICK appear in both English translations. SELV appears in phrases 1, 2, and 4 - where FOX appears in all three. MIK appears in phrases 1 and 3 - where THE appears in both. Therefore TAO = QUICK.",
+          distractor_strategy: "Four phrases with complex overlapping patterns; multiple words appear in multiple phrases requiring careful systematic elimination; target word appears in only two phrases but so do other words",
+          characteristics: [
+            "Four translated phrases (most complex)",
+            "Multiple overlapping patterns",
+            "Requires multi-step systematic elimination",
+            "Several words appear in multiple phrases",
+            "Cannot solve by simple matching",
+            "Tests advanced logical reasoning"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -1673,7 +1748,7 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
     // SUB-SKILL 3: Number Matrices & Grid Patterns
     "Number Matrices & Grid Patterns": {
       description: "Visual grid-based questions where numbers follow patterns across rows, columns, or diagonals",
-      visual_required: true,
+      visual_required: false,
       image_type: "HTML",
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
@@ -3151,7 +3226,7 @@ Style: Clean, test-appropriate, clear borders`,
     // SUB-SKILL 4: Geometry & Measurement
     "Geometry & Spatial Reasoning": {
       description: "Working with shapes, angles, area, perimeter, and spatial concepts",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
@@ -3327,7 +3402,7 @@ Style: Clean triangle diagram, educational geometry`,
     // SUB-SKILL 5: Statistics & Data Interpretation
     "Statistics & Data Interpretation": {
       description: "Reading and interpreting data from tables, graphs, and charts; calculating mean, median, mode, and range; drawing conclusions from data",
-      visual_required: true,
+      visual_required: false,
       image_type: "SVG",
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
@@ -3763,6 +3838,44 @@ Style: Clean educational chart, distinct colors, clear labels`,
             "Word count guidance (400-600 words)",
             "Specific criteria provided"
           ]
+        },
+        {
+          difficulty: 2,
+          question_text: "CREATIVE WRITING PROMPT:\n\nWrite a story that begins with this sentence:\n\n\"When I looked in the mirror that morning, I saw someone else looking back at me.\"\n\nYour story should:\n• Be creative and original\n• Develop characters and setting\n• Build tension or conflict\n• Have a satisfying conclusion\n• Be approximately 400-600 words\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended creative writing response",
+          explanation: "This creative writing prompt provides an intriguing opening sentence that can lead to various narrative possibilities - fantasy, science fiction, thriller, or even realistic fiction exploring identity. Students should craft a complete narrative with well-developed characters, vivid setting details, rising action, climax, and resolution. Strong responses will use effective dialogue, sensory details, and narrative techniques to engage the reader.",
+          characteristics: [
+            "Open-ended prompt",
+            "Narrative writing",
+            "Fantasy/speculative element",
+            "Identity theme",
+            "Requires strong plot development",
+            "Time-limited (30 mins)",
+            "Word count guidance (400-600 words)",
+            "Specific criteria provided"
+          ],
+          requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "CREATIVE WRITING PROMPT:\n\nWrite a story inspired by this abstract concept:\n\n\"The Last Light\"\n\nYour story should:\n• Show sophisticated narrative techniques (symbolism, metaphor, varied sentence structures)\n• Develop complex characters with depth and motivation\n• Create vivid, evocative settings using sensory details\n• Build a compelling plot with nuanced conflict\n• Demonstrate mature vocabulary and varied language\n• Be approximately 500-700 words\n\nTime allowed: 35 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended creative writing response",
+          explanation: "This is an advanced creative writing prompt that requires students to interpret an abstract concept and develop a sophisticated narrative. 'The Last Light' could be interpreted literally (dystopian/post-apocalyptic scenario), metaphorically (hope, knowledge, life), or symbolically (end of an era, final opportunity, dying tradition). Strong responses will demonstrate advanced writing techniques including: layered symbolism, complex character development showing internal conflict, sophisticated vocabulary and varied sentence structures, evocative imagery using multiple senses, and thematic depth. The narrative should show maturity in handling abstract concepts and emotional complexity.",
+          characteristics: [
+            "Open-ended abstract prompt",
+            "Advanced narrative writing",
+            "Requires interpretation of abstract concept",
+            "Multiple possible interpretations (literal/metaphorical/symbolic)",
+            "Demands sophisticated writing techniques",
+            "Complex character and plot development expected",
+            "Higher word count (500-700 words)",
+            "Extended time (35 mins)",
+            "Tests thematic understanding and symbolism",
+            "Requires emotional and conceptual depth"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -3812,6 +3925,46 @@ Style: Clean educational chart, distinct colors, clear labels`,
             "Must address both sides",
             "Specific criteria provided"
           ]
+        },
+        {
+          difficulty: 2,
+          question_text: "PERSUASIVE WRITING PROMPT:\n\nRead the following information:\n\n\"Your local council is considering whether to build a new skateboard park in your community. Some residents believe it would provide a safe recreational space for young people and reduce street skating. Others worry about noise, property values, and the cost to taxpayers.\"\n\nWrite a persuasive piece arguing either FOR or AGAINST building the skateboard park.\n\nYour writing should:\n• Take a clear position on the issue\n• Support your argument with logical reasons and evidence\n• Consider and respond to the opposing perspective\n• Use persuasive techniques effectively\n• Be approximately 400-600 words\n\nTime allowed: 30 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This persuasive writing prompt asks students to argue for or against a community issue. Strong responses will include a clear thesis statement, well-developed supporting arguments (such as community benefits, safety concerns, economic impact, or youth needs), acknowledgment of counterarguments with rebuttals, and persuasive language techniques (rhetorical questions, emotive language, statistics, expert opinions). The piece should be logically organized with an engaging introduction, coherent body paragraphs, and a compelling conclusion.",
+          characteristics: [
+            "Open-ended prompt",
+            "Persuasive/argumentative writing",
+            "Community issue topic",
+            "Multiple stakeholder perspectives",
+            "Requires balanced consideration",
+            "Time-limited (30 mins)",
+            "Word count guidance (400-600 words)",
+            "Specific criteria provided"
+          ],
+          requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "PERSUASIVE WRITING PROMPT:\n\nRead the following information:\n\n\"As climate change accelerates, some governments are proposing that every citizen should have a personal carbon allowance - a limit on the amount of carbon dioxide they can be responsible for emitting each year through their lifestyle choices (transport, energy use, consumption). Supporters argue this would fairly distribute responsibility for reducing emissions and incentivize sustainable choices. Critics claim it infringes on personal freedom, would be difficult to monitor, and unfairly impacts different communities and occupations.\"\n\nWrite a persuasive piece arguing either FOR or AGAINST implementing personal carbon allowances.\n\nYour writing should:\n• Present a sophisticated, well-reasoned argument with a clear thesis\n• Support your position with diverse evidence (scientific, economic, social, ethical)\n• Demonstrate understanding of multiple stakeholder perspectives\n• Address counterarguments with thoughtful, nuanced rebuttals\n• Use advanced persuasive techniques and mature vocabulary\n• Show awareness of complexity and acknowledge limitations of your position where appropriate\n• Be approximately 500-700 words\n\nTime allowed: 35 minutes",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This advanced persuasive writing prompt requires students to engage with a complex environmental and ethical issue that has no simple answer. Strong responses will demonstrate: sophisticated argumentation that goes beyond simple pros/cons; integration of multiple types of evidence (environmental science, economic implications, social justice considerations, individual rights); nuanced understanding of stakeholder perspectives (governments, citizens, different socioeconomic groups, future generations, businesses); thoughtful counterargument handling that doesn't dismiss opposing views; awareness of implementation challenges and ethical complexity; mature vocabulary and varied persuasive techniques (appeals to logic, emotion, ethics, expert authority); acknowledgment that the issue involves competing values and legitimate concerns on both sides. The writing should show intellectual maturity in handling ambiguity and complexity.",
+          characteristics: [
+            "Open-ended complex prompt",
+            "Advanced persuasive/argumentative writing",
+            "Environmental and ethical issue",
+            "Requires multi-dimensional analysis",
+            "Multiple competing values and stakeholders",
+            "Demands sophisticated reasoning",
+            "Integration of diverse evidence types expected",
+            "Nuanced treatment of counterarguments",
+            "Higher word count (500-700 words)",
+            "Extended time (35 mins)",
+            "Tests ability to handle ambiguity and complexity",
+            "Requires intellectual maturity and balanced perspective"
+          ],
+          requires_visual: false
         }
       ],
 
