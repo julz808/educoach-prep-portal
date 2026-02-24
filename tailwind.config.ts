@@ -114,7 +114,7 @@ export default {
 				'scale-in': 'scale-in 0.2s ease-out',
 			},
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
+				sans: ['Poppins', 'system-ui', 'sans-serif'],
 			},
 			scrollBehavior: {
 				'smooth': 'smooth'

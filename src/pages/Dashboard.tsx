@@ -207,9 +207,9 @@ const Dashboard: React.FC = () => {
       {/* Main Content - Three Card Layout - Optimized for tablets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* 1. Diagnostic Assessment Card */}
-        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0 
-          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
-          : 'bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 border-slate-200 shadow-xl shadow-purple-100'}`}>
+        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full ${dashboardMetrics.diagnostic.sectionsCompleted === dashboardMetrics.diagnostic.totalSections && dashboardMetrics.diagnostic.totalSections > 0
+          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200/50 shadow-xl shadow-green-200/30'
+          : 'bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 border-2 border-purple-200/50 shadow-xl shadow-purple-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
@@ -261,9 +261,9 @@ const Dashboard: React.FC = () => {
         </Card>
 
         {/* 2. Skill Drills Card */}
-        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0 
-          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
-          : 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-slate-200 shadow-xl shadow-orange-100'}`}>
+        <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full ${dashboardMetrics.drill.subSkillsCompleted === dashboardMetrics.drill.totalSubSkills && dashboardMetrics.drill.totalSubSkills > 0
+          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200/50 shadow-xl shadow-green-200/30'
+          : 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-2 border-orange-200/50 shadow-xl shadow-orange-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
@@ -315,9 +315,9 @@ const Dashboard: React.FC = () => {
         </Card>
 
         {/* 3. Practice Tests Card - Spans columns appropriately */}
-        <Card className={`lg:col-span-2 xl:col-span-1 relative overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests 
-          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-200 shadow-xl shadow-green-100' 
-          : 'bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 border-slate-200 shadow-xl shadow-rose-100'}`}>
+        <Card className={`lg:col-span-2 xl:col-span-1 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full ${dashboardMetrics.practice.testsCompleted === dashboardMetrics.practice.totalTests
+          ? 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200/50 shadow-xl shadow-green-200/30'
+          : 'bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 border-2 border-rose-200/50 shadow-xl shadow-rose-200/30'}`}>
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${

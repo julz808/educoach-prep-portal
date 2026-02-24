@@ -878,10 +878,10 @@ const DiagnosticTests: React.FC = () => {
         </h2>
         
         <div className="space-y-6">
-          <Card 
+          <Card
             className={cn(
-              "transition-all duration-300 bg-white border border-slate-200/60 hover:shadow-xl hover:shadow-slate-200/50 rounded-2xl overflow-hidden",
-              diagnosticTest.totalQuestions > 0 ? "hover:border-edu-teal/30 hover:-translate-y-1" : "opacity-60"
+              "transition-all duration-300 bg-white border-2 border-slate-200/60 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden",
+              diagnosticTest.totalQuestions > 0 ? "hover:border-purple-300/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-200/30" : "opacity-60"
             )}
           >
             <CardHeader className="pb-4 bg-gradient-to-r from-slate-50/30 to-white">
@@ -996,11 +996,11 @@ const DiagnosticTests: React.FC = () => {
                         <h4 className="font-semibold text-slate-900">Assessment Sections</h4>
                         <div className="grid gap-4">
                           {diagnosticTest.sections.map((section, index) => (
-                            <div 
+                            <div
                               key={section.id}
                               className={cn(
-                                "p-3 sm:p-4 rounded-lg border-2 transition-all duration-200",
-                                section.questions > 0 ? "hover:shadow-md" : "opacity-60",
+                                "p-3 sm:p-4 rounded-xl border-2 transition-all duration-200",
+                                section.questions > 0 ? "hover:shadow-lg hover:-translate-y-0.5" : "opacity-60",
                                 getStatusColor(section.status)
                               )}
                             >
