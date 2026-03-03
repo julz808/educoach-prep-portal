@@ -5,6 +5,7 @@ import { Clock, Flag, ChevronLeft, ChevronRight, ChevronRight as ChevronRightIco
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatQuestionText, cleanOptionText, formatPassageText, formatExplanationText } from '@/utils/textFormatting';
 import { WritingAssessmentFeedback } from './WritingAssessmentFeedback';
 import { WritingAssessmentService } from '@/services/writingAssessmentService';
@@ -49,6 +50,8 @@ interface EnhancedTestInterfaceProps {
   testScore?: any; // For displaying weighted scores in review mode
   calculatingScore?: boolean; // For showing loading state during score calculation
   productType?: string; // For passing to writing assessment feedback
+  currentDifficulty?: 'easy' | 'medium' | 'hard'; // For drill mode difficulty toggle
+  onDifficultyChange?: (difficulty: 'easy' | 'medium' | 'hard') => void; // Callback for difficulty change
 }
 
 export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
@@ -73,7 +76,9 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
   sessionId,
   testScore,
   calculatingScore = false,
-  productType
+  productType,
+  currentDifficulty,
+  onDifficultyChange
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -490,9 +495,10 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 
                     {/* Question Text */}
                     <div>
-                      <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
-                        {formatQuestionText(currentQuestion?.text || '')}
-                      </h2>
+                      <div
+                        className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line"
+                        dangerouslySetInnerHTML={{ __html: formatQuestionText(currentQuestion?.text || '') }}
+                      />
                       {/* Visual (SVG diagram or HTML table) */}
                       {currentQuestion?.visualSvg && (
                         <div className="mb-6">
@@ -657,9 +663,10 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
 
                   {/* Question Text */}
                   <div>
-                    <h2 className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line">
-                      {formatQuestionText(currentQuestion?.text || '')}
-                    </h2>
+                    <div
+                      className="text-lg font-bold leading-relaxed text-edu-navy mb-6 whitespace-pre-line"
+                      dangerouslySetInnerHTML={{ __html: formatQuestionText(currentQuestion?.text || '') }}
+                    />
                     {/* Visual (SVG diagram or HTML table) */}
                     {currentQuestion?.visualSvg && (
                       <div className="mb-6">
@@ -900,6 +907,43 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                   </>
                 )}
               </div>
+
+              {/* Difficulty Toggle - Only show for drill mode */}
+              {isDrillMode && currentDifficulty && onDifficultyChange && (
+                <div className="pt-6 pb-4 border-t border-gray-200">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Difficulty Level
+                  </label>
+                  <Select
+                    value={currentDifficulty}
+                    onValueChange={(value) => onDifficultyChange(value as 'easy' | 'medium' | 'hard')}
+                  >
+                    <SelectTrigger className="w-full bg-white border-gray-300">
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span>Easy</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="medium">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <span>Medium</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="hard">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                          <span>Hard</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Statistics */}
               <div className="pt-6 border-t space-y-2 text-sm">

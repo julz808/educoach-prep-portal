@@ -146,6 +146,7 @@ const TestTaking: React.FC = () => {
 
   const sectionName = searchParams.get('sectionName') || '';
   const isReviewMode = searchParams.get('review') === 'true';
+  const currentDifficulty = searchParams.get('difficulty') as 'easy' | 'medium' | 'hard' | null;
 
   // Calculate test score when entering review mode
   useEffect(() => {
@@ -1422,9 +1423,29 @@ const TestTaking: React.FC = () => {
     });
   };
 
+  const handleDifficultyChange = async (newDifficulty: 'easy' | 'medium' | 'hard') => {
+    if (!session || session.type !== 'drill') return;
+
+    console.log('🎯 DIFFICULTY CHANGE: Switching from', currentDifficulty, 'to', newDifficulty);
+
+    // Update URL with new difficulty parameter
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.set('difficulty', newDifficulty);
+
+    // Remove sessionId to start a fresh drill session at the new difficulty
+    // This prevents trying to resume an incompatible session with different difficulty questions
+    currentParams.delete('sessionId');
+
+    // Use React Router navigation instead of hard reload to prevent "site can't be reached" errors
+    // The useEffect with searchParams dependency will re-initialize with new questions
+    const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+    console.log('🎯 DIFFICULTY CHANGE: Navigating to', newUrl);
+    navigate(newUrl, { replace: true });
+  };
+
   const handleFinish = () => {
     if (!session) return;
-    
+
     // Show confirmation dialog
     setShowSubmitConfirm(true);
   };
@@ -1515,10 +1536,15 @@ const TestTaking: React.FC = () => {
       } else {
         // For regular sessions (diagnostic/practice) AND writing drills, use developer tools replica approach
         // Create the session structure in the exact format the replica service expects
+
+        // CRITICAL FIX: Calculate productType (session doesn't have this field)
+        const properDisplayName = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
+        console.log('🏁 COMPLETE: Using productType:', properDisplayName);
+
         const sessionForReplica = {
           id: session.id,
           userId: user.id,
-          productType: session.productType,
+          productType: properDisplayName,  // ✅ Use calculated productType, not session.productType (undefined)
           testMode: actualTestMode, // diagnostic, practice_1, practice_2, etc.
           sectionName: session.sectionName,
           questions: session.questions,
@@ -1526,7 +1552,17 @@ const TestTaking: React.FC = () => {
           textAnswers: session.textAnswers,
           flaggedQuestions: session.flaggedQuestions
         };
-        
+
+        console.log('🏁 COMPLETE: Session for replica:', {
+          id: sessionForReplica.id.substring(0, 8) + '...',
+          userId: sessionForReplica.userId,
+          productType: sessionForReplica.productType,
+          testMode: sessionForReplica.testMode,
+          sectionName: sessionForReplica.sectionName,
+          questionsCount: sessionForReplica.questions.length,
+          answersCount: Object.keys(sessionForReplica.answers).length
+        });
+
         await DeveloperToolsReplicaService.completeSessionLikeDeveloperTools(sessionForReplica);
         
         // BRIDGE: For writing drills, also create a drill_sessions entry for progress tracking
@@ -1647,13 +1683,15 @@ const TestTaking: React.FC = () => {
       try {
         setWritingProcessingStatus(`Reviewing writing response ${i + 1} of ${writingQuestions.length}...`);
         console.log(`✍️ WRITING: Assessing question ${questionIndex} (${question.id}) for product ${productType}`);
-        
+
         const assessment = await WritingAssessmentService.assessWriting(
           userResponse,
           question.id,
           productType,
           session.id,
-          user.id
+          user.id,
+          question.text, // Pass the question text from the session
+          question.subSkill // Pass the subSkill/genre from the session
         );
         
         console.log(`✍️ WRITING: Assessment completed for question ${questionIndex}:`, {
@@ -1853,6 +1891,8 @@ const TestTaking: React.FC = () => {
         testScore={testScore}
         calculatingScore={calculatingScore}
         productType={PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct}
+        currentDifficulty={currentDifficulty || undefined}
+        onDifficultyChange={handleDifficultyChange}
       />
     );
   }
@@ -1880,6 +1920,8 @@ const TestTaking: React.FC = () => {
         onFinish={handleFinish}
         onExit={handleExit}
         sessionId={session.id}
+        currentDifficulty={currentDifficulty || undefined}
+        onDifficultyChange={handleDifficultyChange}
       />
 
       {/* Submit Confirmation Dialog */}

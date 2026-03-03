@@ -716,8 +716,10 @@ const Drill: React.FC = () => {
     }
   };
 
-  // Handle recommendation card click
-  const handleRecommendationClick = (recommendation: DrillRecommendation) => {
+  // Handle recommendation card click - automatically start drill at lowest difficulty or continue from last session
+  const handleRecommendationClick = async (recommendation: DrillRecommendation) => {
+    if (!user) return;
+
     // Find matching skill area and sub-skill
     const skillArea = skillAreas.find(sa =>
       sa.name.toLowerCase().includes(recommendation.section.toLowerCase()) ||
@@ -729,12 +731,91 @@ const Drill: React.FC = () => {
       recommendation.subSkill.toLowerCase().includes(ss.name.toLowerCase())
     );
 
-    if (skillArea && subSkill) {
-      setSelectedSkillArea(skillArea);
-      setSelectedSubSkill(subSkill);
-      setCurrentView('sub-skill');
-    } else {
+    if (!skillArea || !subSkill) {
       console.warn('Could not find matching skill area or sub-skill for recommendation:', recommendation);
+      return;
+    }
+
+    console.log('🎯 RECOMMENDATION: Starting drill for', subSkill.name);
+
+    // Determine which difficulty to start (lowest available with questions, or continue existing session)
+    let targetDifficulty: 'easy' | 'medium' | 'hard' = 'easy'; // Default to lowest
+    let existingSessionId: string | undefined;
+
+    // Check for existing sessions in order: easy -> medium -> hard
+    if (subSkill.progress.easy.sessionId) {
+      targetDifficulty = 'easy';
+      existingSessionId = subSkill.progress.easy.sessionId;
+    } else if (subSkill.progress.medium.sessionId) {
+      targetDifficulty = 'medium';
+      existingSessionId = subSkill.progress.medium.sessionId;
+    } else if (subSkill.progress.hard.sessionId) {
+      targetDifficulty = 'hard';
+      existingSessionId = subSkill.progress.hard.sessionId;
+    } else {
+      // No existing session - start at lowest difficulty that has questions
+      if (subSkill.progress.easy.total > 0) {
+        targetDifficulty = 'easy';
+      } else if (subSkill.progress.medium.total > 0) {
+        targetDifficulty = 'medium';
+      } else if (subSkill.progress.hard.total > 0) {
+        targetDifficulty = 'hard';
+      }
+    }
+
+    console.log('🎯 RECOMMENDATION: Target difficulty:', targetDifficulty, 'Session ID:', existingSessionId);
+
+    // Check if this is a writing drill
+    const isWritingDrill = subSkill.name.toLowerCase().includes('writing') ||
+                          subSkill.name.toLowerCase().includes('written') ||
+                          subSkill.name.toLowerCase().includes('expression');
+
+    try {
+      if (isWritingDrill) {
+        // For writing drills, use sectionName and navigate directly
+        const subjectId = subSkill.name.toLowerCase().replace(/\s+/g, '-');
+        let navigationUrl = `/test/drill/${subjectId}?sectionName=${encodeURIComponent(subSkill.name)}&difficulty=${targetDifficulty}`;
+
+        if (existingSessionId) {
+          navigationUrl += `&sessionId=${existingSessionId}`;
+        }
+
+        navigate(navigationUrl);
+      } else {
+        // For non-writing drills, check for active session via DrillSessionService
+        const subSkillText = subSkill.questions[0]?.subSkill || subSkill.name;
+        const firstQuestionWithUUID = subSkill.questions.find(q => q.subSkillId && q.subSkillId.trim() !== '');
+        const actualSubSkillId = getOrCreateSubSkillUUID(subSkillText, firstQuestionWithUUID?.subSkillId);
+        const dbProductType = getDbProductType(selectedProduct);
+
+        const difficultyMap = { easy: 1, medium: 2, hard: 3 };
+        const targetDifficultyNum = difficultyMap[targetDifficulty];
+
+        const existingSession = await DrillSessionService.getActiveSession(
+          user.id,
+          actualSubSkillId,
+          targetDifficultyNum,
+          dbProductType
+        );
+
+        let navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${targetDifficulty}&skillArea=${skillArea.name}`;
+
+        if (existingSession) {
+          navigationUrl += `&sessionId=${existingSession.sessionId}`;
+
+          if (existingSession.status === 'completed' ||
+              (existingSession.questionsAnswered === existingSession.questionsTotal && existingSession.questionsTotal > 0)) {
+            navigationUrl += '&review=true';
+          }
+        }
+
+        navigate(navigationUrl);
+      }
+    } catch (error) {
+      console.error('🎯 RECOMMENDATION: Error starting drill:', error);
+      // Fallback navigation
+      const navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${targetDifficulty}&skillArea=${skillArea.name}`;
+      navigate(navigationUrl);
     }
   };
 

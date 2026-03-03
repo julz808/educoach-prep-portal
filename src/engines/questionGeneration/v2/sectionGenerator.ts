@@ -21,6 +21,11 @@ import {
 import { getExistingQuestionCounts, detectSectionGaps, printSectionGapSummary } from './gapDetection';
 import { getExistingPassageCountsByType } from './supabaseStorage';
 import { createClient } from '@supabase/supabase-js';
+import {
+  generateQuestionOrderSeed,
+  generateQuestionOrders,
+  shouldRandomizeSection
+} from '@/utils/seededShuffle';
 
 // Create supabase client for direct queries
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
@@ -208,7 +213,42 @@ export async function generateSectionV2(params: {
     const totalFailed = Object.values(subSkillStats).reduce((sum, s) => sum + s.failed, 0);
     const totalReattempts = Object.values(subSkillStats).reduce((sum, s) => sum + s.reattempts, 0);
 
-    // Step 3: Return results
+    // Step 3: Assign question_order for consistent randomization (non-passage sections only)
+    if (shouldRandomizeSection(sectionName)) {
+      console.log(`\n🔀 QUESTION RANDOMIZATION`);
+      console.log(`${'='.repeat(80)}`);
+      console.log(`   Section "${sectionName}" will have randomized question order`);
+
+      // Generate seed based on test configuration
+      const seed = generateQuestionOrderSeed(testType, testMode, sectionName);
+      console.log(`   Using seed: ${seed} (deterministic for all users)`);
+
+      // Generate shuffled order indices
+      const orderIndices = generateQuestionOrders(questions.length, seed);
+
+      // Assign question_order to each question
+      questions.forEach((question, index) => {
+        question.question_order = orderIndices[index];
+      });
+
+      console.log(`   ✅ Assigned random question_order to ${questions.length} questions`);
+      console.log(`   Example: Q1 will appear at position ${orderIndices[0] + 1}`);
+      console.log(`${'='.repeat(80)}\n`);
+    } else {
+      console.log(`\n📖 PASSAGE-BASED SECTION - PRESERVING ORDER`);
+      console.log(`${'='.repeat(80)}`);
+      console.log(`   Section "${sectionName}" keeps questions grouped by passage`);
+
+      // For passage-based sections, assign sequential order
+      questions.forEach((question, index) => {
+        question.question_order = index;
+      });
+
+      console.log(`   ✅ Assigned sequential question_order to ${questions.length} questions`);
+      console.log(`${'='.repeat(80)}\n`);
+    }
+
+    // Step 4: Return results
     console.log(`\n${'='.repeat(80)}`);
     console.log(`✅ SECTION GENERATION COMPLETE`);
     console.log(`${'='.repeat(80)}`);
@@ -548,7 +588,8 @@ async function generateHybridSection(params: {
   for (const spec of standalone_distribution) {
     standaloneDistributionMap[spec.sub_skill] = spec.count;
   }
-  const existingStandaloneCounts = await getExistingQuestionCounts(testType, sectionName, testMode);
+  // ⭐ IMPORTANT: Only count standalone questions (passage_id = null)
+  const existingStandaloneCounts = await getExistingQuestionCounts(testType, sectionName, testMode, true);
   const standaloneGap = detectSectionGaps(standaloneDistributionMap, existingStandaloneCounts, sectionName);
   printSectionGapSummary(standaloneGap);
 
@@ -665,99 +706,154 @@ async function generateHybridSection(params: {
       console.log(`   📝 Need ${questionsNeeded} more passage-based questions for ${testMode}...`);
       console.log(`   Generating questions from existing passages...\n`);
 
-      // Get existing passages for this test mode
-      const { data: existingQuestions, error: qError } = await supabase
+      // ⭐ NEW: Determine which passage-based sub-skills are under-generated
+      const { data: existingQuestionsDetailed, error: qError } = await supabase
         .from('questions_v2')
-        .select('passage_id')
+        .select('passage_id, sub_skill')
         .eq('test_type', testType)
         .eq('section_name', sectionName)
         .eq('test_mode', testMode)
         .not('passage_id', 'is', null);
 
       if (qError) {
-        console.error(`   ❌ Error fetching passage links:`, qError);
+        console.error(`   ❌ Error fetching passage questions:`, qError);
       }
 
-      const passageIds = [...new Set((existingQuestions || []).map(q => q.passage_id as string))];
+      // Count existing questions by sub-skill (passage-based only)
+      const passageSubSkillCounts: Record<string, number> = {};
+      (existingQuestionsDetailed || []).forEach(q => {
+        passageSubSkillCounts[q.sub_skill] = (passageSubSkillCounts[q.sub_skill] || 0) + 1;
+      });
 
-      if (passageIds.length === 0) {
-        console.log(`   ⚠️  No passages linked to ${testMode}. Cannot generate questions.\n`);
-      } else {
-        // Fetch the actual passages
-        const { data: existingPassages, error: pError } = await supabase
-          .from('passages_v2')
-          .select('*')
-          .in('id', passageIds);
+      // Calculate target counts for passage-based sub-skills
+      const passageSubSkillTargets: Record<string, number> = {};
+      passage_distribution.forEach(item => {
+        const questionsPerPassage = Array.isArray(item.questions_per_passage)
+          ? Math.max(...item.questions_per_passage)
+          : item.questions_per_passage;
+        const totalQuestionsForThisPassageType = item.count * questionsPerPassage;
+        const numSubSkills = item.sub_skills.length;
 
-        if (pError) {
-          console.error(`   ❌ Error fetching passages:`, pError);
+        item.sub_skills.forEach((skill, index) => {
+          const baseCount = Math.floor(totalQuestionsForThisPassageType / numSubSkills);
+          const remainder = totalQuestionsForThisPassageType % numSubSkills;
+          const skillCount = baseCount + (index < remainder ? 1 : 0);
+          passageSubSkillTargets[skill] = (passageSubSkillTargets[skill] || 0) + skillCount;
+        });
+      });
+
+      // Identify which sub-skills need more questions
+      const subSkillGaps: Array<{ subSkill: string; needed: number }> = [];
+      Object.entries(passageSubSkillTargets).forEach(([subSkill, target]) => {
+        const existing = passageSubSkillCounts[subSkill] || 0;
+        const needed = Math.max(0, target - existing);
+        if (needed > 0) {
+          subSkillGaps.push({ subSkill, needed });
+          console.log(`   ⚠️  ${subSkill}: ${existing}/${target} (need ${needed} more)`);
         }
+      });
 
-        if (existingPassages && existingPassages.length > 0) {
-          // Count questions per passage
-          const questionCountsByPassage = new Map<string, number>();
-          (existingQuestions || []).forEach(q => {
-            const pid = q.passage_id as string;
-            questionCountsByPassage.set(pid, (questionCountsByPassage.get(pid) || 0) + 1);
-          });
+      if (subSkillGaps.length === 0) {
+        console.log(`   ✅ All passage-based sub-skills are complete!\n`);
+      } else {
+        const passageIds = [...new Set((existingQuestionsDetailed || []).map(q => q.passage_id as string))];
 
-          // Sort passages by question count (fewest first) to distribute evenly
-          const passagesSorted = existingPassages.sort((a, b) => {
-            const countA = questionCountsByPassage.get(a.id) || 0;
-            const countB = questionCountsByPassage.get(b.id) || 0;
-            return countA - countB;
-          });
+        if (passageIds.length === 0) {
+          console.log(`   ⚠️  No passages linked to ${testMode}. Cannot generate questions.\n`);
+        } else {
+          // Fetch the actual passages with metadata
+          const { data: existingPassages, error: pError } = await supabase
+            .from('passages_v2')
+            .select('*')
+            .in('id', passageIds);
 
-          console.log(`   📊 Distributing ${questionsNeeded} questions across ${passagesSorted.length} passages...\n`);
-
-          // Use the primary difficulty from the plan for passages
-          const primaryDifficulty = difficultyPlan.distribution.reduce((max, d) =>
-            d.count > max.count ? d : max
-          ).difficulty;
-
-          // Get the passage-based sub-skill from config
-          const passageSubSkill = passage_distribution[0]?.sub_skills?.[0] || passage.sub_skill || 'Passage Comprehension & Inference';
-
-          // Generate questions for each passage until we reach the target
-          let generatedCount = 0;
-          for (const passage of passagesSorted) {
-            if (generatedCount >= questionsNeeded) break;
-
-            const currentCount = questionCountsByPassage.get(passage.id) || 0;
-            console.log(`   📝 Generating question for passage: "${passage.title}" (currently has ${currentCount} questions)`);
-
-            try {
-              const result = await generateQuestionV2(
-                {
-                  testType,
-                  section: sectionName,
-                  subSkill: passageSubSkill,
-                  difficulty: primaryDifficulty,
-                  testMode,
-                  passageId: passage.id,
-                  passageText: passage.content
-                },
-                {
-                  skipValidation: false,
-                  skipStorage,
-                  strictValidation: true
-                }
-              );
-
-              if (result.success && result.question) {
-                passageQuestions.push(result.question);
-                totalCost += result.cost;
-                generatedCount++;
-                console.log(`      ✅ Question ${generatedCount}/${questionsNeeded} generated\n`);
-              } else {
-                console.log(`      ❌ Failed: ${result.error}\n`);
-              }
-            } catch (error) {
-              console.log(`      ❌ Error: ${error instanceof Error ? error.message : 'Unknown'}\n`);
-            }
+          if (pError) {
+            console.error(`   ❌ Error fetching passages:`, pError);
           }
 
-          console.log(`   ✅ Generated ${generatedCount} questions from existing passages\n`);
+          if (existingPassages && existingPassages.length > 0) {
+            // Count questions per passage
+            const questionCountsByPassage = new Map<string, number>();
+            (existingQuestionsDetailed || []).forEach(q => {
+              const pid = q.passage_id as string;
+              questionCountsByPassage.set(pid, (questionCountsByPassage.get(pid) || 0) + 1);
+            });
+
+            // Sort passages by question count (fewest first) to distribute evenly
+            const passagesSorted = existingPassages.sort((a, b) => {
+              const countA = questionCountsByPassage.get(a.id) || 0;
+              const countB = questionCountsByPassage.get(b.id) || 0;
+              return countA - countB;
+            });
+
+            console.log(`   📊 Generating ${questionsNeeded} questions targeting under-generated sub-skills...\n`);
+
+            // Use the primary difficulty from the plan for passages
+            const primaryDifficulty = difficultyPlan.distribution.reduce((max, d) =>
+              d.count > max.count ? d : max
+            ).difficulty;
+
+            // Generate questions cycling through under-generated sub-skills
+            let generatedCount = 0;
+            let subSkillIndex = 0;
+
+            for (const passage of passagesSorted) {
+              if (generatedCount >= questionsNeeded) break;
+
+              // Find next sub-skill that needs questions
+              let attempts = 0;
+              while (attempts < subSkillGaps.length) {
+                const gap = subSkillGaps[subSkillIndex % subSkillGaps.length];
+                if (gap.needed > 0) {
+                  const currentCount = questionCountsByPassage.get(passage.id) || 0;
+                  console.log(`   📝 Generating ${gap.subSkill} question for passage: "${passage.title}" (currently has ${currentCount} questions)`);
+
+                  try {
+                    const result = await generateQuestionV2(
+                      {
+                        testType,
+                        section: sectionName,
+                        subSkill: gap.subSkill,
+                        difficulty: primaryDifficulty,
+                        testMode,
+                        passageId: passage.id,
+                        passageText: passage.content
+                      },
+                      {
+                        skipValidation: false,
+                        skipStorage,
+                        strictValidation: true
+                      }
+                    );
+
+                    if (result.success && result.question) {
+                      passageQuestions.push(result.question);
+                      totalCost += result.cost;
+                      generatedCount++;
+                      gap.needed--;
+                      questionCountsByPassage.set(passage.id, currentCount + 1);
+                      console.log(`      ✅ Question ${generatedCount}/${questionsNeeded} generated\n`);
+                      subSkillIndex++;
+                      break;
+                    } else {
+                      console.log(`      ❌ Failed: ${result.error}\n`);
+                      subSkillIndex++;
+                      attempts++;
+                    }
+                  } catch (error) {
+                    console.log(`      ❌ Error: ${error instanceof Error ? error.message : 'Unknown'}\n`);
+                    subSkillIndex++;
+                    attempts++;
+                  }
+                } else {
+                  subSkillIndex++;
+                  attempts++;
+                }
+              }
+            }
+
+            console.log(`   ✅ Generated ${generatedCount} questions from existing passages\n`);
+          }
         }
       }
     }

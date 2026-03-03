@@ -5,17 +5,28 @@ import { useAuth } from '@/context/AuthContext';
 import { useProduct } from '@/context/ProductContext';
 import { PaywallComponent } from '@/components/PaywallComponent';
 import { isPaywallUIEnabled } from '@/config/stripeConfig';
-import { 
-  AnalyticsService, 
-  type OverallPerformance, 
-  type DiagnosticResults, 
-  type PracticeTestResults, 
-  type DrillResults 
+import {
+  AnalyticsService,
+  type OverallPerformance,
+  type DiagnosticResults,
+  type PracticeTestResults,
+  type DrillResults
 } from '@/services/analyticsService';
-import { UNIFIED_SUB_SKILLS, SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '@/data/curriculumData';
+import { SUB_SKILL_EXAMPLES, SECTION_CONFIGURATIONS } from '@/data/curriculumData_v2';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+
+// Create flattened UNIFIED_SUB_SKILLS from v2 nested structure for backward compatibility
+const UNIFIED_SUB_SKILLS: Record<string, { description: string; visual_required?: boolean }> = {};
+Object.entries(SUB_SKILL_EXAMPLES).forEach(([section, subSkills]) => {
+  Object.entries(subSkills).forEach(([subSkillName, subSkillData]) => {
+    UNIFIED_SUB_SKILLS[subSkillName] = {
+      description: subSkillData.description,
+      visual_required: subSkillData.visual_required
+    };
+  });
+});
 
 // Map frontend product IDs to curriculum product types
 const PRODUCT_ID_TO_TYPE: Record<string, string> = {
@@ -33,43 +44,31 @@ const PRODUCT_ID_TO_TYPE: Record<string, string> = {
 const getFilterTabsForProduct = (productId: string) => {
   // Map the product ID to the curriculum product type
   const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
-  const sections = Object.keys(TEST_STRUCTURES[productType as keyof typeof TEST_STRUCTURES] || {});
 
-  console.log('🔍 getFilterTabsForProduct:', { productId, productType, sections });
+  // Get sections from V2 SECTION_CONFIGURATIONS (source of truth)
+  const sections = Object.keys(SECTION_CONFIGURATIONS)
+    .filter(key => key.startsWith(productType))
+    .map(key => {
+      const config = SECTION_CONFIGURATIONS[key as keyof typeof SECTION_CONFIGURATIONS];
+      return config.section_name;
+    });
 
-  // Create filter tabs from actual sections
+  console.log('🔍 getFilterTabsForProduct (V2):', { productId, productType, sections });
+
+  // Create filter tabs from actual sections - each section gets its own filter
   const filterTabs = [{ id: 'all', label: 'All Skills' }];
 
-  // Add each section as a filter, using a simplified ID
+  // Add each section as a unique filter
   sections.forEach(section => {
-    let id = 'other';
-    const lowerSection = section.toLowerCase();
+    // Create a unique ID from the section name
+    const id = section.toLowerCase()
+      .replace(/\s+/g, '-')  // Replace spaces with hyphens
+      .replace(/[()]/g, '');  // Remove parentheses
 
-    if (lowerSection.includes('reading')) {
-      id = 'reading';
-    } else if (lowerSection.includes('verbal')) {
-      id = 'verbal';
-    } else if (lowerSection.includes('mathematics') || lowerSection.includes('mathematical') || lowerSection.includes('numeracy')) {
-      id = 'mathematical';
-    } else if (lowerSection.includes('numerical') || lowerSection.includes('quantitative')) {
-      id = 'quantitative';
-    } else if (lowerSection.includes('writing') || lowerSection.includes('written')) {
-      id = 'writing';
-    } else if (lowerSection.includes('language')) {
-      id = 'language';
-    } else if (lowerSection.includes('thinking')) {
-      id = 'thinking';
-    } else if (lowerSection.includes('humanities')) {
-      id = 'humanities';
-    }
-
-    // Check if this filter ID already exists
-    if (!filterTabs.find(tab => tab.id === id)) {
-      filterTabs.push({ id, label: section });
-    }
+    filterTabs.push({ id, label: section });
   });
 
-  console.log('✅ Filter tabs generated:', filterTabs);
+  console.log('✅ Filter tabs generated (V2):', filterTabs);
 
   return filterTabs;
 };
@@ -926,11 +925,22 @@ const PerformanceDashboard = () => {
                         <div className="space-y-4">
                           {(() => {
                             const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
-                            // Only include sub-skills that have been attempted AND score >50%
+                            // Only include sub-skills that have been attempted
                             const attemptedSkills = allSubSkills.filter(skill => {
-                              const score = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
-                              return skill.questionsAttempted > 0 && score > 50;
+                              return skill.questionsAttempted > 0;
                             });
+
+                            // Require at least 10 attempted sub-skills to show meaningful top 5
+                            if (attemptedSkills.length < 10) {
+                              return (
+                                <div className="text-center py-8 text-slate-500">
+                                  <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                  <p className="font-medium">Complete more sub-skills to see your top performers</p>
+                                  <p className="text-sm mt-1">At least 10 sub-skills needed ({attemptedSkills.length}/10)</p>
+                                </div>
+                              );
+                            }
+
                             const sortedSkills = topBottomView === 'score'
                               ? [...attemptedSkills].sort((a, b) => (b.score || 0) - (a.score || 0))
                               : [...attemptedSkills].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0));
@@ -964,12 +974,6 @@ const PerformanceDashboard = () => {
                             </div>
                             ));
                           })()}
-                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.filter(s => s.questionsAttempted > 0).length === 0) && (
-                            <div className="text-center py-8 text-slate-500">
-                              <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                              Complete more questions to see your top sub-skills
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1025,11 +1029,22 @@ const PerformanceDashboard = () => {
                         <div className="space-y-4">
                           {(() => {
                             const allSubSkills = performanceData.diagnostic?.allSubSkills || [];
-                            // Only include sub-skills that have been attempted AND score >50%
+                            // Only include sub-skills that have been attempted
                             const attemptedSkills = allSubSkills.filter(skill => {
-                              const score = topBottomView === 'score' ? (skill.score || 0) : (skill.accuracy || 0);
-                              return skill.questionsAttempted > 0 && score > 50;
+                              return skill.questionsAttempted > 0;
                             });
+
+                            // Require at least 10 attempted sub-skills to show meaningful bottom 5
+                            if (attemptedSkills.length < 10) {
+                              return (
+                                <div className="text-center py-8 text-slate-500">
+                                  <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                  <p className="font-medium">Complete more sub-skills to identify areas for improvement</p>
+                                  <p className="text-sm mt-1">At least 10 sub-skills needed ({attemptedSkills.length}/10)</p>
+                                </div>
+                              );
+                            }
+
                             const sortedSkills = topBottomView === 'score'
                               ? [...attemptedSkills].sort((a, b) => (a.score || 0) - (b.score || 0))
                               : [...attemptedSkills].sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0));
@@ -1066,12 +1081,6 @@ const PerformanceDashboard = () => {
                             </div>
                             ));
                           })()}
-                          {(!performanceData.diagnostic?.allSubSkills || performanceData.diagnostic.allSubSkills.filter(s => s.questionsAttempted > 0).length === 0) && (
-                            <div className="text-center py-8 text-slate-500">
-                              <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                              Complete more questions to see your bottom sub-skills
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1147,56 +1156,24 @@ const PerformanceDashboard = () => {
                         // Map to consistent format using actual section names
                         const mappedSkills = allSkills.map(skill => {
                           const sectionName = skill.sectionName || 'Unknown Section';
-                          
-                          // Map section names to filter categories (all test types)
-                          let category = 'all';
-                          const lowerSectionName = sectionName.toLowerCase();
-                          
-                          // Reading categories
-                          if (lowerSectionName.includes('reading')) {
-                            category = 'reading';
-                          }
-                          // Mathematics categories  
-                          else if (lowerSectionName.includes('mathematics') || lowerSectionName.includes('mathematical') || lowerSectionName.includes('numeracy')) {
-                            category = 'mathematical';
-                          }
-                          // Verbal/Language categories
-                          else if (lowerSectionName.includes('verbal') || lowerSectionName.includes('language') || lowerSectionName.includes('thinking skills')) {
-                            category = 'verbal';
-                          }
-                          // Quantitative/Numerical categories
-                          else if (lowerSectionName.includes('quantitative') || lowerSectionName.includes('numerical')) {
-                            category = 'quantitative';
-                          }
-                          // Writing categories
-                          else if (lowerSectionName.includes('writing') || lowerSectionName.includes('written expression')) {
-                            category = 'writing';
-                          }
-                          // Language categories
-                          else if (lowerSectionName.includes('language')) {
-                            category = 'language';
-                          }
-                          // Thinking categories
-                          else if (lowerSectionName.includes('thinking')) {
-                            category = 'thinking';
-                          }
-                          // Humanities categories
-                          else if (lowerSectionName.includes('humanities')) {
-                            category = 'humanities';
-                          }
-                          
+
+                          // Create normalized section ID for filtering (matches getFilterTabsForProduct logic)
+                          const sectionId = sectionName.toLowerCase()
+                            .replace(/\s+/g, '-')  // Replace spaces with hyphens
+                            .replace(/[()]/g, '');  // Remove parentheses
+
                           return {
                             skill: skill.subSkill,
                             section: sectionName,
+                            sectionId,  // Add normalized section ID for filtering
                             score: skill.questionsCorrect,
                             total: skill.questionsTotal,
                             answered: skill.questionsAttempted,
                             performancePercent: skill.questionsTotal > 0 ? Math.round((skill.questionsCorrect / skill.questionsTotal) * 100) : 0,
                             accuracyPercent: skill.questionsAttempted > 0 ? Math.round((skill.questionsCorrect / skill.questionsAttempted) * 100) : 0,
-                            category
                           };
                         });
-                        
+
                         return mappedSkills
                           .filter(item => {
                             // ALWAYS only show attempted sub-skills (both score and accuracy views)
@@ -1204,7 +1181,7 @@ const PerformanceDashboard = () => {
                               return false;
                             }
 
-                            return diagnosticFilter === 'all' || item.category === diagnosticFilter;
+                            return diagnosticFilter === 'all' || item.sectionId === diagnosticFilter;
                           })
                           .sort((a, b) => {
                             const aValue = subSkillView === 'score' ? a.performancePercent : a.accuracyPercent;
@@ -1594,12 +1571,14 @@ const PerformanceDashboard = () => {
                     <div className="flex flex-col lg:flex-row">
                       {/* Spider Chart - Top on mobile, Left on desktop */}
                       <div className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
-                        <SpiderChart 
-                          data={(selectedTest.sectionBreakdown || []).map((section) => ({
-                            label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
-                            value: sectionView === 'score' ? section.score : section.accuracy,
-                            maxValue: 100
-                          }))}
+                        <SpiderChart
+                          data={(selectedTest.sectionBreakdown || [])
+                            .filter(section => section.completed !== false)  // Only show completed sections
+                            .map((section) => ({
+                              label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+                              value: sectionView === 'score' ? section.score : section.accuracy,
+                              maxValue: 100
+                            }))}
                           size={280}
                           animate={animateSpiderChart}
                         />
@@ -1611,47 +1590,66 @@ const PerformanceDashboard = () => {
                           selectedTest.sectionBreakdown.map((section, index) => {
                             const displayScore = section.score;
                             const displayAccuracy = section.accuracy;
-                            
+
+                            // Check if section is incomplete (MATCHES DIAGNOSTIC BEHAVIOR)
+                            const isIncomplete = section.completed === false;
+
                             return (
-                              <div key={index} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                              <div key={section.sectionName} className={`px-4 py-3 transition-colors ${isIncomplete ? 'opacity-60' : 'hover:bg-slate-50'}`}>
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
-                                    <h4 className="font-medium text-slate-900 text-base">{section.sectionName}</h4>
+                                    <h4 className={`font-medium text-base ${isIncomplete ? 'text-slate-400' : 'text-slate-900'}`}>{section.sectionName}</h4>
                                   </div>
                                   <div className="flex flex-col items-end gap-2">
-                                    <div className={`text-base font-semibold ${
-                                      sectionView === 'score'
-                                        ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
-                                        : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
-                                    }`}>
-                                      {sectionView === 'score' ? displayScore : displayAccuracy}%
-                                    </div>
-                                    <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                      <div 
-                                        key={`${section.sectionName}-${sectionView}`}
-                                        className={`h-full rounded-full growToRight ${
+                                    {isIncomplete ? (
+                                      <>
+                                        <div className="text-sm font-medium text-slate-400 italic">
+                                          Not Completed
+                                        </div>
+                                        <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                          <div className="h-full rounded-full bg-slate-300" style={{ width: '0%' }} />
+                                        </div>
+                                        <div className="text-sm text-slate-400 italic">
+                                          -/-
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <div className={`text-base font-semibold ${
                                           sectionView === 'score'
-                                            ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                            : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
-                                        }`}
-                                        style={{ 
-                                          width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
-                                          animationDelay: `${index * 150}ms`
-                                        }}
-                                      />
-                                    </div>
-                                    <div 
-                                      key={`${section.sectionName}-fraction-${sectionView}`}
-                                      className="text-sm text-slate-600 fadeIn"
-                                      style={{ animationDelay: `${index * 150 + 600}ms` }}
-                                    >
-                                      {sectionView === 'score' 
-                                        ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                        : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
-                                          ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
-                                          : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
-                                      }
-                                    </div>
+                                            ? (displayScore >= 80 ? 'text-green-600' : displayScore >= 60 ? 'text-orange-600' : 'text-red-600')
+                                            : (displayAccuracy >= 80 ? 'text-green-600' : displayAccuracy >= 60 ? 'text-orange-600' : 'text-red-600')
+                                        }`}>
+                                          {sectionView === 'score' ? displayScore : displayAccuracy}%
+                                        </div>
+                                        <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                          <div
+                                            key={`${section.sectionName}-${sectionView}`}
+                                            className={`h-full rounded-full growToRight ${
+                                              sectionView === 'score'
+                                                ? (displayScore >= 80 ? 'bg-green-500' : displayScore >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                                : (displayAccuracy >= 80 ? 'bg-green-500' : displayAccuracy >= 60 ? 'bg-orange-500' : 'bg-red-500')
+                                            }`}
+                                            style={{
+                                              width: `${sectionView === 'score' ? displayScore : displayAccuracy}%`,
+                                              animationDelay: `${index * 150}ms`
+                                            }}
+                                          />
+                                        </div>
+                                        <div
+                                          key={`${section.sectionName}-fraction-${sectionView}`}
+                                          className="text-sm text-slate-600 fadeIn"
+                                          style={{ animationDelay: `${index * 150 + 600}ms` }}
+                                        >
+                                          {sectionView === 'score'
+                                            ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                            : (section.sectionName.toLowerCase().includes('written expression') || section.sectionName.toLowerCase().includes('writing'))
+                                              ? <span>{section.questionsCorrect}/{section.questionsTotal}</span>
+                                              : <span>{section.questionsCorrect}/{section.questionsAttempted}</span>
+                                          }
+                                        </div>
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -1733,50 +1731,21 @@ const PerformanceDashboard = () => {
                     <div className="divide-y divide-slate-100">
                       {(selectedTest.subSkillBreakdown || [])
                         .filter(subSkill => {
-                          // Filter by score/accuracy tab: 
+                          // Filter by score/accuracy tab:
                           // Score tab: show ALL sub-skills (including unattempted)
                           // Accuracy tab: show ONLY attempted sub-skills
                           if (subSkillView === 'accuracy' && subSkill.questionsAttempted === 0) {
                             return false;
                           }
-                          
+
                           if (practiceFilter === 'all') return true;
-                          
-                          const lowerSectionName = subSkill.sectionName.toLowerCase();
-                          
-                          // Universal section filtering for all test types
-                          if (practiceFilter === 'reading') {
-                            return lowerSectionName.includes('reading');
-                          }
-                          if (practiceFilter === 'mathematical') {
-                            return lowerSectionName.includes('mathematics') || 
-                                   lowerSectionName.includes('mathematical') || 
-                                   lowerSectionName.includes('numeracy');
-                          }
-                          if (practiceFilter === 'verbal') {
-                            return lowerSectionName.includes('verbal') || 
-                                   lowerSectionName.includes('language') || 
-                                   lowerSectionName.includes('thinking skills');
-                          }
-                          if (practiceFilter === 'quantitative') {
-                            return lowerSectionName.includes('quantitative') || 
-                                   lowerSectionName.includes('numerical');
-                          }
-                          if (practiceFilter === 'writing') {
-                            return lowerSectionName.includes('writing') || 
-                                   lowerSectionName.includes('written expression');
-                          }
-                          if (practiceFilter === 'language') {
-                            return lowerSectionName.includes('language');
-                          }
-                          if (practiceFilter === 'thinking') {
-                            return lowerSectionName.includes('thinking');
-                          }
-                          if (practiceFilter === 'humanities') {
-                            return lowerSectionName.includes('humanities');
-                          }
-                          
-                          return true;
+
+                          // Create normalized section ID for filtering (matches getFilterTabsForProduct logic)
+                          const sectionId = subSkill.sectionName.toLowerCase()
+                            .replace(/\s+/g, '-')  // Replace spaces with hyphens
+                            .replace(/[()]/g, '');  // Remove parentheses
+
+                          return sectionId === practiceFilter;
                         })
                         .sort((a, b) => {
                           // Sort by score/accuracy depending on current view (best to worst)
@@ -2143,7 +2112,7 @@ const PerformanceDashboard = () => {
                       {(() => {
                         // Flatten all sub-skills from all sections into one list
                         const allSubSkills = (performanceData.drills?.subSkillBreakdown || [])
-                          .flatMap(section => 
+                          .flatMap(section =>
                             section.subSkills.map(skill => ({
                               ...skill,
                               sectionName: section.sectionName
@@ -2151,42 +2120,13 @@ const PerformanceDashboard = () => {
                           )
                           .filter(subSkill => {
                             if (drillFilter === 'all') return true;
-                            
-                            const lowerSectionName = subSkill.sectionName.toLowerCase();
-                            
-                            // Universal section filtering for all test types
-                            if (drillFilter === 'reading') {
-                              return lowerSectionName.includes('reading');
-                            }
-                            if (drillFilter === 'mathematical') {
-                              return lowerSectionName.includes('mathematics') || 
-                                     lowerSectionName.includes('mathematical') || 
-                                     lowerSectionName.includes('numeracy');
-                            }
-                            if (drillFilter === 'verbal') {
-                              return lowerSectionName.includes('verbal') || 
-                                     lowerSectionName.includes('language') || 
-                                     lowerSectionName.includes('thinking skills');
-                            }
-                            if (drillFilter === 'quantitative') {
-                              return lowerSectionName.includes('quantitative') || 
-                                     lowerSectionName.includes('numerical');
-                            }
-                            if (drillFilter === 'writing') {
-                              return lowerSectionName.includes('writing') || 
-                                     lowerSectionName.includes('written expression');
-                            }
-                            if (drillFilter === 'language') {
-                              return lowerSectionName.includes('language');
-                            }
-                            if (drillFilter === 'thinking') {
-                              return lowerSectionName.includes('thinking');
-                            }
-                            if (drillFilter === 'humanities') {
-                              return lowerSectionName.includes('humanities');
-                            }
-                            
-                            return true;
+
+                            // Create normalized section ID for filtering (matches getFilterTabsForProduct logic)
+                            const sectionId = subSkill.sectionName.toLowerCase()
+                              .replace(/\s+/g, '-')  // Replace spaces with hyphens
+                              .replace(/[()]/g, '');  // Remove parentheses
+
+                            return sectionId === drillFilter;
                           });
 
                         // Group writing sub-skills by base name (consolidate essays)
@@ -2409,33 +2349,13 @@ const PerformanceDashboard = () => {
                         .flatMap(section => section.subSkills.map(skill => ({ ...skill, sectionName: section.sectionName })))
                         .filter(subSkill => {
                           if (drillFilter === 'all') return true;
-                          
-                          const lowerSectionName = subSkill.sectionName.toLowerCase();
-                          
-                          // Universal section filtering for all test types
-                          if (drillFilter === 'reading') {
-                            return lowerSectionName.includes('reading');
-                          }
-                          if (drillFilter === 'mathematical') {
-                            return lowerSectionName.includes('mathematics') || 
-                                   lowerSectionName.includes('mathematical') || 
-                                   lowerSectionName.includes('numeracy');
-                          }
-                          if (drillFilter === 'verbal') {
-                            return lowerSectionName.includes('verbal') || 
-                                   lowerSectionName.includes('language') || 
-                                   lowerSectionName.includes('thinking skills');
-                          }
-                          if (drillFilter === 'quantitative') {
-                            return lowerSectionName.includes('quantitative') || 
-                                   lowerSectionName.includes('numerical');
-                          }
-                          if (drillFilter === 'writing') {
-                            return lowerSectionName.includes('writing') || 
-                                   lowerSectionName.includes('written expression');
-                          }
-                          
-                          return true;
+
+                          // Create normalized section ID for filtering (matches getFilterTabsForProduct logic)
+                          const sectionId = subSkill.sectionName.toLowerCase()
+                            .replace(/\s+/g, '-')  // Replace spaces with hyphens
+                            .replace(/[()]/g, '');  // Remove parentheses
+
+                          return sectionId === drillFilter;
                         }).length > 0;
 
                       return !hasFilteredResults && (

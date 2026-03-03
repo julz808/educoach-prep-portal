@@ -155,7 +155,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
     test_type: "NSW Selective Entry (Year 7 Entry)",
     section_name: "Reading",
     total_questions: 30,
-    time_limit_minutes: 40,
+    time_limit_minutes: 45,  // Official NSW test: 45 minutes (38 answers across 17 questions)
 
     section_structure: {
       generation_strategy: "passage_based",  // 100% passage-based
@@ -440,7 +440,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
     test_type: "ACER Scholarship (Year 7 Entry)",
     section_name: "Humanities",
     total_questions: 35,
-    time_limit_minutes: 47,
+    time_limit_minutes: 40,  // Official ACER: 40 minutes
 
     section_structure: {
       generation_strategy: "passage_based",  // 100% passage-based
@@ -506,7 +506,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
     test_type: "ACER Scholarship (Year 7 Entry)",
     section_name: "Written Expression",
     total_questions: 2,  // Generate 2 prompts (student chooses 1 to answer)
-    time_limit_minutes: 40,
+    time_limit_minutes: 25,  // Official ACER: 25 minutes per essay
 
     section_structure: {
       generation_strategy: "writing_prompt",
@@ -527,7 +527,7 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
     test_type: "ACER Scholarship (Year 7 Entry)",
     section_name: "Mathematics",
     total_questions: 35,
-    time_limit_minutes: 47,
+    time_limit_minutes: 40,  // Official ACER: 40 minutes
 
     section_structure: {
       generation_strategy: "balanced",
@@ -767,12 +767,14 @@ export const SECTION_CONFIGURATIONS: SectionConfigDatabase = {
       balanced_distribution: {
         total_questions: 45,
         sub_skills: [
-          "Advanced Grammar & Sentence Structure",
-          "Punctuation & Sentence Boundaries",
-          "Spelling & Word Formation",
-          "Vocabulary Precision & Usage"
+          "Advanced Spelling & Orthography",
+          "Sophisticated Grammar",
+          "Advanced Punctuation",
+          "Advanced Vocabulary & Usage",
+          "Advanced Editing Skills",
+          "Complex Syntax Analysis"
         ],
-        distribution_strategy: "even"  // 45 ÷ 4 = 11-12 questions per sub-skill
+        distribution_strategy: "even"  // 45 ÷ 6 = 7-8 questions per sub-skill
       }
     }
   },

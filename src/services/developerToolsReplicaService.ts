@@ -108,17 +108,28 @@ export class DeveloperToolsReplicaService {
       
       // Create individual question attempt records exactly like developer tools
       console.log('🎯 DEV-REPLICA: Creating question attempt records...');
-      
+      console.log('🎯 DEV-REPLICA: Total answers to process:', Object.keys(session.answers).length);
+      console.log('🎯 DEV-REPLICA: Total questions in session:', session.questions.length);
+
+      let successCount = 0;
+      let failCount = 0;
+
       for (const [qIndexStr, userAnswerIndex] of Object.entries(session.answers)) {
         const qIndex = parseInt(qIndexStr);
         const question = session.questions[qIndex];
-        
-        if (!question) continue;
-        
+
+        if (!question) {
+          console.error(`❌ DEV-REPLICA: Question at index ${qIndex} not found in session.questions!`);
+          failCount++;
+          continue;
+        }
+
+        console.log(`📝 DEV-REPLICA: Processing answer ${qIndex}: question ID ${question.id.substring(0, 8)}..., answer index ${userAnswerIndex}`);
+
         // Convert answer index to letter format (A, B, C, D)
         const userAnswerLetter = String.fromCharCode(65 + userAnswerIndex);
         const isCorrect = userAnswerIndex === question.correctAnswer;
-        
+
         const attemptData = {
           user_id: session.userId,
           question_id: question.id,
@@ -130,16 +141,34 @@ export class DeveloperToolsReplicaService {
           is_skipped: false,
           time_spent_seconds: Math.floor(Math.random() * 180) + 60 // Random time like developer tools
         };
-        
+
+        console.log(`📝 DEV-REPLICA: Inserting attempt:`, {
+          questionId: attemptData.question_id.substring(0, 8) + '...',
+          sessionId: attemptData.session_id.substring(0, 8) + '...',
+          userAnswer: attemptData.user_answer,
+          isCorrect: attemptData.is_correct,
+          sessionType: attemptData.session_type
+        });
+
         const { error: attemptError } = await supabase
           .from('question_attempt_history')
           .insert(attemptData);
-        
+
         if (attemptError) {
-          console.warn(`⚠️ DEV-REPLICA: Warning creating attempt for question ${question.id}:`, attemptError);
+          console.error(`❌ DEV-REPLICA: ERROR creating attempt for question ${question.id}:`, attemptError);
+          console.error(`❌ DEV-REPLICA: Attempt data was:`, attemptData);
+          failCount++;
           // Don't throw error to avoid disrupting completion flow
+        } else {
+          console.log(`✅ DEV-REPLICA: Successfully inserted attempt for question ${qIndex}`);
+          successCount++;
         }
       }
+
+      console.log(`\n📊 DEV-REPLICA: Attempt insertion summary:`);
+      console.log(`   ✅ Successful: ${successCount}`);
+      console.log(`   ❌ Failed: ${failCount}`);
+      console.log(`   📝 Total: ${Object.keys(session.answers).length}\n`);
       
       console.log('✅ DEV-REPLICA: Session completion complete - ready for insights!');
       

@@ -277,6 +277,91 @@ export class UserProgressService {
     // Placeholder implementation
     return true;
   }
+
+  /**
+   * Clear progress for a specific test mode within a product
+   */
+  static async clearTestModeProgress(
+    userId: string,
+    productType: string,
+    testMode: 'practice' | 'drill' | 'diagnostic'
+  ): Promise<void> {
+    try {
+      console.log('📞 Calling RPC: clear_test_mode_progress', { userId, productType, testMode });
+
+      const { data, error } = await supabase.rpc('clear_test_mode_progress', {
+        p_user_id: userId,
+        p_product_type: productType,
+        p_test_mode: testMode
+      });
+
+      console.log('📞 RPC Response:', { data, error });
+
+      if (error) {
+        console.error('❌ RPC Error:', error);
+        throw new Error(error.message || 'Failed to clear test mode progress');
+      }
+
+      console.log(`✅ Cleared ${testMode} progress for ${productType}`);
+    } catch (error: any) {
+      console.error('❌ Error clearing test mode progress:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear all progress for a specific product
+   */
+  static async clearProductProgress(
+    userId: string,
+    productType: string
+  ): Promise<void> {
+    try {
+      console.log('📞 Calling RPC: clear_product_progress', { userId, productType });
+
+      const { data, error } = await supabase.rpc('clear_product_progress', {
+        p_user_id: userId,
+        p_product_type: productType
+      });
+
+      console.log('📞 RPC Response:', { data, error });
+
+      if (error) {
+        console.error('❌ RPC Error:', error);
+        throw new Error(error.message || 'Failed to clear product progress');
+      }
+
+      console.log(`✅ Cleared all progress for ${productType}`);
+    } catch (error: any) {
+      console.error('❌ Error clearing product progress:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear ALL progress across all products
+   */
+  static async clearAllProgress(userId: string): Promise<void> {
+    try {
+      console.log('📞 Calling RPC: clear_all_user_progress', { userId });
+
+      const { data, error } = await supabase.rpc('clear_all_user_progress', {
+        p_user_id: userId
+      });
+
+      console.log('📞 RPC Response:', { data, error });
+
+      if (error) {
+        console.error('❌ RPC Error:', error);
+        throw new Error(error.message || 'Failed to clear all progress');
+      }
+
+      console.log(`✅ Cleared ALL progress for user ${userId}`);
+    } catch (error: any) {
+      console.error('❌ Error clearing all progress:', error);
+      throw error;
+    }
+  }
 }
 
 export default UserProgressService; 

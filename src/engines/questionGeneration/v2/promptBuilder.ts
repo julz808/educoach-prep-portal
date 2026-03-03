@@ -97,16 +97,42 @@ CRITICAL: This question MUST be answerable from the text alone. NO VISUAL AIDS W
 DESCRIPTION: ${subSkillData.description}
 FORMAT: ${subSkillData.question_format}
 ${passageBlock}
-EXAMPLES — study these for style, difficulty level, and format. Your question must feel like it belongs in the same test:
+🎯 EXAMPLES — These show STYLE, FORMAT, and DIFFICULTY LEVEL only:
 
 ${formatExamples(selectedExamples)}
 
-Pattern:
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+
+1. **Examples are STYLE GUIDES, not templates!**
+   - DO NOT replicate the exact patterns, numbers, or operations shown
+   - The examples show PRESENTATION FORMAT only
+
+2. **CHALLENGE YOURSELF - Go harder than the examples!**
+   - VIC Selective is for HIGH-ACHIEVING Year 9 students (top 10-15% of cohort)
+   - These students can handle: exponential patterns (n²,n³), Fibonacci sequences, prime numbers, multi-step logic
+   - Basic +5 or -3 patterns are TOO EASY - push the difficulty!
+
+3. **Pattern Innovation Required:**
+   - If examples show addition, try exponential or multiplication
+   - If examples show simple sequences, try compound patterns (rows multiply, columns add)
+   - Use mathematical concepts these students know: squares, cubes, primes, Fibonacci
+
+4. **Number Range Freedom:**
+   - Don't cluster around small numbers (10-30)
+   - Try: 1-20 for Fibonacci, 50-150 for subtraction, 100-200 for advanced patterns
+   - Use the full range Year 9 students can calculate
+
+Pattern Guidelines:
 - ${pattern.key_characteristics.slice(0, 3).join('\n- ')}
 - Difficulty ${difficulty}: ${pattern.difficulty_progression[difficulty.toString() as '1' | '2' | '3']}
 - Distractors: ${pattern.distractor_strategies.slice(0, 3).join('; ')}
 
-Be creative with scenarios — use varied contexts (sports, nature, technology, history, everyday life, etc). Never reuse a scenario from the examples above.
+CREATIVE FREEDOM: With ${context.recentQuestions?.length || 0} existing questions in this sub-skill, you MUST innovate:
+- Use fresh number combinations never seen in existing questions
+- Experiment with different mathematical operations and relationships
+- Try more complex (but solvable) patterns that Year 9 students can figure out
+- Vary the position of the missing value
+- Challenge students while keeping problems logically discoverable
 
 ⚠️ CRITICAL: RANDOMIZE CORRECT ANSWER POSITION
 - The correct answer should appear in DIFFERENT positions across questions
@@ -117,7 +143,7 @@ Be creative with scenarios — use varied contexts (sports, nature, technology, 
 ${subSkillGuidance}${recentQuestionsBlock}${previousFailuresBlock}
 Return ONLY valid JSON, no markdown:
 
-${buildOutputFormat(false)}
+${buildOutputFormat(false, !!context.passage)}
 
 Generate the question now:`;
 
@@ -251,12 +277,29 @@ function formatPreviousFailures(previousFailures?: Array<{
     return `${i + 1}. "${f.question}"\n   ❌ REASON: ${f.reason}`;
   });
 
+  // Check if any failures were due to duplicates
+  const hasDuplicateFailures = previousFailures.some(f =>
+    f.reason.toLowerCase().includes('duplicate')
+  );
+
+  const duplicateGuidance = hasDuplicateFailures ? `
+
+🚨 CRITICAL ANTI-DUPLICATE INSTRUCTIONS:
+Your previous attempts were rejected as duplicates. This means you MUST:
+1. Use a COMPLETELY DIFFERENT example sentence context (different people, places, activities, objects)
+2. If testing grammar, you can test the SAME grammar rule but with TOTALLY NEW sentence examples
+3. For grammar/punctuation questions: "Which sentence is correct?" is the standard format - that's OK!
+4. The uniqueness comes from the ANSWER OPTIONS (the actual sentences), not the question stem
+5. Change the scenario entirely: if you used school → try sports, nature, travel, technology, home life
+6. Use different proper nouns: different names, different places, different specific items
+` : '';
+
   return `
 
 ⚠️ PREVIOUS ATTEMPTS THAT FAILED — Learn from these and pivot your approach:
 ${lines.join('\n\n')}
 
-You MUST generate something clearly different from the failed attempts above. If the failure was a duplicate, choose a completely different topic/scenario/concept. If the failure was an incorrect answer, ensure your logic is sound.
+You MUST generate something clearly different from the failed attempts above. If the failure was a duplicate, choose a completely different topic/scenario/concept. If the failure was an incorrect answer, ensure your logic is sound.${duplicateGuidance}
 `;
 }
 
@@ -295,14 +338,23 @@ Rules: Use "html_table" for any data tables. If a chart asks students to calcula
 // OUTPUT FORMAT
 // ============================================================================
 
-function buildOutputFormat(visualRequired: boolean): string {
+function buildOutputFormat(visualRequired: boolean, hasPassage: boolean = false): string {
   // Visual requirement is now always false - all data must be in question_text
+  const questionTextGuidance = hasPassage
+    ? '"The question ONLY - do NOT include the passage content. The passage is stored separately and will be displayed to students."'
+    : '"Complete question text with ALL data and information needed to answer (tables in markdown, all measurements, all values)"';
+
   return `{
-  "question_text": "Complete question text with ALL data and information needed to answer (tables in markdown, all measurements, all values)",
-  "answer_options": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
-  "correct_answer": "B",
-  "solution": "• [step 1]\\n• [step 2]\\n• Therefore, the answer is B because [reason]"
-}`;
+  "question_text": ${questionTextGuidance},
+  "answer_options": ["Option 1 text", "Option 2 text", "Option 3 text", "Option 4 text", "Option 5 text"],
+  "correct_answer": "C",
+  "solution": "• [step 1]\\n• [step 2]\\n• Therefore, the answer is C because [reason]"
+}
+
+IMPORTANT:
+- answer_options must be an array of 4-5 strings (the actual option text WITHOUT letter prefixes)
+- correct_answer should be a single letter (A, B, C, D, or E) matching the position in the array
+- Do NOT include A), B), C) etc. in the answer_options text - just the option content itself${hasPassage ? '\n\n⚠️ CRITICAL FOR PASSAGE-BASED QUESTIONS:\n- The passage is provided above and stored separately in the database\n- Your question_text should ONLY contain the question itself (e.g., "What is the main idea of this passage?")\n- DO NOT include "Read the following passage:" or the passage title or content in question_text\n- The passage will be displayed separately to students' : ''}`;
 }
 
 // ============================================================================
@@ -361,10 +413,34 @@ const PASSAGE_TYPE_GUIDANCE: Record<string, {
   avoid: string;
 }> = {
   narrative: {
-    description: 'A story with characters, setting, plot arc, conflict and resolution. Use dialogue, descriptive language, and show character motivation.',
-    subSkillsServed: 'character analysis, inference about feelings/motivation, theme identification, literary devices, narrative comprehension',
-    topicIdeas: 'coming-of-age moments, friendship or family challenges, overcoming a personal obstacle, discovery or adventure, moral dilemmas, cultural experiences, historical fiction, science fiction, mystery',
-    avoid: 'statistics, data, arguments, persuasive language — this is fiction, not opinion or fact'
+    description: `A fictional narrative passage. IMPORTANT: Narratives can take many forms — NOT just character-driven stories. Choose from these varied types:
+
+NARRATIVE TYPES (mix these across passages):
+1. CHARACTER-DRIVEN STORY (30% of passages): Traditional story with characters, dialogue, conflict, and resolution
+2. DESCRIPTIVE SETTING (25%): Rich, atmospheric description of a place (haunted mansion, alien planet, bustling market, underwater cave) with NO characters needed
+3. GENRE EXCERPTS (25%): Fantasy world-building, mystery/crime scene setup, science fiction scenario, historical fiction atmosphere, horror/suspense mood-setting
+4. DIARY/JOURNAL ENTRY (10%): First-person reflection or observation WITHOUT dialogue
+5. DREAMSCAPE/SURREAL (10%): Abstract, imaginative narrative focused on imagery and mood
+
+GENRE VARIETY (age-appropriate):
+- Fantasy: magical realms, mythical creatures, enchanted objects
+- Mystery/Crime: discovering clues, solving puzzles, investigating strange events
+- Science Fiction: futuristic technology, space exploration, alternate realities
+- Historical Fiction: past eras brought to life through sensory detail
+- Adventure: exploration, survival, discovery
+- Contemporary Realistic: everyday moments with emotional depth
+- Horror/Suspense (mild): eerie atmosphere, tension, the unknown
+
+WRITING TECHNIQUES TO VARY:
+- Sensory language (sight, sound, smell, touch, taste)
+- Figurative language (metaphor, simile, personification)
+- Mood and atmosphere
+- Time manipulation (flashback, flash-forward, slow-motion moment)
+- Stream of consciousness
+- Detailed observation without plot`,
+    subSkillsServed: 'literary analysis, inference, theme identification, literary devices (imagery, symbolism, foreshadowing), mood/tone, narrative comprehension, sensory language interpretation',
+    topicIdeas: 'Descriptive: abandoned space station, midnight forest, Victorian London street, coral reef, post-apocalyptic ruins. Character: moral dilemmas, cultural experiences, overcoming obstacles. Genre: fantasy quests, mystery investigations, sci-fi scenarios, historical moments, survival situations',
+    avoid: 'statistics, data, arguments, persuasive language — this is fiction/creative writing, not factual reporting or opinion'
   },
   informational: {
     description: 'An expository or explanatory text. Clear topic sentences, well-organised paragraphs, factual content with examples, academic but accessible tone.',
@@ -439,6 +515,20 @@ Choose a FRESH topic that is clearly different from all of the above.\n`
 
   const difficultyGuidance = getPassageDifficultyGuidance(difficulty, yearLevel);
 
+  // Narrative variety block (narrative passages only)
+  const narrativeVarietyBlock = passageType === 'narrative'
+    ? `\n🚨 NARRATIVE VARIETY REQUIREMENTS:
+NOT ALL NARRATIVES NEED CHARACTERS! Choose from:
+- DESCRIPTIVE SETTING (40%): Atmospheric place description with NO characters (haunted mansion, alien planet, enchanted forest)
+- CHARACTER-DRIVEN STORY (30%): Traditional narrative with characters and dialogue
+- GENRE EXCERPT (20%): Fantasy world-building, mystery scene, sci-fi scenario, historical atmosphere
+- DIARY/JOURNAL or DREAMSCAPE (10%): First-person reflection or surreal imagery
+
+When using characters: Use UNIQUE, CULTURALLY DIVERSE names. AVOID: Maya, Arjun, Liam, Sophie, Emma, Jack, Tariq.
+Use diverse backgrounds: Asian (Kenji, Priya, Akari), European (Astrid, Mateo, Sven), Middle Eastern (Leila, Amina), African (Kofi, Zuri), Indigenous (Kaia, Tane), Latin American (Diego, Lucia).
+\n`
+    : '';
+
   return `You are an expert educational content writer for ${testType}. Generate a reading passage for the ${section} section.
 
 PASSAGE TYPE: ${passageType}
@@ -458,7 +548,7 @@ ${guidance.topicIdeas}
 
 WHAT TO AVOID:
 ${guidance.avoid}
-${topicDiversityBlock}
+${topicDiversityBlock}${narrativeVarietyBlock}
 QUALITY REQUIREMENTS:
 - The topic and content must be engaging and age-appropriate for Year ${yearLevel}
 - Topics can be from anywhere in the world — do not limit to Australia
@@ -515,6 +605,49 @@ MANDATORY ANTI-DUPLICATION RULES:
 
   const difficultyGuidance = getPassageDifficultyGuidance(difficulty, yearLevel);
 
+  // Narrative variety and character diversity block (narrative passages only)
+  const narrativeVarietyBlock = passageType === 'narrative'
+    ? `\n🚨 NARRATIVE VARIETY REQUIREMENTS:
+
+CRITICAL: NOT ALL NARRATIVES NEED CHARACTERS!
+Vary your approach across these narrative types:
+
+1. DESCRIPTIVE SETTING (NO characters needed - 40% of passages):
+   - Atmospheric description of a place: haunted library, futuristic city, enchanted forest, abandoned subway
+   - Focus on SENSORY DETAILS (sounds, smells, textures, visual imagery)
+   - Create MOOD and ATMOSPHERE through descriptive language
+   - Examples: "The Abandoned Observatory at Midnight", "Inside the Ice Cavern", "The Floating Gardens of Neo-Tokyo"
+
+2. CHARACTER-DRIVEN STORY (30% of passages):
+   - Traditional narrative with characters, dialogue, conflict
+   - When using characters, follow diversity rules below
+
+3. GENRE EXCERPT (20% of passages):
+   - Fantasy world-building WITHOUT characters (describe magic system, enchanted location)
+   - Mystery/crime scene description (clues, atmosphere, tension)
+   - Sci-fi scenario (alien technology, space station, future world)
+   - Historical fiction atmosphere (Victorian street, ancient temple)
+
+4. DIARY/JOURNAL ENTRY or DREAMSCAPE (10% of passages):
+   - First-person reflection, observation, or surreal imagery
+   - Focus on internal experience and sensory impressions
+
+🚨 CHARACTER NAME DIVERSITY (when characters ARE used):
+
+MANDATORY CHARACTER NAMING RULES:
+1. Use UNIQUE, CULTURALLY DIVERSE character names
+2. DO NOT use overused names like: Maya, Arjun, Liam, Sophie, Emma, Jack, Olivia, Tariq
+3. Draw from diverse cultural backgrounds:
+   - Asian: Kenji, Priya, Mei-Lin, Hassan, Farah, Nguyen, Akari, Yuki
+   - European: Astrid, Mateo, Zara, Finn, Iliana, Sven, Ines
+   - Middle Eastern: Leila, Amina, Jamal, Yasmin, Omar, Rania
+   - African: Kofi, Amara, Zuri, Kwame, Ayanna, Zahara
+   - Indigenous: Kaia, Tane, Bindi, Jarrah, Marlee, Koa
+   - Latin American: Diego, Lucia, Alejandra, Rafael, Matias
+4. Avoid teacher names: Mrs Smith, Mrs Chen, Mr Brown, Ms Wilson
+`
+    : '';
+
   return `You are generating a mini-passage for a skill drill question.
 
 DRILL SUB-SKILL: "${subSkill}"
@@ -524,7 +657,7 @@ SPELLING: Australian spelling
 
 DIFFICULTY & READING LEVEL:
 ${difficultyGuidance}
-${topicDiversityBlock}
+${topicDiversityBlock}${narrativeVarietyBlock}
 CRITICAL TOPIC DIVERSITY REQUIREMENTS:
 - You will see curriculum examples showing questions about specific topics (e.g., platypuses, koalas, etc.)
 - These examples show the QUESTION PATTERN and DIFFICULTY LEVEL — NOT the topics you should use
@@ -542,11 +675,22 @@ FORBIDDEN TITLE PATTERNS (do NOT use these):
 - "The Invention of..." (overused pattern)
 
 GOOD TITLE EXAMPLES (varied and creative):
-- "Hidden Treasures in City Gardens"
+DESCRIPTIVE/ATMOSPHERIC:
+- "The Abandoned Observatory at Midnight"
+- "Inside the Ice Cavern"
+- "The Whispering Library"
+- "Beneath the Neon Streets"
+
+GENRE/FANTASY/SCI-FI:
+- "The Last Dragon's Hoard"
+- "Station Omega: Life in Zero Gravity"
+- "The Detective's Desk, 1922"
+- "The Enchanted Clockwork Garden"
+
+INFORMATIONAL (non-narrative):
 - "When Computers Learned to See"
 - "Floating Markets of Southeast Asia"
 - "Racing Against Time: Emergency Response Teams"
-- "Crystal Caves and Their Secrets"
 
 PASSAGE REQUIREMENTS:
 - The mini-passage must be rich enough to support ONE question testing "${subSkill}"
@@ -586,16 +730,41 @@ LETTER SERIES GUIDANCE:
 `;
   }
 
+  // Grammar
+  if (subSkillLower.includes('grammar') && !subSkillLower.includes('punctuation')) {
+    return `
+
+GRAMMAR GUIDANCE (Sophisticated Grammar):
+- Each question tests a specific grammar rule through 4 sentence variations
+- The question stem is ALWAYS "Which sentence is correct?" (this is standard format)
+- What makes each question UNIQUE is the example sentences, NOT the grammar rule being tested
+- Grammar topics to vary: subject-verb agreement (plural/singular, collective nouns, neither/nor, there is/are), pronoun usage (I/me in different positions, who/whom, they/them, possessive pronouns), verb tenses (past/present/future consistency, irregular verbs), common errors (could of/could have, should of/should have), comparative/superlative forms (more/most, less/least, -er/-est)
+- CRITICAL DIVERSITY REQUIREMENT: Use completely different example SENTENCES from recent questions
+  - If recent questions used school/classroom contexts, use sports, nature, technology, or travel contexts
+  - If recent questions focused on pronouns, test subject-verb agreement or verb tenses
+  - Vary the sentence topics: people's names, places, activities, objects - make each sentence scenario unique
+- Ensure only ONE option is grammatically correct according to Australian curriculum standards
+- Distractors should have clear, teachable errors that Year 7 students commonly make
+- Keep sentence complexity appropriate for Year 7 (12-13 year olds)
+`;
+  }
+
   // Punctuation
   if (subSkillLower.includes('punctuation')) {
     return `
 
 PUNCTUATION GUIDANCE:
-- Cover various punctuation types: apostrophes (possessive singular/plural), commas (series, introductory phrases), quotation marks, periods, question marks
+- Each question tests a specific punctuation rule through 4 sentence variations
+- The question stem is typically "Which sentence uses punctuation correctly?" (this is standard format)
+- What makes each question UNIQUE is the example sentences, NOT the punctuation rule being tested
+- Cover various punctuation types: apostrophes (possessive singular/plural), commas (series, introductory phrases, clauses), quotation marks, periods, question marks, exclamation marks
+- CRITICAL DIVERSITY REQUIREMENT: Use completely different example SENTENCES from recent questions
+  - If recent questions used dialogue/quotations, use apostrophes or commas
+  - If recent questions had possessive apostrophes, use commas in lists or introductory phrases
+  - Vary sentence topics: use different names, places, activities, scenarios
 - Make ONE option clearly correct with only ONE valid interpretation
 - Incorrect options should have obvious errors: missing punctuation, misplaced apostrophes, wrong comma placement
 - For possessive apostrophes: singular (dog's), plural not ending in s (children's), plural ending in s (dogs')
-- Format: "Which sentence has correct punctuation?" or "Which sentence uses [specific punctuation] correctly?"
 - Ensure answer is unambiguous - punctuation rules should be clear-cut, not debatable
 `;
   }
@@ -617,19 +786,70 @@ NUMBER SERIES GUIDANCE:
 
   // Grid/Matrix Patterns
   if (subSkillLower.includes('matrix') ||
+      subSkillLower.includes('grid') ||
       subSkillLower.includes('grid pattern')) {
     return `
 
-GRID PATTERN GUIDANCE:
-- Use simple ASCII tables or clearly formatted grids
-- Patterns can be: row sums, column products, diagonal patterns, or position-based rules
-- Example grid format:
-  | 2  | 4  | 6  |
-  | 3  | 6  | 9  |
-  | 4  | 8  | ?  |
-- Make the pattern discoverable from at least 2 complete rows/columns
-- Explain the pattern step-by-step in the solution
-- Ensure only ONE pattern produces the answer
+🎨 GRID PATTERN GUIDANCE - CREATIVE FREEDOM WITH LOGICAL RIGOR:
+
+⚠️ CRITICAL: The examples above are STYLE GUIDES ONLY, showing format and difficulty level.
+DO NOT feel constrained to use similar patterns or number ranges to the examples!
+
+PATTERN VARIETY (choose different patterns from examples - GO HARDER!):
+
+BASIC PATTERNS (use sparingly):
+- Addition patterns: constant increment per row/column (e.g., +3, +5, +7)
+- Subtraction patterns: decreasing sequences (e.g., -4, -6, -9)
+
+INTERMEDIATE PATTERNS (good balance):
+- Multiplication patterns: each cell = previous × constant (e.g., ×2, ×3)
+- Division patterns: each cell = previous ÷ constant (e.g., ÷2, ÷4)
+- Row/column relationships: third = sum/difference of first two (e.g., A + B = C or A - B = C)
+- Mixed operations: rows use one rule, columns use another (rows: +3, columns: ×2)
+- Varying increments: +2, +4, +6 progression or -9, -8, -7 pattern
+
+ADVANCED PATTERNS (prefer these for Year 9):
+- Exponential patterns: n, n², n³ (e.g., 4, 16, 64 / 5, 25, 125)
+- Fibonacci-style: each cell = sum of previous two in row/column (1, 1, 2 / 2, 3, 5)
+- Prime number sequences combined with operations (17, 23, 31 in column 1)
+- Dual pattern validation: pattern works both horizontally AND vertically
+- Multiplicative columns with additive rows (or vice versa)
+- Working backwards: given result and operation, find missing intermediate value
+- Products and differences: third = first × second, or first ÷ second
+
+NUMBER RANGE VARIETY:
+- Use DIFFERENT number ranges from the examples: 1-20, 20-50, 50-100, or even 100-200
+- Mix odd and even numbers creatively
+- Try prime numbers, multiples of specific numbers, or square numbers
+- Don't avoid larger numbers - Year 9 students can handle 2-digit and 3-digit arithmetic
+
+COMPLEXITY LEVELS (all must be logically solvable - aim for Moderate to Challenge):
+- Simple: One consistent operation across all rows/columns (e.g., +5 everywhere)
+- Moderate: Different operations in rows vs columns (rows: +3, columns: ×2)
+- Advanced: Exponential patterns (n²), varying increments (+2,+4,+6), prime sequences
+- Challenge: Multi-step reasoning (A - B = C), Fibonacci patterns, dual-validation patterns
+- Expert: Combinations like "columns multiply by 3, rows add first two cells to get third"
+
+🎯 TARGET: Aim for 60% Advanced, 30% Challenge, 10% Moderate for Year 9 selective entry
+These students are high-performers who can handle sophisticated mathematical reasoning!
+
+MANDATORY REQUIREMENTS:
+✓ The pattern MUST be discoverable from the given information
+✓ Only ONE answer should be correct - test this by working through your solution
+✓ The solution must show clear, logical steps to reach the answer
+✓ Avoid ambiguous patterns where multiple rules could apply
+✓ The grid should have sufficient complete rows/columns to establish the pattern (at least 2)
+
+Grid format (use consistent spacing):
+5     10    15
+8     16    24
+11    ?     33
+
+ANTI-DUPLICATION REQUIREMENTS:
+1. Use COMPLETELY DIFFERENT number combinations than recent questions shown above
+2. Choose a DIFFERENT pattern type (if recent used +2, try ×3 or row-sum relationships)
+3. Position the missing value in a DIFFERENT location (top-left, middle, bottom-right, etc.)
+4. Vary your grid starting numbers widely - don't cluster around the same ranges
 `;
   }
 

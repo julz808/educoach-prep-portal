@@ -364,6 +364,63 @@ export async function getExistingPassageTopics(
   }
 }
 
+/**
+ * Get character names from existing narrative passages.
+ * Used to prevent character name repetition when generating new narrative passages.
+ * Returns array of character names extracted from narrative passages.
+ */
+export async function getExistingCharacterNames(
+  testType: string,
+  sectionName: string
+): Promise<string[]> {
+  try {
+    const { data: passages, error } = await supabase
+      .from('passages_v2')
+      .select('content, passage_type')
+      .eq('test_type', testType)
+      .eq('section_name', sectionName)
+      .eq('passage_type', 'narrative') // Only narrative passages have characters
+      .order('created_at', { ascending: false })
+      .limit(100); // Look at more passages for character diversity
+
+    if (error) throw new Error(`Failed to query narrative passages: ${error.message}`);
+
+    const allCharacterNames: string[] = [];
+    const namePattern = /\b([A-Z][a-z]+(?:'s)?)\b/g;
+    const commonWords = new Set([
+      'The', 'When', 'After', 'Before', 'While', 'If', 'As', 'For', 'With',
+      'In', 'On', 'At', 'By', 'To', 'From', 'Of', 'A', 'An', 'This', 'That',
+      'These', 'Those', 'He', 'She', 'It', 'They', 'We', 'You', 'I', 'But',
+      'However', 'What', 'How', 'Why', 'Where', 'Which', 'Who', 'Some', 'Many',
+      'Every', 'Each', 'Then', 'Now', 'Today', 'Other', 'Instead', 'Even',
+      'Great', 'Over', 'During', 'Maybe', 'Because', 'Could', 'And', 'Nothing',
+      'Deep', 'Despite', 'Let', 'Single', 'Now', 'Map', 'North', 'Graph',
+      'Table', 'Sleep', 'Others', 'Think', 'Are', 'Later', 'One', 'Only',
+      'Not', 'Remember', 'Just', 'Behind', 'Their', 'War', 'Major', 'Sound',
+      'Consider', 'Yet', 'Beneath', 'Making', 'Notice', 'Would', 'Research',
+      'Slowly', 'Paper', 'Scientists', 'Researchers', 'Students', 'Teachers',
+      'Parents', 'Teenagers', 'His', 'Her', 'Him', 'Them', 'Around', 'Across',
+      'Perhaps', 'Through', 'Inside', 'Outside', 'Without', 'Within', 'Mrs',
+      'Mr', 'Ms', 'Dr', 'Professor', 'Taking', 'Nervousness', 'Feel', 'Gradually'
+    ]);
+
+    for (const passage of passages || []) {
+      const matches = passage.content.match(namePattern) || [];
+      matches.forEach(name => {
+        const cleanName = name.replace("'s", '');
+        if (!commonWords.has(cleanName) && cleanName.length > 2) {
+          allCharacterNames.push(cleanName);
+        }
+      });
+    }
+
+    return allCharacterNames;
+  } catch (error) {
+    console.error('❌ Failed to get existing character names:', error);
+    return []; // Safe fallback
+  }
+}
+
 export async function getExistingQuestionCountsV2(
   testType: string,
   testMode: string

@@ -6,6 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { fetchQuestionsFromSupabase } from '@/services/supabaseQuestionService';
 
+// CRITICAL: Use the same questions table as test loading
+const USE_V2_QUESTIONS = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+const QUESTIONS_TABLE = USE_V2_QUESTIONS ? 'questions_v2' : 'questions';
+
 // Helper function to parse answer options (same logic as supabaseQuestionService.ts)
 const parseAnswerOptions = (answerOptions: any): string[] => {
   if (!answerOptions) return [];
@@ -265,7 +269,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       // Get available sections/questions from the database with more detailed logging
       const testModeQuery = testType === 'practice' ? 'practice_1' : testType;
       const { data: availableQuestions, error: queryError } = await supabase
-        .from('questions')
+        .from(QUESTIONS_TABLE)
         .select('section_name, sub_skill_id, difficulty, id')
         .eq('product_type', dbProductType)
         .eq('test_mode', testModeQuery);
@@ -280,7 +284,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         
         // Let's also check what products and test modes exist
         const { data: allQuestions } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('product_type, test_mode')
           .limit(10);
         return;
@@ -338,7 +342,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.log(`🏁 DEV: Querying ALL practice test questions for product_type='${dbProductType}'`);
         
         const { data: allPracticeQuestions, error: queryError } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('section_name, sub_skill_id, difficulty, id, test_mode')
           .eq('product_type', dbProductType)
           .like('test_mode', 'practice_%');
@@ -360,7 +364,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         console.log(`🏁 DEV: Querying questions with product_type='${dbProductType}', test_mode='${testModeQuery}'`);
         
         const { data: questions, error: queryError } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('section_name, sub_skill_id, difficulty, id')
           .eq('product_type', dbProductType)
           .eq('test_mode', testModeQuery);
@@ -381,7 +385,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         
         // Let's also check what products and test modes exist
         const { data: allQuestions } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('product_type, test_mode')
           .limit(10);
         return;
@@ -403,7 +407,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         
         // Determine which practice test modes actually exist in the database
         const allPracticeQuestions = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('test_mode')
           .eq('product_type', dbProductType)
           .like('test_mode', 'practice_%');
@@ -516,7 +520,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       } else if (mode === 'diagnostic') {
         // Use direct Supabase query for diagnostic (more reliable)  
         const { data: rawQuestions, error: questionsError } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('id, question_text, answer_options, correct_answer, solution, question_order, passage_id')
           .eq('product_type', dbProductType)
           .eq('section_name', sectionName)
@@ -658,6 +662,17 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
       }
       
+      // Calculate final_score - handle edge cases
+      let finalScore = null;
+
+      // Writing sections or sections with no questions should have null score
+      const isWritingSection = sectionName.toLowerCase().includes('writing');
+
+      if (!isWritingSection && totalQuestions > 0) {
+        const rawScore = (finalCorrectAnswers / totalQuestions) * 100;
+        finalScore = Math.round(Math.max(0, Math.min(100, rawScore))); // Clamp between 0-100
+      }
+
       const sessionData = {
         user_id: user.id,
         product_type: dbProductType,
@@ -667,8 +682,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         current_question_index: questionsAttempted, // Index of last attempted question
         total_questions: totalQuestions,
         questions_answered: questionsAttempted, // Total questions with answers
-        correct_answers: finalCorrectAnswers, // Actual correct answers count
-        final_score: Math.round((finalCorrectAnswers / totalQuestions) * 100), // Overall score including blanks
+        correct_answers: isWritingSection ? null : finalCorrectAnswers, // Writing has no MCQ correct answers
+        final_score: finalScore, // Null for writing, 0-100 for others
         completed_at: status === 'completed' ? new Date().toISOString() : null,
         answers_data: answersData,
         flagged_questions: flaggedQuestions,
@@ -793,7 +808,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       } else if (mode === 'diagnostic') {
         // Use direct Supabase query for diagnostic (more reliable)
         const { data: rawQuestions, error: questionsError } = await supabase
-          .from('questions')
+          .from(QUESTIONS_TABLE)
           .select('id, question_text, answer_options, correct_answer, solution, question_order')
           .eq('product_type', dbProductType)
           .eq('section_name', sectionName)
@@ -842,18 +857,21 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       
       questionsAnswered = Math.min(calculatedAnswered, maxAnswered);
       }
+    // Check if this is a writing section (no MCQ scoring)
+    const isWritingSection = sectionName.toLowerCase().includes('writing');
+
     // Use a higher score range for better test data (80-95%)
     const mockScore = Math.floor(Math.random() * 15) + 80; // 80-95%
     const correctAnswers = Math.floor(questionsAnswered * (mockScore / 100));
-    
+
     // Create realistic answer data with actual question responses
     const answersData: Record<string, string> = {};
     const flaggedQuestions: number[] = [];
-    
+
     for (let qIndex = 0; qIndex < questionsAnswered; qIndex++) {
       const question = questions[qIndex];
       const isCorrect = qIndex < correctAnswers;
-      
+
       let selectedAnswerIndex: number;
       if (isCorrect) {
         selectedAnswerIndex = question.correctAnswer; // Use the correct answer index
@@ -868,18 +886,24 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
         }
         selectedAnswerIndex = incorrectOptions[Math.floor(Math.random() * incorrectOptions.length)];
       }
-      
+
       // Store the full option text (same format as what TestTaking expects)
       if (question.options && question.options[selectedAnswerIndex]) {
         answersData[qIndex.toString()] = question.options[selectedAnswerIndex];
         }
-      
+
       // Random flagging (5% chance)
       if (Math.random() < 0.05) {
         flaggedQuestions.push(qIndex);
       }
     }
-    
+
+    // Calculate final score - null for writing sections, valid score for others
+    let finalScore = null;
+    if (status === 'completed' && !isWritingSection && totalQuestions > 0) {
+      finalScore = Math.max(0, Math.min(100, mockScore)); // Clamp between 0-100
+    }
+
     const sessionData = {
       user_id: user.id,
       product_type: dbProductType,
@@ -889,8 +913,8 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
       current_question_index: questionsAnswered,
       total_questions: totalQuestions,
       questions_answered: questionsAnswered,
-      correct_answers: status === 'completed' ? correctAnswers : null, // Add the actual correct answers count
-      final_score: status === 'completed' ? mockScore : null,
+      correct_answers: (status === 'completed' && !isWritingSection) ? correctAnswers : null,
+      final_score: finalScore,
       completed_at: status === 'completed' ? new Date().toISOString() : null,
       answers_data: answersData,
       flagged_questions: flaggedQuestions,
@@ -967,7 +991,7 @@ export const DeveloperTools: React.FC<DeveloperToolsProps> = ({
     try {
       // Get real questions using direct Supabase query (since drills work with sub_skill_id)
       const { data: rawQuestions, error: questionsError } = await supabase
-        .from('questions')
+        .from(QUESTIONS_TABLE)
         .select('id, question_text, answer_options, correct_answer, solution')
         .eq('product_type', dbProductType)
         .eq('sub_skill_id', cleanSubSkillId)

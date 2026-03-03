@@ -9,11 +9,18 @@ import { createClient } from '@supabase/supabase-js';
 
 // Create Supabase client with service role key (bypasses RLS)
 const getSupabaseClient = () => {
-  const serviceRoleKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Try multiple env var names in order of preference
+  const serviceRoleKey =
+    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  const supabaseUrl =
+    process.env.VITE_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   if (!serviceRoleKey || !supabaseUrl) {
-    throw new Error('Missing Supabase credentials for gap detection');
+    console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('SUPABASE')));
+    throw new Error(`Missing Supabase credentials for gap detection. URL: ${supabaseUrl ? 'found' : 'missing'}, Key: ${serviceRoleKey ? 'found' : 'missing'}`);
   }
 
   return createClient(supabaseUrl, serviceRoleKey, {
@@ -24,7 +31,16 @@ const getSupabaseClient = () => {
   });
 };
 
-const supabase = getSupabaseClient();
+// Lazy initialization - only create client when first used
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(target, prop) {
+    if (!supabaseInstance) {
+      supabaseInstance = getSupabaseClient();
+    }
+    return (supabaseInstance as any)[prop];
+  }
+});
 
 // ============================================================================
 // TYPES
@@ -68,15 +84,24 @@ export interface TestGapReport {
 export async function getExistingQuestionCounts(
   testType: string,
   sectionName: string,
-  testMode: string
+  testMode: string,
+  standaloneOnly: boolean = false,
+  expectedSubSkills?: string[]  // Optional: validate against expected sub-skills
 ): Promise<ExistingQuestionCounts> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('questions_v2')
-      .select('sub_skill')
+      .select('sub_skill, passage_id')
       .eq('test_type', testType)
       .eq('section_name', sectionName)
       .eq('test_mode', testMode);
+
+    // If standaloneOnly, filter to only questions without a passage_id
+    if (standaloneOnly) {
+      query = query.is('passage_id', null);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.warn(`   ⚠️  Failed to query existing questions: ${error.message}`);
@@ -89,9 +114,40 @@ export async function getExistingQuestionCounts(
 
     // Count questions per sub-skill
     const counts: ExistingQuestionCounts = {};
+    const unexpectedSubSkills = new Set<string>();
+
     for (const row of data) {
       const subSkill = row.sub_skill;
       counts[subSkill] = (counts[subSkill] || 0) + 1;
+
+      // Track unexpected sub-skills if validation is enabled
+      if (expectedSubSkills && !expectedSubSkills.includes(subSkill)) {
+        unexpectedSubSkills.add(subSkill);
+      }
+    }
+
+    // Warn about unexpected sub-skills
+    if (expectedSubSkills && unexpectedSubSkills.size > 0) {
+      console.warn('');
+      console.warn(`   ⚠️  WARNING: Found questions with UNEXPECTED sub-skill names in database:`);
+      unexpectedSubSkills.forEach(skill => {
+        console.warn(`      • "${skill}" (${counts[skill]} questions)`);
+      });
+      console.warn('');
+      console.warn('   💡 This may indicate:');
+      console.warn('      1. Database contains questions generated with old sub-skill names');
+      console.warn('      2. Configuration was updated but database was not');
+      console.warn('      3. Questions were manually inserted with incorrect sub-skill names');
+      console.warn('');
+      console.warn('   ⚠️  RISK: If you continue, the script may generate NEW questions with the');
+      console.warn('      expected sub-skill names, resulting in OVER-GENERATION!');
+      console.warn('');
+      console.warn('   Expected sub-skills:');
+      expectedSubSkills.forEach(skill => {
+        const hasQuestions = counts[skill] > 0;
+        console.warn(`      ${hasQuestions ? '✓' : '✗'} "${skill}" (${counts[skill] || 0} questions)`);
+      });
+      console.warn('');
     }
 
     return counts;
@@ -199,11 +255,32 @@ export async function generateTestGapReport(
   let totalNeeded = 0;
 
   for (const config of sectionConfigs) {
+    // Extract expected sub-skills from target distribution
+    const expectedSubSkills = Object.keys(config.targetDistribution);
+
     const existingCounts = await getExistingQuestionCounts(
       testType,
       config.sectionName,
-      testMode
+      testMode,
+      false,  // standaloneOnly
+      expectedSubSkills  // Pass expected sub-skills for validation
     );
+
+    // ⭐ SAFETY CHECK: Check total count regardless of sub-skill names
+    const totalQuestionsInDb = Object.values(existingCounts).reduce((sum, count) => sum + count, 0);
+    const targetTotal = Object.values(config.targetDistribution).reduce((sum, count) => sum + count, 0);
+
+    if (totalQuestionsInDb >= targetTotal) {
+      console.warn('');
+      console.warn(`   ⚠️  SAFETY CHECK: Section "${config.sectionName}" already has ${totalQuestionsInDb} questions`);
+      console.warn(`      (target: ${targetTotal}). This section may be COMPLETE or OVER-GENERATED.`);
+      console.warn('');
+      console.warn(`   💡 If sub-skill names don't match configuration, consider:`);
+      console.warn(`      1. Updating database sub-skill names to match configuration`);
+      console.warn(`      2. Updating configuration to match database sub-skill names`);
+      console.warn(`      3. Deleting over-generated questions before proceeding`);
+      console.warn('');
+    }
 
     const sectionGap = detectSectionGaps(
       config.targetDistribution,

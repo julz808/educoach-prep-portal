@@ -137,29 +137,37 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
 
 export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
   try {
+    // Check if we should use V2 tables
+    const useV2 = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+    const questionsTable = useV2 ? 'questions_v2' : 'questions';
+    const passagesTable = useV2 ? 'passages_v2' : 'passages';
+
+    console.log(`📊 Loading questions from ${useV2 ? 'V2' : 'V1'} tables`);
+
     // Get all test types from our mapping
     const allTestTypes = Object.keys(TEST_TYPE_MAPPING);
-    
+
     // Fetch questions for all test types and modes separately to bypass RLS policy restrictions
     const questionQueries = [];
-    
+
     // For each test type, fetch each mode separately
     for (const testType of allTestTypes) {
       for (const testMode of ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5', 'drill', 'diagnostic']) {
         questionQueries.push(
           supabase
-            .from('questions')
+            .from(questionsTable)
             .select('*')
             .eq('test_type', testType)
             .eq('test_mode', testMode)
+            .order('question_order', { ascending: true, nullsFirst: false })  // Sort by question_order for consistent ordering
         );
       }
     }
-    
+
     // Execute all question queries and passages query in parallel
     const [questionResults, passagesResult] = await Promise.all([
       Promise.all(questionQueries),
-      supabase.from('passages').select('*').limit(2000) // Increased limit to handle all passages
+      supabase.from(passagesTable).select('*').limit(2000) // Increased limit to handle all passages
     ]);
     
     // Combine all question results
@@ -299,11 +307,15 @@ function getTestModeDescription(type: 'practice' | 'drill' | 'diagnostic', secti
 
 export async function fetchQuestionsForTest(testType: string, testMode: string, sectionName?: string): Promise<OrganizedQuestion[]> {
   try {
+    const useV2 = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+    const questionsTable = useV2 ? 'questions_v2' : 'questions';
+    const passagesTable = useV2 ? 'passages_v2' : 'passages';
+
     let query = supabase
-      .from('questions')
+      .from(questionsTable)
       .select(`
         *,
-        passages (*)
+        ${passagesTable} (*)
       `)
       .eq('test_type', testType)
       .eq('test_mode', testMode);
@@ -311,6 +323,9 @@ export async function fetchQuestionsForTest(testType: string, testMode: string, 
     if (sectionName) {
       query = query.eq('section_name', sectionName);
     }
+
+    // Sort by question_order for consistent ordering
+    query = query.order('question_order', { ascending: true, nullsFirst: false });
 
     const { data: questions, error } = await query;
 
@@ -364,27 +379,32 @@ export function getPlaceholderTestStructure(testTypeId: string): TestType {
 
 export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
   try {
+    const useV2 = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+    const questionsTable = useV2 ? 'questions_v2' : 'questions';
+    const passagesTable = useV2 ? 'passages_v2' : 'passages';
+
     console.log('🔧 DEBUG: Fetching drill questions for test type:', testTypeId);
-    
+
     // Map frontend testTypeId to database test_type
     const dbTestType = Object.keys(TEST_TYPE_MAPPING).find(
       key => TEST_TYPE_MAPPING[key] === testTypeId
     );
-    
+
     if (!dbTestType) {
       console.warn('🔧 DEBUG: No database test type found for:', testTypeId);
       return [];
     }
-    
+
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
-    
+
     // Fetch all drill questions for this test type
     // First, get all unique sections that actually exist for this test type
     const { data: sectionData, error: sectionError } = await supabase
-      .from('questions')
+      .from(questionsTable)
       .select('section_name')
       .eq('test_type', dbTestType)
-      .eq('test_mode', 'drill');
+      .eq('test_mode', 'drill')
+      .order('question_order', { ascending: true, nullsFirst: false });
     
     if (sectionError) {
       console.error('🔧 DEBUG: Error fetching sections:', sectionError);
@@ -399,11 +419,12 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     // Fetch questions for each section separately to ensure we get all of them
     for (const section of sections) {
       const { data: sectionQuestions, error: sectionError } = await supabase
-        .from('questions')
+        .from(questionsTable)
         .select('*')
         .eq('test_type', dbTestType)
         .eq('test_mode', 'drill')
-        .eq('section_name', section);
+        .eq('section_name', section)
+        .order('question_order', { ascending: true, nullsFirst: false });
         
       if (sectionError) {
         console.error(`🔧 DEBUG: Error fetching ${section} questions:`, sectionError);
@@ -437,11 +458,11 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
     const passageIds = drillQuestions
       .filter(q => q.passage_id)
       .map(q => q.passage_id);
-      
+
     let passages: Passage[] = [];
     if (passageIds.length > 0) {
       const { data: passageData } = await supabase
-        .from('passages')
+        .from(passagesTable)
         .select('*')
         .in('id', passageIds);
       passages = passageData || [];
@@ -556,27 +577,31 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
 
 export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode[]> {
   try {
+    const useV2 = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+    const questionsTable = useV2 ? 'questions_v2' : 'questions';
+    const passagesTable = useV2 ? 'passages_v2' : 'passages';
+
     console.log('🔧 DEBUG: Fetching diagnostic modes for test type:', testTypeId);
-    
+
     // Map frontend testTypeId to database test_type
     const dbTestType = Object.keys(TEST_TYPE_MAPPING).find(
       key => TEST_TYPE_MAPPING[key] === testTypeId
     );
-    
+
     if (!dbTestType) {
       console.warn('🔧 DEBUG: No database test type found for:', testTypeId);
       return [];
     }
-    
+
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
-    
+
     // Fetch all diagnostic questions for this test type
     const { data: diagnosticQuestions, error } = await supabase
-      .from('questions')
+      .from(questionsTable)
       .select('*')
       .eq('test_type', dbTestType)
       .eq('test_mode', 'diagnostic')
-      .order('question_order');
+      .order('question_order', { ascending: true, nullsFirst: false });
       
     if (error) {
       console.error('🔧 DEBUG: Error fetching diagnostic questions:', error);
@@ -594,11 +619,11 @@ export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode
     const passageIds = diagnosticQuestions
       .filter(q => q.passage_id)
       .map(q => q.passage_id);
-      
+
     let passages: Passage[] = [];
     if (passageIds.length > 0) {
       const { data: passageData } = await supabase
-        .from('passages')
+        .from(passagesTable)
         .select('*')
         .in('id', passageIds);
       passages = passageData || [];

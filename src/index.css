@@ -57,25 +57,49 @@
   .edu-card {
     @apply bg-white rounded-2xl shadow-sm p-6 border border-edu-teal/10;
   }
-  
+
   .btn-primary {
     @apply bg-edu-teal text-white rounded-full px-6 py-2 font-medium hover:bg-edu-teal/90 transition-colors;
   }
-  
+
   .btn-secondary {
     @apply bg-edu-coral text-white rounded-full px-6 py-2 font-medium hover:bg-edu-coral/90 transition-colors;
   }
-  
+
   .nav-item {
     @apply flex items-center gap-2 px-4 py-3 rounded-lg transition-colors;
   }
-  
+
   .nav-item.active {
     @apply bg-edu-teal text-white;
   }
-  
+
   .nav-item:not(.active) {
     @apply hover:bg-edu-teal/10 text-edu-navy;
+  }
+
+  /* Table formatting for questions */
+  .question-table {
+    @apply w-full border-collapse my-4;
+    border: 2px solid #2C3E50;
+  }
+
+  .question-table th {
+    @apply bg-edu-navy text-white font-semibold px-4 py-3 text-left;
+    border: 1px solid #34495E;
+  }
+
+  .question-table td {
+    @apply px-4 py-3 border;
+    border-color: #2C3E50;
+  }
+
+  .question-table tbody tr:nth-child(even) {
+    @apply bg-gray-50;
+  }
+
+  .question-table tbody tr:hover {
+    @apply bg-edu-light-blue/30 transition-colors;
   }
 }
 
@@ -213,4 +237,122 @@
 
 .btn-shimmer:hover::before {
   animation: shimmer 1s ease-in-out;
+}
+
+/* Number Grid Table Styles */
+.number-grid-table {
+  border-collapse: collapse;
+  margin: 1.5rem auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.number-grid-table td {
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border: 2px solid hsl(var(--border));
+  background: white;
+  color: hsl(var(--foreground));
+  transition: all 0.2s ease;
+}
+
+.number-grid-table td.grid-cell-question {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  font-size: 2rem;
+  font-weight: 700;
+  border: 3px solid hsl(var(--primary));
+  position: relative;
+}
+
+.number-grid-table td.grid-cell-question::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 2px dashed hsl(var(--primary));
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Responsive sizing for smaller screens */
+@media (max-width: 640px) {
+  .number-grid-table td {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
+
+  .number-grid-table td.grid-cell-question {
+    font-size: 1.5rem;
+  }
+}
+
+/* Number Series Table Styles */
+.number-series-table {
+  border-collapse: collapse;
+  margin: 1.5rem auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.number-series-table td {
+  width: 70px;
+  height: 70px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border: 2px solid hsl(var(--border));
+  background: white;
+  color: hsl(var(--foreground));
+  transition: all 0.2s ease;
+}
+
+.number-series-table td:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.number-series-table td:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.number-series-table td.series-cell-question {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  font-size: 2rem;
+  font-weight: 700;
+  border: 3px solid hsl(var(--primary));
+  position: relative;
+}
+
+.number-series-table td.series-cell-question::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 2px dashed hsl(var(--primary));
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Responsive sizing for smaller screens */
+@media (max-width: 640px) {
+  .number-series-table td {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .number-series-table td.series-cell-question {
+    font-size: 1.5rem;
+  }
 }

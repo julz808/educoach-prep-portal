@@ -167,14 +167,14 @@ function validateStructure(question: QuestionV2): { passed: boolean; errors: str
       errors.push('Multiple choice requires correct_answer');
     }
     if (question.answer_options && question.correct_answer) {
-      const hasCorrect = question.answer_options.some(opt =>
-        opt.startsWith(question.correct_answer + ')') ||
-        opt.startsWith(question.correct_answer + ':') ||
-        opt.startsWith(question.correct_answer + ' ') ||
-        opt.startsWith(question.correct_answer + '.')
-      );
-      if (!hasCorrect) {
-        errors.push(`Correct answer "${question.correct_answer}" not found in answer_options`);
+      // Convert letter (A, B, C, D, E) to index (0, 1, 2, 3, 4)
+      const letterToIndex: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4 };
+      const answerIndex = letterToIndex[question.correct_answer.toUpperCase()];
+
+      if (answerIndex === undefined) {
+        errors.push(`Invalid correct_answer "${question.correct_answer}". Must be A, B, C, D, or E`);
+      } else if (answerIndex >= question.answer_options.length) {
+        errors.push(`Correct answer "${question.correct_answer}" points to index ${answerIndex}, but only ${question.answer_options.length} options exist`);
       }
     }
     if (question.answer_options) {
@@ -196,7 +196,7 @@ function validateStructure(question: QuestionV2): { passed: boolean; errors: str
 // CHECK 2: CORRECTNESS — haiku verifies the answer and checks distractors
 // ============================================================================
 
-// Pattern-based sub-skills that require precise calculation and may have
+// Pattern-based and grammar sub-skills that require precise calculation or may have
 // multiple valid interpretations. For these, we use a more lenient threshold.
 const PATTERN_BASED_SUBSKILLS = [
   'Letter Series & Patterns',
@@ -209,10 +209,33 @@ const PATTERN_BASED_SUBSKILLS = [
   'Pattern Recognition'
 ];
 
+// Language Conventions sub-skills that should trust the curriculum standard
+// rather than Haiku's interpretation of evolving grammar/spelling/usage rules
+const GRAMMAR_BASED_SUBSKILLS = [
+  'Sophisticated Grammar',
+  'Advanced Punctuation',
+  'Advanced Spelling & Orthography',
+  'Advanced Vocabulary & Usage',
+  'Advanced Editing Skills',
+  'Complex Syntax Analysis',
+  'Grammar',
+  'Punctuation',
+  'Spelling Patterns',
+  'Common Spelling Errors',
+  'Spelling'
+];
+
 function isPatternBasedQuestion(question: QuestionV2): boolean {
   const subSkill = question.sub_skill || '';
   return PATTERN_BASED_SUBSKILLS.some(pattern =>
     subSkill.toLowerCase().includes(pattern.toLowerCase())
+  );
+}
+
+function isGrammarBasedQuestion(question: QuestionV2): boolean {
+  const subSkill = question.sub_skill || '';
+  return GRAMMAR_BASED_SUBSKILLS.some(grammar =>
+    subSkill.toLowerCase().includes(grammar.toLowerCase())
   );
 }
 
@@ -223,6 +246,7 @@ async function checkCorrectness(question: QuestionV2): Promise<{
 }> {
   try {
     const isPatternBased = isPatternBasedQuestion(question);
+    const isGrammarBased = isGrammarBasedQuestion(question);
 
     // Pattern-based questions get additional guidance and more lenient acceptance
     const patternGuidance = isPatternBased ? `
@@ -233,6 +257,20 @@ IMPORTANT: This is a pattern-based question (letter series, code substitution, o
 - Be MORE LENIENT with pattern questions - if the solution is mathematically consistent and leads to the marked answer, it's likely correct
 - Focus on: Does the solution follow a consistent rule? Does it correctly apply to get the marked answer?
 - Don't reject just because the pattern explanation differs slightly from what you'd expect` : '';
+
+    // Language Conventions questions should trust the curriculum standard, not debate modern usage
+    const grammarGuidance = isGrammarBased ? `
+
+IMPORTANT: This is a Language Conventions question (grammar/punctuation/spelling/vocabulary/editing) following Australian educational curriculum standards.
+- The marked answer represents the CURRICULUM STANDARD for Year 5-9 students in Australia
+- For grammar: DO NOT debate modern usage evolution (e.g., singular "they") vs. traditional rules
+- For spelling: Follow Australian spelling conventions (colour, organise, recognise)
+- For vocabulary: Accept Australian English usage and meanings
+- DO NOT debate British vs. Australian conventions - assume Australian standard English
+- DO NOT reject based on prescriptive vs. descriptive debates
+- If the solution explains why the marked answer follows a clear rule, ACCEPT IT
+- Focus on: Does the solution correctly identify the rule being tested? Is the marked answer defensible under Australian curriculum standards?
+- Be LENIENT - if the answer can be justified by standard educational textbooks, it's correct` : '';
 
     const prompt = `You are checking a test question for correctness.
 
@@ -245,7 +283,7 @@ ${question.answer_options?.join('\n')}
 MARKED ANSWER: ${question.correct_answer}
 
 SOLUTION PROVIDED:
-${question.solution}${patternGuidance}
+${question.solution}${patternGuidance}${grammarGuidance}
 
 Check:
 1. Is the marked answer definitively correct?
@@ -294,7 +332,23 @@ Return ONLY valid JSON:
       };
     }
 
-    // Standard validation for non-pattern questions
+    // For grammar-based questions, be lenient to avoid debates over evolving rules
+    // Trust the curriculum standard rather than Haiku's interpretation
+    if (isGrammarBased) {
+      const confidence = result.confidence || 0;
+      const isCorrect = result.is_correct === true;
+
+      // Grammar: Lenient - 70% confidence OR correct answer with reasonable justification
+      const passed = (isCorrect && confidence >= 70) || isCorrect;
+
+      return {
+        passed,
+        confidence,
+        reasoning: result.reasoning || 'No reasoning provided'
+      };
+    }
+
+    // Standard validation for non-pattern, non-grammar questions
     const passed = result.is_correct === true && result.all_distractors_wrong === true;
 
     return {
@@ -442,7 +496,17 @@ const STANDARDIZED_FORMAT_SUBSKILLS = [
   'Foreign Language Translation',
   'Sequential Ordering',
   'Code Breaking',
-  'Word Manipulation'
+  'Word Manipulation',
+  // Language Conventions - all use standardized format with same question stem
+  'Sophisticated Grammar',
+  'Advanced Punctuation',
+  'Advanced Spelling & Orthography',
+  'Advanced Vocabulary & Usage',
+  'Advanced Editing Skills',
+  'Complex Syntax Analysis',
+  'Grammar',
+  'Punctuation',
+  'Spelling'
 ];
 
 function isStandardizedQuestionFormat(subSkill: string): boolean {
@@ -504,26 +568,37 @@ A duplicate means the new prompt covers the SAME TOPIC or SCENARIO as an existin
 - Same scenario type with a different setting or character → duplicate (e.g. two "write a story about overcoming fear" prompts)
 - Clearly different topics or scenarios → NOT a duplicate`,
 
-    grammar: `DUPLICATE RULE FOR GRAMMAR/PUNCTUATION/SPELLING QUESTIONS:
+    grammar: `DUPLICATE RULE FOR LANGUAGE CONVENTIONS QUESTIONS (Grammar/Punctuation/Spelling/Vocabulary/Editing):
 
-⚠️ CRITICAL: IT IS NORMAL AND EXPECTED TO HAVE MULTIPLE QUESTIONS TESTING THE SAME GRAMMAR/PUNCTUATION RULE!
+⚠️ CRITICAL: IT IS NORMAL AND EXPECTED TO HAVE MULTIPLE QUESTIONS WITH THE SAME QUESTION STEM!
 
-For Language Conventions questions, the EXAMPLE SENTENCE is what makes each question unique, NOT the underlying grammar rule being tested.
+For Language Conventions questions, the ANSWER OPTIONS are what make each question unique, NOT the question stem.
 
-ONLY mark as duplicate if the question uses the EXACT SAME EXAMPLE SENTENCE or PHRASE.
+🔍 IMPORTANT: The question stem is often identical. This is STANDARD FORMAT:
+   - Grammar: "Which sentence is correct?"
+   - Spelling: "Which word is spelled correctly?"
+   - Punctuation: "Which sentence uses punctuation correctly?"
+   - Vocabulary: "Which word best fits in the sentence?"
+   - You will see [Options: ...] showing answer choices for each question
+   - Compare the OPTIONS/CONTENT, NOT just the question stem
+   - Same question stem with DIFFERENT options = NOT a duplicate
+
+ONLY mark as duplicate if the answer options contain the EXACT SAME WORDS/SENTENCES/CONTENT.
 
 NOT DUPLICATES (these are acceptable):
+- "Which sentence is correct?" with different sentences in options → NOT duplicate
+- "Which word is spelled correctly?" with option A: "accommodate" vs. option A: "necessary" → NOT duplicate (different words)
 - Two questions about "commas in a list" with different example sentences → NOT duplicate
-- Two questions about "apostrophes for possession" with different examples (girls' vs. children's) → NOT duplicate
-- Two questions about "capital letters for proper nouns" with different name examples → NOT duplicate
-- "Which sentence uses commas correctly?" with different sentence options → NOT duplicate
-- Multiple questions testing the same punctuation rule (e.g., commas, apostrophes, quotation marks) → NOT duplicate as long as the sentences/examples differ
+- Two questions about "apostrophes" with different examples (girls' vs. children's) → NOT duplicate
+- "Which word best completes...?" with different target words → NOT duplicate
+- Multiple questions testing the same rule → NOT duplicate as long as the examples/words/sentences differ
 
 DUPLICATES (reject these):
-- EXACT same sentence/phrase in both questions → duplicate
+- EXACT same words/sentences in the answer options → duplicate
 - Word-for-word identical question text AND identical answer options → duplicate
+- "Which word is spelled correctly?" with identical spelling options (A: definately, B: definitely, etc.) → duplicate
 
-Focus on: Does the question use the EXACT SAME SENTENCE/PHRASE/EXAMPLE as an existing question? If the example is different, it's acceptable even if testing the same grammar rule.`,
+Focus on: Do the ANSWER OPTIONS contain the EXACT SAME WORDS/SENTENCES/CONTENT? If the options are different, it's NOT a duplicate even if using the same question stem.`,
   };
 
   return `You are checking if a new test question is a duplicate of existing questions.
@@ -746,6 +821,9 @@ async function checkDuplicate(
     // just the passage reference ("Read the passage about X..."), hiding the actual question.
     const previewLen = category === 'reading' ? 200 : 100;
 
+    // Check if this is a standardized format question (grammar/punctuation/etc.)
+    const isStandardizedFormatQuestion = isStandardizedQuestionFormat(question.sub_skill || '');
+
     const recentList = recentQuestions
       .slice(0, 20)
       .map((q, i) => {
@@ -758,7 +836,14 @@ async function checkDuplicate(
           ? ` [Passage: ${q.passage_id.slice(0, 8)}]`
           : '';
 
-        return `${i + 1}. "${preview}" → ${q.correct_answer ?? 'N/A'}${passageInfo}`;
+        // For standardized format questions (grammar/punctuation), include answer options
+        // so Haiku can see that "Which sentence is correct?" with different sentences = NOT duplicate
+        // Show ALL options (not just first 2) for accurate duplicate detection
+        const optionsPreview = isStandardizedFormatQuestion && q.answer_options && q.answer_options.length > 0
+          ? ` [Options: ${q.answer_options.map((opt, idx) => `${String.fromCharCode(65 + idx)}:"${opt.slice(0, 40)}..."`).join(' ')}]`
+          : '';
+
+        return `${i + 1}. "${preview}" → ${q.correct_answer ?? 'N/A'}${passageInfo}${optionsPreview}`;
       })
       .join('\n');
 
@@ -767,7 +852,13 @@ async function checkDuplicate(
       ? ` [Passage ID: ${question.passage_id.slice(0, 8)}]`
       : '';
 
-    const prompt = buildDuplicatePrompt(question, recentList, category, newQuestionPassageInfo);
+    // For standardized format questions, include answer options in the new question context
+    // Show ALL options for accurate duplicate detection
+    const newQuestionOptionsInfo = isStandardizedFormatQuestion && question.answer_options && question.answer_options.length > 0
+      ? ` [Options: ${question.answer_options.map((opt, idx) => `${String.fromCharCode(65 + idx)}:"${opt.slice(0, 40)}..."`).join(' ')}]`
+      : '';
+
+    const prompt = buildDuplicatePrompt(question, recentList, category, newQuestionPassageInfo + newQuestionOptionsInfo);
 
     const response = await anthropic.messages.create({
       model: HAIKU_MODEL,

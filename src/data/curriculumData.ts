@@ -24,16 +24,9 @@ export const TEST_STRUCTURES = {
       "passages": 0,
       "words_per_passage": 0
     },
-    "Numeracy No Calculator": {
-      "questions": 25,
-      "time": 25,
-      "format": "Multiple Choice",
-      "passages": 0,
-      "words_per_passage": 0
-    },
-    "Numeracy Calculator": {
-      "questions": 25,
-      "time": 25,
+    "Numeracy": {
+      "questions": 50,
+      "time": 50,
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
@@ -78,22 +71,22 @@ export const TEST_STRUCTURES = {
   },
   "ACER Scholarship (Year 7 Entry)": {
     "Written Expression": {
-      "questions": 1, 
+      "questions": 2,
       "time": 25, 
       "format": "Written Response",
       "passages": 0,
       "words_per_passage": 0
     },
     "Mathematics": {
-      "questions": 35, 
-      "time": 47, 
+      "questions": 35,
+      "time": 40, 
       "format": "Multiple Choice",
       "passages": 0,
       "words_per_passage": 0
     },
     "Humanities": {
-      "questions": 35, 
-      "time": 47, 
+      "questions": 35,
+      "time": 40, 
       "format": "Multiple Choice",
       "passages": 4,
       "words_per_passage": 350
@@ -138,8 +131,8 @@ export const TEST_STRUCTURES = {
   },
   "NSW Selective Entry (Year 7 Entry)": {
     "Reading": {
-      "questions": 30, 
-      "time": 40, 
+      "questions": 30,
+      "time": 45, 
       "format": "Multiple Choice",
       "passages": 6,
       "words_per_passage": 250

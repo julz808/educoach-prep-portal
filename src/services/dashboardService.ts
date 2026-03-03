@@ -7,6 +7,10 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// CRITICAL: Use the same questions table as test loading
+const USE_V2_QUESTIONS = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+const QUESTIONS_TABLE = USE_V2_QUESTIONS ? 'questions_v2' : 'questions';
+
 export interface DashboardMetrics {
   // Hero metrics
   totalQuestionsCompleted: number;
@@ -93,7 +97,7 @@ export async function fetchDashboardMetrics(
   
   // 2. Get total questions available for this product
   const { count: questionsAvailable } = await supabase
-    .from('questions')
+    .from(QUESTIONS_TABLE)
     .select('id', { count: 'exact', head: true })
     .eq('product_type', dbProductType);
   
@@ -163,7 +167,7 @@ export async function fetchDashboardMetrics(
   
   // Get total available diagnostic sections
   const { data: allDiagnosticSections } = await supabase
-    .from('questions')
+    .from(QUESTIONS_TABLE)
     .select('section_name')
     .eq('product_type', dbProductType)
     .eq('test_mode', 'diagnostic');
@@ -218,7 +222,7 @@ export async function fetchDashboardMetrics(
   
   // Get the actual test structure to know how many sections each practice test should have
   const { data: testStructureData } = await supabase
-    .from('questions')
+    .from(QUESTIONS_TABLE)
     .select('section_name, test_mode')
     .eq('product_type', dbProductType)
     .not('section_name', 'is', null);
@@ -350,7 +354,7 @@ export async function fetchDashboardMetrics(
   let uniqueAttemptedSubSkills = 0;
   if (attemptedQuestionIds.size > 0) {
     const { data: attemptedQuestions } = await supabase
-      .from('questions')
+      .from(QUESTIONS_TABLE)
       .select('sub_skill')
       .in('id', Array.from(attemptedQuestionIds))
       .not('sub_skill', 'is', null);
@@ -360,7 +364,7 @@ export async function fetchDashboardMetrics(
   
   // Get total available sub-skills (unique sub_skill names for this product)
   const { data: allSubSkills } = await supabase
-    .from('questions')
+    .from(QUESTIONS_TABLE)
     .select('sub_skill')
     .eq('product_type', dbProductType)
     .eq('test_mode', 'drill')

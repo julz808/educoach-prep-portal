@@ -3,6 +3,9 @@
  * Handles common formatting issues across all test modes and product types
  */
 
+import { convertMarkdownTableToHtml, containsMarkdownTable } from './tableFormatter';
+import { formatQuestionWithGrid, renderGridAsTable, formatQuestionWithSeries, renderSeriesAsTable } from './gridFormatter';
+
 /**
  * Cleans option text by removing answer prefixes and fixing formatting
  */
@@ -49,59 +52,87 @@ export function cleanOptionText(text: string): string {
 }
 
 /**
- * Formats question text by handling spacing, punctuation, and structure
+ * Formats question text by handling spacing, punctuation, structure, and tables
+ * Returns an object with both the formatted text and any HTML table content
  */
 export function formatQuestionText(text: string): string {
   if (!text) return '';
-  
+
+  // Check if text contains a markdown table and convert it to HTML
+  if (containsMarkdownTable(text)) {
+    return convertMarkdownTableToHtml(text);
+  }
+
+  // Check if text contains a number series/sequence and format it
+  const seriesFormatted = formatQuestionWithSeries(text);
+  if (seriesFormatted) {
+    const seriesTableHtml = renderSeriesAsTable(seriesFormatted.seriesData);
+    return `${seriesFormatted.textBeforeSeries}\n\n${seriesTableHtml}\n\n${seriesFormatted.textAfterSeries}`.trim();
+  }
+
+  // Check if text contains a 3x3 number grid and format it
+  const gridFormatted = formatQuestionWithGrid(text);
+  if (gridFormatted) {
+    const gridTableHtml = renderGridAsTable(gridFormatted.gridData);
+    return `${gridFormatted.textBeforeGrid}\n\n${gridTableHtml}\n\n${gridFormatted.textAfterGrid}`.trim();
+  }
+
   let formatted = text
     // Normalize spaces while preserving intentional line breaks
     .replace(/[ \t]+/g, ' ')
-    
+
+    // CRITICAL FIX: Ensure bullet points ALWAYS start on a new line
+    // Only match actual bullet point characters (•, *, -) when they're used as list markers
+    // Handle • bullets specifically (most common in questions)
+    .replace(/([.!?;:,])\s*•\s+/g, '$1\n• ')  // After punctuation with optional space before bullet
+    .replace(/\s+•\s+/g, '\n• ')  // Replace any space + • + space with newline + • + space
+    // Handle - or * bullets only when they start a clear list item (capital letter after)
+    .replace(/\s+([-*])\s+(?=[A-Z])/g, '\n$1 ')
+
     // Fix spacing between numbers and units (months, years, etc.)
     .replace(/(\d+)months/g, '$1 months')
     .replace(/(\d+)years/g, '$1 years')
     .replace(/(\d+)days/g, '$1 days')
     .replace(/(\d+)hours/g, '$1 hours')
     .replace(/(\d+)minutes/g, '$1 minutes')
-    
+
     // Fix currency formatting
     .replace(/\$\s+(\d)/g, '$$$1')
-    
+
     // Fix spacing around mathematical operators
     .replace(/(\d)\s*([+\-×÷=])\s*(\d)/g, '$1 $2 $3')
-    
+
     // Fix decimal spacing - but be careful not to break legitimate decimal numbers
     .replace(/(\d+)\.\s+(\d+)(?!\s*[A-Za-z])/g, '$1.$2')
-    
+
     // Fix colon spacing - add space after colons except for time formats
     .replace(/:(?!\d{2}|\s*\d{2})/g, ': ')
     .replace(/:(\d{1,2}:\d{2})/g, ':$1') // Fix time formats like 12:30:45
     .replace(/(\d{1,2})\s*:\s*(\d{2})(?!\s*:\d{2})/g, '$1:$2') // Fix simple time formats like 12:30
-    
-    // Fix spacing after other punctuation (ensure single space)
-    .replace(/([,.!?;])\s+/g, '$1 ')
-    
+
+    // Fix spacing after other punctuation (ensure single space, but preserve newlines)
+    .replace(/([,.!?;])[ \t]+/g, '$1 ')
+
     // Clean up cases where bullet points are inserted randomly in sentences
     .replace(/([a-zA-Z])\s*•\s*([a-z])/g, '$1 $2')
-    
+
     // Handle temperature and measurement units properly
     .replace(/(\d+)\s*°\s*C/g, '$1°C')
     .replace(/(\d+)\s*°\s*F/g, '$1°F')
     .replace(/(\d+)\s*(km|m|cm|mm|kg|g|L|mL|units)/g, '$1 $2')
-    
+
     // Fix percentage formatting
     .replace(/(\d+)\s*%/g, '$1%')
-    
+
     // Ensure proper sentence structure - capitalize after periods
     .replace(/\.\s+([a-z])/g, (match, letter) => '. ' + letter.toUpperCase())
-    
+
     // Capitalize the first letter of the text
     .replace(/^([a-z])/, (match, firstLetter) => firstLetter.toUpperCase())
-    
+
     // Clean up multiple consecutive line breaks (preserve intentional paragraph breaks)
     .replace(/\n{3,}/g, '\n\n')
-    
+
     // Clean up trailing/leading spaces on each line
     .split('\n').map(line => line.trim()).join('\n')
     .trim();
@@ -161,17 +192,26 @@ export function formatQuestionText(text: string): string {
  */
 export const formatPassageText = (text: string): string => {
   if (!text) return '';
-  
+
   let formatted = text
     // Fix spacing issues similar to question text
     .replace(/[ \t]+/g, ' ')
+
+    // CRITICAL FIX: Ensure bullet points ALWAYS start on a new line (same as formatQuestionText)
+    // Only match actual bullet point characters (•, *, -) when they're used as list markers
+    // Handle • bullets specifically (most common in passages)
+    .replace(/([.!?;:,])\s*•\s+/g, '$1\n• ')  // After punctuation with optional space before bullet
+    .replace(/\s+•\s+/g, '\n• ')  // Replace any space + • + space with newline + • + space
+    // Handle - or * bullets only when they start a clear list item (capital letter after)
+    .replace(/\s+([-*])\s+(?=[A-Z])/g, '\n$1 ')
+
     .replace(/(\d+)\.\s+(\d+)/g, '$1.$2')
     .replace(/\$\s+(\d)/g, '$$$1')
     .replace(/(\d)\s+%/g, '$1%')
     .replace(/\s+([,.!?;:])/g, '$1')
     .replace(/([.!?])\s*([A-Z])/g, '$1 $2')
     .replace(/([,:;])\s*([a-zA-Z])/g, '$1 $2')
-    
+
     // Clean up multiple consecutive line breaks
     .replace(/\n{3,}/g, '\n\n')
     .replace(/[ \t]+/g, ' ')

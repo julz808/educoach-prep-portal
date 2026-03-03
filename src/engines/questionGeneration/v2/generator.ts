@@ -357,6 +357,24 @@ function parseClaudeResponse(
       throw new Error('Missing solution in response');
     }
 
+    // Determine if this should be a writing question
+    const isWriting = isWritingSubSkill(request.subSkill, request.section);
+
+    // Validate and clean answer_options for non-writing questions
+    if (!isWriting) {
+      if (!parsed.answer_options || !Array.isArray(parsed.answer_options) || parsed.answer_options.length < 4) {
+        throw new Error(`Missing or invalid answer_options for non-writing question. Expected array of 4-5 options, got: ${JSON.stringify(parsed.answer_options)}`);
+      }
+      if (!parsed.correct_answer) {
+        throw new Error('Missing correct_answer for multiple choice question');
+      }
+
+      // Clean answer options: remove letter prefixes if present (A), B), etc.)
+      parsed.answer_options = parsed.answer_options.map((opt: string) => {
+        return opt.replace(/^[A-E]\)\s*/, '').trim();
+      });
+    }
+
     // Determine response type
     const responseType = parsed.answer_options && parsed.answer_options.length > 0
       ? 'multiple_choice'

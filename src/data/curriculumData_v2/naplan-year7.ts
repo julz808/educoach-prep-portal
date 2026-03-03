@@ -607,121 +607,22 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
 
   "Year 7 NAPLAN - Language Conventions": {
 
-    // SUB-SKILL 1: Advanced Grammar & Sentence Structure
-    "Advanced Grammar & Sentence Structure": {
-      description: "Understanding and applying advanced grammar rules including subjunctive mood, complex and compound-complex sentences, parallel structure, and sophisticated punctuation. Year 7 level expects mastery of complex grammatical concepts.",
+    // SUB-SKILL 1: Spelling & Orthography
+    "Advanced Spelling & Orthography": {
+      description: "Spelling common and moderately challenging words correctly. Tests include high-frequency words, commonly misspelled words, and words with tricky spelling patterns (silent letters, double letters, vowel combinations). NO technical linguistic terminology - students simply identify correct spellings.",
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
-      question_format: "Choose the sentence that is grammatically correct.\n\nOR\n\nWhich word or words best complete this sentence?\n\n[Sentence with blank or multiple versions]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+      question_format: "Which word is spelled correctly?\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
       examples: [
         {
           difficulty: 1,  // Easy
           requires_visual: false,
-          question_text: "Which sentence is grammatically correct?\n\nA: The students was playing soccer.\nB: The students were playing soccer.\nC: The students is playing soccer.\nD: The students be playing soccer.",
-          answer_options: ["A: The students was playing soccer.", "B: The students were playing soccer.", "C: The students is playing soccer.", "D: The students be playing soccer."],
-          correct_answer: "B",
-          explanation: "This tests basic subject-verb agreement. 'Students' is plural, so it requires the plural verb 'were.' Option A incorrectly uses singular 'was.' Option C incorrectly uses singular 'is.' Option D uses the incorrect form 'be.'",
-          distractor_strategy: "Options use common errors: singular verbs with plural subjects (A: was, C: is) and incorrect verb form (D: be)",
-          characteristics: [
-            "Basic subject-verb agreement",
-            "Plural subject requires plural verb",
-            "Common grammar concept",
-            "Simple past continuous tense",
-            "Difficulty 1: Basic grammar rule",
-            "Clear correct answer",
-            "Age-appropriate for Year 7"
-          ]
-        },
-        {
-          difficulty: 2,  // Medium (mapped from old level 4)
-          requires_visual: false,
-          question_text: "Which sentence is grammatically correct?\n\nA: If I was the principal, I would change the school uniform policy.\nB: If I were the principal, I would change the school uniform policy.\nC: If I am the principal, I would change the school uniform policy.\nD: If I be the principal, I would change the school uniform policy.",
-          answer_options: ["A: If I was the principal, I would change the school uniform policy.", "B: If I were the principal, I would change the school uniform policy.", "C: If I am the principal, I would change the school uniform policy.", "D: If I be the principal, I would change the school uniform policy."],
-          correct_answer: "B",
-          explanation: "This tests understanding of the subjunctive mood, which is used for hypothetical or contrary-to-fact situations. In formal English, 'If I were' (not 'was') is correct for hypothetical conditions. Option A uses the more common but technically incorrect 'was'. Option C incorrectly uses present indicative 'am'. Option D uses the incorrect 'be'. This is a difficulty 4 question because subjunctive mood is an advanced grammatical concept for Year 7.",
-          distractor_strategy: "Option A uses the common error 'If I was' (indicative mood instead of subjunctive). Option C uses incorrect tense (present + conditional). Option D uses ungrammatical infinitive form.",
-          characteristics: [
-            "Tests subjunctive mood (advanced grammar)",
-            "Hypothetical/contrary-to-fact condition",
-            "Common error ('was' instead of 'were') as distractor",
-            "Requires understanding of formal vs. informal grammar",
-            "Difficulty 4: Advanced grammatical concept",
-            "Age-appropriate for Year 7 students learning formal writing",
-            "Clear correct answer with plausible distractors"
-          ]
-        },
-        {
-          difficulty: 3,  // Hard (mapped from old level 5)
-          requires_visual: false,
-          question_text: "Which sentence maintains parallel structure?\n\nA: The committee recommended improving facilities, hiring more staff, and that we should update technology.\nB: The committee recommended improving facilities, hiring more staff, and to update technology.\nC: The committee recommended improving facilities, hiring more staff, and updating technology.\nD: The committee recommended to improve facilities, hiring more staff, and updating technology.",
-          answer_options: ["A: The committee recommended improving facilities, hiring more staff, and that we should update technology.", "B: The committee recommended improving facilities, hiring more staff, and to update technology.", "C: The committee recommended improving facilities, hiring more staff, and updating technology.", "D: The committee recommended to improve facilities, hiring more staff, and updating technology."],
+          question_text: "Which word is spelled correctly?\n\nA: becaus\nB: becuase\nC: because\nD: becouse",
+          answer_options: ["A: becaus", "B: becuase", "C: because", "D: becouse"],
           correct_answer: "C",
-          explanation: "This tests parallel structure - when listing items in a series, they should all use the same grammatical form. Option C correctly uses three gerunds (improving, hiring, updating). Option A breaks parallelism with a clause 'that we should update'. Option B breaks parallelism with infinitive 'to update'. Option D breaks parallelism with infinitive 'to improve' while the others are gerunds. Parallel structure is a difficulty 5 concept requiring sophisticated grammatical awareness.",
-          distractor_strategy: "Options A, B, and D each break parallel structure in different ways (clause, infinitive, mixed forms), testing whether students can identify consistent grammatical form throughout a series.",
-          characteristics: [
-            "Tests parallel structure (sophisticated grammar)",
-            "Multiple elements in a series",
-            "Requires identifying consistent grammatical forms",
-            "Each distractor breaks parallelism differently",
-            "Difficulty 5: Requires advanced grammatical awareness",
-            "Common in formal writing",
-            "Appropriate challenge for advanced Year 7 students"
-          ]
-        }
-      ],
-      pattern: {
-        format_template: "Choose the sentence that is grammatically correct.\n\nOR\n\nWhich sentence maintains [grammatical concept]?\n\n[Four versions of sentence with different grammatical constructions]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
-        key_characteristics: [
-          "45 questions total, 45 minutes (1 minute per question)",
-          "Tests advanced grammar concepts: subjunctive mood, parallel structure, complex clauses, conditional sentences",
-          "Four versions of same sentence OR sentence with four completion options",
-          "Tests subject-verb agreement, pronoun-antecedent agreement, verb tenses",
-          "Tests punctuation: commas in complex sentences, semicolons, colons, apostrophes",
-          "Tests sentence fragments, run-ons, comma splices",
-          "More sophisticated than Year 5 (advanced concepts expected)"
-        ],
-        distractor_strategies: [
-          "Common errors (e.g., 'If I was' instead of 'If I were')",
-          "Mixing grammatical forms (breaking parallel structure)",
-          "Incorrect tense usage",
-          "Misplaced modifiers",
-          "Incorrect pronoun forms (who/whom, I/me)",
-          "Punctuation errors (missing or extra commas)",
-          "Run-on sentences or fragments that sound plausible",
-          "Confusion of homophones (there/their/they're)"
-        ],
-        difficulty_progression: {
-          "1": "Basic subject-verb agreement, simple tenses, common punctuation",
-          "2": "Complex sentences, advanced punctuation, less common tenses",
-          "3": "Parallel structure, complex clauses, subtle grammatical distinctions",
-        }
-      }
-    },
-
-    // SUB-SKILL 2: Spelling & Word Formation
-    "Spelling & Word Formation": {
-      description: "Spelling complex words correctly and understanding word formation including prefixes, suffixes, and roots",
-      visual_required: false,
-      image_type: null,
-      llm_appropriate: true,
-      difficulty_range: [1, 2, 3],
-      question_format: "Identify correct spelling or word formation",
-
-      examples: [
-        {
-          difficulty: 1,  // Easy
-          requires_visual: false,
-          question_text: "Which word is spelled correctly?",
-          answer_options: [
-            "A: becaus",
-            "B: becuase",
-            "C: because",
-            "D: becouse"
-          ],
-          correct_answer: "C",
-          explanation: "'Because' is the correct spelling. This is a common, basic word that Year 7 students should know. The distractors show typical misspellings based on pronunciation.",
+          explanation: "'Because' is the correct spelling. This is a common, high-frequency word that Year 7 students should know. The distractors show typical phonetic misspellings.",
           distractor_strategy: "Includes common phonetic misspellings (A: missing e, B: vowel reversal, D: wrong vowel)",
           characteristics: [
             "Common everyday word",
@@ -733,264 +634,469 @@ export const NAPLAN_YEAR7_SUB_SKILLS: SubSkillExamplesDatabase = {
           ]
         },
         {
-          difficulty: 2,  // Medium (mapped from old level 3)
+          difficulty: 2,  // Medium
           requires_visual: false,
-          question_text: "Which word is spelled correctly?",
-          answer_options: [
-            "A: definately",
-            "B: definatly",
-            "C: definitely",
-            "D: definetely"
-          ],
+          question_text: "Which word is spelled correctly?\n\nA: definately\nB: definatly\nC: definitely\nD: definetely",
+          answer_options: ["A: definately", "B: definatly", "C: definitely", "D: definetely"],
           correct_answer: "C",
-          explanation: "'Definitely' is the correct spelling. This is one of the most commonly misspelled words in English.",
-          distractor_strategy: "Includes common misspellings based on pronunciation (definately, definatly)",
+          explanation: "'Definitely' is the correct spelling. This is one of the most commonly misspelled words in English, with the 'ite' ending often confused.",
+          distractor_strategy: "Includes common misspellings based on pronunciation (A and B use 'ately' or 'atly', D uses wrong vowel)",
           characteristics: [
             "Commonly misspelled word",
             "Multiple syllables",
-            "Vowel confusion",
+            "Vowel confusion in middle",
+            "Year 7 appropriate difficulty"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          requires_visual: false,
+          question_text: "Which word is spelled correctly?\n\nA: accommodate\nB: accomodate\nC: acommodate\nD: acomodate",
+          answer_options: ["A: accommodate", "B: accomodate", "C: acommodate", "D: acomodate"],
+          correct_answer: "A",
+          explanation: "'Accommodate' is correct, with double 'c' and double 'm'. This is a challenging word that tests knowledge of double consonants.",
+          distractor_strategy: "Includes common errors with single 'c' and/or single 'm'",
+          characteristics: [
+            "Challenging spelling",
+            "Double consonants",
+            "Academic vocabulary",
+            "Difficulty 3 appropriate"
+          ]
+        }
+      ],
+      pattern: {
+        format_template: "Which word is spelled correctly?\n\n[Four spelling options]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+        key_characteristics: [
+          "45 questions total, 45 minutes (1 minute per question)",
+          "Commonly misspelled words (accommodate, necessary, definitely, separate, etc.)",
+          "Words with silent letters (knight, island, psychology)",
+          "Words with double letters (occurrence, embarrass)",
+          "Homophones used correctly (there/their/they're, your/you're, its/it's)",
+          "Words with tricky vowel combinations (receive/believe, piece/chief)",
+          "NO technical terms about spelling rules - just identify correct spelling"
+        ],
+        distractor_strategies: [
+          "Phonetic misspellings (how word sounds vs. how it's spelled)",
+          "Common spelling errors (definately vs. definitely)",
+          "Wrong double/single letters (accomodate vs. accommodate)",
+          "Homophone confusion (their vs. there)",
+          "Vowel reversals or wrong vowels"
+        ],
+        difficulty_progression: {
+          "1": "Basic high-frequency words, simple patterns",
+          "2": "Frequently misspelled words, moderate word length",
+          "3": "Challenging academic vocabulary, complex patterns",
+        }
+      }
+    },
+
+    // SUB-SKILL 2: Grammar & Sentence Structure
+    "Sophisticated Grammar": {
+      description: "Choosing grammatically correct sentences. Tests subject-verb agreement, pronoun usage, verb tenses, and sentence structure. Students identify correct usage WITHOUT needing to name grammar terms. Focus is on recognizing what sounds right and follows standard English rules.",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [1, 2, 3],
+      question_format: "Which sentence is correct?\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+      examples: [
+        {
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which sentence is correct?\n\nA: The students was playing soccer.\nB: The students were playing soccer.\nC: The students is playing soccer.\nD: The students be playing soccer.",
+          answer_options: ["A: The students was playing soccer.", "B: The students were playing soccer.", "C: The students is playing soccer.", "D: The students be playing soccer."],
+          correct_answer: "B",
+          explanation: "'The students were playing soccer' is correct. 'Students' is plural, so it needs 'were' not 'was' or 'is'. Option D uses an incorrect verb form.",
+          distractor_strategy: "Options use common errors: singular verbs with plural subjects (A: was, C: is) and incorrect verb form (D: be)",
+          characteristics: [
+            "Basic subject-verb agreement",
+            "Plural subject requires plural verb",
+            "Common grammar concept",
+            "Clear correct answer"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium
+          requires_visual: false,
+          question_text: "Which sentence is correct?\n\nA: Me and Sarah went to the library.\nB: Sarah and me went to the library.\nC: Sarah and I went to the library.\nD: I and Sarah went to the library.",
+          answer_options: ["A: Me and Sarah went to the library.", "B: Sarah and me went to the library.", "C: Sarah and I went to the library.", "D: I and Sarah went to the library."],
+          correct_answer: "C",
+          explanation: "'Sarah and I' is correct when you're the subject doing the action. 'Me' is used when you're the object receiving the action. Sarah is mentioned first as a courtesy.",
+          distractor_strategy: "Tests pronoun usage (I vs. me) and name order",
+          characteristics: [
+            "Pronoun usage as subject",
+            "Common error ('me and...')",
+            "Name order convention",
             "Year 7 appropriate"
           ]
         },
         {
-          difficulty: 3,  // Hard (mapped from old level 5)
+          difficulty: 3,  // Hard
           requires_visual: false,
-          question_text: "Which word correctly completes this sentence?\n\nThe scientist's research was considered _____; it could not be trusted or verified.",
-          answer_options: [
-            "A: reliable",
-            "B: unreliable",
-            "C: reliably",
-            "D: reliability"
-          ],
+          question_text: "Which sentence is correct?\n\nA: The teacher gave the awards to Sam, Maria, and I.\nB: The teacher gave the awards to Sam, Maria, and me.\nC: The teacher gave the awards to I, Sam, and Maria.\nD: The teacher gave the awards to myself, Sam, and Maria.",
+          answer_options: ["A: The teacher gave the awards to Sam, Maria, and I.", "B: The teacher gave the awards to Sam, Maria, and me.", "C: The teacher gave the awards to I, Sam, and Maria.", "D: The teacher gave the awards to myself, Sam, and Maria."],
           correct_answer: "B",
-          explanation: "The context 'could not be trusted or verified' requires the negative prefix 'un-' with 'reliable,' making 'unreliable' correct.",
-          distractor_strategy: "Includes base word (A), wrong form/part of speech (C, D)",
+          explanation: "'Me' is correct because you're receiving the awards (object position). 'I' is only used as the subject. 'Myself' is reflexive and incorrect here.",
+          distractor_strategy: "Tests pronoun usage as object, with common errors (using 'I', using 'myself')",
           characteristics: [
-            "Prefix usage (un-)",
-            "Context-based word formation",
-            "Part of speech awareness",
-            "Academic vocabulary"
+            "Pronoun as object",
+            "Common overcorrection error",
+            "More subtle than difficulty 1",
+            "Challenging for Year 7"
           ]
         }
       ],
-
       pattern: {
-        format_template: "Which word is spelled correctly? / Which word fits the context?",
+        format_template: "Which sentence is correct?\n\n[Four versions with grammar variations]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
         key_characteristics: [
-          "Commonly misspelled words (accommodate, necessary, etc.)",
-          "Prefixes (un-, re-, pre-, dis-)",
-          "Suffixes (-able, -ible, -tion, -sion)",
-          "Root words and word families",
-          "Homophones and confusables"
+          "Subject-verb agreement (The team is/are, the students was/were)",
+          "Pronoun usage (I/me, who/whom, its/it's)",
+          "Verb tenses (past, present, future, consistency)",
+          "Common grammar errors (could of vs. could have)",
+          "Sentence fragments and run-ons",
+          "NO grammar terminology - just identify correct sentence",
+          "Focus on standard written English"
         ],
         distractor_strategies: [
-          "Phonetic misspellings",
-          "Common spelling errors",
-          "Wrong prefix/suffix",
-          "Homophone confusion",
-          "Incorrect word form"
+          "Common spoken errors ('Me and John', 'could of')",
+          "Subject-verb disagreement",
+          "Wrong tense",
+          "Pronoun confusion (I/me, who/whom)",
+          "Sentence fragments",
+          "Run-on sentences"
         ],
         difficulty_progression: {
-          "1": "Basic spelling, simple prefixes/suffixes",
-          "2": "Frequently misspelled words, moderate word formation",
-          "3": "Sophisticated vocabulary, nuanced word formation",
+          "1": "Basic subject-verb agreement, obvious errors",
+          "2": "Pronoun usage, tense consistency, common errors",
+          "3": "Subtle distinctions, less obvious errors, complex sentences",
         }
       }
     },
 
-    // SUB-SKILL 3: Punctuation & Sentence Boundaries
-    "Punctuation & Sentence Boundaries": {
-      description: "Using advanced punctuation correctly including semicolons, colons, and complex comma usage",
+    // SUB-SKILL 3: Punctuation
+    "Advanced Punctuation": {
+      description: "Using correct punctuation including commas, apostrophes, quotation marks, and end punctuation. Tests focus on recognizing correct usage in context - NO technical terminology about punctuation rules.",
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
-      question_format: "Identify correct punctuation",
+      question_format: "Which sentence uses punctuation correctly?\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
 
       examples: [
         {
           difficulty: 1,  // Easy
           requires_visual: false,
-          question_text: "Which sentence uses punctuation correctly?",
-          answer_options: [
-            "A: What time is lunch.",
-            "B: What time is lunch?",
-            "C: What time is lunch!",
-            "D: What time is lunch"
-          ],
+          question_text: "Which sentence uses punctuation correctly?\n\nA: What time is lunch.\nB: What time is lunch?\nC: What time is lunch!\nD: What time is lunch",
+          answer_options: ["A: What time is lunch.", "B: What time is lunch?", "C: What time is lunch!", "D: What time is lunch"],
           correct_answer: "B",
-          explanation: "This is a question, so it needs a question mark at the end. Option A incorrectly uses a period. Option C incorrectly uses an exclamation mark. Option D has no punctuation at all.",
-          distractor_strategy: "Tests basic end punctuation: period (A), exclamation mark (C), and no punctuation (D) versus correct question mark",
+          explanation: "This is a question, so it needs a question mark at the end. Options A, C, and D use wrong or no end punctuation.",
+          distractor_strategy: "Tests basic end punctuation with wrong marks",
           characteristics: [
             "Basic end punctuation",
-            "Question sentence",
-            "Simple comma rule",
-            "Common everyday sentence",
-            "Difficulty 1: Basic end marks",
+            "Question mark usage",
             "Clear correct answer",
-            "Age-appropriate for Year 7"
+            "Appropriate for Year 7"
           ]
         },
         {
-          difficulty: 2,  // Medium (mapped from old level 4)
+          difficulty: 2,  // Medium
           requires_visual: false,
-          question_text: "Which sentence uses punctuation correctly?",
-          answer_options: [
-            "A: The team's victory was impressive: they scored 15 goals.",
-            "B: The team's victory was impressive; they scored 15 goals.",
-            "C: The teams victory was impressive, they scored 15 goals.",
-            "D: The team's victory was impressive they scored 15 goals."
-          ],
+          question_text: "Which sentence uses apostrophes correctly?\n\nA: The dogs bone was buried in the garden.\nB: The dog's bone was buried in the garden.\nC: The dogs' bone was buried in the garden.\nD: The dogs bone's was buried in the garden.",
+          answer_options: ["A: The dogs bone was buried in the garden.", "B: The dog's bone was buried in the garden.", "C: The dogs' bone was buried in the garden.", "D: The dogs bone's was buried in the garden."],
           correct_answer: "B",
-          explanation: "A semicolon correctly joins two related independent clauses. Option A's colon could work but is less common here. Option C is a comma splice. Option D has no punctuation. 'Team's' needs an apostrophe.",
-          distractor_strategy: "Tests semicolon vs. colon, comma splice (C), apostrophe error (C), and missing punctuation (D)",
+          explanation: "The bone belongs to one dog, so we need 'dog's' (singular possessive). Option A has no apostrophe. Option C is plural possessive. Option D has the apostrophe in the wrong place.",
+          distractor_strategy: "Tests singular vs. plural possessive and apostrophe placement",
           characteristics: [
-            "Semicolon usage",
-            "Independent clauses",
             "Possessive apostrophe",
-            "Advanced punctuation for Year 7"
+            "Singular possession",
+            "Common apostrophe errors",
+            "Year 7 appropriate"
           ]
         },
         {
-          difficulty: 3,  // Hard (mapped from old level 5)
+          difficulty: 3,  // Hard
           requires_visual: false,
-          question_text: "Which sentence demonstrates correct comma usage with a non-restrictive clause?",
-          answer_options: [
-            "A: My brother who lives in Sydney is a doctor.",
-            "B: My brother, who lives in Sydney, is a doctor.",
-            "C: My brother, who lives in Sydney is a doctor.",
-            "D: My brother who lives in Sydney, is a doctor."
-          ],
+          question_text: "Which sentence uses commas correctly?\n\nA: After school we went to the library the park and the shops.\nB: After school we went to the library, the park, and the shops.\nC: After school, we went to the library the park and the shops.\nD: After school we went to, the library, the park, and the shops.",
+          answer_options: ["A: After school we went to the library the park and the shops.", "B: After school we went to the library, the park, and the shops.", "C: After school, we went to the library the park and the shops.", "D: After school we went to, the library, the park, and the shops."],
           correct_answer: "B",
-          explanation: "The clause 'who lives in Sydney' is non-restrictive (adds extra information) and should be set off with commas on both sides.",
-          distractor_strategy: "Includes no commas (A), missing second comma (C), comma in wrong place (D)",
+          explanation: "'After school' should be followed by a comma, and items in a list need commas between them. Option B has both correct.",
+          distractor_strategy: "Tests two comma rules: introductory phrase and list items",
           characteristics: [
-            "Non-restrictive clauses",
-            "Paired commas",
-            "Relative clauses",
-            "Sophisticated punctuation"
+            "Multiple comma rules",
+            "Introductory phrase",
+            "List punctuation",
+            "Challenging for Year 7"
           ]
         }
       ],
 
       pattern: {
-        format_template: "Which sentence uses punctuation correctly?",
+        format_template: "Which sentence uses punctuation correctly?\n\n[Four versions with punctuation variations]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
         key_characteristics: [
-          "Semicolons joining independent clauses",
-          "Colons introducing lists or explanations",
-          "Commas with non-restrictive clauses",
-          "Apostrophes (possessive, contractions)",
-          "Quotation marks and dialogue punctuation"
+          "End punctuation (period, question mark, exclamation mark)",
+          "Apostrophes for possession (dog's, dogs')",
+          "Apostrophes for contractions (it's, they're, we're)",
+          "Commas in lists",
+          "Commas after introductory words/phrases",
+          "Quotation marks for dialogue",
+          "NO technical punctuation terminology - just identify correct usage"
         ],
         distractor_strategies: [
-          "Comma splices",
           "Missing punctuation",
           "Wrong punctuation mark",
-          "Misplaced apostrophes",
-          "Incomplete paired punctuation"
+          "Apostrophe in wrong place or missing",
+          "Missing commas in lists",
+          "Extra or missing commas",
+          "Quotation mark errors"
         ],
         difficulty_progression: {
-          "1": "Basic end marks, simple comma rules",
-          "2": "Commas in complex sentences, quotation marks",
-          "3": "Complex comma patterns, sophisticated punctuation",
+          "1": "Basic end marks, simple apostrophes",
+          "2": "Possessive apostrophes, basic comma rules",
+          "3": "Multiple comma rules, complex apostrophe usage",
         }
       }
     },
 
-    // SUB-SKILL 4: Vocabulary Precision & Usage
-    "Vocabulary Precision & Usage": {
-      description: "Choosing the most precise and appropriate word for the context, including formal vs. informal register",
+    // SUB-SKILL 4: Word Choice & Vocabulary
+    "Advanced Vocabulary & Usage": {
+      description: "Choosing the best word to complete a sentence based on meaning and context. Tests understanding of synonyms, appropriate vocabulary level, and word meaning - NOT asking students to define words or use technical vocabulary terms.",
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
       difficulty_range: [1, 2, 3],
-      question_format: "Choose the best word for the context",
+      question_format: "Which word best completes the sentence?\n\n[Sentence with blank]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
 
       examples: [
         {
           difficulty: 1,  // Easy
           requires_visual: false,
-          question_text: "Which word best completes this sentence?\n\nThe movie was so _____ that everyone in the cinema was laughing.",
-          answer_options: [
-            "A: sad",
-            "B: funny",
-            "C: boring",
-            "D: scary"
-          ],
+          question_text: "Which word best completes this sentence?\n\nThe movie was so _____ that everyone in the cinema was laughing.\n\nA: sad\nB: funny\nC: boring\nD: scary",
+          answer_options: ["A: sad", "B: funny", "C: boring", "D: scary"],
           correct_answer: "B",
-          explanation: "The context 'everyone in the cinema was laughing' makes it clear that the movie was 'funny.' This tests basic word choice with obvious context clues.",
-          distractor_strategy: "Includes opposite emotions (A: sad, C: boring, D: scary) that don't fit the context of laughing",
+          explanation: "If everyone was laughing, the movie must have been 'funny'. The context makes this clear.",
+          distractor_strategy: "Uses opposite or unrelated emotions",
           characteristics: [
             "Basic word choice",
-            "Obvious context (laughing = funny)",
-            "Common everyday vocabulary",
-            "Clear correct answer",
-            "Difficulty 1: Basic word choice with obvious context",
-            "Age-appropriate for Year 7"
+            "Clear context clues",
+            "Common vocabulary",
+            "Obvious answer"
           ]
         },
         {
-          difficulty: 2,  // Medium (mapped from old level 4)
+          difficulty: 2,  // Medium
           requires_visual: false,
-          question_text: "Which word best completes this formal sentence?\n\nThe committee will _____ the proposal at next week's meeting.",
-          answer_options: [
-            "A: talk about",
-            "B: discuss",
-            "C: chat about",
-            "D: go over"
-          ],
+          question_text: "Which word best completes this sentence?\n\nThe athlete's _____ training schedule helped her win the championship.\n\nA: lazy\nB: rigorous\nC: easy\nD: simple",
+          answer_options: ["A: lazy", "B: rigorous", "C: easy", "D: simple"],
           correct_answer: "B",
-          explanation: "'Discuss' is the most formal and precise word for this context. The other options are too informal or vague for a formal committee meeting.",
-          distractor_strategy: "Includes informal synonyms (A: talk about, C: chat about) and casual phrase (D: go over)",
+          explanation: "'Rigorous' means demanding and thorough, which fits with winning a championship. The other options suggest minimal effort.",
+          distractor_strategy: "Uses words suggesting opposite qualities",
           characteristics: [
-            "Formal register",
-            "Precise vocabulary",
-            "Context appropriateness",
-            "Synonym discrimination"
+            "Moderate vocabulary",
+            "Context about achievement",
+            "Synonym knowledge",
+            "Year 7 appropriate"
           ]
         },
         {
-          difficulty: 3,  // Hard (mapped from old level 5)
+          difficulty: 3,  // Hard
           requires_visual: false,
-          question_text: "Choose the word that creates the strongest emotional impact:\n\nThe abandoned building was _____ in the moonlight.",
-          answer_options: [
-            "A: dark",
-            "B: shadowy",
-            "C: ominous",
-            "D: unlit"
-          ],
+          question_text: "Which word best completes this sentence?\n\nThe scientist's research was _____ by three independent laboratories, confirming the results.\n\nA: contradicted\nB: ignored\nC: validated\nD: questioned",
+          answer_options: ["A: contradicted", "B: ignored", "C: validated", "D: questioned"],
           correct_answer: "C",
-          explanation: "'Ominous' suggests something threatening or foreboding, creating the strongest emotional impact. The others are more neutral descriptions.",
-          distractor_strategy: "Includes neutral descriptors (A: dark, D: unlit) and moderate impact (B: shadowy)",
+          explanation: "'Validated' means confirmed or verified, which fits with 'confirming the results'. The other options suggest doubt or disagreement.",
+          distractor_strategy: "Uses words with opposite meanings and subtle distinctions",
           characteristics: [
-            "Connotation and tone",
-            "Emotional impact",
-            "Precise word choice",
-            "Literary vocabulary"
+            "Advanced vocabulary",
+            "Precise word meaning",
+            "Academic context",
+            "Challenging for Year 7"
           ]
         }
       ],
 
       pattern: {
-        format_template: "Which word best completes this sentence? [Context provided]",
+        format_template: "Which word best completes the sentence?\n\n[Sentence with blank and context]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
         key_characteristics: [
-          "Formal vs. informal register",
-          "Precise vocabulary selection",
-          "Connotation and tone",
-          "Context-appropriate word choice",
-          "Avoiding redundancy and wordiness"
+          "Context-based word choice",
+          "Synonyms and antonyms",
+          "Appropriate vocabulary level",
+          "Word meaning from context",
+          "Formal vs. informal language",
+          "NO word definitions or vocabulary terminology"
         ],
         distractor_strategies: [
-          "Wrong register (informal in formal context)",
-          "Imprecise synonyms",
-          "Wrong connotation",
-          "Redundant words",
-          "Contextually inappropriate choices"
+          "Opposite meanings",
+          "Similar but wrong words",
+          "Wrong formality level",
+          "Words that don't fit context",
+          "Near-synonyms with wrong connotation"
         ],
         difficulty_progression: {
-          "1": "Basic word choice, obvious contexts",
-          "2": "Moderate precision, connotation awareness",
-          "3": "Subtle distinctions, sophisticated tone",
+          "1": "Basic vocabulary, obvious context",
+          "2": "Moderate vocabulary, clear context",
+          "3": "Advanced vocabulary, subtle distinctions",
+        }
+      }
+    },
+
+    // SUB-SKILL 5: Sentence Editing
+    "Advanced Editing Skills": {
+      description: "Identifying the best version of a sentence or finding errors in sentences. Tests overall language skills including grammar, word choice, and clarity - students choose the best written option without needing to name specific errors.",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [1, 2, 3],
+      question_format: "Which sentence is written correctly? / Which is the best way to write this sentence?\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+
+      examples: [
+        {
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which sentence is written correctly?\n\nA: The dog runned to the park.\nB: The dog runs to the park.\nC: The dog running to the park.\nD: The dog run to the park.",
+          answer_options: ["A: The dog runned to the park.", "B: The dog runs to the park.", "C: The dog running to the park.", "D: The dog run to the park."],
+          correct_answer: "B",
+          explanation: "'The dog runs' uses the correct present tense verb form. Options A, C, and D have verb errors.",
+          distractor_strategy: "Tests basic verb forms",
+          characteristics: [
+            "Basic verb tense",
+            "Clear correct answer",
+            "Common errors",
+            "Simple sentence"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium
+          requires_visual: false,
+          question_text: "Which is the best way to write this sentence?\n\nA: The teacher she explained the homework clearly.\nB: The teacher, she explained the homework clearly.\nC: The teacher explained the homework clearly.\nD: The teacher her explained the homework clearly.",
+          answer_options: ["A: The teacher she explained the homework clearly.", "B: The teacher, she explained the homework clearly.", "C: The teacher explained the homework clearly.", "D: The teacher her explained the homework clearly."],
+          correct_answer: "C",
+          explanation: "Option C is clear and correct. The other options have unnecessary pronouns that make the sentence awkward.",
+          distractor_strategy: "Tests redundant pronouns and sentence clarity",
+          characteristics: [
+            "Sentence clarity",
+            "Redundant words",
+            "Standard English",
+            "Year 7 appropriate"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          requires_visual: false,
+          question_text: "Which is the best way to express this idea?\n\nA: Due to the fact that it was raining, the match was cancelled.\nB: Because it was raining, the match was cancelled.\nC: The match was cancelled owing to the fact that it was raining.\nD: It was raining, and so therefore the match was cancelled.",
+          answer_options: ["A: Due to the fact that it was raining, the match was cancelled.", "B: Because it was raining, the match was cancelled.", "C: The match was cancelled owing to the fact that it was raining.", "D: It was raining, and so therefore the match was cancelled."],
+          correct_answer: "B",
+          explanation: "Option B is the clearest and most concise. The other options are wordy or use unnecessary words.",
+          distractor_strategy: "Tests concise writing and avoiding wordiness",
+          characteristics: [
+            "Concise writing",
+            "Avoiding wordiness",
+            "Clear expression",
+            "Challenging for Year 7"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Which sentence is correct? / Which is the best way to write this?\n\n[Four versions of sentence]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+        key_characteristics: [
+          "Combining grammar, punctuation, and word choice",
+          "Identifying best written version",
+          "Concise vs. wordy writing",
+          "Clear vs. awkward phrasing",
+          "Standard written English",
+          "NO need to name specific errors"
+        ],
+        distractor_strategies: [
+          "Wordy or redundant phrasing",
+          "Awkward sentence structure",
+          "Grammar errors",
+          "Unclear meaning",
+          "Informal language in formal context"
+        ],
+        difficulty_progression: {
+          "1": "Basic errors, clear differences",
+          "2": "Multiple issues, moderate clarity problems",
+          "3": "Subtle improvements, conciseness, style",
+        }
+      }
+    },
+
+    // SUB-SKILL 6: Syntax Recognition
+    "Complex Syntax Analysis": {
+      description: "Identifying complete and correct sentences vs. fragments or run-ons. Students recognize proper sentence structure without needing to use grammar terminology - just identifying whether something is a complete, correct sentence.",
+      visual_required: false,
+      image_type: null,
+      llm_appropriate: true,
+      difficulty_range: [1, 2, 3],
+      question_format: "Which is a complete sentence? / Which sentence has an error?\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+
+      examples: [
+        {
+          difficulty: 1,  // Easy
+          requires_visual: false,
+          question_text: "Which is a complete sentence?\n\nA: The red car.\nB: Driving to school.\nC: The students arrived at school.\nD: After lunch today.",
+          answer_options: ["A: The red car.", "B: Driving to school.", "C: The students arrived at school.", "D: After lunch today."],
+          correct_answer: "C",
+          explanation: "Option C has a subject ('students') and a verb ('arrived') making it a complete sentence. The others are fragments - incomplete thoughts.",
+          distractor_strategy: "Uses common sentence fragments",
+          characteristics: [
+            "Complete vs. fragment",
+            "Basic sentence recognition",
+            "Clear correct answer",
+            "Simple test"
+          ]
+        },
+        {
+          difficulty: 2,  // Medium
+          requires_visual: false,
+          question_text: "Which sentence has an error?\n\nA: We went to the beach and swam in the ocean.\nB: The weather was perfect for swimming.\nC: We stayed all day we didn't want to leave.\nD: It was the best day of the holidays.",
+          answer_options: ["A: We went to the beach and swam in the ocean.", "B: The weather was perfect for swimming.", "C: We stayed all day we didn't want to leave.", "D: It was the best day of the holidays."],
+          correct_answer: "C",
+          explanation: "Option C is a run-on sentence - two complete thoughts joined without proper punctuation. It needs a comma and 'and', or a semicolon, or should be two sentences.",
+          distractor_strategy: "Tests run-on vs. correct sentences",
+          characteristics: [
+            "Run-on sentence",
+            "Needs punctuation or conjunction",
+            "Year 7 appropriate",
+            "Common error"
+          ]
+        },
+        {
+          difficulty: 3,  // Hard
+          requires_visual: false,
+          question_text: "Which sentence is correct?\n\nA: Although it was raining.\nB: We stayed inside because it was raining.\nC: Because the rain was heavy.\nD: When the weather improved later.",
+          answer_options: ["A: Although it was raining.", "B: We stayed inside because it was raining.", "C: Because the rain was heavy.", "D: When the weather improved later."],
+          correct_answer: "B",
+          explanation: "Option B is a complete sentence with both parts. Options A, C, and D are dependent clauses left incomplete - they start with words like 'although', 'because', and 'when' but don't finish the thought.",
+          distractor_strategy: "Tests dependent clause fragments",
+          characteristics: [
+            "Dependent clause fragments",
+            "Complete vs. incomplete",
+            "Subtle distinction",
+            "Challenging"
+          ]
+        }
+      ],
+
+      pattern: {
+        format_template: "Which is a complete sentence? / Which has an error?\n\n[Four options]\n\nA: [Option]\nB: [Option]\nC: [Option]\nD: [Option]",
+        key_characteristics: [
+          "Complete sentences vs. fragments",
+          "Run-on sentences",
+          "Dependent clauses needing completion",
+          "Proper sentence structure",
+          "NO grammar terminology like 'clause' or 'predicate'"
+        ],
+        distractor_strategies: [
+          "Sentence fragments",
+          "Run-on sentences",
+          "Incomplete thoughts",
+          "Missing subject or verb",
+          "Dependent clauses without main clause"
+        ],
+        difficulty_progression: {
+          "1": "Obvious fragments vs. complete sentences",
+          "2": "Run-on sentences, common errors",
+          "3": "Dependent clause fragments, subtle issues",
         }
       }
     }

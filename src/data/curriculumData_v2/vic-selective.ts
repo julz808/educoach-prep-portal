@@ -231,6 +231,187 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Variable decrements",
             "Requires deducing from incomplete information"
           ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n3     9     27\n5     15    45\n7     ?     63",
+          answer_options: [
+            "A: 18",
+            "B: 21",
+            "C: 24",
+            "D: 28",
+            "E: None of these"
+          ],
+          correct_answer: "B",
+          explanation: "Each row uses multiplication. Row 1: 3 × 3 = 9, 9 × 3 = 27. Row 2: 5 × 3 = 15, 15 × 3 = 45. Row 3: 7 × 3 = 21, 21 × 3 = 63. The missing number is 21.",
+          distractor_strategy: "Includes numbers from addition patterns (A, D) and alternative calculations (C)",
+          characteristics: [
+            "3x3 grid with multiplication pattern",
+            "Each row follows same multiplicative rule",
+            "Requires recognizing multiplication vs addition",
+            "Missing value in middle position"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n48    24    12\n40    20    10\n?     18    9",
+          answer_options: [
+            "A: 32",
+            "B: 34",
+            "C: 36",
+            "D: 38",
+            "E: None of these"
+          ],
+          correct_answer: "C",
+          explanation: "Each row divides by 2 moving right. Row 1: 48 ÷ 2 = 24, 24 ÷ 2 = 12. Row 2: 40 ÷ 2 = 20, 20 ÷ 2 = 10. Row 3: ? ÷ 2 = 18, 18 ÷ 2 = 9. Therefore: 18 × 2 = 36.",
+          distractor_strategy: "Includes nearby even numbers (A, B, D) that might result from miscalculation",
+          characteristics: [
+            "3x3 grid with division pattern",
+            "Working backwards to find starting value",
+            "Requires reverse operation thinking",
+            "Missing value in first column"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n2     5     11\n4     10    22\n6     15    ?",
+          answer_options: [
+            "A: 30",
+            "B: 31",
+            "C: 33",
+            "D: 36",
+            "E: None of these"
+          ],
+          correct_answer: "C",
+          explanation: "Looking at columns: Column 1 increases by 2 (2, 4, 6). Column 2 increases by 5 (5, 10, 15). Column 3 increases by 11 (11, 22, ?). Following the pattern: 22 + 11 = 33.",
+          distractor_strategy: "Includes results from other operations: 15 × 2 (A), 15 + 16 (B), 15 + 21 (D)",
+          characteristics: [
+            "3x3 grid with different column increments",
+            "Each column has unique pattern",
+            "Requires analyzing columns independently",
+            "Tests recognition of varying patterns within same grid"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n7     8     15\n9     12    21\n11    ?     27",
+          answer_options: [
+            "A: 14",
+            "B: 16",
+            "C: 18",
+            "D: 20",
+            "E: None of these"
+          ],
+          correct_answer: "B",
+          explanation: "Each row adds the first two numbers to get the third. Row 1: 7 + 8 = 15. Row 2: 9 + 12 = 21. Row 3: 11 + ? = 27, therefore ? = 16.",
+          distractor_strategy: "Includes numbers from sequence patterns (A, C) and miscalculation (D)",
+          characteristics: [
+            "3x3 grid with addition relationship within rows",
+            "Third column is sum of first two",
+            "Requires algebraic thinking to solve backwards",
+            "Different from sequential increment patterns"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n4     16    64\n5     25    125\n6     ?     216",
+          answer_options: [
+            "A: 30",
+            "B: 32",
+            "C: 36",
+            "D: 42",
+            "E: None of these"
+          ],
+          correct_answer: "C",
+          explanation: "Each row follows a pattern of powers: Row 1: 4, 4², 4³ (4, 16, 64). Row 2: 5, 5², 5³ (5, 25, 125). Row 3: 6, 6², 6³ (6, ?, 216). Since 216 = 6³, the middle must be 6² = 36.",
+          distractor_strategy: "Includes results from simpler multiplication (A: 6×5, B: 6+26, D: 6×7) that don't fit the cubic pattern",
+          characteristics: [
+            "3x3 grid with exponential pattern",
+            "Each row uses same base number raised to powers 1, 2, 3",
+            "Requires recognizing square and cube relationships",
+            "Tests advanced pattern recognition with larger numbers"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n17    13    4\n23    15    8\n31    ?     12",
+          answer_options: [
+            "A: 17",
+            "B: 19",
+            "C: 21",
+            "D: 23",
+            "E: None of these"
+          ],
+          correct_answer: "B",
+          explanation: "Each row follows the pattern: third number = first number - second number. Row 1: 17 - 13 = 4. Row 2: 23 - 15 = 8. Row 3: 31 - ? = 12, therefore ? = 31 - 12 = 19. We can verify by noting that column 1 uses prime numbers (17, 23, 31).",
+          distractor_strategy: "Includes numbers that might fit simpler patterns (A, C, D) or alternative operations",
+          characteristics: [
+            "3x3 grid with subtraction relationship",
+            "Third column equals difference of first two",
+            "Column 1 contains prime number sequence adding complexity",
+            "Requires working backwards from result"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n2     6     12\n6     18    36\n12    ?     72",
+          answer_options: [
+            "A: 24",
+            "B: 30",
+            "C: 36",
+            "D: 42",
+            "E: None of these"
+          ],
+          correct_answer: "C",
+          explanation: "Multiple patterns work together: Looking at columns, each column multiplies by 3 moving down (2→6→12, 6→18→?, 12→36→72). Column 2: 18 × 2 = 36. We can also verify by rows: each row multiplies the first number by 3, then by 2 (2×3=6, 6×2=12; 6×3=18, 18×2=36; 12×3=36, 36×2=72).",
+          distractor_strategy: "Includes numbers from arithmetic sequences (A, B, D) rather than the multiplicative pattern",
+          characteristics: [
+            "3x3 grid with consistent multiplication in columns",
+            "Each column multiplies by 3 going down",
+            "Can also be solved by row pattern (×3, then ×2)",
+            "Tests recognition that rows use first cell value"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n1     1     2\n2     3     5\n3     ?     8",
+          answer_options: [
+            "A: 4",
+            "B: 5",
+            "C: 6",
+            "D: 7",
+            "E: None of these"
+          ],
+          correct_answer: "B",
+          explanation: "This follows a Fibonacci-like pattern within each row: third number = first + second. Row 1: 1 + 1 = 2. Row 2: 2 + 3 = 5. Row 3: 3 + ? = 8, so ? = 5. Additionally, column 3 forms a Fibonacci sequence (2, 5, 8) where each number is the sum of the previous two in the column.",
+          distractor_strategy: "Includes sequential numbers (A, C, D) that don't satisfy the additive relationship",
+          characteristics: [
+            "3x3 grid with Fibonacci-style addition within rows",
+            "Third column is sum of first two in each row",
+            "Column 3 also forms Fibonacci sequence vertically",
+            "Tests recognition of famous mathematical sequence"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "The numbers in the grid go together in a certain way.\nWhich number should be in the square marked by the question mark?\n\n100    91    83\n91     82    74\n?      73    65",
+          answer_options: [
+            "A: 78",
+            "B: 80",
+            "C: 82",
+            "D: 84",
+            "E: None of these"
+          ],
+          correct_answer: "C",
+          explanation: "Looking at columns: Column 1 decreases by 9 each time (100 → 91 → ?). So 91 - 9 = 82. Column 2 decreases by 9 (91 → 82 → 73). Column 3 decreases by 9 (83 → 74 → 65). We can also check rows: Row 1 decreases by 9 then 8 (100-9=91, 91-8=83). Row 2: 91-9=82, 82-8=74. Row 3: 82-9=73, 73-8=65. Pattern confirmed.",
+          distractor_strategy: "Includes nearby even numbers (A, B, D) from alternative calculations",
+          characteristics: [
+            "3x3 grid with decreasing pattern using subtraction",
+            "Columns decrease by 9, rows decrease by 9 then 8",
+            "Uses larger starting numbers (65-100 range)",
+            "Missing value in different position (bottom-left)",
+            "Requires checking both row and column patterns"
+          ]
         }
       ],
 

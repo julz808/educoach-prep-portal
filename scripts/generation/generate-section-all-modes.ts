@@ -140,9 +140,10 @@ async function generateSectionAllModes(testType: string, sectionName: string, mo
       });
 
       // Passage-based questions: distributed among sub-skills via rotation
+      // BUT use max value of range to ensure we hit the total passage_based_count
       hybrid.passage_distribution.forEach(item => {
         const questionsPerPassage = Array.isArray(item.questions_per_passage)
-          ? Math.floor((item.questions_per_passage[0] + item.questions_per_passage[1]) / 2)
+          ? Math.max(...item.questions_per_passage)  // ⭐ USE MAX instead of average
           : item.questions_per_passage;
 
         const totalQuestionsForThisPassageType = item.count * questionsPerPassage;

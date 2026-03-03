@@ -7,6 +7,10 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// CRITICAL: Use the same questions table as test loading
+const USE_V2_QUESTIONS = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
+const QUESTIONS_TABLE = USE_V2_QUESTIONS ? 'questions_v2' : 'questions';
+
 export interface DrillRecommendation {
   subSkill: string;
   section: string;
@@ -101,7 +105,7 @@ export async function getDrillRecommendations(
     // 3. Get question details (sub_skill, section_name) for attempted questions
     const questionIds = [...new Set(questionAttempts.map(a => a.question_id))];
     const { data: questions, error: questionsError } = await supabase
-      .from('questions')
+      .from(QUESTIONS_TABLE)
       .select('id, sub_skill, section_name, difficulty')
       .in('id', questionIds)
       .eq('product_type', dbProductType);

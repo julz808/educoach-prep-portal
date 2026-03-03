@@ -12,7 +12,7 @@ import type { PassageDistributionSpec } from '@/data/curriculumData_v2/types';
 import { CLAUDE_CONFIG, getYearLevel } from './config';
 import { buildPassagePrompt, buildMiniPassagePrompt } from './promptBuilder';
 import { generateQuestionV2 } from './generator';
-import { storePassageV2, getExistingPassageTopics } from './supabaseStorage';
+import { storePassageV2, getExistingPassageTopics, getExistingCharacterNames } from './supabaseStorage';
 
 const anthropic = new Anthropic({
   apiKey: CLAUDE_CONFIG.apiKey
@@ -21,6 +21,82 @@ const anthropic = new Anthropic({
 // ============================================================================
 // DUPLICATE CHECKING HELPERS
 // ============================================================================
+
+/**
+ * Extract character names from narrative passages
+ * Returns array of potential character names (proper nouns that aren't common words)
+ */
+function extractCharacterNames(content: string): string[] {
+  const namePattern = /\b([A-Z][a-z]+(?:'s)?)\b/g;
+  const matches = content.match(namePattern) || [];
+
+  // Common words to exclude (sentence starters, places, generic terms, pronouns)
+  const commonWords = new Set([
+    'The', 'When', 'After', 'Before', 'While', 'If', 'As', 'For', 'With',
+    'In', 'On', 'At', 'By', 'To', 'From', 'Of', 'A', 'An', 'This', 'That',
+    'These', 'Those', 'He', 'She', 'It', 'They', 'We', 'You', 'I', 'But',
+    'However', 'What', 'How', 'Why', 'Where', 'Which', 'Who', 'Some', 'Many',
+    'Every', 'Each', 'Then', 'Now', 'Today', 'Other', 'Instead', 'Even',
+    'Great', 'Over', 'During', 'Maybe', 'Because', 'Could', 'And', 'Nothing',
+    'Deep', 'Despite', 'Let', 'Single', 'Now', 'Map', 'North', 'Graph',
+    'Table', 'Sleep', 'Others', 'Think', 'Are', 'Later', 'One', 'Only',
+    'Not', 'Remember', 'Just', 'Behind', 'Their', 'War', 'Major', 'Sound',
+    'Consider', 'Yet', 'Beneath', 'Making', 'Notice', 'Would', 'Research',
+    'Slowly', 'Paper', 'Scientists', 'Researchers', 'Students', 'Teachers',
+    'Parents', 'Teenagers', 'His', 'Her', 'Him', 'Them', 'Around', 'Across',
+    'Perhaps', 'Through', 'Inside', 'Outside', 'Without', 'Within', 'Mrs',
+    'Mr', 'Ms', 'Dr', 'Professor', 'Taking', 'Nervousness', 'Feel', 'Gradually'
+  ]);
+
+  const characterNames: string[] = [];
+  const seenNames = new Set<string>();
+
+  matches.forEach(name => {
+    const cleanName = name.replace("'s", '');
+
+    // Include if: not common word, length > 2, not already seen
+    if (!commonWords.has(cleanName) &&
+        cleanName.length > 2 &&
+        !seenNames.has(cleanName)) {
+      characterNames.push(cleanName);
+      seenNames.add(cleanName);
+    }
+  });
+
+  return characterNames;
+}
+
+/**
+ * Check if narrative passage uses overused character names
+ * Returns the overused character name if found, null otherwise
+ */
+function checkForOverusedCharacterNames(
+  candidate: PassageV2,
+  usedCharacterNames: string[]
+): string | null {
+  // Only check narrative passages
+  if (candidate.passage_type !== 'narrative') {
+    return null;
+  }
+
+  const candidateNames = extractCharacterNames(candidate.content);
+
+  // Count occurrences of each name in existing passages
+  const nameCounts: Record<string, number> = {};
+  usedCharacterNames.forEach(name => {
+    nameCounts[name] = (nameCounts[name] || 0) + 1;
+  });
+
+  // Check if any character name in candidate is overused
+  // Threshold: name appears 2+ times in existing passages (stricter to ensure real diversity)
+  for (const name of candidateNames) {
+    if (nameCounts[name] && nameCounts[name] >= 2) {
+      return name; // Return the overused name
+    }
+  }
+
+  return null;
+}
 
 /**
  * Check if a passage is too similar to existing passages
@@ -435,10 +511,18 @@ export async function generateMiniPassageWithQuestion(params: {
   // Load existing passages from passages_v2 table (same system as practice tests!)
   const existingPassageTopics = await getExistingPassageTopics(testType, sectionName);
 
+  // Load existing character names for narrative passages
+  const existingCharacterNames = passageType === 'narrative'
+    ? await getExistingCharacterNames(testType, sectionName)
+    : [];
+
   // Combine with session-level usedTopics
   const allUsedTopics = [...existingPassageTopics, ...usedTopics];
 
   console.log(`   📚 Loaded ${existingPassageTopics.length} existing passages + ${usedTopics.length} from session = ${allUsedTopics.length} total for duplicate prevention`);
+  if (passageType === 'narrative') {
+    console.log(`   👥 Loaded ${existingCharacterNames.length} existing character names for diversity check`);
+  }
 
   let passage: PassageV2 | null = null;
   let attempts = 0;
@@ -501,6 +585,18 @@ export async function generateMiniPassageWithQuestion(params: {
       console.warn(`   ⚠️  Attempt ${attempts}: Passage "${candidatePassage.title}" is too similar to existing passages`);
       // Add this failed attempt so next iteration avoids it
       allUsedTopics.push(`"${candidatePassage.title}" - ${candidatePassage.content.substring(0, 100)}...`);
+      continue;
+    }
+
+    // Check for overused character names (narrative passages only)
+    const overusedName = checkForOverusedCharacterNames(candidatePassage, existingCharacterNames);
+
+    if (overusedName) {
+      console.warn(`   ⚠️  Attempt ${attempts}: Character name "${overusedName}" is overused (appears 3+ times in existing passages)`);
+      // Add this failed attempt so next iteration avoids it
+      allUsedTopics.push(`"${candidatePassage.title}" - ${candidatePassage.content.substring(0, 100)}...`);
+      // Track that this character name was rejected
+      existingCharacterNames.push(overusedName);
       continue;
     }
 
