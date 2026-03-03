@@ -14,6 +14,7 @@ import {
 import { CelebrationModal, createCelebration } from '@/components/CelebrationModal';
 import { InteractiveInsightsDashboard } from '@/components/InteractiveInsightsDashboard';
 import { QuestionInterface } from '@/components/QuestionInterface';
+import { AnnouncementBanner } from '@/components/AnnouncementBanner';
 import { useProduct } from '@/context/ProductContext';
 import { useNavigate } from 'react-router-dom';
 import { PaywallComponent } from '@/components/PaywallComponent';
@@ -197,7 +198,14 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6 sm:space-y-8">
       {/* Debug Component - REMOVE IN PRODUCTION */}
       {showDebugger && <AccessDebugger />}
-      
+
+      {/* Announcement Banner */}
+      <AnnouncementBanner
+        message="We've been working on new question sets and they're finally live! Your progress has been reset (04 March 2026) to ensure the best experience with our enhanced content."
+        storageKey="announcement-v2-questions-march-2026"
+        variant="info"
+      />
+
       {/* Hero Banner */}
       <HeroBanner {...heroBannerProps} />
 
