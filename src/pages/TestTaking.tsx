@@ -1041,7 +1041,7 @@ const TestTaking: React.FC = () => {
   // Timer countdown - only for test modes that have timers
   useEffect(() => {
     if (!session || session.status !== 'in-progress') return;
-    
+
     // Check if this test mode should have a timer
     if (!shouldHaveTimer(actualTestMode)) {
       return;
@@ -1050,15 +1050,16 @@ const TestTaking: React.FC = () => {
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          handleFinish();
+          // Auto-submit when timer expires (bypass confirmation)
+          handleAutoSubmit();
           return 0;
         }
         return prev - 1;
       });
-    }, import.meta.env.DEV ? 1000 : 10000);
+    }, 1000); // Run every 1 second for accurate countdown
 
     return () => clearInterval(interval);
-  }, [session?.status, actualTestMode]);
+  }, [session?.status, actualTestMode, handleAutoSubmit]);
 
   // Page unload protection - save text answers before leaving
   useEffect(() => {
@@ -1442,6 +1443,119 @@ const TestTaking: React.FC = () => {
     console.log('🎯 DIFFICULTY CHANGE: Navigating to', newUrl);
     navigate(newUrl, { replace: true });
   };
+
+  // Auto-submit handler for timer expiration (bypasses confirmation dialog)
+  const handleAutoSubmit = useCallback(async () => {
+    if (!session) return;
+
+    console.log('⏰ TIMER EXPIRED: Auto-submitting test');
+
+    try {
+      // Directly execute submission logic without confirmation dialog
+      setShowSubmitConfirm(false);
+
+      // Save final progress with all latest responses
+      await saveProgress(session);
+
+      // Process any writing questions for assessment
+      setIsProcessingWriting(true);
+      setWritingProcessingStatus('Reviewing your writing responses...');
+      await processWritingAssessments();
+
+      // Mark as completed - use different logic for drill vs regular sessions
+      setWritingProcessingStatus('Finalizing your results...');
+
+      const isWritingDrill = session.type === 'drill' && (
+        session.sectionName.toLowerCase().includes('writing') ||
+        session.sectionName.toLowerCase().includes('written') ||
+        session.sectionName.toLowerCase().includes('expression') ||
+        session.questions.some(q => q.format === 'Written Response' || q.format === 'extended_response')
+      );
+
+      if (session.type === 'drill' && !isWritingDrill) {
+        // For NON-WRITING drill sessions, complete using DrillSessionService
+        const questionsAnswered = Object.keys(session.answers).length +
+          Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
+
+        let questionsCorrect = 0;
+
+        questionsCorrect += Object.values(session.answers).filter((answer, index) => {
+          const question = session.questions[parseInt(Object.keys(session.answers)[index])];
+          let answerIndex: number;
+          if (typeof answer === 'string') {
+            answerIndex = answer.charCodeAt(0) - 65;
+          } else {
+            answerIndex = Number(answer);
+          }
+          return answerIndex === question.correctAnswer;
+        }).length;
+
+        const writingQuestionsAttempted = Object.values(session.textAnswers).filter(answer => answer && answer.trim().length > 0).length;
+        questionsCorrect += writingQuestionsAttempted;
+
+        const stringAnswers: Record<string, string> = {};
+        Object.entries(session.answers).forEach(([qIndex, answerIndex]) => {
+          const question = session.questions[parseInt(qIndex)];
+          if (question && question.options && question.options[answerIndex]) {
+            stringAnswers[qIndex] = question.options[answerIndex];
+          }
+        });
+
+        const stringTextAnswers: Record<string, string> = {};
+        Object.entries(session.textAnswers).forEach(([index, answer]) => {
+          if (answer && answer.trim().length > 0) {
+            stringTextAnswers[index] = answer;
+          }
+        });
+
+        await DrillSessionService.completeSession(
+          session.id,
+          questionsAnswered,
+          questionsCorrect,
+          stringAnswers,
+          stringTextAnswers
+        );
+      } else {
+        // For regular sessions (diagnostic/practice) AND writing drills
+        const properDisplayName = PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct;
+
+        const sessionForReplica = {
+          id: session.id,
+          userId: user.id,
+          productType: properDisplayName,
+          testMode: actualTestMode,
+          sectionName: session.sectionName,
+          questions: session.questions,
+          answers: session.answers,
+          textAnswers: session.textAnswers,
+          flaggedQuestions: session.flaggedQuestions
+        };
+
+        await DeveloperToolsReplicaService.completeSessionLikeDeveloperTools(sessionForReplica);
+
+        if (isWritingDrill) {
+          localStorage.setItem('drill_progress_refresh_needed', 'true');
+        }
+      }
+
+      // Calculate final score
+      setWritingProcessingStatus('Calculating final scores...');
+      const finalScore = await ScoringService.calculateTestScore(
+        session.questions,
+        session.answers,
+        session.textAnswers,
+        session.id
+      );
+      setTestScore(finalScore);
+
+      setIsProcessingWriting(false);
+      setSession(prev => prev ? { ...prev, status: 'completed' } : prev);
+      console.log('⏰ TIMER AUTO-SUBMIT: Session completed successfully with score:', finalScore);
+    } catch (error) {
+      console.error('⏰ TIMER AUTO-SUBMIT: Failed to auto-submit:', error);
+      setIsProcessingWriting(false);
+    }
+  }, [session, selectedProduct, user, actualTestMode]);
 
   const handleFinish = () => {
     if (!session) return;
