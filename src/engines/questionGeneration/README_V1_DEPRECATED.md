@@ -79,5 +79,6 @@ The `questions` table in Supabase is still being used by current users, so we ke
 
 ---
 
-**Last Updated:** February 10, 2026
+**Last Updated:** March 4, 2026
 **Status:** Deprecated but maintained for backwards compatibility
+**Codebase Cleanup:** All V1-related scripts and temporary files removed March 4, 2026

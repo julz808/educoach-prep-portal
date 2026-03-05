@@ -25,7 +25,15 @@
     "audit:purchases": "tsx scripts/audit/check-all-purchases.ts",
     "audit:vic-purchases": "tsx scripts/audit/check-vic-purchases.ts",
     "maintenance:question-counts": "tsx scripts/maintenance/get-question-counts.ts",
-    "maintenance:optimize-images": "node scripts/maintenance/optimize-images.mjs"
+    "maintenance:optimize-images": "node scripts/maintenance/optimize-images.mjs",
+    "publish:ghost": "tsx scripts/ghost/publish-to-ghost.ts",
+    "publish:ghost:test": "tsx scripts/ghost/publish-to-ghost.ts test",
+    "upload-images": "tsx scripts/ghost/upload-images-and-publish.ts",
+    "update-ghost-posts": "tsx scripts/ghost/update-existing-posts.ts",
+    "delete-all-published": "tsx scripts/ghost/delete-and-recreate-drafts.ts",
+    "publish:ghost:draft": "tsx scripts/ghost/publish-to-ghost.ts draft",
+    "publish:ghost:live": "tsx scripts/ghost/publish-to-ghost.ts publish",
+    "publish:ghost:delete-drafts": "tsx scripts/ghost/delete-all-drafts.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
@@ -60,6 +68,7 @@
     "@stripe/stripe-js": "^4.8.0",
     "@supabase/supabase-js": "^2.49.10",
     "@tanstack/react-query": "^5.56.2",
+    "@tryghost/admin-api": "^1.14.6",
     "@types/dompurify": "^3.0.5",
     "canvas": "^3.1.0",
     "class-variance-authority": "^0.7.1",

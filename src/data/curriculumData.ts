@@ -1,3 +1,8 @@
+// ⚠️ DEPRECATED - V1 CURRICULUM DATA
+// This file is preserved for backwards compatibility only.
+// All new question generation uses V2 curriculum data in /src/data/curriculumData_v2/
+// DO NOT USE for new features. Read-only for existing user data.
+//
 // EduCourse Curriculum Data - Authoritative Source of Truth
 // Updated with definitive test structures, sections, sub-skills, and requirements
 

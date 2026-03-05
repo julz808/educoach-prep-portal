@@ -1,0 +1,586 @@
+---
+META TITLE:
+VIC Selective General Ability Quantitative 2026: Complete Guide
+
+META DESCRIPTION:
+Master VIC Selective General Ability Quantitative section with strategies for number series, grids, patterns, and word problems. 50 questions in 30 minutes.
+
+PRIMARY KEYWORD:
+vic selective quantitative reasoning
+
+FEATURED IMAGE:
+https://insights.educourse.com.au/content/images/2026/03/35.png
+
+IMAGEN PROMPT:
+Create a modern, clean educational featured image for "VIC Selective General Ability Quantitative 2026: Complete Guide". The composition should feature mathematical and pattern elements: number sequences, grid matrices, mathematical symbols, pattern recognition indicators, calculator with X (showing no calculator), and problem-solving visual metaphors. Include visual elements like number series (2, 4, 8, 16...), 3x3 number grid, pattern arrows, puzzle pieces coming together, and lightbulb moments. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for numbers, patterns, and problem-solving elements, and coral (#FF6B6B) for highlights, correct answers, and key strategies. Include subtle visual elements like stopwatch showing time pressure (30 min), checkmarks for mastered concepts, or progression arrows. The design should feel analytical, systematic, and confidence-building. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use abstract iconography.
+
+TAGS:
+VIC Selective, Quantitative Reasoning, Math Patterns
+
+TARGET WORD COUNT:
+2200
+---
+
+ARTICLE TITLE:
+VIC Selective General Ability Quantitative 2026: Complete Strategy Guide
+
+INTRODUCTION:
+
+The General Ability - Quantitative section is one of five components in Victoria's Selective Entry test, and for many students, it's the most challenging. Unlike curriculum-based Mathematics Reasoning which tests school math concepts, General Ability Quantitative assesses cognitive reasoning with numbers through unfamiliar pattern-recognition problems.
+
+Students must answer 50 questions in just 30 minutes—only 36 seconds per question average—without calculator assistance. Questions include number series, number grids and matrices, pattern recognition in paired numbers, and applied word problems requiring logical deduction rather than mathematical formulas.
+
+Success requires developing rapid pattern-recognition skills, mental math fluency, systematic problem-solving approaches, and the discipline to skip unsolvable questions quickly. This comprehensive guide explains what the section tests, breaks down all four question types with strategies for each, provides timing tactics, and outlines effective practice approaches to achieve superior ability performance.
+
+
+---
+
+**[Start VIC Selective Preparation →](https://educourse.com.au/course/vic-selective)**
+
+---
+
+
+H2: Understanding General Ability - Quantitative
+
+Clarifying what this section tests helps focus preparation effectively.
+
+H3: What Makes It "General Ability" vs. "Mathematics"
+
+**General Ability - Quantitative:**
+- Tests cognitive reasoning using numbers as the medium
+- Focuses on pattern recognition and logical deduction
+- Questions designed to be unfamiliar (can't rely on taught methods)
+- Minimal curriculum mathematics required
+- Success depends on flexible thinking and systematic approach
+
+**Mathematics Reasoning (Different Section):**
+- Tests curriculum mathematics knowledge (algebra, geometry, etc.)
+- Focuses on applying learned concepts and formulas
+- Questions align with Year 8/9 mathematics content
+- Success depends on curriculum mastery and calculation speed
+
+**Key Distinction:**
+You can't prepare for Quantitative by studying mathematics textbooks. Instead, you develop pattern-recognition skills through extensive practice with these specific question types.
+
+H3: Section Format
+
+**Structure:**
+- 50 questions total
+- 30 minutes time limit
+- Multiple choice with 5 options (A, B, C, D, E)
+- "None of these" sometimes appears as option E
+- No calculator permitted
+- All questions equal value (no penalty for wrong answers)
+
+**Question Type Breakdown:**
+Approximately:
+- Number series and sequences: 12-13 questions (25%)
+- Number grids and matrices: 12-13 questions (25%)
+- Applied word problems: 12-13 questions (25%)
+- Pattern recognition in paired numbers: 12-13 questions (25%)
+
+H3: The Time Pressure Challenge
+
+**36 Seconds Per Question Average:**
+This extreme time pressure means:
+- You must identify patterns very quickly
+- Complex calculations must be avoided
+- Skipping difficult questions is essential, not optional
+- Mental math must be automatic
+- Panic about time hurts more than slow progress
+
+**Realistic Expectations:**
+- Attempting 40-45 questions is strong performance
+- Completing all 50 requires exceptional speed
+- 85%+ accuracy on attempted questions targets superior ability
+
+
+---
+
+MID-ARTICLE PRODUCT LINK:
+
+Mastering General Ability Quantitative requires extensive practice with authentic question types under time pressure. EduCourse's VIC Selective preparation includes 200+ Quantitative questions covering number series, grids, word problems, and pattern recognition with detailed explanations of solving strategies, timed practice modes building speed, and analytics showing which pattern types you've mastered.
+
+**[Practice Quantitative Reasoning →](https://educourse.com.au/course/vic-selective)**
+
+---
+
+
+H2: Question Type 1: Number Series and Sequences
+
+The most common question type requires identifying patterns in number sequences.
+
+H3: What They Look Like
+
+**Typical Format:**
+"Find the missing number in the following series:"
+
+**Example:**
+2    4    8    16    ?    64
+
+Options: A) 24   B) 28   C) 32   D) 30   E) None of these
+
+**Answer:** C) 32 (each number doubles: 2×2=4, 4×2=8, 8×2=16, 16×2=32, 32×2=64)
+
+H3: Common Pattern Types
+
+**Arithmetic Sequences:**
+- Adding/subtracting the same number each step
+- Example: 3, 7, 11, 15, 19, ? (adding 4 each time)
+
+**Geometric Sequences:**
+- Multiplying/dividing by the same number
+- Example: 2, 6, 18, 54, ? (multiplying by 3)
+
+**Alternating Patterns:**
+- Two different operations alternating
+- Example: 5, 10, 8, 16, 14, ? (×2, -2, ×2, -2, ×2)
+
+**Complex Operations:**
+- Squaring, cubing, or other exponentials
+- Example: 1, 4, 9, 16, ? (perfect squares: 1², 2², 3², 4², 5²)
+
+**Fibonacci-Style:**
+- Each number is sum/product of previous numbers
+- Example: 1, 1, 2, 3, 5, 8, ? (each is sum of previous two)
+
+H3: Systematic Solving Strategy
+
+**Step-by-Step Approach:**
+
+1. **Calculate Differences:**
+   - Subtract each number from the next
+   - Look for pattern in differences
+
+2. **Calculate Ratios:**
+   - If differences aren't consistent, try ratios (division)
+   - Look for multiplication/division patterns
+
+3. **Check for Alternating Patterns:**
+   - Look at every other number
+   - Are odd positions following one rule, even positions another?
+
+4. **Look for Position-Based Patterns:**
+   - Is each number related to its position? (1st, 2nd, 3rd)
+   - Example: Position squared, position cubed, etc.
+
+5. **Test Your Pattern:**
+   - Apply discovered pattern to find missing number
+   - Verify it works for ALL given numbers
+
+6. **If No Pattern in 30 Seconds:**
+   - Select "None of these" or make educated guess
+   - Mark and move on
+
+H3: Practice Examples with Solutions
+
+**Example 1:**
+5    8    11    14    ?    20
+
+**Solution:**
+Difference: +3, +3, +3 (adding 3 each time)
+Answer: 17
+
+**Example 2:**
+3    9    27    81    ?
+
+**Solution:**
+Ratio: ×3, ×3, ×3 (multiplying by 3 each time)
+Answer: 243
+
+**Example 3:**
+100    50    25    ?    6.25
+
+**Solution:**
+Ratio: ÷2, ÷2, ÷2 (dividing by 2 each time)
+Answer: 12.5
+
+
+H2: Question Type 2: Number Grids and Matrices
+
+These questions present numbers arranged in grids with missing values.
+
+H3: What They Look Like
+
+**Typical Format:**
+Numbers arranged in 2×2, 3×3, or larger grid with one or more missing values.
+
+**Example:**
+```
+2    4    8
+3    6    ?
+5   10   20
+```
+
+What number replaces the ?
+
+H3: Common Grid Patterns
+
+**Row-Based Patterns:**
+- Each row follows the same rule
+- Example above: Each row multiplies by 2 then by 2 again
+- Answer: 12 (because 3 × 2 = 6, 6 × 2 = 12)
+
+**Column-Based Patterns:**
+- Each column follows the same rule
+- Look vertically instead of horizontally
+
+**Diagonal Patterns:**
+- Numbers along diagonals related
+- Less common but possible
+
+**Cross Patterns:**
+- Four numbers around center relate to center
+- Example: Top + Bottom = Left + Right
+
+**Total/Product Patterns:**
+- Row sums are equal
+- Row products are equal
+- Column sums/products consistent
+
+H3: Systematic Grid Solving Strategy
+
+**Step-by-Step:**
+
+1. **Check Rows First:**
+   - Do all rows follow the same pattern?
+   - Calculate operations between numbers in each row
+
+2. **Check Columns:**
+   - Do all columns follow the same pattern?
+   - Look vertically for relationships
+
+3. **Check Row/Column Sums:**
+   - Do all rows sum to same number?
+   - Do all columns sum to same number?
+
+4. **Look for Multiples:**
+   - Is each number in a row a multiple of first number?
+   - Are numbers doubling, tripling, etc.?
+
+5. **Test Your Pattern:**
+   - Apply to find missing number
+   - Verify it works for ALL present numbers
+
+6. **If No Clear Pattern:**
+   - Make educated guess based on number range
+   - Move on quickly
+
+H3: Practice Grid Examples
+
+**Example 1:**
+```
+4    8   16
+5   10   20
+6   12    ?
+```
+
+**Solution:**
+Each row: First number doubles, then doubles again
+Row 3: 6 × 2 = 12, 12 × 2 = 24
+Answer: 24
+
+**Example 2:**
+```
+2    5    7
+3    8   11
+4    ?   15
+```
+
+**Solution:**
+Each row: First + Second = Third
+Row 3: 4 + ? = 15, so ? = 11
+Answer: 11
+
+
+H2: Question Type 3: Applied Word Problems
+
+Logical reasoning problems using numerical information.
+
+H3: What They Look Like
+
+**Typical Format:**
+Short scenario with numerical information requiring logical deduction.
+
+**Example:**
+"Sarah has three times as many marbles as Tom. Together they have 48 marbles. How many marbles does Sarah have?"
+
+Options: A) 12  B) 16  C) 24  D) 36  E) 40
+
+**Answer:** D) 36 (Tom has 12, Sarah has 36: 12 + 36 = 48)
+
+H3: Common Problem Types
+
+**Ratio and Proportion:**
+- Comparing quantities in ratios
+- Example: "If 3 apples cost $6, how much do 7 apples cost?"
+
+**Work and Rate:**
+- Time to complete tasks
+- Example: "If 4 people paint a fence in 6 hours, how long for 3 people?"
+
+**Age Problems:**
+- Comparing ages with time differences
+- Example: "John is twice Mary's age. In 5 years he'll be 35. How old is Mary now?"
+
+**Logic and Deduction:**
+- Using given constraints to deduce answer
+- Example: Set theory, Venn diagrams, logical constraints
+
+H3: Systematic Solving Strategy
+
+**Step-by-Step:**
+
+1. **Read Carefully:**
+   - Identify exactly what's being asked
+   - Note all given information
+
+2. **Set Up Simply:**
+   - Use simple variables (not complex equations)
+   - Draw quick diagram if helpful
+
+3. **Work Backwards:**
+   - Sometimes easier to test answer options
+   - Eliminate impossible answers immediately
+
+4. **Estimate:**
+   - Use approximate calculations to narrow options
+   - Exact precision often unnecessary
+
+5. **Check Answer Makes Sense:**
+   - Does answer fit the scenario logically?
+   - Is it in the right range?
+
+
+H2: Question Type 4: Pattern Recognition in Paired Numbers
+
+Identifying relationships between number pairs.
+
+H3: What They Look Like
+
+**Typical Format:**
+Given number pairs that follow a pattern, find missing number.
+
+**Example:**
+2→5    4→9    6→13    8→?
+
+Options: A) 15  B) 16  C) 17  D) 18  E) 19
+
+**Answer:** C) 17 (pattern: multiply by 2, add 1 → 8×2+1=17)
+
+H3: Common Pair Patterns
+
+**Simple Operations:**
+- Add constant: 5→8 means +3 to each
+- Multiply then add: 2→7 might be ×3+1
+
+**Two-Step Operations:**
+- First operation, then second
+- Example: ×2-1, ×2-1, ×2-1
+
+**Position-Based:**
+- Operation depends on position in sequence
+- First pair one rule, second pair different rule
+
+H3: Solving Strategy
+
+1. **Test Simple Operations First:**
+   - Addition, subtraction
+   - Multiplication, division
+
+2. **Try Two-Step Operations:**
+   - Multiply then add/subtract
+   - Square then adjust
+
+3. **Apply to All Pairs:**
+   - Must work for EVERY given pair
+   - If doesn't work for one, try different pattern
+
+4. **Calculate Missing Number:**
+   - Apply discovered pattern
+   - Check answer is among options
+
+
+H2: Time Management and Pacing
+
+Strategic timing maximizes questions attempted with high accuracy.
+
+H3: The Two-Pass Strategy
+
+**First Pass (24-26 minutes):**
+- Attempt all questions you can solve in 30-40 seconds
+- Skip anything requiring complex calculation or unclear pattern
+- Goal: Answer 35-40 questions confidently
+
+**Second Pass (4-6 minutes):**
+- Return to skipped questions
+- Spend up to 60 seconds on harder problems
+- Guess intelligently on any remaining questions
+
+**Why This Works:**
+- Captures "easy points" first
+- Prevents time waste on impossible questions
+- Reduces stress of incomplete test
+
+H3: Question Prioritization
+
+**Attempt First (Quickest):**
+- Simple arithmetic sequences
+- Clear grid patterns
+- Straightforward word problems
+
+**Attempt Second (Moderate):**
+- Complex sequences
+- Multi-step word problems
+- Grids without obvious pattern
+
+**Attempt Last or Skip:**
+- No discernible pattern after 45 seconds
+- Requires extensive calculation
+- Completely unfamiliar problem type
+
+H3: Strategic Guessing
+
+**When to Guess:**
+- You've spent 45+ seconds with no progress
+- 2 minutes remaining, questions still unanswered
+- Pattern seems impossible to identify
+
+**How to Guess Intelligently:**
+- Eliminate obviously wrong answers
+- Choose middle-range numbers (not extremes)
+- Avoid "None of these" unless confident
+- Fill in ALL answers (no penalty for wrong)
+
+
+H2: Mental Math Skills for Quantitative
+
+Rapid calculation ability is essential for 36-second-per-question pace.
+
+H3: Essential Mental Math Skills
+
+**Multiplication Tables:**
+- Fluency through 12×12 minimum
+- Instant recall, no counting needed
+- Practice: 15×15 for advanced speed
+
+**Division:**
+- Quick division by 2, 3, 4, 5, 10
+- Recognize divisibility rules
+- Estimate quotients rapidly
+
+**Fractions and Decimals:**
+- Convert common fractions to decimals instantly
+- ½ = 0.5, ¼ = 0.25, ⅕ = 0.2, etc.
+- Add/subtract fractions quickly
+
+**Squares and Cubes:**
+- Know perfect squares 1²-15²
+- Know cubes 1³-10³
+- Recognize these in sequences quickly
+
+H3: Daily Mental Math Practice
+
+**10-Minute Daily Routine:**
+- 2 min: Multiplication facts (random flashcards)
+- 2 min: Division practice (72÷8=?, 56÷7=?)
+- 2 min: Fraction operations (⅔ + ¼ = ?)
+- 2 min: Pattern recognition (quick series)
+- 2 min: Estimation (789×4 ≈ ?)
+
+
+H2: Common Mistakes to Avoid
+
+Learning from typical errors improves performance.
+
+H3: Pattern Recognition Errors
+
+**Forcing Non-Existent Patterns:**
+- Don't convince yourself of patterns that don't work for all numbers
+- If pattern fails for even one number, it's wrong
+
+**Overthinking Simple Patterns:**
+- Sometimes the answer is straightforward
+- Don't ignore simple solutions seeking complexity
+
+**Not Testing Pattern:**
+- Always verify pattern works for ALL given numbers
+
+H3: Timing Errors
+
+**Spending Too Long on One Question:**
+- 2+ minutes on single question is devastating
+- Sacrifice one question to gain time for five others
+
+**Rushing Through Easy Questions:**
+- Slow slightly on simple questions to ensure accuracy
+- One careless error wastes the time saved rushing
+
+H3: Calculation Errors
+
+**Not Double-Checking:**
+- Mental math errors are common under pressure
+- Quick verification prevents silly mistakes
+
+**Complex Calculations:**
+- If calculation takes 30+ seconds, pattern might be wrong
+- Or you're missing simpler approach
+
+
+H2: Effective Practice Strategies
+
+Systematic practice develops the skills needed for superior ability.
+
+H3: Practice Progression
+
+**Weeks 1-2: Accuracy Focus**
+- Untimed practice
+- Learn question types thoroughly
+- Understand solving strategies
+- Target: 90%+ accuracy untimed
+
+**Weeks 3-6: Building Speed**
+- Introduce time limits gradually
+- 40 questions in 35 minutes (start)
+- 50 questions in 35 minutes
+- 50 questions in 32 minutes
+- Target: 80%+ accuracy with improving speed
+
+**Weeks 7-12: Test Simulation**
+- Full 50 questions in 30 minutes
+- Exact test conditions
+- Practice two-pass strategy
+- Target: 85%+ accuracy on 40-45 attempted
+
+H3: Daily Practice Volume
+
+**Minimum Effective Practice:**
+- 15-20 questions daily (5 days per week)
+- 1 full timed section weekly
+- Total: ~100 questions per week
+
+**Optimal Practice:**
+- 25-30 questions daily
+- 2 full timed sections weekly
+- Total: ~150 questions per week
+
+H3: Using Practice Results
+
+**After Each Practice Session:**
+- Identify question types with errors
+- Understand why mistakes occurred
+- Practice similar questions
+- Track improvement in those types
+
+
+CALL TO ACTION:
+
+Master General Ability Quantitative with Systematic Practice
+
+EduCourse's VIC Selective preparation provides 200+ General Ability Quantitative questions covering all four question types—number series, grids, word problems, and pattern pairs—with detailed strategy explanations for each. Practice under timed conditions, build mental math speed with focused drills, track your accuracy by question type to identify exactly where to focus, and access unlimited practice until you achieve 85%+ accuracy on 40+ questions in 30 minutes. Turn quantitative reasoning from your most challenging section into a strength.
+
+**[Start Quantitative Practice →](https://educourse.com.au/course/vic-selective)**
+
+---
+END OF ARTICLE
+---

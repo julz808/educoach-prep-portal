@@ -111,14 +111,14 @@ H3: Test Format Overview
 The test comprises four sections administered over approximately 3 hours including breaks.
 
 **Section 1: Reading**
-- Time Allowed: 40 minutes
-- Number of Questions: 38-40 questions
+- Time Allowed: 45 minutes
+- Number of Questions: 30 questions
 - Format: Multiple choice (typically 4-5 answer options)
-- Content: Multiple passages of varying types and lengths
+- Content: Multiple passages of varying types and lengths (6-8 passages typical)
 
 **Section 2: Mathematical Reasoning**
 - Time Allowed: 40 minutes
-- Number of Questions: 35-40 questions
+- Number of Questions: 35 questions
 - Format: Multiple choice (typically 5 answer options)
 - Calculator: NOT permitted
 
@@ -131,8 +131,8 @@ The test comprises four sections administered over approximately 3 hours includi
 **Section 4: Writing**
 - Time Allowed: 30 minutes
 - Format: Extended written response to one prompt
-- Task Type: Creative, persuasive, or narrative writing
-- Assessment: Creativity, effectiveness, purpose, and audience
+- Task Type: Creative, persuasive, narrative, informative, or reflective writing
+- Assessment: Ideas, structure, language, and conventions
 
 Total testing time is approximately 2.5 hours of actual testing plus breaks between sections.
 
@@ -162,10 +162,9 @@ H3: Who Takes the Test
 
 MID-ARTICLE PRODUCT LINK:
 
-NSW's Selective Test is highly competitive, with three times as many applicants as available places. EduCourse's NSW Selective preparation provides comprehensive practice across all four test sections—Reading, Mathematical Reasoning, Thinking Skills, and Writing—with detailed analytics showing exactly where your child stands and what improvement is needed to compete for placement.
+NSW's Selective Test is highly competitive, with three times as many applicants as available places. EduCourse's NSW Selective preparation provides comprehensive practice across all four test sections—Reading (30 Q, 45 min), Mathematical Reasoning (35 Q, 40 min), Thinking Skills (40 Q, 40 min), and Writing (30 min)—with detailed analytics showing exactly where your child stands and what improvement is needed to compete for placement.
 
-**[Start NSW Selective Preparation →]**
-Product URL: /products/nsw-selective
+**[Start NSW Selective Preparation →](https://educourse.com.au/course/nsw-selective-entry-year-7-entry)**
 
 ---
 
@@ -198,7 +197,7 @@ Passages range from 200-600 words with varying complexity.
 
 H3: Time Management Challenge
 
-40 questions in 40 minutes = 1 minute per question average, including reading time. Students must read strategically, not every word in depth.
+30 questions in 45 minutes = 1.5 minutes per question average, including reading time. This allows more careful reading than some other tests, but students must still read efficiently and manage their time across 6-8 passages of varying lengths.
 
 
 H2: Mathematical Reasoning Section
@@ -457,10 +456,9 @@ CALL TO ACTION:
 
 Prepare for NSW Selective Success
 
-EduCourse's NSW Selective preparation package provides everything needed to compete: diagnostic assessment identifying current performance across all four sections, 1000+ practice questions covering Reading, Mathematical Reasoning, Thinking Skills, and Writing, AI-powered writing feedback, full-length practice tests simulating exact test conditions and timing, detailed analytics revealing which sub-skills need development, and progress tracking showing improvement toward competitive placement scores. Join NSW families achieving offers to selective high schools. All for $199.
+EduCourse's NSW Selective preparation package provides everything needed to compete: diagnostic assessment identifying current performance across all four sections, 1000+ practice questions covering Reading (30 Q), Mathematical Reasoning (35 Q), Thinking Skills (40 Q), and Writing (30 min), AI-powered writing feedback, full-length practice tests simulating exact test conditions and timing, detailed analytics revealing which sub-skills need development, and progress tracking showing improvement toward competitive placement scores. Join NSW families achieving offers to selective high schools. All for $199.
 
-Start Your NSW Selective Preparation Today
-Product URL: /products/nsw-selective
+**[Start Your NSW Selective Preparation Today →](https://educourse.com.au/course/nsw-selective-entry-year-7-entry)**
 
 ---
 END OF ARTICLE

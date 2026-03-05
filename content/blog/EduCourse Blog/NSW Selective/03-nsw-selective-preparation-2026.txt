@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 nsw selective preparation
 
 FEATURED IMAGE:
-PLACEHOLDER_nsw_selective_prep_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/24.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "NSW Selective Test Preparation 2026: Complete 16-Week Strategy". The composition should feature study planning elements: 16-week calendar/timeline, study schedule, progress tracking chart, practice materials, books/computer for study, and achievement milestones. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for planning elements, timeline markers, and study materials, and coral (#FF6B6B) for milestone achievements, progress indicators, and success highlights. Include subtle visual elements like checkmarks for completed weeks, ascending progress graph, or target goal markers. The design should feel organised, achievable, and motivating for NSW families. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use abstract iconography.
@@ -190,10 +190,7 @@ Focus: Confidence, Maintenance, and Test Day Readiness
 
 MID-ARTICLE PRODUCT LINK:
 
-Systematic 16-week preparation requires structured materials and progress tracking. EduCourse's NSW Selective preparation provides weekly practice assignments aligned with this progression, diagnostic assessments identifying starting levels, and analytics tracking improvement across all sections—taking the guesswork out of self-directed preparation.
-
-**[Start Structured 16-Week Preparation →]**
-Product URL: /products/nsw-selective
+**[Practice with NSW Selective →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 
@@ -440,6 +437,9 @@ EduCourse's NSW Selective preparation provides complete 16-week structured pract
 
 Start NSW Selective Preparation Today
 Product URL: /products/nsw-selective
+
+
+**[Get Complete NSW Selective Preparation →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 END OF ARTICLE

@@ -28,9 +28,9 @@ INTRODUCTION:
 
 Your child has an upcoming ACER scholarship test, and you want to ensure they're fully prepared. The ACER test is one of Australia's most widely used assessments for private school scholarships and selective entry programs, and understanding its format is the first step toward successful preparation.
 
-This comprehensive guide covers everything you need to know about the ACER scholarship test 2026: the four test sections, question types, timing, scoring systems, and exactly how schools use these results to make scholarship decisions. Whether your child is sitting the test for the first time or you're looking to improve their performance, this guide will give you the clarity and confidence to support their preparation effectively.
+This comprehensive guide covers everything you need to know about the ACER scholarship test 2026: the three test sections, question types, timing, scoring systems, and exactly how schools use these results to make scholarship decisions. Whether your child is sitting the test for the first time or you're looking to improve their performance, this guide will give you the clarity and confidence to support their preparation effectively.
 
-EduCourse's ACER preparation package provides targeted practice across all four sections with detailed analytics that show exactly where your child excels and where they need focused improvement.
+EduCourse's ACER preparation package provides targeted practice across all three sections—Mathematics, Humanities, and Written Expression—with detailed analytics that show exactly where your child excels and where they need focused improvement.
 
 
 H2: What Is the ACER Scholarship Test?
@@ -42,102 +42,93 @@ Unlike school-based assessments that test curriculum knowledge, the ACER test me
 The test is typically administered to students in Years 5 through 10, though most schools focus on Year 6 and Year 8 entry points. Results are reported as percentile rankings, showing how your child performed compared to other students who took the same test.
 
 
-H2: The Four Sections of the ACER Test
+H2: The Three Sections of the ACER Test
 
-The ACER scholarship test comprises four distinct sections, each assessing different cognitive abilities. Understanding what each section tests helps you support your child's preparation more effectively.
-
-H3: Reading Comprehension
-
-The Reading Comprehension section assesses your child's ability to understand, analyse, and interpret written texts.
-
-Format and Timing:
-- 30 questions
-- 30 minutes
-- Multiple-choice format
-
-Question Types:
-Your child will encounter various passage types including narratives, informational texts, persuasive writing, and poetry. Questions test both literal comprehension (understanding what the text directly states) and inferential comprehension (reading between the lines to understand implied meanings).
-
-Common question categories include:
-- Main idea and theme identification
-- Supporting details and specific information
-- Author's purpose and perspective
-- Vocabulary in context
-- Making inferences and drawing conclusions
-- Text structure and organisation
-
-Skills Assessed:
-This section measures how well your child can quickly process written information, identify key details, understand relationships between ideas, and make logical inferences. Strong readers who can move efficiently between passages and questions typically perform best.
+The ACER scholarship test comprises three distinct sections, each assessing different cognitive abilities. Understanding what each section tests helps you support your child's preparation more effectively.
 
 H3: Mathematics
 
-The Mathematics section tests mathematical reasoning and problem-solving abilities rather than just computational skills.
+The Mathematics section tests mathematical reasoning and problem-solving abilities across a wide range of concepts.
 
 Format and Timing:
-- 30 questions
-- 30 minutes
+- 35 questions
+- 40 minutes
 - Multiple-choice format
 - Calculators are NOT permitted
 
 Question Types:
-Questions cover a broad range of mathematical concepts appropriate to your child's year level, including:
-- Number and algebra (patterns, equations, operations)
-- Measurement and geometry (area, perimeter, volume, angles)
-- Statistics and probability (data interpretation, graphs, likelihood)
-- Problem-solving and logical reasoning
+Questions cover sophisticated mathematical concepts appropriate to Year 7 entry level, including:
+- Set theory and Venn diagrams
+- Probability and statistical reasoning
+- Geometry (perimeter, area, volume)
+- Spatial reasoning (reflections, transformations, 3D visualization)
+- Fractions and number lines
+- Logic puzzles and algebraic reasoning
+- Data interpretation and applied mathematics
 
 Skills Assessed:
-This section evaluates mathematical thinking rather than memorised formulas. Your child needs to interpret word problems, visualise spatial relationships, recognise patterns, and apply mathematical concepts in novel situations. Time management is crucial since calculations must be completed without calculator assistance.
+This section evaluates mathematical thinking at a high level, requiring your child to interpret complex word problems, visualise spatial relationships, apply set theory concepts, and solve multi-step problems. Time management is crucial with 40 minutes for 35 questions, averaging just over 1 minute per question, and no calculator assistance.
 
-H3: Verbal Reasoning
+H3: Humanities
 
-The Verbal Reasoning section measures your child's ability to think logically about words, relationships, and language patterns.
+The Humanities section assesses your child's ability to understand, analyse, and interpret sophisticated written texts across various genres and purposes.
 
 Format and Timing:
-- 30 questions
-- 25 minutes
+- 35 questions
+- 40 minutes
 - Multiple-choice format
+- Passage-based questions
 
 Question Types:
-Verbal reasoning questions assess language logic through various formats:
-- Analogies (identifying relationships between word pairs)
-- Word associations (finding connections between terms)
-- Vocabulary (understanding word meanings and usage)
-- Classification (identifying words that belong together)
-- Logical sequences (completing patterns with words)
+Your child will encounter various passage types including informational texts, persuasive arguments, narratives, poetry, and visual texts. Questions test multiple comprehension levels:
+- Literal comprehension (understanding explicitly stated information)
+- Inference and interpretation (reading between the lines)
+- Main idea and theme identification
+- Vocabulary in context
+- Analysis and comparison
+- Text organization and sequencing
+- Author's purpose and perspective
+- Poetry analysis and visual interpretation
 
 Skills Assessed:
-This section tests abstract thinking with language, pattern recognition, and the ability to identify relationships between concepts. A strong vocabulary helps, but the key skill is logical reasoning about how words and ideas connect. Your child must think flexibly and recognise patterns quickly.
+This section measures sophisticated reading comprehension, critical thinking, and analytical skills. Students must read complex passages quickly (400-700 words), identify key details, understand relationships between ideas, make logical inferences, and evaluate arguments. Strong readers who can efficiently navigate between passages and apply critical analysis typically perform best.
 
-H3: Abstract Reasoning
+H3: Written Expression
 
-The Abstract Reasoning section assesses your child's ability to identify patterns, sequences, and logical relationships using shapes and diagrams.
+The Written Expression section assesses your child's ability to communicate ideas effectively through writing.
 
 Format and Timing:
-- 30 questions
-- 25 minutes
-- Multiple-choice format
+- 2 writing prompts provided
+- 25 minutes total
+- Student chooses 1 prompt to respond to
+- Extended written response (approximately 400-500 words expected)
 
-Question Types:
-Questions present visual puzzles where your child must identify the underlying pattern or rule:
-- Series completion (identifying the next shape in a sequence)
-- Analogies (shapes that relate in the same way as a given pair)
-- Odd one out (finding which shape doesn't belong)
-- Matrices (completing pattern grids)
-- Pattern recognition (identifying rules governing shape transformations)
+Prompt Types:
+Students receive two prompts and choose one to answer:
+
+**Creative & Imaginative Writing**:
+- Tell an engaging story based on a scenario or stimulus
+- Develop characters, setting, plot, and conflict
+- Use descriptive and imaginative language
+- Example: "Write a story about discovering something unexpected that changes everything"
+
+**Persuasive & Argumentative Writing**:
+- Argue a position on an issue with conviction
+- Convince readers with evidence, reasoning, and examples
+- Structure arguments logically and persuasively
+- Example: "Should students have more freedom to choose their subjects? Argue your position with specific reasons"
 
 Skills Assessed:
-This section measures non-verbal reasoning and the ability to think logically without relying on language or numerical skills. Success requires careful observation, systematic testing of hypotheses, and the ability to identify rules governing pattern changes (rotation, reflection, addition, subtraction of elements).
+This section evaluates planning and organization, idea development, vocabulary range and precision, sentence variety and complexity, grammar and punctuation accuracy, and the ability to write persuasively or creatively under timed conditions. With only 25 minutes including planning time (2-3 minutes), drafting (18-20 minutes), and reviewing (2-3 minutes), efficient time management is essential.
 
 
 ---
 
 MID-ARTICLE PRODUCT LINK:
 
-Understanding these four sections is the first step—but effective preparation requires systematic practice across all question types. EduCourse's ACER preparation package provides diagnostic assessments to identify your child's current strengths and weaknesses in each section, followed by targeted practice where it's needed most.
+Understanding these three sections is the first step—but effective preparation requires systematic practice across all question types. EduCourse's ACER preparation package provides diagnostic assessments to identify your child's current strengths and weaknesses in each section, followed by targeted practice in Mathematics, Humanities, and Written Expression where it's needed most.
 
-**[Explore EduCourse ACER Preparation →]**
-Product URL: /products/acer
+**[Explore EduCourse ACER Preparation →](https://educourse.com.au/course/acer-scholarship-year-7-entry)**
 
 ---
 
@@ -230,11 +221,11 @@ Most education experts recommend 8-12 weeks of preparation for students new to A
 H3: Focus on Reasoning Skills
 
 Since ACER tests reasoning rather than curriculum knowledge, preparation should emphasise:
-- Pattern recognition across all sections
-- Logical thinking and systematic problem-solving
-- Vocabulary development through reading, not memorisation
-- Mental mathematics and number sense
-- Time management strategies
+- Advanced mathematical concepts (set theory, probability, spatial reasoning)
+- Critical reading and analysis of complex texts
+- Developing sophisticated writing skills for both creative and persuasive tasks
+- Mental mathematics and problem-solving strategies
+- Time management strategies across all three sections
 
 H3: Practice With Authentic Materials
 
@@ -261,7 +252,7 @@ Mistake 1: Starting Too Late
 Cramming in the final week before the test rarely produces significant improvement. Reasoning skills develop through consistent practice over time, not last-minute memorisation.
 
 Mistake 2: Practicing Only Strong Sections
-It's natural for children to gravitate toward sections they find easier, but scholarship decisions often consider performance across all sections. Balanced preparation addressing weaknesses produces better overall results.
+It's natural for children to gravitate toward sections they find easier, but scholarship decisions often consider performance across all three sections. Balanced preparation addressing weaknesses in Mathematics, Humanities, and Written Expression produces better overall results.
 
 Mistake 3: Ignoring Time Management
 Even students who can eventually solve all questions often run out of time. Practice must include timed conditions so your child develops efficient pacing strategies.
@@ -293,13 +284,16 @@ Do NOT bring:
 
 H3: Test Day Schedule
 
-The complete testing session usually runs 2.5 to 3 hours including:
+The complete testing session usually runs approximately 2 hours including:
 - Registration and settling in (15-20 minutes)
 - Instructions and practice questions (10-15 minutes)
-- Four test sections with short breaks between sections
+- Three test sections with short breaks between sections:
+  - Mathematics (40 minutes)
+  - Humanities (40 minutes)
+  - Written Expression (25 minutes)
 - Collection of materials and dismissal
 
-Your child will likely take the sections in order: Reading, Mathematics, Verbal Reasoning, Abstract Reasoning, though some test administrators may vary this sequence.
+Your child will likely take the sections in this order, though some test administrators may vary the sequence.
 
 
 H2: After the Test
@@ -321,10 +315,9 @@ CALL TO ACTION:
 
 Ready to Help Your Child Excel in the ACER Scholarship Test?
 
-EduCourse's ACER Scholarship Test Preparation Package gives your child everything needed to succeed: comprehensive diagnostic assessments that identify strengths and gaps across all four sections, 500+ expertly-designed practice questions targeting Reading, Mathematics, Verbal Reasoning, and Abstract Reasoning, detailed sub-skill analytics showing exactly where to focus preparation, and full-length practice tests that mirror the real exam environment. All for $199.
+EduCourse's ACER Scholarship Test Preparation Package gives your child everything needed to succeed: comprehensive diagnostic assessments that identify strengths and gaps across all three sections, 600+ expertly-designed practice questions targeting Mathematics, Humanities, and Written Expression, detailed sub-skill analytics showing exactly where to focus preparation, AI-powered writing feedback for essay improvement, and full-length practice tests that mirror the real exam environment. All for $199.
 
-Start Your ACER Preparation Today
-Product URL: /products/acer
+**[Start Your ACER Preparation Today →](https://educourse.com.au/course/acer-scholarship-year-7-entry)**
 
 ---
 END OF ARTICLE

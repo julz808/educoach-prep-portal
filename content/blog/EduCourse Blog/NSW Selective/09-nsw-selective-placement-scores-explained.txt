@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 nsw selective placement scores
 
 FEATURED IMAGE:
-PLACEHOLDER_nsw_selective_scores_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/30.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "NSW Selective Placement Scores Explained: How Offers Are Made". The composition should feature scoring and ranking elements for NSW families: 50/50 split diagram showing test and school components, score scales, ranking indicators, placement calculation visualization, and achievement levels. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for scoring scales and calculation elements, and coral (#FF6B6B) for high achievement indicators, competitive score markers, and success highlights. Include subtle visual elements like pie chart showing 50/50 split, ascending ranking visualization, or achievement badges. The design should feel informative, analytical, and helpful for NSW parents. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use data visualization iconography.
@@ -163,10 +163,7 @@ Students not receiving initial offers may be waitlisted. If offered students dec
 
 MID-ARTICLE PRODUCT LINK:
 
-Achieving competitive placement scores requires understanding exactly where your child currently stands in both test performance and school assessments. EduCourse's diagnostic assessments provide placement score predictions based on current performance levels, revealing whether test preparation or school performance improvement provides greater impact on final placement scores.
-
-**[Get Placement Score Prediction →]**
-Product URL: /products/nsw-selective
+**[Practice with NSW Selective →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 
@@ -328,6 +325,9 @@ EduCourse's NSW Selective preparation provides placement score-focused developme
 
 Start NSW Selective Preparation Today
 Product URL: /products/nsw-selective
+
+
+**[Get Complete NSW Selective Preparation →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 END OF ARTICLE

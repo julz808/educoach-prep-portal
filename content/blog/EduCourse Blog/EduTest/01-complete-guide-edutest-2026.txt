@@ -87,41 +87,41 @@ Total Testing Time: Approximately 2.5 hours (including breaks)
 
 **Section 1: Verbal Reasoning**
 - Time Allowed: 30 minutes
-- Number of Questions: 30-35 questions
+- Number of Questions: 60 questions
 - Format: Multiple choice
-- Content: Vocabulary, analogies, word relationships, critical reasoning
+- Content: Vocabulary, analogies, word relationships, code breaking, logical reasoning
 
 **Section 2: Numerical Reasoning**
 - Time Allowed: 30 minutes
-- Number of Questions: 30-35 questions
+- Number of Questions: 50 questions
 - Format: Multiple choice
 - Calculator: NOT permitted
 
 **Section 3: Reading Comprehension**
 - Time Allowed: 30 minutes
-- Number of Questions: 30-35 questions
-- Format: Multiple choice
-- Content: Comprehension questions based on passages
+- Number of Questions: 50 questions
+- Format: Multiple choice (mostly standalone questions, some passage-based)
+- Content: Grammar, vocabulary, sentence structure, with limited passage comprehension
 
 **Section 4: Mathematics**
 - Time Allowed: 30 minutes
-- Number of Questions: 30-35 questions
+- Number of Questions: 60 questions
 - Format: Multiple choice
 - Calculator: NOT permitted
 
 **Section 5: Written Expression**
-- Time Allowed: 15-30 minutes (varies by test level)
+- Time Allowed: 30 minutes
 - Format: Extended response to writing prompt(s)
-- Task Type: Either narrative/creative OR persuasive/expository
-- Length: Students write continuously for the allotted time
+- Task Type: Student chooses between narrative/creative OR persuasive/expository
+- Length: 2 prompts provided, student responds to 1 (approximately 400-600 words expected)
 
 Between sections, students typically receive short breaks (2-5 minutes) to rest and refocus.
 
 H3: Question Format
 
-**Verbal Reasoning, Numerical Reasoning, Reading Comprehension, and Mathematics**: All questions are multiple choice with 4-5 answer options. Students select the single best answer for each question.
+**Verbal Reasoning, Numerical Reasoning, Reading Comprehension, and Mathematics**: All questions are multiple choice with 5 answer options (A-E). Students select the single best answer for each question. The high question counts require efficient time management—averaging 30 seconds per question for Verbal Reasoning, 36 seconds for Numerical Reasoning, 36 seconds for Reading, and 30 seconds for Mathematics.
 
-**Written Expression**: Students respond to one or more extended writing prompts. They receive lined paper (or a typing interface if testing online) and write for the allotted time period. There is no minimum or maximum word count, but students are expected to write complete, well-developed responses.
+**Written Expression**: Students receive 2 writing prompts and choose 1 to respond to. They receive lined paper (or a typing interface if testing online) and write for 30 minutes. While there's no strict word count requirement, strong responses typically range from 400-600 words demonstrating well-developed ideas, clear structure, and sophisticated vocabulary.
 
 H3: Age-Appropriate Versions
 
@@ -149,26 +149,27 @@ H3: What Makes It Challenging
 
 Numerical Reasoning presents unfamiliar problem types requiring flexible thinking. Students must identify patterns, apply logic, and reason systematically without relying on memorized formulas.
 
-Time pressure is significant: approximately 1 minute per question with no calculator permitted means students need efficient mental math skills and pattern recognition abilities.
+Time pressure is extreme: 50 questions in 30 minutes means only 36 seconds per question average. With no calculator permitted, students need exceptional mental math skills, rapid pattern recognition, and the ability to quickly move past difficult questions.
 
 
 H2: Reading Comprehension Section
 
-The reading component assesses comprehension and interpretation abilities.
+The reading component primarily assesses language skills with limited passage-based comprehension.
 
 H3: What It Tests
 
 Reading Comprehension evaluates:
-- Literal comprehension of passages
-- Inference and interpretation
-- Understanding main ideas and supporting details
-- Vocabulary in context
-- Author's purpose and perspective
-- Making connections between ideas
+- Grammar and sentence structure (approximately 40% of questions)
+- Vocabulary in context (approximately 25% of questions)
+- Sentence transformation and correction (approximately 20% of questions)
+- Punctuation and capitalization (approximately 10% of questions)
+- Passage comprehension and inference (approximately 5% of questions - typically 1 short passage with 7 questions)
+
+Unlike traditional reading tests, EduTest's Reading section focuses heavily on standalone language conventions questions with minimal passage-based comprehension.
 
 H3: What Makes It Challenging
 
-Students must read passages quickly and accurately, then answer questions testing both surface-level understanding and deeper interpretation. Time management is crucial with multiple passages and questions to complete.
+With 50 questions in 30 minutes (36 seconds per question), time pressure is intense. Students must quickly identify grammar errors, select appropriate vocabulary, and transform sentences while maintaining accuracy. The predominantly standalone format means less time reading passages but requires strong technical language knowledge.
 
 
 H2: Mathematics Section
@@ -192,17 +193,16 @@ H3: What Makes It Challenging
 
 Unlike school math tests, EduTest Mathematics often presents problems in unfamiliar contexts requiring flexible application of concepts. Students can't rely solely on memorized procedures—they must understand mathematical principles deeply.
 
-Time pressure with no calculator means students need strong mental math skills and efficient problem-solving strategies.
+Time pressure is severe: 60 questions in 30 minutes means only 30 seconds per question average. With no calculator permitted and the high question volume, students need exceptional mental math fluency, rapid problem-solving skills, and the discipline to skip difficult questions and return later.
 
 
 ---
 
 MID-ARTICLE PRODUCT LINK:
 
-EduTest success requires both strong reasoning skills and strategic practice. EduCourse's EduTest preparation package provides comprehensive practice across all five sections—Verbal Reasoning, Numerical Reasoning, Reading Comprehension, Mathematics, and Written Expression—with detailed performance analytics showing exactly where your child excels and where focused practice will yield the greatest improvement.
+EduTest success requires both strong reasoning skills and strategic practice under intense time pressure. EduCourse's EduTest preparation package provides comprehensive practice across all five sections—60-question Verbal Reasoning, 50-question Numerical Reasoning, 50-question Reading Comprehension, 60-question Mathematics, and Written Expression—with detailed performance analytics showing exactly where your child excels and where focused practice will yield the greatest improvement.
 
-**[Start EduTest Preparation →]**
-Product URL: /products/edutest
+**[Start EduTest Preparation →](https://educourse.com.au/course/edutest-scholarship-year-7-entry)**
 
 ---
 
@@ -240,11 +240,11 @@ H3: What Makes It Challenging
 The difficulty comes from:
 - **Sophisticated vocabulary**: Words well beyond typical grade-level expectations
 - **Complex reasoning**: Multi-step logical thinking required
-- **Unfamiliar content**: Passages and scenarios outside students' typical experience
-- **Time pressure**: Approximately 45-50 seconds per question
+- **Unfamiliar formats**: Code breaking, foreign language logic, and abstract word patterns
+- **Extreme time pressure**: 60 questions in 30 minutes = only 30 seconds per question
 - **Nuanced distinctions**: Multiple answer options that seem plausible
 
-Success requires both broad vocabulary knowledge and flexible reasoning skills—students must think about language in sophisticated ways, not just know definitions.
+With twice as many questions as most other test sections in the same time period, Verbal Reasoning demands both rapid processing and accurate reasoning. Success requires broad vocabulary knowledge, flexible logical thinking, and the ability to recognize patterns across diverse question types at exceptional speed.
 
 
 H2: Written Expression Section
@@ -557,10 +557,9 @@ CALL TO ACTION:
 
 Master EduTest 2026 with Strategic Preparation
 
-EduCourse's EduTest Preparation Package provides everything your child needs to excel: diagnostic assessments identifying current strengths and areas for improvement across all five sections, 1000+ practice questions specifically designed to build Verbal Reasoning, Numerical Reasoning, Reading Comprehension, Mathematics, and Written Expression skills, AI-powered writing feedback that provides detailed improvement suggestions for every essay, full-length practice tests with authentic timing and format, and comprehensive analytics showing progress at the sub-skill level. Build the reasoning skills and test-taking confidence that lead to 90th+ percentile results. All for $199.
+EduCourse's EduTest Preparation Package provides everything your child needs to excel: diagnostic assessments identifying current strengths and areas for improvement across all five sections, 1200+ practice questions specifically designed to build speed and accuracy in Verbal Reasoning (60 Q), Numerical Reasoning (50 Q), Reading Comprehension (50 Q), and Mathematics (60 Q), AI-powered writing feedback that provides detailed improvement suggestions for every essay, full-length practice tests with authentic timing and format to build stamina for the high question volumes, and comprehensive analytics showing progress at the sub-skill level. Build the reasoning skills, speed, and test-taking confidence that lead to 90th+ percentile results. All for $199.
 
-Start Your EduTest Preparation Today
-Product URL: /products/edutest
+**[Start Your EduTest Preparation Today →](https://educourse.com.au/course/edutest-scholarship-year-7-entry)**
 
 ---
 END OF ARTICLE

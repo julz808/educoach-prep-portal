@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 nsw selective reading
 
 FEATURED IMAGE:
-PLACEHOLDER_nsw_selective_reading_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/27.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "NSW Selective Reading 2026: Complete Strategy Guide". The composition should feature reading and comprehension elements for NSW students: open book with highlighted text, various passage types (story, article, poem), comprehension symbols, question marks for analysis, and achievement indicators. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for book/reading elements and passage symbols, and coral (#FF6B6B) for comprehension indicators, key insight highlights, and success markers. Include subtle visual elements like lightbulb for understanding, magnifying glass for close reading, or checkmarks for strategies. The design should feel analytical, supportive, and reading-focused for selective test students. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use abstract iconography.
@@ -219,10 +219,7 @@ Common Forms:
 
 MID-ARTICLE PRODUCT LINK:
 
-Reading comprehension improves through practice with diverse, appropriately challenging passages and detailed question explanations. EduCourse's NSW Selective Reading practice provides 200+ passages across all text types with questions, detailed explanations showing how to find correct answers, and analytics identifying which comprehension skills need development.
-
-**[Practice NSW Selective Reading →]**
-Product URL: /products/nsw-selective
+**[Practice with NSW Selective →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 
@@ -404,6 +401,9 @@ EduCourse's NSW Selective preparation provides comprehensive Reading practice: 2
 
 Start NSW Selective Preparation Today
 Product URL: /products/nsw-selective
+
+
+**[Get Complete NSW Selective Preparation →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 END OF ARTICLE

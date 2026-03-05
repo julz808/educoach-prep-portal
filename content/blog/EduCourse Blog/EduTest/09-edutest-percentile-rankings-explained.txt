@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 edutest percentile rankings
 
 FEATURED IMAGE:
-PLACEHOLDER_edutest_percentiles_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/22.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "EduTest Percentile Rankings Explained: What Your Score Means". The composition should feature data visualisation and ranking elements: percentile scales (0-100), bar charts showing score distributions, achievement levels with badges/tiers, and comparison indicators. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for percentile scales and chart elements, and coral (#FF6B6B) for high achievement markers (90th+), top tier indicators, and excellence badges. Include subtle visual elements like an ascending graph, ranking podium positions, or milestone markers. The design should feel analytical, informative, and achievement-focused. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use data visualisation iconography.
@@ -127,10 +127,7 @@ Interpretation:
 
 MID-ARTICLE PRODUCT LINK:
 
-Achieving your target percentile requires knowing exactly where you currently stand and what skills need development. EduCourse's diagnostic assessments provide detailed percentile predictions across all three EduTest sections, revealing which specific sub-skills are limiting your overall percentile and where focused practice will yield the greatest improvement.
-
-**[Get Your Percentile Prediction →]**
-Product URL: /products/edutest
+**[Practice with EduTest →](https://educourse.com.au/course/edutest-scholarship)**
 
 ---
 
@@ -331,6 +328,9 @@ EduCourse's EduTest preparation provides percentile-focused development: diagnos
 
 Start Your EduTest Preparation Today
 Product URL: /products/edutest
+
+
+**[Get Complete EduTest Preparation →](https://educourse.com.au/course/edutest-scholarship)**
 
 ---
 END OF ARTICLE

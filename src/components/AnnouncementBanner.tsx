@@ -32,14 +32,14 @@ export const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
 
   const variantStyles = {
     default: 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200 text-blue-900',
-    info: 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200 text-teal-900',
+    info: 'bg-gradient-to-r from-red-50 to-orange-50 border-[#FF6B6B] text-red-900',
     success: 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-900'
   };
 
   return (
     <Alert className={`${variantStyles[variant]} border-2 shadow-lg relative animate-in slide-in-from-top-2 duration-500`}>
       <Sparkles className="h-5 w-5 mt-0.5" />
-      <AlertDescription className="ml-2 pr-8 text-sm sm:text-base font-medium">
+      <AlertDescription className="ml-2 pr-8 text-sm sm:text-base font-bold">
         {message}
       </AlertDescription>
       <button

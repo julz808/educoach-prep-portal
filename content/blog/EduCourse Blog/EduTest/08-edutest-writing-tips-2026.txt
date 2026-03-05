@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 edutest writing tips
 
 FEATURED IMAGE:
-PLACEHOLDER_edutest_writing_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/21.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "EduTest Written Expression 2026: How to Score in 90th Percentile". The composition should feature writing and expression elements: a pen or pencil writing on paper, document with organised paragraphs, essay outline structure, idea/thought bubbles, and achievement symbols. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for writing tools and document elements, and coral (#FF6B6B) for achievement indicators, high scores, rubric excellence markers, and success symbols. Include subtle visual elements like checkmarks for quality writing criteria, ascending stars showing scoring levels, or a trophy representing 90th percentile achievement. The design should feel creative, organised, and achievement-focused. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use abstract writing iconography.
@@ -259,10 +259,7 @@ Example: Begin with "I never expected that day to change everything" and conclud
 
 MID-ARTICLE PRODUCT LINK:
 
-Writing improvement requires consistent practice with detailed feedback. EduCourse's AI-powered writing assessment provides instant, comprehensive feedback on every practice essay—analysing structure, idea development, language use, and conventions with specific improvement suggestions calibrated to the EduTest rubric.
-
-**[Get AI Writing Feedback →]**
-Product URL: /products/edutest
+**[Practice with EduTest →](https://educourse.com.au/course/edutest-scholarship)**
 
 ---
 
@@ -470,6 +467,9 @@ EduCourse's EduTest preparation provides comprehensive writing development: AI-p
 
 Start Your EduTest Preparation Today
 Product URL: /products/edutest
+
+
+**[Get Complete EduTest Preparation →](https://educourse.com.au/course/edutest-scholarship)**
 
 ---
 END OF ARTICLE

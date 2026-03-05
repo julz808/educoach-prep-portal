@@ -9,7 +9,7 @@ PRIMARY KEYWORD:
 nsw selective changes 2026
 
 FEATURED IMAGE:
-PLACEHOLDER_nsw_selective_changes_2026.jpg
+https://insights.educourse.com.au/content/images/2026/03/23.png
 
 IMAGEN PROMPT:
 Create a modern, clean educational featured image for "NSW Selective 2026: Key Changes to the Entry Test". The composition should feature change and update elements: calendar showing 2026, arrows indicating changes/updates, comparison icons (old vs new), document with highlighted modifications, and notification symbols. Use a gradient background from light teal (#E6F7F5) to white. Incorporate teal (#4ECDC4) for update indicators and new feature highlights, and coral (#FF6B6B) for important changes, attention markers, and key differences. Include subtle visual elements like refresh icons for updates, spotlight for important changes, or notification badges. The design should feel informative, clear, and update-focused for NSW families. Use flat design with soft shadows and rounded corners. Keep it uncluttered with generous white space. No people or photos - use abstract iconography.
@@ -233,10 +233,7 @@ Selective schools continue attracting highly qualified teachers and providing en
 
 MID-ARTICLE PRODUCT LINK:
 
-Preparing for 2026's test requires practice materials aligned with current formats. EduCourse's NSW Selective preparation reflects all recent changes and 2026 specifications—ensuring students practice with accurate question types, correct timing, and authentic section structures.
-
-**[Practice with 2026-Aligned Materials →]**
-Product URL: /products/nsw-selective
+**[Practice with NSW Selective →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 
@@ -298,6 +295,9 @@ EduCourse's NSW Selective preparation incorporates all 2026 changes and specific
 
 Start NSW Selective Preparation Today
 Product URL: /products/nsw-selective
+
+
+**[Get Complete NSW Selective Preparation →](https://educourse.com.au/course/nsw-selective)**
 
 ---
 END OF ARTICLE
