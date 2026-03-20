@@ -579,6 +579,49 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Tests systematic problem-solving"
           ],
           requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "In a secret code, TRAIN is coded as VUDKP, HOUSE is coded as JQWUG, and RIVER is coded as TKXGT. What is the code for STORM?",
+          answer_options: [
+            "A) UVQTO",
+            "B) RSNQL",
+            "C) UVQOP",
+            "D) TSNQL",
+            "E) UVSTO"
+          ],
+          correct_answer: "A",
+          explanation: "The pattern is to shift each letter forward by 2 positions in the alphabet: S→U, T→V, O→Q, R→T, M→O, giving UVQTO. We can verify this with the examples: T→V, R→T, A→C... wait, TRAIN→VUDKP shows T→V (+2), R→T (+2), A→C (+2), I→K (+2), N→P (+2), confirming the +2 shift pattern.",
+          distractor_strategy: "Other options use different shift amounts or directions (backward shift, +1, +3)",
+          characteristics: [
+            "Pattern must be deduced from multiple examples",
+            "Simple consistent pattern (+2 shift)",
+            "No explicit rule given",
+            "Requires testing examples to find pattern",
+            "All transformations use same shift"
+          ],
+          requires_visual: false
+        },
+        {
+          difficulty: 3,
+          question_text: "If WORLD is coded as 23-15-18-12-4 and PEACE is coded as 16-5-1-3-5, using the same system, what is the code for LIGHT?",
+          answer_options: [
+            "A) 12-9-7-8-20",
+            "B) 11-8-6-7-19",
+            "C) 13-10-8-9-21",
+            "D) 12-9-8-7-20",
+            "E) 11-9-7-8-19"
+          ],
+          correct_answer: "A",
+          explanation: "The code uses each letter's position in the alphabet: L=12, I=9, G=7, H=8, T=20. We can verify: W=23, O=15, R=18, L=12, D=4 (matches WORLD), and P=16, E=5, A=1, C=3, E=5 (matches PEACE).",
+          distractor_strategy: "Other options use off-by-one errors or different numbering systems",
+          characteristics: [
+            "Standard alphabet position encoding",
+            "Multiple examples given",
+            "Requires recognizing number-to-position pattern",
+            "Tests careful counting of alphabet positions"
+          ],
+          requires_visual: false
         }
       ],
 
@@ -598,9 +641,9 @@ export const EDUTEST_SUB_SKILLS: SubSkillExamplesDatabase = {
           "Include 'All correct' or 'None correct' for error identification"
         ],
         difficulty_progression: {
-          "1": "Simple letter shifts (previous/next letter), word reversals, clear pattern stated",
-          "2": "Number-letter codes, more complex substitutions, pattern must be deduced",
-          "3": "Multi-step codes, combinations of patterns, ambiguous patterns requiring logic"
+          "1": "Simple letter shifts (previous/next letter), word reversals, clear pattern explicitly stated in question",
+          "2": "Number-letter codes (A=1, B=2...), simple substitutions where pattern must be deduced from examples",
+          "3": "Two-step transformations (e.g., shift THEN reverse), or pattern deduction from multiple examples. IMPORTANT: Keep patterns mathematically consistent and verifiable. Avoid position-dependent multiplications or overly complex multi-step processes that become impossible to verify."
         },
         common_mistakes: [
           "Applying wrong transformation direction (forward vs backward shift)",

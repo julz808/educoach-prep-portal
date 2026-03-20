@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Flag, ChevronLeft, ChevronRight, ChevronRight as ChevronRightIcon, ChevronDown, CheckCircle, AlertCircle, X, LogOut, ArrowLeft, ArrowRight, List, Maximize2, Minimize2 } from 'lucide-react';
@@ -54,7 +54,7 @@ interface EnhancedTestInterfaceProps {
   onDifficultyChange?: (difficulty: 'easy' | 'medium' | 'hard') => void; // Callback for difficulty change
 }
 
-export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
+const EnhancedTestInterfaceComponent: React.FC<EnhancedTestInterfaceProps> = ({
   questions,
   currentQuestionIndex,
   timeRemaining,
@@ -205,6 +205,36 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // PERFORMANCE OPTIMIZATION: Memoize expensive calculations
+  // These are used in the statistics section and recalculating on every render is wasteful
+  const stats = useMemo(() => {
+    const correctAnswers = questions.filter((q, index) => answers[index] === q.correctAnswer).length;
+    const totalAnswered = Object.keys(answers).length;
+    const totalQuestions = questions.length;
+
+    const answeredCount = questions.filter((_, index) => {
+      const question = questions[index];
+      const isWrittenResponseQuestion = question?.format === 'Written Response' ||
+                                      !question?.options ||
+                                      question?.options.length === 0;
+      return isWrittenResponseQuestion
+        ? (textAnswers[index] && textAnswers[index].trim().length > 0)
+        : answers[index] !== undefined;
+    }).length;
+
+    const flaggedCount = flaggedQuestions.size;
+
+    return {
+      correctAnswers,
+      totalAnswered,
+      totalQuestions,
+      answeredCount,
+      flaggedCount,
+      percentageScore: totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0,
+      accuracyPercentage: totalAnswered > 0 ? Math.round((correctAnswers / totalAnswered) * 100) : 0,
+    };
+  }, [questions, answers, textAnswers, flaggedQuestions]);
+
   const handleAnswerSelect = (answerIndex: number) => {
     // Don't allow selection in review mode or when drill feedback is being shown
     if (isReviewMode || (isDrillMode && showDrillFeedback)) return;
@@ -230,18 +260,18 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
     onNext();
   };
 
-  const getQuestionStatus = (questionIndex: number) => {
+  const getQuestionStatus = useCallback((questionIndex: number) => {
     const question = questions[questionIndex];
-    const isWrittenResponseQuestion = question?.format === 'Written Response' || 
-                                    !question?.options || 
+    const isWrittenResponseQuestion = question?.format === 'Written Response' ||
+                                    !question?.options ||
                                     question?.options.length === 0;
-    
-    const isAnswered = isWrittenResponseQuestion 
+
+    const isAnswered = isWrittenResponseQuestion
       ? (textAnswers[questionIndex] && textAnswers[questionIndex].trim().length > 0)
       : answers[questionIndex] !== undefined;
-    
+
     const isFlagged = flaggedQuestions.has(questionIndex);
-    
+
     // In review mode, show correct/incorrect status if answered
     if (isReviewMode) {
       // For writing sections, show answered/not answered instead of correct/incorrect
@@ -265,7 +295,7 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
         };
       }
     }
-    
+
     // In regular mode
     if (isAnswered) {
       return {
@@ -273,19 +303,19 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
         flagged: isFlagged
       };
     }
-    
+
     if (isFlagged) {
       return {
         primary: 'flagged',
         flagged: true
       };
     }
-    
+
     return {
       primary: 'unanswered',
       flagged: false
     };
-  };
+  }, [questions, answers, textAnswers, flaggedQuestions, isReviewMode, isWritingSection]);
 
   const getQuestionCircleClass = (questionIndex: number, status: any) => {
     const baseClass = "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 cursor-pointer hover:scale-105";
@@ -997,25 +1027,25 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                             <div className="flex justify-between">
                               <span className="text-gray-600">Total Score:</span>
                               <span className="font-semibold text-edu-navy">
-                                {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{questions.length}
+                                {stats.correctAnswers}/{stats.totalQuestions}
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600">Percentage Score:</span>
                               <span className="font-semibold text-edu-navy">
-                                {Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / questions.length) * 100)}%
+                                {stats.percentageScore}%
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600">Accuracy:</span>
                               <span className="font-semibold text-edu-navy">
-                                {questions.filter((q, index) => answers[index] === q.correctAnswer).length}/{Object.keys(answers).length}
+                                {stats.correctAnswers}/{stats.totalAnswered}
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600">Accuracy %:</span>
                               <span className="font-semibold text-edu-navy">
-                                {Object.keys(answers).length > 0 ? Math.round((questions.filter((q, index) => answers[index] === q.correctAnswer).length / Object.keys(answers).length) * 100) : 0}%
+                                {stats.accuracyPercentage}%
                               </span>
                             </div>
                           </>
@@ -1025,22 +1055,13 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600">Answered:</span>
                       <span className="font-semibold text-edu-navy">
-                        {questions.filter((_, index) => {
-                          const question = questions[index];
-                          const isWrittenResponseQuestion = question?.format === 'Written Response' || 
-                                                          !question?.options || 
-                                                          question?.options.length === 0;
-                          
-                          return isWrittenResponseQuestion 
-                            ? (textAnswers[index] && textAnswers[index].trim().length > 0)
-                            : answers[index] !== undefined;
-                        }).length}/{questions.length}
+                        {stats.answeredCount}/{stats.totalQuestions}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Flagged:</span>
                       <span className="font-semibold text-edu-coral">
-                        {flaggedQuestions.size}
+                        {stats.flaggedCount}
                       </span>
                     </div>
                   </>
@@ -1049,22 +1070,13 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600">Answered:</span>
                       <span className="font-semibold text-edu-navy">
-                        {questions.filter((_, index) => {
-                          const question = questions[index];
-                          const isWrittenResponseQuestion = question?.format === 'Written Response' || 
-                                                          !question?.options || 
-                                                          question?.options.length === 0;
-                          
-                          return isWrittenResponseQuestion 
-                            ? (textAnswers[index] && textAnswers[index].trim().length > 0)
-                            : answers[index] !== undefined;
-                        }).length}/{questions.length}
+                        {stats.answeredCount}/{stats.totalQuestions}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Flagged:</span>
                       <span className="font-semibold text-edu-coral">
-                        {flaggedQuestions.size}
+                        {stats.flaggedCount}
                       </span>
                     </div>
                   </>
@@ -1187,4 +1199,28 @@ export const EnhancedTestInterface: React.FC<EnhancedTestInterfaceProps> = ({
       )}
     </div>
   );
-}; 
+};
+
+// Memoize the component to prevent unnecessary re-renders
+// Only re-render when these specific props change
+export const EnhancedTestInterface = React.memo(
+  EnhancedTestInterfaceComponent,
+  (prevProps, nextProps) => {
+    // Return true if props are equal (skip re-render)
+    // Return false if props changed (do re-render)
+    return (
+      prevProps.currentQuestionIndex === nextProps.currentQuestionIndex &&
+      prevProps.answers === nextProps.answers &&
+      prevProps.textAnswers === nextProps.textAnswers &&
+      prevProps.flaggedQuestions === nextProps.flaggedQuestions &&
+      prevProps.timeRemaining === nextProps.timeRemaining &&
+      prevProps.showFeedback === nextProps.showFeedback &&
+      prevProps.isReviewMode === nextProps.isReviewMode &&
+      prevProps.questions === nextProps.questions &&
+      prevProps.sessionId === nextProps.sessionId &&
+      prevProps.testScore === nextProps.testScore &&
+      prevProps.calculatingScore === nextProps.calculatingScore &&
+      prevProps.currentDifficulty === nextProps.currentDifficulty
+    );
+  }
+); 

@@ -102,11 +102,55 @@ const Dashboard: React.FC = () => {
   }, [selectedProduct, user]);
 
   if (loading || !dashboardMetrics) {
+    // PERFORMANCE OPTIMIZATION: Show skeleton UI immediately instead of blank screen
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+      <div className="space-y-8 animate-pulse">
+        {/* Hero Banner Skeleton */}
+        <div className="bg-gradient-to-br from-edu-navy to-edu-teal text-white rounded-2xl p-8 shadow-lg">
+          <div className="h-10 bg-white/20 rounded w-96 mb-3"></div>
+          <div className="h-5 bg-white/20 rounded w-64 mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/10 rounded-xl p-6">
+              <div className="h-4 bg-white/20 rounded w-32 mb-3"></div>
+              <div className="h-8 bg-white/20 rounded w-16"></div>
+            </div>
+            <div className="bg-white/10 rounded-xl p-6">
+              <div className="h-4 bg-white/20 rounded w-32 mb-3"></div>
+              <div className="h-8 bg-white/20 rounded w-16"></div>
+            </div>
+            <div className="bg-white/10 rounded-xl p-6">
+              <div className="h-4 bg-white/20 rounded w-32 mb-3"></div>
+              <div className="h-8 bg-white/20 rounded w-16"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions Skeleton */}
+        <div>
+          <div className="h-6 bg-gray-200 rounded w-40 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <div className="h-10 w-10 bg-gray-200 rounded-full mb-4"></div>
+                <div className="h-5 bg-gray-200 rounded w-32 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-48"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Progress Overview Skeleton */}
+        <div>
+          <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <div className="h-5 bg-gray-200 rounded w-40 mb-4"></div>
+                <div className="h-2 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

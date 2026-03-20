@@ -1146,25 +1146,21 @@ const TestTaking: React.FC = () => {
     };
   }, [session]);
 
-  const handleAnswer = (answerIndex: number) => {
+  const handleAnswer = useCallback((answerIndex: number) => {
     if (!session) {
       return;
     }
-    
-    // Create the updated session state first
+
+    // PERFORMANCE OPTIMIZATION: Only update answers, not the entire questions array
+    // This prevents unnecessary re-renders since we can derive userAnswer from answers
     const newAnswers = { ...session.answers };
     newAnswers[session.currentQuestion] = answerIndex;
-    
-    // Update the question's userAnswer
-    const updatedQuestions = [...session.questions];
-    updatedQuestions[session.currentQuestion].userAnswer = answerIndex;
-    
+
     const updatedSession = {
       ...session,
-      answers: newAnswers,
-      questions: updatedQuestions
+      answers: newAnswers
     };
-    
+
     setSession(updatedSession);
     
     // Save immediately after multiple choice answer using the updated state
@@ -1251,28 +1247,25 @@ const TestTaking: React.FC = () => {
         console.error('❌ IMMEDIATE-SAVE FAILED: Error details:', JSON.stringify(error, null, 2));
       }
     })(); // Immediate execution
-  };
+  }, [session, isReviewMode, timeRemaining]);
 
   const handleTextAnswer = useCallback((text: string) => {
     if (!session) return;
-    
+
     // Update last change time for periodic saving
     lastTextChangeTimeRef.current = Date.now();
-    
+
     setSession(prev => {
       if (!prev) return prev;
-      
+
+      // PERFORMANCE OPTIMIZATION: Only update textAnswers, not the entire questions array
+      // This prevents unnecessary re-renders since we can derive userTextAnswer from textAnswers
       const newTextAnswers = { ...prev.textAnswers };
       newTextAnswers[prev.currentQuestion] = text;
-      
-      // Update the question's userTextAnswer
-      const updatedQuestions = [...prev.questions];
-      updatedQuestions[prev.currentQuestion].userTextAnswer = text;
-      
+
       const updatedSession = {
         ...prev,
-        textAnswers: newTextAnswers,
-        questions: updatedQuestions
+        textAnswers: newTextAnswers
       };
       
       // Clear existing timeout
@@ -1334,7 +1327,7 @@ const TestTaking: React.FC = () => {
     }
   }, [session, saveProgress]);
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     if (!session) return;
     
     // Check if current question is a written response - if so, save before moving
@@ -1376,48 +1369,47 @@ const TestTaking: React.FC = () => {
       if (!prev || prev.currentQuestion >= prev.questions.length - 1) return prev;
       return { ...prev, currentQuestion: prev.currentQuestion + 1 };
     });
-  };
+  }, [session, saveProgress, user]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (!session) return;
     setSession(prev => {
       if (!prev || prev.currentQuestion <= 0) return prev;
       return { ...prev, currentQuestion: prev.currentQuestion - 1 };
     });
-  };
+  }, [session]);
 
-  const handleJumpToQuestion = (questionIndex: number) => {
+  const handleJumpToQuestion = useCallback((questionIndex: number) => {
     if (!session) return;
     setSession(prev => {
       if (!prev) return prev;
       return { ...prev, currentQuestion: questionIndex };
     });
-  };
+  }, [session]);
 
-  const handleFlag = (questionIndex: number) => {
+  const handleFlag = useCallback((questionIndex: number) => {
     if (!session) return;
-    
+
     console.log('🚩 FLAG: Flagging/unflagging question', questionIndex);
-    
+
     setSession(prev => {
       if (!prev) return prev;
+
+      // PERFORMANCE OPTIMIZATION: Only update flaggedQuestions, not the entire questions array
+      // The flagged state can be derived from flaggedQuestions Set
       const newFlagged = new Set(prev.flaggedQuestions);
-      const updatedQuestions = [...prev.questions];
-      
+
       if (newFlagged.has(questionIndex)) {
         newFlagged.delete(questionIndex);
-        updatedQuestions[questionIndex].flagged = false;
         console.log('🚩 FLAG: Unflagged question', questionIndex);
       } else {
         newFlagged.add(questionIndex);
-        updatedQuestions[questionIndex].flagged = true;
         console.log('🚩 FLAG: Flagged question', questionIndex);
       }
-      
+
       const updatedSession = {
         ...prev,
-        flaggedQuestions: newFlagged,
-        questions: updatedQuestions
+        flaggedQuestions: newFlagged
       };
       
       // Save progress after flagging to persist flag changes
@@ -1430,12 +1422,12 @@ const TestTaking: React.FC = () => {
           console.error('🚩 FLAG: Failed to save flag change:', error);
         }
       }, 100);
-      
+
       return updatedSession;
     });
-  };
+  }, [session, saveProgress]);
 
-  const handleDifficultyChange = async (newDifficulty: 'easy' | 'medium' | 'hard') => {
+  const handleDifficultyChange = useCallback(async (newDifficulty: 'easy' | 'medium' | 'hard') => {
     if (!session || session.type !== 'drill') return;
 
     console.log('🎯 DIFFICULTY CHANGE: Switching from', currentDifficulty, 'to', newDifficulty);
@@ -1453,17 +1445,17 @@ const TestTaking: React.FC = () => {
     const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
     console.log('🎯 DIFFICULTY CHANGE: Navigating to', newUrl);
     navigate(newUrl, { replace: true });
-  };
+  }, [session, currentDifficulty, navigate]);
 
 
-  const handleFinish = () => {
+  const handleFinish = useCallback(() => {
     if (!session) return;
 
     // Show confirmation dialog
     setShowSubmitConfirm(true);
-  };
+  }, [session]);
 
-  const handleConfirmSubmit = async () => {
+  const handleConfirmSubmit = useCallback(async () => {
     if (!session) return;
 
     try {
@@ -1649,7 +1641,7 @@ const TestTaking: React.FC = () => {
       setIsProcessingWriting(false);
       setShowSubmitConfirm(false);
     }
-  };
+  }, [session, user, selectedProduct, testType, navigate]);
 
   // Process writing assessments for all writing questions in the session
   const processWritingAssessments = async () => {

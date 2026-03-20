@@ -971,12 +971,33 @@ const Drill: React.FC = () => {
   };
 
   if (loading) {
+    // PERFORMANCE OPTIMIZATION: Show skeleton UI immediately instead of blank screen
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading skill drills...</p>
+      <div className="space-y-6 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="bg-gradient-to-br from-edu-navy to-edu-teal text-white rounded-2xl p-8 shadow-lg">
+          <div className="h-8 bg-white/20 rounded w-48 mb-4"></div>
+          <div className="h-4 bg-white/20 rounded w-72 mb-6"></div>
+          <div className="flex gap-4">
+            <div className="h-12 bg-white/20 rounded w-32"></div>
+            <div className="h-12 bg-white/20 rounded w-32"></div>
+          </div>
         </div>
+
+        {/* Skill Areas Skeleton */}
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-white rounded-xl shadow-md p-6">
+            <div className="h-6 bg-gray-200 rounded w-40 mb-4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map(j => (
+                <div key={j} className="border border-gray-200 rounded-lg p-4">
+                  <div className="h-5 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

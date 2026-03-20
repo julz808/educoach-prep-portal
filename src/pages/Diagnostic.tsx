@@ -554,11 +554,32 @@ const DiagnosticTests: React.FC = () => {
   };
 
   if (loading) {
+    // PERFORMANCE OPTIMIZATION: Show skeleton UI immediately instead of blank screen
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-teal mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading diagnostic test...</p>
+      <div className="space-y-8 animate-pulse">
+        {/* Hero Banner Skeleton */}
+        <div className="bg-gradient-to-br from-edu-navy to-edu-teal text-white rounded-2xl p-8 shadow-lg">
+          <div className="h-8 bg-white/20 rounded w-64 mb-4"></div>
+          <div className="h-4 bg-white/20 rounded w-96 mb-6"></div>
+          <div className="flex gap-6">
+            <div className="h-16 bg-white/20 rounded w-32"></div>
+            <div className="h-16 bg-white/20 rounded w-32"></div>
+            <div className="h-16 bg-white/20 rounded w-32"></div>
+          </div>
+        </div>
+
+        {/* Section Cards Skeleton */}
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="bg-white rounded-xl shadow-md p-6 border border-edu-light-blue">
+              <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-96 mb-4"></div>
+              <div className="flex gap-4">
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+                <div className="h-10 bg-gray-200 rounded w-32"></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

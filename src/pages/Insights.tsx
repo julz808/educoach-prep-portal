@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart3, Target, BookOpen, Activity, AlertCircle, TrendingUp, TrendingDown, Clock, Award, CheckCircle, XCircle, Flag, Star, Info, Zap, FileText, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -438,6 +438,64 @@ const PerformanceDashboard = () => {
     setAnimatedBottomSkillScores(newBottomScores);
   }, [performanceData.diagnostic, topBottomView]);
 
+  // PERFORMANCE OPTIMIZATION: Memoize expensive calculations
+  // These calculations were happening inline on every render
+  const memoizedStats = useMemo(() => {
+    if (!performanceData.diagnostic) {
+      return {
+        averageScore: 0,
+        spiderChartDataScore: [],
+        spiderChartDataAccuracy: [],
+        attemptedTopSkills: [],
+        attemptedBottomSkills: []
+      };
+    }
+
+    // Calculate average score across sections (used in multiple places)
+    const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
+    const averageScore = sectionScores.length > 0
+      ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
+      : 0;
+
+    // Pre-calculate spider chart data for both views (score and accuracy)
+    const completedSections = performanceData.diagnostic.sectionBreakdown
+      .filter(section => section.completed !== false);
+
+    const spiderChartDataScore = completedSections.map(section => ({
+      label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+      value: section.score,
+      maxValue: 100
+    }));
+
+    const spiderChartDataAccuracy = completedSections.map(section => ({
+      label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
+      value: section.accuracy,
+      maxValue: 100
+    }));
+
+    // Filter attempted skills for top/bottom skills
+    const allSubSkills = performanceData.diagnostic.allSubSkills || [];
+    const attemptedTopSkills = allSubSkills.filter(skill => {
+      const attempted = skill.questionsAttempted || 0;
+      const total = skill.totalQuestions || 0;
+      return attempted > 0 && total > 0;
+    });
+
+    const attemptedBottomSkills = allSubSkills.filter(skill => {
+      const attempted = skill.questionsAttempted || 0;
+      const total = skill.totalQuestions || 0;
+      return attempted > 0 && total > 0;
+    });
+
+    return {
+      averageScore,
+      spiderChartDataScore,
+      spiderChartDataAccuracy,
+      attemptedTopSkills,
+      attemptedBottomSkills
+    };
+  }, [performanceData.diagnostic]);
+
   // Helper function to format time
   const formatStudyTime = (hours: number): string => {
     if (hours === 0) return '0h';
@@ -464,11 +522,40 @@ const PerformanceDashboard = () => {
 
   // Show loading state
   if (isLoading) {
+    // PERFORMANCE OPTIMIZATION: Show skeleton UI immediately instead of blank screen
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading Performance Insights...</p>
+      <div className="min-h-screen bg-white p-6 space-y-6 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-2xl p-8">
+          <div className="h-8 bg-white/20 rounded w-64 mb-4"></div>
+          <div className="flex gap-4">
+            <div className="h-12 bg-white/20 rounded w-32"></div>
+            <div className="h-12 bg-white/20 rounded w-32"></div>
+            <div className="h-12 bg-white/20 rounded w-32"></div>
+          </div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="flex gap-2 border-b">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-10 bg-gray-200 rounded-t w-32"></div>
+          ))}
+        </div>
+
+        {/* Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white border rounded-xl p-6">
+              <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
+              <div className="h-8 bg-gray-200 rounded w-20"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chart Skeleton */}
+        <div className="bg-white border rounded-xl p-6">
+          <div className="h-6 bg-gray-200 rounded w-40 mb-6"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
@@ -678,23 +765,11 @@ const PerformanceDashboard = () => {
                           </div>
                         </div>
                         <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${
-                          (() => {
-                            // Calculate simple average across all sections
-                            const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
-                            const averageScore = sectionScores.length > 0 
-                              ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
-                              : 0;
-                            return averageScore >= 80 ? 'text-green-600' : 
-                                   averageScore >= 60 ? 'text-orange-600' : 
-                                   'text-red-600';
-                          })()
+                          memoizedStats.averageScore >= 80 ? 'text-green-600' :
+                          memoizedStats.averageScore >= 60 ? 'text-orange-600' :
+                          'text-red-600'
                         }`}>
-                          {(() => {
-                            const sectionScores = performanceData.diagnostic.sectionBreakdown.map(s => s.score);
-                            return sectionScores.length > 0 
-                              ? Math.round(sectionScores.reduce((sum, score) => sum + score, 0) / sectionScores.length)
-                              : 0;
-                          })()}%
+                          {memoizedStats.averageScore}%
                         </div>
                       </div>
                     </div>
@@ -779,13 +854,7 @@ const PerformanceDashboard = () => {
                       {/* Spider Chart - Top on mobile, Left on desktop */}
                       <div ref={spiderChartObserver.ref} className="w-full lg:w-1/2 p-3 sm:p-6 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
                         <SpiderChart
-                          data={performanceData.diagnostic.sectionBreakdown
-                            .filter(section => section.completed !== false)
-                            .map(section => ({
-                              label: section.sectionName.replace('General Ability - ', 'GA - ').replace(' Reasoning', '\nReasoning'),
-                              value: sectionView === 'score' ? section.score : section.accuracy,
-                              maxValue: 100
-                            }))}
+                          data={sectionView === 'score' ? memoizedStats.spiderChartDataScore : memoizedStats.spiderChartDataAccuracy}
                           size={280}
                           animate={animateSpiderChart}
                         />

@@ -873,10 +873,52 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
       visual_required: false,
       image_type: null,
       llm_appropriate: true,
-      difficulty_range: [2],
+      difficulty_range: [1, 2, 3],
       question_format: "Find the next letter(s) in the series: [letter sequence]",
 
       examples: [
+        // DIFFICULTY 1
+        {
+          difficulty: 1,
+          question_text: "The next letter in the series\nA    C    E    G    I    is:",
+          answer_options: [
+            "A: J",
+            "B: K",
+            "C: L",
+            "D: M",
+            "E: N"
+          ],
+          correct_answer: "B",
+          explanation: "The pattern skips one letter each time (+2): A(1)→C(3) is +2, C(3)→E(5) is +2, E(5)→G(7) is +2, G(7)→I(9) is +2, so I(9)→K(11) is +2. Answer: K",
+          distractor_strategy: "Includes letters from +1 pattern (A), +3 pattern (C, D), and +4 pattern (E)",
+          characteristics: [
+            "Simple constant increment (+2)",
+            "Every other letter",
+            "Single letter answer",
+            "Most basic letter series pattern"
+          ]
+        },
+        {
+          difficulty: 1,
+          question_text: "The next letter in the series\nB    D    F    H    J    is:",
+          answer_options: [
+            "A: K",
+            "B: L",
+            "C: M",
+            "D: N",
+            "E: O"
+          ],
+          correct_answer: "B",
+          explanation: "The pattern skips one letter each time (+2): B(2)→D(4), D(4)→F(6), F(6)→H(8), H(8)→J(10), so J(10)→L(12). Answer: L",
+          distractor_strategy: "Includes adjacent letters and alternative patterns",
+          characteristics: [
+            "Constant increment (+2)",
+            "Even-positioned letters",
+            "Single letter answer"
+          ]
+        },
+
+        // DIFFICULTY 2
         {
           difficulty: 2,
           question_text: "The next two letters in the series\nBD    EG    HJ    KM    are:",
@@ -996,6 +1038,48 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
             "Two-letter answer",
             "Tests recognition of paired progression"
           ]
+        },
+
+        // DIFFICULTY 3
+        {
+          difficulty: 3,
+          question_text: "The next letter in the series\nA    C    F    J    O    is:",
+          answer_options: [
+            "A: T",
+            "B: U",
+            "C: S",
+            "D: V",
+            "E: P"
+          ],
+          correct_answer: "B",
+          explanation: "The increments increase by 1 each time: A→C is +2, C→F is +3, F→J is +4, J→O is +5, so O→? should be +6, giving O(15)+6=U(21). Answer: U",
+          distractor_strategy: "Includes letters from simpler patterns (T from +5, V from +7) and nearby letters",
+          characteristics: [
+            "Increasing increment pattern (+2, +3, +4, +5, +6)",
+            "Single letter answer",
+            "Clear mathematical progression",
+            "Concise solution under 80 words"
+          ]
+        },
+        {
+          difficulty: 3,
+          question_text: "The next letter in the series\nB    D    H    N    V    is:",
+          answer_options: [
+            "A: Z",
+            "B: X",
+            "C: Y",
+            "D: W",
+            "E: F"
+          ],
+          correct_answer: "E",
+          explanation: "The increments double each time: B→D is +2, D→H is +4, H→N is +6, N→V is +8. Following this pattern, V→? should be +10, giving V(22)+10=32. Since 32>26, we wrap: 32-26=6=F. Answer: F",
+          distractor_strategy: "Includes letters near the end of alphabet (Z, X, Y, W) as distractors for wrapping confusion",
+          characteristics: [
+            "Doubling increment pattern (+2, +4, +6, +8, +10)",
+            "Requires alphabet wrapping",
+            "Single letter answer",
+            "Concise solution showing wrap calculation"
+          ]
         }
       ],
 
@@ -1016,9 +1100,9 @@ export const VIC_SELECTIVE_SUB_SKILLS: SubSkillExamplesDatabase = {
           "Adjacent letters in alphabet to correct answer"
         ],
         difficulty_progression: {
-          "1": "N/A - VIC Selective uses single difficulty level",
-          "2": "Varied: simple constant increments to increasing/decreasing increments, single letters to pairs",
-          "3": "N/A - VIC Selective uses single difficulty level"
+          "1": "Simple constant increments (+2 every time, +3 every time), single letter answers",
+          "2": "Variable increments (alternating +3/-1, or pair-based patterns), can be single or two-letter answers",
+          "3": "Increasing/doubling increments (+2, +3, +4, +5... or +2, +4, +6, +8...), may require alphabet wrapping. IMPORTANT: Keep patterns mathematically clean - no position-dependent multiplications or overly complex multi-step transformations. Solutions must be under 100 words and avoid hallucination phrases like 'wait, let me recalculate'."
         }
       }
     },
@@ -3385,6 +3469,36 @@ Style: Clean educational chart, distinct colors, clear labels`
             "Word count guidance (400-600 words)",
             "Specific criteria provided"
           ]
+        },
+        {
+          difficulty: 2,
+          question_text: "CREATIVE WRITING PROMPT:\n\nWrite a story that begins with the following sentence:\n\n\"The door was open, which was strange because it was always locked.\"\n\nYour story should:\n• Be engaging and imaginative\n• Have a clear beginning, middle, and end\n• Include descriptive language and show, don't tell\n• Be approximately 400-600 words\n\nTime allowed: 20 minutes (of the 40-minute writing test)",
+          answer_options: [],
+          correct_answer: "Open-ended creative writing response",
+          explanation: "This prompt provides an opening sentence to spark imagination. Students should build a narrative from this intriguing beginning, developing tension, mystery, or conflict. The story should include well-developed characters, vivid setting descriptions, and a satisfying resolution. Effective narratives will use techniques like sensory details, varied sentence structure, and dialogue.",
+          characteristics: [
+            "Opening sentence provided",
+            "Narrative writing",
+            "Mystery/intrigue element",
+            "Time-limited (20 mins)",
+            "Word count guidance (400-600 words)",
+            "Requires continuation from given start"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "CREATIVE WRITING PROMPT:\n\nWrite a story about a character who discovers an unexpected talent or ability.\n\nYour story should:\n• Be engaging and imaginative\n• Have a clear beginning, middle, and end\n• Develop your main character through actions, thoughts, and dialogue\n• Include descriptive language\n• Be approximately 400-600 words\n\nTime allowed: 20 minutes (of the 40-minute writing test)",
+          answer_options: [],
+          correct_answer: "Open-ended creative writing response",
+          explanation: "This prompt focuses on character development through the discovery of a talent or ability. Students should show the character's journey from discovery through development or use of this ability. Strong narratives will include character thoughts and emotions, realistic dialogue, and vivid descriptions. The story should demonstrate growth or change in the character.",
+          characteristics: [
+            "Character-focused prompt",
+            "Narrative writing",
+            "Theme: self-discovery",
+            "Time-limited (20 mins)",
+            "Word count guidance (400-600 words)",
+            "Emphasis on character development"
+          ]
         }
       ],
 
@@ -3433,6 +3547,38 @@ Style: Clean educational chart, distinct colors, clear labels`
             "Word count guidance (400-600 words)",
             "Must address both sides",
             "Specific criteria provided"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "PERSUASIVE WRITING PROMPT:\n\nRead the following information:\n\n\"Many schools are considering whether students should be required to wear school uniforms. Supporters argue that uniforms reduce peer pressure, improve focus on learning, and create school unity. Opponents argue that uniforms limit self-expression and can be expensive for families.\"\n\nWrite a persuasive piece arguing either FOR or AGAINST mandatory school uniforms.\n\nYour writing should:\n• State your position clearly\n• Provide reasons and evidence to support your position\n• Address opposing viewpoints\n• Use persuasive language and techniques\n• Be approximately 400-600 words\n\nTime allowed: 20 minutes (of the 40-minute writing test)",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This prompt asks students to argue for or against mandatory school uniforms, a topic familiar to Year 9 students. Strong persuasive writing will include a clear thesis statement, multiple supporting arguments with specific examples, acknowledgment of counterarguments with rebuttals, and persuasive techniques such as rhetorical questions, emotive language, and logical reasoning. The writing should demonstrate organization with clear paragraphs.",
+          characteristics: [
+            "Open-ended prompt",
+            "Persuasive/argumentative writing",
+            "School-related topic",
+            "Time-limited (20 mins)",
+            "Word count guidance (400-600 words)",
+            "Must address both sides",
+            "Relatable to student experience"
+          ]
+        },
+        {
+          difficulty: 2,
+          question_text: "PERSUASIVE WRITING PROMPT:\n\nRead the following information:\n\n\"There is ongoing debate about whether students should have mobile phones at school. Some believe phones are essential tools for safety, research, and organization. Others argue that phones are distracting, reduce face-to-face communication, and can be used for cyberbullying.\"\n\nWrite a persuasive piece arguing either FOR or AGAINST allowing students to have mobile phones at school.\n\nYour writing should:\n• State your position clearly\n• Provide reasons and evidence to support your position\n• Address opposing viewpoints\n• Use persuasive language and techniques\n• Be approximately 400-600 words\n\nTime allowed: 20 minutes (of the 40-minute writing test)",
+          answer_options: [],
+          correct_answer: "Open-ended persuasive writing response",
+          explanation: "This prompt addresses mobile phone use at school, a highly relevant issue for Year 9 students. Effective persuasive writing will present a clear position with well-developed arguments supported by real-world examples. Students should acknowledge the complexity of the issue by addressing counterarguments fairly before refuting them. Persuasive techniques like statistics, expert opinion references, appeals to logic and emotion, and varied sentence structures will strengthen the argument.",
+          characteristics: [
+            "Open-ended prompt",
+            "Persuasive/argumentative writing",
+            "Technology/school policy topic",
+            "Time-limited (20 mins)",
+            "Word count guidance (400-600 words)",
+            "Must address both sides",
+            "Highly relevant to students"
           ]
         }
       ],

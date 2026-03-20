@@ -994,13 +994,25 @@ export class AnalyticsService {
     }
 
     try {
-      // Get user progress data
-      const { data: progressData, error: progressError } = await supabase
-        .from('user_progress')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('product_type', productType)
-        .single();
+      // PERFORMANCE: Parallelize independent queries
+      const [
+        { data: progressData, error: progressError },
+        { data: testSessions, error: testError }
+      ] = await Promise.all([
+        supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('product_type', productType)
+          .single(),
+        supabase
+          .from('user_test_sessions')
+          .select('final_score, test_mode')
+          .eq('user_id', userId)
+          .eq('product_type', productType)
+          .eq('status', 'completed')
+          .in('test_mode', ['diagnostic', 'practice'])
+      ]);
 
       if (progressError) {
         console.error('❌ Error fetching user progress:', progressError);
@@ -1019,15 +1031,6 @@ export class AnalyticsService {
         }
         throw progressError;
       }
-
-      // Get average test score (diagnostic + practice tests)
-      const { data: testSessions, error: testError } = await supabase
-        .from('user_test_sessions')
-        .select('final_score, test_mode')
-        .eq('user_id', userId)
-        .eq('product_type', productType)
-        .eq('status', 'completed')
-        .in('test_mode', ['diagnostic', 'practice']);
 
       if (testError) {
         console.error('❌ Error fetching test sessions:', testError);
@@ -1066,7 +1069,9 @@ export class AnalyticsService {
     sectionTotals?: Map<string, {questionsCorrect: number, questionsTotal: number, questionsAttempted: number}>,
     latestSessions?: any[] // ✅ NEW: Pass latest sessions to filter responses
   ) {
-    // Get all questions for this sub-skill and test mode
+    const sessionType = testMode === 'diagnostic' ? 'diagnostic' : 'practice';
+
+    // PERFORMANCE: Only fetch questions (don't need auth check for every sub-skill)
     const { data: questions, error: questionsError } = await supabase
       .from(QUESTIONS_TABLE)
       .select('id, section_name, max_points')
@@ -1080,25 +1085,21 @@ export class AnalyticsService {
     }
 
     // Check if this is a writing sub-skill
-    const isWritingSubSkill = subSkillName.toLowerCase().includes('writing') || 
+    const isWritingSubSkill = subSkillName.toLowerCase().includes('writing') ||
                               sectionName?.toLowerCase().includes('writing');
-    
+
     // Calculate total max_points for this sub-skill
     const totalPoints = questions?.reduce((sum, q) => sum + (q.max_points || 1), 0) || 0;
-    
+
     if (totalPoints === 0) {
       console.log(`⚠️ Sub-skill "${subSkillName}" has no diagnostic questions`);
       return;
     }
-    
-    // Note: We now use actual max_points from database instead of manual conversion
 
     // Get user responses for these questions
     const questionIds = questions?.map(q => q.id) || [];
 
-    const sessionType = testMode === 'diagnostic' ? 'diagnostic' : 'practice';
-
-    // CRITICAL FIX: Filter by latest session IDs if provided (for practice tests)
+    // Build queries
     let responsesQuery = supabase
       .from('question_attempt_history')
       .select('question_id, is_correct, user_answer')
@@ -1106,13 +1107,32 @@ export class AnalyticsService {
       .eq('session_type', sessionType)
       .in('question_id', questionIds);
 
-    // If latest sessions provided, only get responses from those sessions
+    // CRITICAL FIX: Filter by latest session IDs if provided (for practice tests)
     if (latestSessions && latestSessions.length > 0) {
       const latestSessionIds = latestSessions.map(s => s.id);
       responsesQuery = responsesQuery.in('session_id', latestSessionIds);
     }
 
-    const { data: responses, error: responsesError } = await responsesQuery;
+    // PERFORMANCE: Parallelize responses and writing assessments queries
+    const queryPromises: Promise<any>[] = [responsesQuery];
+
+    if (isWritingSubSkill) {
+      let writingQuery = supabase
+        .from('writing_assessments')
+        .select('question_id, total_score, max_possible_score, percentage_score')
+        .eq('user_id', userId)
+        .in('question_id', questionIds);
+
+      if (latestSessions && latestSessions.length > 0) {
+        const latestSessionIds = latestSessions.map(s => s.id);
+        writingQuery = writingQuery.in('session_id', latestSessionIds);
+      }
+
+      queryPromises.push(writingQuery);
+    }
+
+    const results = await Promise.all(queryPromises);
+    const { data: responses, error: responsesError } = results[0];
 
     if (responsesError) {
       console.error(`❌ Error fetching responses for sub-skill ${subSkillName}:`, responsesError);
@@ -1121,37 +1141,18 @@ export class AnalyticsService {
     
     let questionsAttempted = 0;
     let questionsCorrect = 0;
-    
+
     if (isWritingSubSkill) {
       console.log(`✍️ Processing writing sub-skill: ${subSkillName}`);
-      
-      // For writing questions, get scores from writing_assessments table
-      // Verify user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.warn('User not authenticated for writing assessments query');
-        return { score: 0, maxScore: 0, accuracy: 0 };
-      }
-      
-      // CRITICAL FIX: Filter by latest session IDs if provided (for practice tests)
-      let writingQuery = supabase
-        .from('writing_assessments')
-        .select('question_id, total_score, max_possible_score, percentage_score')
-        .eq('user_id', userId)
-        .in('question_id', questionIds);
 
-      // If latest sessions provided, only get assessments from those sessions
-      if (latestSessions && latestSessions.length > 0) {
-        const latestSessionIds = latestSessions.map(s => s.id);
-        writingQuery = writingQuery.in('session_id', latestSessionIds);
-      }
+      // Get writing assessments from parallel query results (if available)
+      const writingAssessments = results.length > 1 ? results[1].data : null;
+      const writingError = results.length > 1 ? results[1].error : null;
 
-      const { data: writingAssessments, error: writingError } = await writingQuery;
-      
       if (writingError) {
         console.error(`❌ Error fetching writing assessments for ${subSkillName}:`, writingError);
       }
-      
+
       // Use weighted scoring for writing assessments
       if (writingAssessments && writingAssessments.length > 0) {
         const totalPossiblePoints = writingAssessments.reduce((sum, w) => sum + (w.max_possible_score || 0), 0);
@@ -1217,6 +1218,8 @@ export class AnalyticsService {
     }
 
   static async getDiagnosticResults(userId: string, productId: string): Promise<DiagnosticResults | null> {
+    const startTime = performance.now();
+    console.log('⏱️ getDiagnosticResults START');
     const productType = PRODUCT_ID_TO_TYPE[productId] || productId;
     // Return mock diagnostic data for demo purposes if enabled
     if (USE_MOCK_DATA) {
@@ -1287,14 +1290,25 @@ export class AnalyticsService {
     }
 
     try {
-      // Get all diagnostic test sessions (multiple sections)
-      const { data: diagnosticSessions, error: sessionError } = await supabase
-        .from('user_test_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('product_type', productType)
-        .eq('test_mode', 'diagnostic')
-        .eq('status', 'completed');
+      // PERFORMANCE: Parallelize initial queries
+      const [
+        { data: diagnosticSessions, error: sessionError },
+        { data: questionSubSkills, error: questionError }
+      ] = await Promise.all([
+        supabase
+          .from('user_test_sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('product_type', productType)
+          .eq('test_mode', 'diagnostic')
+          .eq('status', 'completed'),
+        supabase
+          .from(QUESTIONS_TABLE)
+          .select('sub_skill, section_name')
+          .eq('product_type', productType)
+          .eq('test_mode', 'diagnostic')
+          .not('sub_skill', 'is', null)
+      ]);
 
       if (sessionError) {
         console.error('❌ Error fetching diagnostic sessions:', sessionError);
@@ -1342,55 +1356,37 @@ export class AnalyticsService {
       }
 
       // COMPLETELY REBUILD sub-skill performance calculation
-      // Step 1: Try to get sub-skills from sub_skills table first
-      const { data: subSkillsData, error: subSkillsError } = await supabase
-        .from('sub_skills')
-        .select(`
-          id,
-          name,
-          product_type,
-          test_sections!inner(section_name)
-        `)
-        .eq('product_type', productType);
-
-      if (subSkillsError) {
-        console.error('❌ Error fetching sub-skills:', subSkillsError);
-        throw subSkillsError;
-      }
-
-      // Step 2: ALWAYS use sub_skill text field (sub_skill_id not populated in questions_v2)
       const subSkillPerformance = [];
 
-      if (true) { // Force use of sub_skill text field instead of sub_skill_id foreign key
-        // Get unique sub-skills directly from diagnostic questions
-        const { data: questionSubSkills, error: questionError } = await supabase
-          .from(QUESTIONS_TABLE)
-          .select('sub_skill, section_name')
-          .eq('product_type', productType)
-          .eq('test_mode', 'diagnostic')
-          .not('sub_skill', 'is', null);
+      if (questionError) {
+        console.error('❌ Error fetching sub-skills from questions:', questionError);
+        throw questionError;
+      }
 
-        if (questionError) {
-          console.error('❌ Error fetching sub-skills from questions:', questionError);
-          throw questionError;
+      // Create unique sub-skills from questions
+      const uniqueSubSkills = new Map<string, string>();
+      questionSubSkills?.forEach(q => {
+        if (q.sub_skill) {
+          uniqueSubSkills.set(q.sub_skill, q.section_name);
         }
+      });
 
-        // Create unique sub-skills from questions
-        const uniqueSubSkills = new Map<string, string>();
-        questionSubSkills?.forEach(q => {
-          if (q.sub_skill) {
-            uniqueSubSkills.set(q.sub_skill, q.section_name);
-          }
-        });
+      console.log(`⏱️ Processing ${uniqueSubSkills.size} sub-skills in PARALLEL...`);
+      const subSkillStart = performance.now();
 
-        // Process each unique sub-skill
-        for (const [subSkillName, sectionName] of uniqueSubSkills) {
-          await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance);
-        }
-      } else {
-        // Process sub-skills from sub_skills table (original logic)
-      
-      for (const subSkill of subSkillsData || []) {
+      // PERFORMANCE: Process all sub-skills in parallel
+      await Promise.all(
+        Array.from(uniqueSubSkills).map(([subSkillName, sectionName]) =>
+          this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance)
+        )
+      );
+
+      const subSkillDuration = performance.now() - subSkillStart;
+      console.log(`⏱️ Sub-skills processed in ${subSkillDuration.toFixed(0)}ms`);
+
+      // The following code is dead code (was inside an if (true) block) - keeping for reference but skipping
+      if (false) {
+      for (const subSkill of [] as any[]) {
         // Get all diagnostic questions for this sub-skill
         const { data: questions, error: questionsError } = await supabase
           .from(QUESTIONS_TABLE)
@@ -1941,7 +1937,7 @@ export class AnalyticsService {
         });
       }
 
-      return {
+      const result = {
         overallScore,
         totalQuestionsCorrect: totalCorrect,
         totalQuestions,
@@ -1958,8 +1954,13 @@ export class AnalyticsService {
         totalSections: expectedSections.length,
       };
 
+      const duration = performance.now() - startTime;
+      console.log(`⏱️ getDiagnosticResults COMPLETE in ${duration.toFixed(0)}ms`);
+      return result;
+
     } catch (error) {
-      console.error('❌ Error in getDiagnosticResults:', error);
+      const duration = performance.now() - startTime;
+      console.error(`❌ Error in getDiagnosticResults after ${duration.toFixed(0)}ms:`, error);
       throw error;
     }
   }
