@@ -2191,10 +2191,14 @@ export class AnalyticsService {
 
           // ALWAYS use sub_skill text field approach (sub_skill_id not populated in questions_v2)
           if (true) { // Force use of sub_skill text field instead of sub_skill_id foreign key
-            // Get unique sub-skills directly from practice questions for this test
-            const { data: questionSubSkills, error: questionError } = await supabase
+            // PERFORMANCE OPTIMIZATION: Batch-fetch ALL data upfront instead of N+1 queries
+            const latestSessionIds = testSessions.map(s => s.id);
+            const sessionType = 'practice';
+
+            // 1. Get all questions for this test (with sub_skill, section, max_points)
+            const { data: allQuestions, error: questionError } = await supabase
               .from(QUESTIONS_TABLE)
-              .select('sub_skill, section_name')
+              .select('id, sub_skill, section_name, max_points')
               .eq('product_type', productType)
               .eq('test_mode', testMode)
               .not('sub_skill', 'is', null);
@@ -2204,17 +2208,123 @@ export class AnalyticsService {
               throw questionError;
             }
 
-            // Create unique sub-skills from questions
-            const uniqueSubSkills = new Map<string, string>();
-            questionSubSkills?.forEach(q => {
-              if (q.sub_skill) {
-                uniqueSubSkills.set(q.sub_skill, q.section_name);
+            if (!allQuestions || allQuestions.length === 0) {
+              console.log(`⚠️ No questions found for practice test ${testMode}`);
+              continue; // Skip to next practice test
+            }
+
+            const allQuestionIds = allQuestions.map(q => q.id);
+
+            // 2. Batch-fetch ALL responses and writing assessments in parallel
+            const [
+              { data: allResponses, error: responsesError },
+              { data: allWritingAssessments, error: writingError }
+            ] = await Promise.all([
+              supabase
+                .from('question_attempt_history')
+                .select('question_id, is_correct, user_answer')
+                .eq('user_id', userId)
+                .eq('session_type', sessionType)
+                .in('question_id', allQuestionIds)
+                .in('session_id', latestSessionIds),
+              supabase
+                .from('writing_assessments')
+                .select('question_id, total_score, max_possible_score, percentage_score')
+                .eq('user_id', userId)
+                .in('question_id', allQuestionIds)
+                .in('session_id', latestSessionIds)
+            ]);
+
+            if (responsesError) {
+              console.error('❌ Error fetching responses:', responsesError);
+            }
+
+            if (writingError) {
+              console.error('❌ Error fetching writing assessments:', writingError);
+            }
+
+            // 3. Create lookup maps for fast access
+            const responsesByQuestionId = new Map<number, any[]>();
+            allResponses?.forEach(response => {
+              if (!responsesByQuestionId.has(response.question_id)) {
+                responsesByQuestionId.set(response.question_id, []);
               }
+              responsesByQuestionId.get(response.question_id)!.push(response);
             });
 
-            // Process each unique sub-skill using diagnostic approach
-            for (const [subSkillName, sectionName] of uniqueSubSkills) {
-              await this.processSubSkillFromQuestions(subSkillName, sectionName, productType, userId, subSkillPerformance, testMode, sectionTotals, testSessions);
+            const writingAssessmentsByQuestionId = new Map<number, any>();
+            allWritingAssessments?.forEach(assessment => {
+              writingAssessmentsByQuestionId.set(assessment.question_id, assessment);
+            });
+
+            // 4. Group questions by sub-skill
+            const questionsBySubSkill = new Map<string, Array<typeof allQuestions[0]>>();
+            allQuestions.forEach(q => {
+              if (!q.sub_skill) return;
+              if (!questionsBySubSkill.has(q.sub_skill)) {
+                questionsBySubSkill.set(q.sub_skill, []);
+              }
+              questionsBySubSkill.get(q.sub_skill)!.push(q);
+            });
+
+            // 5. Process each sub-skill using pre-fetched data (NO MORE DATABASE QUERIES!)
+            for (const [subSkillName, questions] of questionsBySubSkill) {
+              const sectionName = questions[0]?.section_name || 'Unknown';
+              const isWritingSubSkill = subSkillName.toLowerCase().includes('writing') ||
+                                       sectionName?.toLowerCase().includes('writing');
+
+              const totalPoints = questions.reduce((sum, q) => sum + (q.max_points || 1), 0);
+
+              let questionsAttempted = 0;
+              let questionsCorrect = 0;
+
+              if (isWritingSubSkill) {
+                // Use weighted scoring for writing questions
+                let totalPossiblePoints = 0;
+                let totalEarnedPoints = 0;
+
+                questions.forEach(q => {
+                  const assessment = writingAssessmentsByQuestionId.get(q.id);
+                  if (assessment) {
+                    totalPossiblePoints += assessment.max_possible_score || 0;
+                    totalEarnedPoints += assessment.total_score || 0;
+                  }
+                });
+
+                questionsAttempted = totalPossiblePoints;
+                questionsCorrect = totalEarnedPoints;
+              } else {
+                // Non-writing questions: count correct responses
+                questions.forEach(q => {
+                  const responses = responsesByQuestionId.get(q.id) || [];
+                  questionsAttempted += responses.length;
+                  questionsCorrect += responses.filter(r => r.is_correct).length;
+                });
+              }
+
+              const accuracy = questionsAttempted > 0 ? Math.round((questionsCorrect / questionsAttempted) * 100) : 0;
+              const score = totalPoints > 0 ? Math.round((questionsCorrect / totalPoints) * 100) : 0;
+
+              subSkillPerformance.push({
+                subSkill: subSkillName,
+                subSkillName,
+                questionsTotal: totalPoints,
+                questionsAttempted,
+                questionsCorrect,
+                accuracy,
+                score,
+                sectionName
+              });
+
+              // Aggregate by section
+              const mappedSectionName = mapSectionNameToCurriculum(sectionName, productType);
+              if (!sectionTotals.has(mappedSectionName)) {
+                sectionTotals.set(mappedSectionName, {questionsCorrect: 0, questionsTotal: 0, questionsAttempted: 0});
+              }
+              const sectionData = sectionTotals.get(mappedSectionName)!;
+              sectionData.questionsCorrect += questionsCorrect;
+              sectionData.questionsTotal += totalPoints;
+              sectionData.questionsAttempted += questionsAttempted;
             }
           } else {
             // Process sub-skills from sub_skills table (exactly like diagnostic)
