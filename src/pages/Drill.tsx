@@ -694,7 +694,7 @@ const Drill: React.FC = () => {
           dbProductType
         );
 
-        let navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${selectedDifficulty}&skillArea=${skillArea.name}`;
+        let navigationUrl = `/test/drill/${subSkill.id}?skill=${encodeURIComponent(subSkill.name)}&difficulty=${selectedDifficulty}&skillArea=${encodeURIComponent(skillArea.name)}`;
 
         if (existingSession) {
           navigationUrl += `&sessionId=${existingSession.sessionId}`;
@@ -708,7 +708,7 @@ const Drill: React.FC = () => {
         navigate(navigationUrl);
       } catch (error) {
         console.error('🎯 DROPDOWN DRILL: Error starting drill:', error);
-        const navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${selectedDifficulty}&skillArea=${skillArea.name}`;
+        const navigationUrl = `/test/drill/${subSkill.id}?skill=${encodeURIComponent(subSkill.name)}&difficulty=${selectedDifficulty}&skillArea=${encodeURIComponent(skillArea.name)}`;
         navigate(navigationUrl);
       }
     } else {
@@ -798,7 +798,7 @@ const Drill: React.FC = () => {
           dbProductType
         );
 
-        let navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${targetDifficulty}&skillArea=${skillArea.name}`;
+        let navigationUrl = `/test/drill/${subSkill.id}?skill=${encodeURIComponent(subSkill.name)}&difficulty=${targetDifficulty}&skillArea=${encodeURIComponent(skillArea.name)}`;
 
         if (existingSession) {
           navigationUrl += `&sessionId=${existingSession.sessionId}`;
@@ -814,7 +814,7 @@ const Drill: React.FC = () => {
     } catch (error) {
       console.error('🎯 RECOMMENDATION: Error starting drill:', error);
       // Fallback navigation
-      const navigationUrl = `/test/drill/${subSkill.id}?skill=${subSkill.name}&difficulty=${targetDifficulty}&skillArea=${skillArea.name}`;
+      const navigationUrl = `/test/drill/${subSkill.id}?skill=${encodeURIComponent(subSkill.name)}&difficulty=${targetDifficulty}&skillArea=${encodeURIComponent(skillArea.name)}`;
       navigate(navigationUrl);
     }
   };
@@ -883,7 +883,7 @@ const Drill: React.FC = () => {
         );
         
         // For non-writing drills, keep the current Drill.tsx experience
-        let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
+        let navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}&skillArea=${encodeURIComponent(selectedSkillArea.name)}`;
         
         if (existingSession) {
           // Add session ID for resume/review
@@ -903,7 +903,7 @@ const Drill: React.FC = () => {
         console.error('🎯 DRILL: Error checking/creating drill session:', error);
         // Fallback to navigation method for non-writing drills only
         // (Writing drills already handled above and returned early)
-        const navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${selectedSubSkill.name}&difficulty=${difficulty}&skillArea=${selectedSkillArea.name}`;
+        const navigationUrl = `/test/drill/${selectedSubSkill.id}?skill=${encodeURIComponent(selectedSubSkill.name)}&difficulty=${difficulty}&skillArea=${encodeURIComponent(selectedSkillArea.name)}`;
         navigate(navigationUrl);
       }
     } else {
