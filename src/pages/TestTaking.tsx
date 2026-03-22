@@ -144,8 +144,10 @@ const TestTaking: React.FC = () => {
   const textAutoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const periodicSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTextChangeTimeRef = useRef<number>(0);
+  const sessionLoadedRef = useRef(false); // Prevent re-initialization when session already loaded
 
-  const sectionName = searchParams.get('sectionName') || '';
+  // Handle both 'sectionName' (writing drills) and 'skill' (non-writing drills) query params
+  const sectionName = searchParams.get('sectionName') || searchParams.get('skill') || '';
   const isReviewMode = searchParams.get('review') === 'true';
   const currentDifficulty = searchParams.get('difficulty') as 'easy' | 'medium' | 'hard' | null;
 
@@ -564,6 +566,13 @@ const TestTaking: React.FC = () => {
     const initializeSession = async () => {
       if (!user || initializing || initializingRef.current) return;
 
+      // CRITICAL FIX: Prevent re-initialization if session is already loaded
+      // This prevents the page from refreshing when switching tabs
+      if (sessionLoadedRef.current && session) {
+        console.log('🔒 INIT-GUARD: Session already loaded, skipping re-initialization');
+        return;
+      }
+
       try {
         initializingRef.current = true;
         setInitializing(true);
@@ -699,7 +708,11 @@ const TestTaking: React.FC = () => {
             });
             setSession(resumedSession);
             setTimeRemaining(savedSession.timeRemainingSeconds);
-            
+
+            // Mark session as loaded to prevent re-initialization
+            sessionLoadedRef.current = true;
+            console.log('🔒 SESSION-LOADED: Session resumed and marked as loaded');
+
             // Ensure URL has session ID for future resumes
             if (!searchParams.get('sessionId')) {
               const newSearchParams = new URLSearchParams(searchParams);
@@ -707,7 +720,7 @@ const TestTaking: React.FC = () => {
               setSearchParams(newSearchParams, { replace: true });
               console.log('🔗 URL-UPDATE: Added sessionId to initial resume URL via setSearchParams:', actualSessionId);
             }
-            
+
             return;
           } else {
             }
@@ -902,7 +915,11 @@ const TestTaking: React.FC = () => {
 
           setSession(resumedSession);
           setTimeRemaining(existingSession.timeRemainingSeconds);
-          
+
+          // Mark session as loaded to prevent re-initialization
+          sessionLoadedRef.current = true;
+          console.log('🔒 SESSION-LOADED: Existing session resumed and marked as loaded');
+
           // Ensure URL has session ID for future resumes
           if (!searchParams.get('sessionId')) {
             const newSearchParams = new URLSearchParams(searchParams);
@@ -910,7 +927,7 @@ const TestTaking: React.FC = () => {
             setSearchParams(newSearchParams, { replace: true });
             console.log('🔗 URL-UPDATE: Added sessionId to resumed session URL via setSearchParams:', sessionIdToUse);
           }
-          
+
           return;
         }
 
@@ -936,6 +953,11 @@ const TestTaking: React.FC = () => {
         console.log('🔥 TIMER SET: About to setTimeRemaining with seconds:', timeLimitSeconds);
         setTimeRemaining(timeLimitSeconds || 0);
         console.log('🔥 TIMER SET: Timer initialized with', timeLimitSeconds, 'seconds (', timeLimitMinutes, 'minutes)');
+
+        // Mark session as loaded to prevent re-initialization
+        sessionLoadedRef.current = true;
+        console.log('🔒 SESSION-LOADED: New session created and marked as loaded');
+
         // Update URL with session ID so it can be resumed
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('sessionId', sessionIdToUse);
@@ -961,7 +983,15 @@ const TestTaking: React.FC = () => {
     };
 
     initializeSession();
-  }, [testType, subjectId, actualSessionId, searchParams, selectedProduct, user]);
+
+    // Cleanup: Reset sessionLoadedRef when component unmounts or test changes
+    return () => {
+      console.log('🧹 CLEANUP: Resetting sessionLoadedRef on unmount/test change');
+      sessionLoadedRef.current = false;
+    };
+  }, [testType, subjectId, actualSessionId, selectedProduct, user]);
+  // CRITICAL FIX: Removed 'searchParams' from dependencies to prevent re-initialization loop
+  // searchParams changes when we add sessionId to URL, which was causing infinite re-initialization
 
   // Auto-save progress
   const saveProgress = async (overrideSession?: TestSessionState) => {
