@@ -1136,23 +1136,20 @@ const TestTaking: React.FC = () => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'hidden' && session) {
         // Page is being hidden (tab switch, minimized, etc.)
-        const hasUnsavedText = Object.values(session.textAnswers).some(text => 
-          text && text.trim().length > 0
-        );
-        
-        if (hasUnsavedText) {
-          console.log('👁️ VISIBILITY: Page hidden, saving text answers');
-          
-          // Clear any pending auto-save timeout
-          if (textAutoSaveTimeoutRef.current) {
-            clearTimeout(textAutoSaveTimeoutRef.current);
-          }
-          
-          try {
-            await saveProgress(session);
-            } catch (error) {
-            console.error('❌ VISIBILITY: Failed to save text answers:', error);
-          }
+        // CRITICAL FIX: Always save progress to preserve current question position
+        // Not just when there are text answers!
+        console.log('👁️ VISIBILITY: Page hidden, saving progress (currentQuestion:', session.currentQuestion, ')');
+
+        // Clear any pending auto-save timeout
+        if (textAutoSaveTimeoutRef.current) {
+          clearTimeout(textAutoSaveTimeoutRef.current);
+        }
+
+        try {
+          await saveProgress(session);
+          console.log('👁️ VISIBILITY: Progress saved successfully');
+        } catch (error) {
+          console.error('❌ VISIBILITY: Failed to save progress:', error);
         }
       }
     };
