@@ -110,13 +110,13 @@ async function main() {
 
     // Get the actual performance data that was analyzed
     const { data: last7DaysSnapshots } = await db.client
-      .from('google_ads_daily_snapshots')
+      .from('google_ads_campaign_performance')
       .select('*')
       .gte('date', sevenDaysAgo.toISOString().split('T')[0])
       .lte('date', today);
 
     const { data: previous7DaysSnapshots } = await db.client
-      .from('google_ads_daily_snapshots')
+      .from('google_ads_campaign_performance')
       .select('*')
       .gte('date', fourteenDaysAgo.toISOString().split('T')[0])
       .lt('date', sevenDaysAgo.toISOString().split('T')[0]);
@@ -170,7 +170,8 @@ async function main() {
  * Aggregate snapshot data for performance summary
  */
 function aggregateSnapshots(snapshots: any[]) {
-  const total_spend = snapshots.reduce((sum, s) => sum + s.cost, 0);
+  // Convert cost_micros to dollars (micros / 1,000,000)
+  const total_spend = snapshots.reduce((sum, s) => sum + (s.cost_micros / 1000000), 0);
   const total_conversions = snapshots.reduce((sum, s) => sum + s.conversions, 0);
   const total_clicks = snapshots.reduce((sum, s) => sum + s.clicks, 0);
   const total_impressions = snapshots.reduce((sum, s) => sum + s.impressions, 0);

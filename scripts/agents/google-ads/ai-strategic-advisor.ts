@@ -151,7 +151,7 @@ export class AIStrategicAdvisor {
 
     // Get campaign performance from daily snapshots
     const { data: snapshots } = await this.db
-      .from('google_ads_daily_snapshots')
+      .from('google_ads_campaign_performance')
       .select('*')
       .gte('date', startDateStr)
       .lte('date', endDateStr);
@@ -161,8 +161,11 @@ export class AIStrategicAdvisor {
 
     snapshots?.forEach(snapshot => {
       const existing = campaignMap.get(snapshot.campaign_id);
+      // Convert cost_micros to dollars
+      const cost = snapshot.cost_micros / 1000000;
+
       if (existing) {
-        existing.spend += snapshot.cost;
+        existing.spend += cost;
         existing.conversions += snapshot.conversions;
         existing.impressions += snapshot.impressions;
         existing.clicks += snapshot.clicks;
@@ -171,7 +174,7 @@ export class AIStrategicAdvisor {
           campaign_id: snapshot.campaign_id,
           campaign_name: snapshot.campaign_name,
           product_slug: snapshot.product_slug || '',
-          spend: snapshot.cost,
+          spend: cost,
           conversions: snapshot.conversions,
           cac: 0, // Will calculate after
           ctr: 0,
