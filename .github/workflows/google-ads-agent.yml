@@ -28,14 +28,18 @@ jobs:
       - name: Determine mode (daily vs weekly)
         id: mode
         run: |
+          # TEMPORARY: Force optimize mode for testing
+          echo "mode=optimize" >> $GITHUB_OUTPUT
+          echo "Running FULL OPTIMIZATION (TESTING MODE)"
+          # Uncomment below for normal operation after testing:
           # Check if today is Monday (1 = Monday in date +%u)
-          if [ "$(date +%u)" = "1" ]; then
-            echo "mode=optimize" >> $GITHUB_OUTPUT
-            echo "Running FULL OPTIMIZATION (Monday)"
-          else
-            echo "mode=collect" >> $GITHUB_OUTPUT
-            echo "Running DATA COLLECTION (non-Monday)"
-          fi
+          # if [ "$(date +%u)" = "1" ]; then
+          #   echo "mode=optimize" >> $GITHUB_OUTPUT
+          #   echo "Running FULL OPTIMIZATION (Monday)"
+          # else
+          #   echo "mode=collect" >> $GITHUB_OUTPUT
+          #   echo "Running DATA COLLECTION (non-Monday)"
+          # fi
 
       - name: Run data collection
         if: steps.mode.outputs.mode == 'collect'
