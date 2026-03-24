@@ -36,7 +36,9 @@
     "publish:ghost:delete-drafts": "tsx scripts/ghost/delete-all-drafts.ts",
     "agents:google-ads": "tsx scripts/agents/google-ads/index.ts",
     "agents:google-ads:dry-run": "tsx scripts/agents/google-ads/index.ts --dry-run",
-    "agents:google-ads:collect-data": "tsx scripts/agents/google-ads/collect-data-only.ts"
+    "agents:google-ads:collect-data": "tsx scripts/agents/google-ads/collect-data-only.ts",
+    "agents:google-ads:ai": "tsx scripts/agents/google-ads/index-ai.ts",
+    "agents:google-ads:ai:dry-run": "tsx scripts/agents/google-ads/index-ai.ts --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",

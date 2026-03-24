@@ -79,10 +79,15 @@ export interface TestCalendar {
 }
 
 export class Database {
-  private client: SupabaseClient;
+  public client: SupabaseClient;  // Made public for direct access
 
   constructor() {
     this.client = createClient(supabaseUrl, supabaseServiceKey);
+  }
+
+  // Expose the raw client for modules that need direct Supabase access
+  getClient(): SupabaseClient {
+    return this.client;
   }
 
   // ==========================================
