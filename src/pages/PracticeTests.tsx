@@ -213,36 +213,49 @@ const PracticeTests: React.FC = () => {
         if (user) {
           try {
             const dbProductType = getDbProductType(selectedProduct);
-            // Load progress for all practice test modes
-            const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
-            const allProgressData: Record<string, any> = {};
 
-            for (const testMode of practiceTestModes) {
-              try {
-                const progressData = await SessionService.getUserProgress(
-                  user.id, 
-                  dbProductType,
-                  testMode
-                );
-                
-                // Prefix section names with test mode to avoid conflicts
-                Object.entries(progressData).forEach(([sectionName, progress]) => {
-                  allProgressData[`${testMode}_${sectionName}`] = {
-                    ...progress,
-                    testMode // Add test mode for lookup
+            // PERFORMANCE OPTIMIZATION: Load all practice test progress in a single query
+            // instead of 5 separate queries (one per practice test)
+            console.time('📊 Load practice progress');
+            const { data: allSessions, error } = await supabase
+              .from('user_test_sessions')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('product_type', dbProductType)
+              .in('test_mode', ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'])
+              .order('updated_at', { ascending: false });
+            console.timeEnd('📊 Load practice progress');
+
+            if (!error && allSessions) {
+              // Process sessions into progress data
+              const allProgressData: Record<string, any> = {};
+              const progressByModeAndSection: Record<string, any> = {};
+
+              // Group by test_mode and section_name, keeping only the most recent
+              allSessions.forEach(session => {
+                const key = `${session.test_mode}_${session.section_name}`;
+                if (!progressByModeAndSection[key]) {
+                  progressByModeAndSection[key] = session;
+
+                  allProgressData[key] = {
+                    sessionId: session.id,
+                    status: session.status,
+                    score: session.status === 'completed' ?
+                      Math.round((session.questions_correct / session.total_questions) * 100) :
+                      undefined,
+                    lastAttempt: session.updated_at,
+                    testMode: session.test_mode
                   };
-                });
-                
-              } catch (error) {
-                // Silent error handling for performance
-              }
+                }
+              });
+
+              setSectionProgress(allProgressData);
             }
 
-            setSectionProgress(allProgressData);
             // Calculate average score from test sessions
             await calculateAverageScore();
           } catch (error) {
-            // Silent error handling for performance
+            console.error('Error loading practice progress:', error);
           }
         }
 
@@ -259,75 +272,8 @@ const PracticeTests: React.FC = () => {
     loadTestData();
   }, [selectedProduct, user]);
 
-  // Reload progress when returning to page
-  useEffect(() => {
-    const refreshProgress = async () => {
-      if (user) {
-        try {
-          const dbProductType = getDbProductType(selectedProduct);
-          // Load progress for all practice test modes
-          const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
-          const allProgressData: Record<string, any> = {};
-
-          for (const testMode of practiceTestModes) {
-            try {
-              const progressData = await SessionService.getUserProgress(user.id, dbProductType, testMode);
-              
-              // Prefix section names with test mode to avoid conflicts
-              Object.entries(progressData).forEach(([sectionName, progress]) => {
-                allProgressData[`${testMode}_${sectionName}`] = {
-                  ...progress,
-                  testMode
-                };
-              });
-            } catch (error) {
-              // Silent error handling for performance
-            }
-          }
-
-          setSectionProgress(allProgressData);
-          // Recalculate average score
-          await calculateAverageScore();
-        } catch (error) {
-          // Silent error handling for performance
-        }
-      }
-    };
-
-    // Refresh immediately when component mounts or dependencies change
-    refreshProgress();
-
-    // Refresh on window focus
-    const handleFocus = () => refreshProgress();
-    // Reduced focus polling for performance
-    let focusTimeout: NodeJS.Timeout;
-    const debouncedHandleFocus = () => {
-      clearTimeout(focusTimeout);
-      focusTimeout = setTimeout(handleFocus, 1000); // Debounce 1s
-    };
-    window.addEventListener('focus', debouncedHandleFocus);
-
-    // Refresh periodically when window is visible (to catch updates from other tabs)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refreshProgress();
-      }
-    };
-    // Reduced visibility polling for performance
-    let visibilityTimeout: NodeJS.Timeout;
-    const debouncedVisibilityChange = () => {
-      clearTimeout(visibilityTimeout);
-      visibilityTimeout = setTimeout(handleVisibilityChange, 2000); // Debounce 2s
-    };
-    document.addEventListener('visibilitychange', debouncedVisibilityChange);
-
-    return () => {
-      clearTimeout(focusTimeout);
-      clearTimeout(visibilityTimeout);
-      window.removeEventListener('focus', debouncedHandleFocus);
-      document.removeEventListener('visibilitychange', debouncedVisibilityChange);
-    };
-  }, [user, selectedProduct]);
+  // Note: Progress refresh on mount is now handled by the main loadTestData useEffect above
+  // This eliminates duplicate loading and improves performance
 
   // Handle refresh parameter from navigation
   useEffect(() => {
@@ -336,34 +282,46 @@ const PracticeTests: React.FC = () => {
       const forceRefreshProgress = async () => {
         try {
           const dbProductType = getDbProductType(selectedProduct);
-          // Load progress for all practice test modes
-          const practiceTestModes = ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'];
-          const allProgressData: Record<string, any> = {};
 
-          for (const testMode of practiceTestModes) {
-            try {
-              const progressData = await SessionService.getUserProgress(user.id, dbProductType, testMode);
-              
-              // Prefix section names with test mode to avoid conflicts
-              Object.entries(progressData).forEach(([sectionName, progress]) => {
-                allProgressData[`${testMode}_${sectionName}`] = {
-                  ...progress,
-                  testMode
+          // PERFORMANCE OPTIMIZATION: Single query instead of 5 sequential queries
+          const { data: allSessions, error } = await supabase
+            .from('user_test_sessions')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('product_type', dbProductType)
+            .in('test_mode', ['practice_1', 'practice_2', 'practice_3', 'practice_4', 'practice_5'])
+            .order('updated_at', { ascending: false });
+
+          if (!error && allSessions) {
+            const allProgressData: Record<string, any> = {};
+            const progressByModeAndSection: Record<string, any> = {};
+
+            allSessions.forEach(session => {
+              const key = `${session.test_mode}_${session.section_name}`;
+              if (!progressByModeAndSection[key]) {
+                progressByModeAndSection[key] = session;
+                allProgressData[key] = {
+                  sessionId: session.id,
+                  status: session.status,
+                  score: session.status === 'completed' ?
+                    Math.round((session.questions_correct / session.total_questions) * 100) :
+                    undefined,
+                  lastAttempt: session.updated_at,
+                  testMode: session.test_mode
                 };
-              });
-            } catch (error) {
-              // Silent error handling for performance
-            }
+              }
+            });
+
+            setSectionProgress(allProgressData);
           }
 
-          setSectionProgress(allProgressData);
           // Recalculate average score
           await calculateAverageScore();
 
           // Clear the refresh parameter from URL
           setSearchParams({});
         } catch (error) {
-          // Silent error handling for performance
+          console.error('Error refreshing practice progress:', error);
         }
       };
 

@@ -38,7 +38,12 @@
     "agents:google-ads:dry-run": "tsx scripts/agents/google-ads/index.ts --dry-run",
     "agents:google-ads:collect-data": "tsx scripts/agents/google-ads/collect-data-only.ts",
     "agents:google-ads:ai": "tsx scripts/agents/google-ads/index-ai.ts",
-    "agents:google-ads:ai:dry-run": "tsx scripts/agents/google-ads/index-ai.ts --dry-run"
+    "agents:google-ads:ai:dry-run": "tsx scripts/agents/google-ads/index-ai.ts --dry-run",
+    "agents:google-ads:weekly": "tsx scripts/agents/google-ads/index-weekly.ts",
+    "agents:google-ads:collect-snapshots": "tsx scripts/agents/google-ads/collect-weekly-snapshots.ts",
+    "agents:google-ads:collect-snapshots:dry-run": "tsx scripts/agents/google-ads/collect-weekly-snapshots.ts --dry-run",
+    "agents:google-ads:analyze": "tsx scripts/agents/google-ads/analyze-with-ai.ts",
+    "agents:google-ads:audit": "tsx scripts/agents/google-ads/audit-comprehensive.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
@@ -93,6 +98,7 @@
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.66.0",
     "puppeteer": "^24.9.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -103,6 +109,7 @@
     "react-router-dom": "^6.26.2",
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
+    "source-map-js": "^1.2.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.3",
@@ -112,6 +119,7 @@
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.15.21",
+    "@types/node-telegram-bot-api": "^0.64.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",

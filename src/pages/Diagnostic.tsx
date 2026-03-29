@@ -194,46 +194,8 @@ const DiagnosticTests: React.FC = () => {
     loadDiagnosticData();
   }, [selectedProduct, user]);
   
-  // Reload progress when returning to page
-  useEffect(() => {
-    const refreshProgress = async () => {
-      if (user) {
-        try {
-          // Use the same product mapping as the main load
-          const getDbProductType = (productId: string): string => {
-            const productMap: Record<string, string> = {
-              'vic-selective': 'VIC Selective Entry (Year 9 Entry)',
-              'nsw-selective': 'NSW Selective Entry (Year 7 Entry)',
-              'year-5-naplan': 'Year 5 NAPLAN',
-              'year-7-naplan': 'Year 7 NAPLAN',
-              'edutest-scholarship': 'EduTest Scholarship (Year 7 Entry)',
-              'edutest-year-7': 'EduTest Scholarship (Year 7 Entry)',
-              'acer-scholarship': 'ACER Scholarship (Year 7 Entry)',
-              'acer-year-7': 'ACER Scholarship (Year 7 Entry)'
-            };
-            return productMap[productId] || productId;
-          };
-          
-          const dbProductType = getDbProductType(selectedProduct);
-          const progressData = await SessionService.getUserProgress(user.id, dbProductType, 'diagnostic');
-          setSectionProgress(progressData);
-          // Log status of each section for debugging
-          Object.entries(progressData).forEach(([sectionName, progress]) => {
-            });
-        } catch (error) {
-          console.error('Error refreshing progress:', error);
-        }
-      }
-    };
-
-    // Refresh on window focus
-    const handleFocus = () => {
-      refreshProgress();
-    };
-    window.addEventListener('focus', handleFocus);
-    
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [user, selectedProduct]);
+  // Note: Progress refresh removed - data loads on component mount via loadDiagnosticData()
+  // No need to refresh on every focus event, which caused constant unnecessary reloads
 
   // Add manual refresh function for debugging
   const manualRefresh = async () => {

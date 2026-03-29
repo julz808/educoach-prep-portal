@@ -568,8 +568,16 @@ const TestTaking: React.FC = () => {
 
       // CRITICAL FIX: Prevent re-initialization if session is already loaded
       // This prevents the page from refreshing when switching tabs
-      if (sessionLoadedRef.current && session) {
-        console.log('🔒 INIT-GUARD: Session already loaded, skipping re-initialization');
+      // Check BOTH the ref and if we have an actualSessionId (meaning we should be resuming, not creating new)
+      if (sessionLoadedRef.current) {
+        console.log('🔒 INIT-GUARD: Session already loaded (ref), skipping re-initialization');
+        return;
+      }
+
+      // Additional guard: If we already have a session object, don't reinitialize
+      if (session && actualSessionId) {
+        console.log('🔒 INIT-GUARD: Session already exists in state, skipping re-initialization');
+        sessionLoadedRef.current = true; // Set ref to prevent future reinits
         return;
       }
 
@@ -986,8 +994,11 @@ const TestTaking: React.FC = () => {
 
     // Cleanup: Reset sessionLoadedRef when component unmounts or test changes
     return () => {
-      console.log('🧹 CLEANUP: Resetting sessionLoadedRef on unmount/test change');
-      sessionLoadedRef.current = false;
+      // CRITICAL FIX: Don't reset sessionLoadedRef in cleanup
+      // React Strict Mode causes double-mount in dev, which would reset the ref
+      // and cause re-initialization on tab switch
+      // The ref will be naturally reset when dependencies actually change (different test, etc.)
+      console.log('🧹 CLEANUP: Component cleanup (not resetting sessionLoadedRef to prevent tab-switch issues)');
     };
   }, [testType, subjectId, actualSessionId, selectedProduct, user]);
   // CRITICAL FIX: Removed 'searchParams' from dependencies to prevent re-initialization loop
@@ -1565,6 +1576,10 @@ const TestTaking: React.FC = () => {
           stringAnswers, // Use converted string answers
           stringTextAnswers
         );
+
+        // Set refresh flag so Drill.tsx knows to reload progress data
+        console.log('🔄 DRILL-COMPLETE: Setting refresh flag for drill progress update');
+        localStorage.setItem('drill_progress_refresh_needed', 'true');
       } else {
         // For regular sessions (diagnostic/practice) AND writing drills, use developer tools replica approach
         // Create the session structure in the exact format the replica service expects

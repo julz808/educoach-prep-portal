@@ -544,57 +544,24 @@ const Drill: React.FC = () => {
     loadDrillData();
   }, [selectedProduct, user]);
   
-  // Refresh progress data when component becomes visible (user returns from drill)
+  // Refresh progress data ONLY when flag is set (after completing a drill)
+  // This prevents constant unnecessary refreshes while providing updates when needed
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && user) {
-        // Check if there's a refresh flag from completed writing drill
+        // Check if there's a refresh flag from completed drill
         const refreshFlag = localStorage.getItem('drill_progress_refresh_needed');
         if (refreshFlag === 'true') {
+          console.log('🔄 DRILL: Refresh flag detected, reloading progress data');
           localStorage.removeItem('drill_progress_refresh_needed');
+          reloadProgressData();
         }
-        
-        reloadProgressData();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [user]);
-
-  // Add periodic refresh to catch developer tools changes
-  useEffect(() => {
-    if (!user) return;
-
-    const refreshProgress = async () => {
-      await reloadProgressData();
-    };
-
-    // Refresh on window focus
-    const handleFocus = () => refreshProgress();
-    window.addEventListener('focus', handleFocus);
-    
-    // Refresh periodically when window is visible
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refreshProgress();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Also refresh every 5 seconds in development to catch dev tool changes
-    const interval = setInterval(() => {
-      if (!document.hidden && import.meta.env.DEV) {
-        refreshProgress();
-      }
-    }, import.meta.env.DEV ? 5000 : 30000);
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearInterval(interval);
     };
   }, [user]);
 
