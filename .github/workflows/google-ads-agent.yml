@@ -1,15 +1,13 @@
-name: Google Ads Marketing Agent
+name: Google Ads Weekly AI Agent
 
 on:
   schedule:
-    # Daily data collection: 6 AM AEST = 8 PM UTC (previous day)
-    - cron: '0 20 * * *'
-    # Weekly optimization: Monday 6 AM AEST = Sunday 8 PM UTC
+    # Weekly analysis: Monday 6 AM AEST = Sunday 8 PM UTC
     - cron: '0 20 * * 0'
   workflow_dispatch: # Manual trigger button
 
 jobs:
-  run-agent:
+  weekly-agent:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,33 +23,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Determine mode (daily vs weekly)
-        id: mode
-        run: |
-          # Check if today is Monday (1 = Monday in date +%u)
-          if [ "$(date +%u)" = "1" ]; then
-            echo "mode=optimize" >> $GITHUB_OUTPUT
-            echo "Running FULL OPTIMIZATION (Monday)"
-          else
-            echo "mode=collect" >> $GITHUB_OUTPUT
-            echo "Running DATA COLLECTION (non-Monday)"
-          fi
-
-      - name: Run data collection
-        if: steps.mode.outputs.mode == 'collect'
-        run: npm run agents:google-ads:collect-data
-        env:
-          GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
-          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
-          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
-          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
-          GOOGLE_ADS_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: Run AI-powered optimization
-        if: steps.mode.outputs.mode == 'optimize'
-        run: npm run agents:google-ads:ai
+      - name: Run Weekly AI Agent V2
+        run: npx tsx "Google Ads Agent/scripts/v2/index-weekly-v2.ts"
         env:
           GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
           GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
