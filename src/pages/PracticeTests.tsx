@@ -331,7 +331,11 @@ const PracticeTests: React.FC = () => {
 
   // Transform Supabase data to component format - exclude drill and diagnostic modes
   const transformTestMode = (testMode: TestMode): PracticeTest => {
+    console.log('🔄 TRANSFORM: Processing test mode:', testMode.name, 'with', testMode.sections.length, 'sections');
+
     const sections: TestSection[] = testMode.sections.map((section, index) => {
+      console.log(`📝 SECTION: ${section.name} has ${section.questions.length} questions (totalQuestions: ${section.totalQuestions})`);
+
       // Get real progress data for this section using test-specific key
       const progressKey = `${testMode.id}_${section.name}`;
       const progressData = sectionProgress[progressKey];
@@ -347,10 +351,13 @@ const PracticeTests: React.FC = () => {
         }
       }
 
+      const questionCount = section.questions.length;
+      console.log(`✅ FINAL COUNT for ${section.name}: ${questionCount} questions`);
+
       return {
         id: section.id,
         name: section.name,
-        questions: section.totalQuestions,
+        questions: questionCount, // ✅ FIXED: Use questions array length, not totalQuestions property
         timeLimit: getSectionTimeLimit(testData?.name || '', section.name),
         status,
         score,

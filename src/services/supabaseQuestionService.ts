@@ -146,27 +146,66 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
 
     // PERFORMANCE OPTIMIZATION: Use a single query instead of 56 separate queries
     // This reduces loading time from ~3-5 seconds to ~200-500ms
+    // NOTE: Supabase has a default max of 1000 rows per request, so we need to paginate
     console.time('📊 Fetch all questions');
-    const [questionsResult, passagesResult] = await Promise.all([
-      supabase
-        .from(questionsTable)
-        .select('*')
-        .order('question_order', { ascending: true, nullsFirst: false })
-        .limit(10000), // Reasonable limit to get all questions
-      supabase
-        .from(passagesTable)
-        .select('*')
-        .limit(2000)
-    ]);
-    console.timeEnd('📊 Fetch all questions');
 
-    if (questionsResult.error) {
-      console.error('Error fetching questions:', questionsResult.error);
-      throw questionsResult.error;
+    // Fetch all questions using pagination
+    let allQuestions: Question[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    let hasMore = true;
+
+    console.log('📥 Starting paginated fetch from', questionsTable);
+
+    while (hasMore) {
+      const { data, error, count } = await supabase
+        .from(questionsTable)
+        .select('*', { count: 'exact' })
+        .order('question_order', { ascending: true, nullsFirst: false })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error('Error fetching questions page:', error);
+        throw error;
+      }
+
+      if (data) {
+        allQuestions = allQuestions.concat(data);
+        console.log(`📥 Fetched page: ${from}-${from + data.length - 1}, Total so far: ${allQuestions.length}${count ? ` / ${count}` : ''}`);
+      }
+
+      hasMore = data && data.length === pageSize;
+      from += pageSize;
     }
 
-    const questions: Question[] = questionsResult.data || [];
-    const passages = passagesResult.data || [];
+    // Fetch all passages using pagination
+    let allPassages: Passage[] = [];
+    from = 0;
+    hasMore = true;
+
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from(passagesTable)
+        .select('*')
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error('Error fetching passages page:', error);
+        throw error;
+      }
+
+      if (data) {
+        allPassages = allPassages.concat(data);
+      }
+
+      hasMore = data && data.length === pageSize;
+      from += pageSize;
+    }
+
+    console.timeEnd('📊 Fetch all questions');
+
+    const questions: Question[] = allQuestions;
+    const passages = allPassages;
 
     console.log(`📊 Loaded ${questions.length} questions and ${passages.length} passages in single query`);
     
@@ -225,12 +264,17 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
 
       Object.entries(testModes).forEach(([testModeName, sections]) => {
         const sectionEntries: TestSection[] = Object.entries(sections).map(([sectionName, sectionQuestions]) => {
+          console.log(`🔧 BUILDING SECTION: ${sectionName} for mode ${testModeName}`);
+          console.log(`   Raw questions count: ${sectionQuestions.length}`);
+
           const transformedQuestions = sectionQuestions.map(q => {
             const passage = q.passage_id ? passageMap.get(q.passage_id) : undefined;
             return transformQuestion(q, passage);
           });
 
-          return {
+          console.log(`   Transformed questions count: ${transformedQuestions.length}`);
+
+          const sectionData = {
             id: sectionName.toLowerCase().replace(/\s+/g, '-'),
             name: sectionName,
             questions: transformedQuestions,
@@ -238,6 +282,10 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
             timeLimit: Math.ceil(transformedQuestions.length * 1.5), // Rough estimate: 1.5 min per question
             status: 'not-started' as const,
           };
+
+          console.log(`   ✅ Section created with ${sectionData.questions.length} questions in array`);
+
+          return sectionData;
         });
 
         const modeInfo = TEST_MODE_MAPPING[testModeName] || { name: testModeName, type: 'practice' as const };
