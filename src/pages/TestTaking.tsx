@@ -1000,7 +1000,7 @@ const TestTaking: React.FC = () => {
       // The ref will be naturally reset when dependencies actually change (different test, etc.)
       console.log('🧹 CLEANUP: Component cleanup (not resetting sessionLoadedRef to prevent tab-switch issues)');
     };
-  }, [testType, subjectId, actualSessionId, selectedProduct, user]);
+  }, [testType, subjectId, actualSessionId, selectedProduct, user, currentDifficulty]);
   // CRITICAL FIX: Removed 'searchParams' from dependencies to prevent re-initialization loop
   // searchParams changes when we add sessionId to URL, which was causing infinite re-initialization
 
@@ -1469,6 +1469,10 @@ const TestTaking: React.FC = () => {
     if (!session || session.type !== 'drill') return;
 
     console.log('🎯 DIFFICULTY CHANGE: Switching from', currentDifficulty, 'to', newDifficulty);
+
+    // Reset the session loaded ref to allow re-initialization with new difficulty
+    sessionLoadedRef.current = false;
+    initializingRef.current = false;
 
     // Update URL with new difficulty parameter
     const currentParams = new URLSearchParams(window.location.search);

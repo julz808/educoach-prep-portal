@@ -946,7 +946,7 @@ const EnhancedTestInterfaceComponent: React.FC<EnhancedTestInterfaceProps> = ({
                   </label>
                   <Select
                     value={currentDifficulty}
-                    onValueChange={(value) => onDifficultyChange(value as 'easy' | 'medium' | 'hard')}
+                    onValueChange={(value) => onDifficultyChange?.(value as 'easy' | 'medium' | 'hard')}
                   >
                     <SelectTrigger className="w-full bg-white border-gray-300">
                       <SelectValue placeholder="Select difficulty" />
