@@ -1,0 +1,238 @@
+═══════════════════════════════════════════════════════════════════
+           GOOGLE ADS COMPREHENSIVE AUDIT REPORT
+           Period: 2025-12-24 to 2026-03-24
+           Generated: 2026-03-24T07:59:26.191Z
+═══════════════════════════════════════════════════════════════════
+
+📊 EXECUTIVE SUMMARY
+
+Total Spend (3 months):     $5243.34
+Total Conversions:          35.0
+Overall CAC:                $149.81
+Total Impressions:          47,975
+Total Clicks:               4,106
+Overall CTR:                8.56%
+Active Campaigns:           0/6
+
+─────────────────────────────────────────────────────────────────
+📊 CAMPAIGN PERFORMANCE
+
+⏸️ ACER Scholarship
+   Product: acer
+   Seasonal Phase: Unknown (No test date)
+   Spend: $1,236.31 | Conversions: 11.0 | CAC: 🔴 $112.39
+   Target CAC: $0 | Pause Threshold: $0
+   CTR: 11.25% | Conv Rate: 1.05% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $0)
+   Bidding: 10
+
+⏸️ EduTest Scholarship
+   Product: edutest
+   Seasonal Phase: Unknown (No test date)
+   Spend: $1,191.45 | Conversions: 10.0 | CAC: 🔴 $119.14
+   Target CAC: $0 | Pause Threshold: $0
+   CTR: 8.72% | Conv Rate: 0.89% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $0)
+   Bidding: 10
+
+⏸️ Year 7 NAPLAN
+   Product: naplan-year-7
+   Seasonal Phase: Unknown (No test date)
+   Spend: $725.23 | Conversions: 2.5 | CAC: 🔴 $290.09
+   Target CAC: $0 | Pause Threshold: $0
+   CTR: 8.24% | Conv Rate: 0.45% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $0)
+   Bidding: 10
+
+⏸️ VIC Selective Entry
+   Product: vic-selective-entry
+   Seasonal Phase: Unknown (No test date)
+   Spend: $701 | Conversions: 4.0 | CAC: 🔴 $175.25
+   Target CAC: $0 | Pause Threshold: $0
+   CTR: 6.79% | Conv Rate: 0.87% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $0)
+   Bidding: 10
+
+⏸️ NSW Selective Entry
+   Product: nsw-selective
+   Seasonal Phase: LATE (5 weeks to test)
+   Spend: $698.99 | Conversions: 3.5 | CAC: 🔴 $199.71
+   Target CAC: $120 | Pause Threshold: $150
+   CTR: 7.08% | Conv Rate: 0.87% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $50)
+   Bidding: 10
+
+⏸️ Year 5 NAPLAN
+   Product: naplan-year-5
+   Seasonal Phase: Unknown (No test date)
+   Spend: $690.36 | Conversions: 4.0 | CAC: 🔴 $172.59
+   Target CAC: $0 | Pause Threshold: $0
+   CTR: 7.84% | Conv Rate: 0.78% | ROAS: 0.00x
+   Daily Budget: $0 (Max: $0)
+   Bidding: 10
+
+─────────────────────────────────────────────────────────────────
+✅ WHAT'S WORKING WELL
+
+Profitable Campaigns (0):
+
+High CTR Campaigns (6 > 5%):
+  • ACER Scholarship: 11.25% CTR
+  • EduTest Scholarship: 8.72% CTR
+  • NSW Selective Entry: 7.08% CTR
+  • VIC Selective Entry: 6.79% CTR
+  • Year 5 NAPLAN: 7.84% CTR
+  • Year 7 NAPLAN: 8.24% CTR
+
+Top Performing Keywords (by conversions):
+  1. "Acer practice papers" (4)
+     Campaign: ACER Scholarship
+     8.0 conv | CAC: $98.98 | CTR: 11.71%
+  2. "edutest test papers" (4)
+     Campaign: EduTest Scholarship
+     5.0 conv | CAC: $97.35 | CTR: 8.62%
+  3. "edutest practice test" (3)
+     Campaign: EduTest Scholarship
+     4.0 conv | CAC: $48.38 | CTR: 11.49%
+  4. "melbourne selective schools" (4)
+     Campaign: VIC Selective Entry
+     2.0 conv | CAC: $154.48 | CTR: 8.05%
+  5. "NSW selective school test" (3)
+     Campaign: NSW Selective Entry
+     1.5 conv | CAC: $184.88 | CTR: 7.28%
+  6. "selective entry exam" (4)
+     Campaign: VIC Selective Entry
+     1.0 conv | CAC: $230.47 | CTR: 6.67%
+  7. "NSW Selective practice test" (3)
+     Campaign: NSW Selective Entry
+     1.0 conv | CAC: $90.06 | CTR: 7.84%
+  8. "Year 7 scholarship test" (3)
+     Campaign: ACER Scholarship
+     1.0 conv | CAC: $91.44 | CTR: 9.79%
+  9. "vic selective test" (4)
+     Campaign: VIC Selective Entry
+     1.0 conv | CAC: $27.25 | CTR: 10.48%
+  10. "Year 7 scholarship test" (3)
+     Campaign: EduTest Scholarship
+     1.0 conv | CAC: $33.68 | CTR: 8.54%
+
+Top Performing Ads (by CTR):
+  1. Campaign: ACER Scholarship
+     Headlines: VIC Selective Entry Test Prep | Year 9 Selective Entry | Melbourne Selective Schools
+     CTR: 11.25% | Conv Rate: 1.05%
+     11.0 conversions from 1052 clicks
+  2. Campaign: EduTest Scholarship
+     Headlines: VIC Selective Entry Test Prep | Year 9 Selective Entry | Melbourne Selective Schools
+     CTR: 8.72% | Conv Rate: 0.89%
+     10.0 conversions from 1125 clicks
+  3. Campaign: NSW Selective Entry
+     Headlines: VIC Selective Entry Test Prep | Year 9 Selective Entry | Melbourne Selective Schools
+     CTR: 7.08% | Conv Rate: 0.87%
+     3.5 conversions from 403 clicks
+  4. Campaign: VIC Selective Entry
+     Headlines: VIC Selective Entry Test Prep | Year 9 Selective Entry | Melbourne Selective Schools
+     CTR: 6.79% | Conv Rate: 0.87%
+     4.0 conversions from 462 clicks
+
+─────────────────────────────────────────────────────────────────
+⚠️  ISSUES & OPPORTUNITIES
+
+🔴 Critical: CAC Above Pause Threshold (6):
+  • ACER Scholarship: CAC $112.39 > threshold $0
+    → Recommend: Pause or reduce budget by 50%
+  • EduTest Scholarship: CAC $119.14 > threshold $0
+    → Recommend: Pause or reduce budget by 50%
+  • NSW Selective Entry: CAC $199.71 > threshold $150
+    → Recommend: Pause or reduce budget by 50%
+  • VIC Selective Entry: CAC $175.25 > threshold $0
+    → Recommend: Pause or reduce budget by 50%
+  • Year 5 NAPLAN: CAC $172.59 > threshold $0
+    → Recommend: Pause or reduce budget by 50%
+  • Year 7 NAPLAN: CAC $290.09 > threshold $0
+    → Recommend: Pause or reduce budget by 50%
+
+🟡 Low CTR (0 < 3% with 1000+ impressions):
+
+🟡 Low Conversion Rate (6 < 2% with 100+ clicks):
+  • ACER Scholarship: 1.05% conv rate
+    → Recommend: Review landing page, target audience
+  • EduTest Scholarship: 0.89% conv rate
+    → Recommend: Review landing page, target audience
+  • NSW Selective Entry: 0.87% conv rate
+    → Recommend: Review landing page, target audience
+  • VIC Selective Entry: 0.87% conv rate
+    → Recommend: Review landing page, target audience
+  • Year 5 NAPLAN: 0.78% conv rate
+    → Recommend: Review landing page, target audience
+  • Year 7 NAPLAN: 0.45% conv rate
+    → Recommend: Review landing page, target audience
+
+💸 Wasted Spend (0 conversions):
+  Total wasted: $568.70 on 4 keywords with 0 conversions
+  • "selective school test NSW": $168.23 spent, 0 conversions
+  • "edutest scholarship test": $134.28 spent, 0 conversions
+  • "Acer scholarship test": $117.76 spent, 0 conversions
+  • "edutest practice papers": $148.44 spent, 0 conversions
+
+🚫 Negative Keyword Opportunities:
+  • "acer scholarship test": 707 impressions, $79.52 spent, 0 conversions
+    → Add as negative keyword
+  • "edutest": 678 impressions, $62.81 spent, 0 conversions
+    → Add as negative keyword
+  • "alfa pte": 244 impressions, $51.68 spent, 0 conversions
+    → Add as negative keyword
+  • "entrance exam quiz": 195 impressions, $48.05 spent, 0 conversions
+    → Add as negative keyword
+  • "acer selective entry": 38 impressions, $41.34 spent, 0 conversions
+    → Add as negative keyword
+  • "acer scholarship practice tests": 109 impressions, $34.28 spent, 0 conversions
+    → Add as negative keyword
+  • "acer scholarship test practice": 164 impressions, $23.73 spent, 0 conversions
+    → Add as negative keyword
+  • "naplan": 107 impressions, $15.70 spent, 0 conversions
+    → Add as negative keyword
+  • "naplan practice tests year 5": 79 impressions, $15.60 spent, 0 conversions
+    → Add as negative keyword
+  • "edutest past papers": 53 impressions, $14.36 spent, 0 conversions
+    → Add as negative keyword
+  • "year 5 naplan": 118 impressions, $13.79 spent, 0 conversions
+    → Add as negative keyword
+  • "selective entry practice tests": 26 impressions, $13.65 spent, 0 conversions
+    → Add as negative keyword
+  • "acer scholarship": 158 impressions, $13.18 spent, 0 conversions
+    → Add as negative keyword
+  • "naplan": 195 impressions, $13.04 spent, 0 conversions
+    → Add as negative keyword
+  • "naplan": 133 impressions, $13.02 spent, 0 conversions
+    → Add as negative keyword
+  • "edutest scholarship practice test": 46 impressions, $12.98 spent, 0 conversions
+    → Add as negative keyword
+  • "acer exam": 110 impressions, $12.03 spent, 0 conversions
+    → Add as negative keyword
+  • "naplan year 7": 353 impressions, $11.87 spent, 0 conversions
+    → Add as negative keyword
+  • "acer practice test": 65 impressions, $11.75 spent, 0 conversions
+    → Add as negative keyword
+  • "edu test practice": 26 impressions, $10.71 spent, 0 conversions
+    → Add as negative keyword
+
+─────────────────────────────────────────────────────────────────
+💡 PRIORITY RECOMMENDATIONS
+
+1. CRITICAL: Pause or reduce campaigns with CAC > pause threshold
+   • ACER Scholarship: Reduce budget from $0 to $0.00/day
+   • EduTest Scholarship: Reduce budget from $0 to $0.00/day
+   • NSW Selective Entry: Reduce budget from $0 to $0.00/day
+   • VIC Selective Entry: Reduce budget from $0 to $0.00/day
+   • Year 5 NAPLAN: Reduce budget from $0 to $0.00/day
+   • Year 7 NAPLAN: Reduce budget from $0 to $0.00/day
+
+2. MEDIUM: Add negative keywords to reduce wasted spend
+   Potential savings: $568.70/3 months = $189.57/month
+   Start with top 10 non-converting search terms (see above)
+
+3. LOW: Align budgets with seasonal phases
+
+═══════════════════════════════════════════════════════════════════
+                         END OF REPORT
+═══════════════════════════════════════════════════════════════════

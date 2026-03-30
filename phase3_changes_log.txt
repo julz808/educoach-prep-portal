@@ -1,0 +1,161 @@
+2026-03-26T01:16:13.613Z | BUDGET_ALIGN | VIC Selective Entry | Status: ENABLED→ENABLED | Budget: $50.00→$22.01
+2026-03-26T01:16:15.400Z | BUDGET_ALIGN | NSW Selective Entry | Status: ENABLED→ENABLED | Budget: $42.50→$10.16
+2026-03-26T01:16:18.006Z | BUDGET_ALIGN | Year 5 NAPLAN | Status: PAUSED→ENABLED | Budget: $10.00→$8.46
+2026-03-26T01:16:20.528Z | BUDGET_ALIGN | Year 7 NAPLAN | Status: PAUSED→ENABLED | Budget: $10.00→$8.46
+2026-03-26T01:16:22.910Z | BUDGET_ALIGN | ACER Scholarship | Status: PAUSED→ENABLED | Budget: $13.00→$4.40
+2026-03-26T01:16:25.435Z | BUDGET_ALIGN | EduTest Scholarship | Status: PAUSED→ENABLED | Budget: $13.00→$18.28
+2026-03-26T01:25:15.559Z | PAUSE_LOW_QS | NSW Selective Entry | "NSW selective school test" | QS: 1 | Cost: $166.10
+2026-03-26T01:25:16.650Z | PAUSE_LOW_QS | NSW Selective Entry | "NSW Selective practice test" | QS: 1 | Cost: $31.23
+2026-03-26T01:25:17.705Z | PAUSE_LOW_QS | NSW Selective Entry | "selective school test NSW" | QS: 1 | Cost: $22.08
+2026-03-26T01:25:18.664Z | PAUSE_LOW_QS | NSW Selective Entry | "Selective school test NSW" | QS: 1 | Cost: $4.81
+2026-03-26T01:25:19.668Z | PAUSE_LOW_QS | VIC Selective Entry | "melbourne high school test" | QS: 1 | Cost: $0.00
+2026-03-26T01:25:20.595Z | PAUSE_LOW_QS | ACER Scholarship | "Acer test prep" | QS: 2 | Cost: $0.00
+2026-03-26T01:26:21.585Z | ADD_NEGATIVE | VIC Selective Entry | "free" | PHRASE
+2026-03-26T01:26:22.494Z | ADD_NEGATIVE | VIC Selective Entry | "pdf" | PHRASE
+2026-03-26T01:26:23.249Z | ADD_NEGATIVE | VIC Selective Entry | "download" | PHRASE
+2026-03-26T01:26:23.964Z | ADD_NEGATIVE | VIC Selective Entry | "downloads" | PHRASE
+2026-03-26T01:26:24.717Z | ADD_NEGATIVE | VIC Selective Entry | "sample" | PHRASE
+2026-03-26T01:26:25.460Z | ADD_NEGATIVE | VIC Selective Entry | "samples" | PHRASE
+2026-03-26T01:26:26.228Z | ADD_NEGATIVE | VIC Selective Entry | "template" | PHRASE
+2026-03-26T01:26:26.917Z | ADD_NEGATIVE | VIC Selective Entry | "templates" | PHRASE
+2026-03-26T01:26:27.654Z | ADD_NEGATIVE | VIC Selective Entry | "job" | PHRASE
+2026-03-26T01:26:28.405Z | ADD_NEGATIVE | VIC Selective Entry | "careers" | PHRASE
+2026-03-26T01:26:29.315Z | ADD_NEGATIVE | VIC Selective Entry | "free year 8 pdf" | PHRASE
+2026-03-26T01:26:30.078Z | ADD_NEGATIVE | VIC Selective Entry | "past papers pdf" | PHRASE
+2026-03-26T01:26:30.770Z | ADD_NEGATIVE | VIC Selective Entry | "pdf free download" | PHRASE
+2026-03-26T01:26:31.659Z | ADD_NEGATIVE | VIC Selective Entry | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:26:32.478Z | ADD_NEGATIVE | VIC Selective Entry | "free download" | PHRASE
+2026-03-26T01:26:33.367Z | ADD_NEGATIVE | VIC Selective Entry | "practice tests online free" | PHRASE
+2026-03-26T01:26:34.131Z | ADD_NEGATIVE | VIC Selective Entry | "online free practice tests" | PHRASE
+2026-03-26T01:26:34.887Z | ADD_NEGATIVE | VIC Selective Entry | "naplan free" | PHRASE
+2026-03-26T01:26:35.717Z | ADD_NEGATIVE | VIC Selective Entry | "practice tests free" | PHRASE
+2026-03-26T01:26:36.471Z | ADD_NEGATIVE | VIC Selective Entry | "test past papers free pdf" | PHRASE
+2026-03-26T01:26:38.965Z | ADD_NEGATIVE | Year 5 NAPLAN | "free" | PHRASE
+2026-03-26T01:26:39.708Z | ADD_NEGATIVE | Year 5 NAPLAN | "pdf" | PHRASE
+2026-03-26T01:26:40.533Z | ADD_NEGATIVE | Year 5 NAPLAN | "download" | PHRASE
+2026-03-26T01:26:41.311Z | ADD_NEGATIVE | Year 5 NAPLAN | "downloads" | PHRASE
+2026-03-26T01:26:42.100Z | ADD_NEGATIVE | Year 5 NAPLAN | "sample" | PHRASE
+2026-03-26T01:26:42.809Z | ADD_NEGATIVE | Year 5 NAPLAN | "samples" | PHRASE
+2026-03-26T01:26:43.755Z | ADD_NEGATIVE | Year 5 NAPLAN | "template" | PHRASE
+2026-03-26T01:26:44.439Z | ADD_NEGATIVE | Year 5 NAPLAN | "templates" | PHRASE
+2026-03-26T01:26:45.103Z | ADD_NEGATIVE | Year 5 NAPLAN | "job" | PHRASE
+2026-03-26T01:26:45.833Z | ADD_NEGATIVE | Year 5 NAPLAN | "careers" | PHRASE
+2026-03-26T01:26:46.593Z | ADD_NEGATIVE | Year 5 NAPLAN | "teacher" | PHRASE
+2026-03-26T01:26:47.397Z | ADD_NEGATIVE | Year 5 NAPLAN | "free year 8 pdf" | PHRASE
+2026-03-26T01:26:48.510Z | ADD_NEGATIVE | Year 5 NAPLAN | "past papers pdf" | PHRASE
+2026-03-26T01:26:49.319Z | ADD_NEGATIVE | Year 5 NAPLAN | "pdf free download" | PHRASE
+2026-03-26T01:26:50.034Z | ADD_NEGATIVE | Year 5 NAPLAN | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:26:50.725Z | ADD_NEGATIVE | Year 5 NAPLAN | "free download" | PHRASE
+2026-03-26T01:26:51.434Z | ADD_NEGATIVE | Year 5 NAPLAN | "practice tests online free" | PHRASE
+2026-03-26T01:26:52.266Z | ADD_NEGATIVE | Year 5 NAPLAN | "online free practice tests" | PHRASE
+2026-03-26T01:26:53.065Z | ADD_NEGATIVE | Year 5 NAPLAN | "naplan free" | PHRASE
+2026-03-26T01:26:53.885Z | ADD_NEGATIVE | Year 5 NAPLAN | "practice tests free" | PHRASE
+2026-03-26T01:26:54.621Z | ADD_NEGATIVE | Year 5 NAPLAN | "test past papers free pdf" | PHRASE
+2026-03-26T01:26:57.037Z | ADD_NEGATIVE | Year 7 NAPLAN | "free" | PHRASE
+2026-03-26T01:26:57.783Z | ADD_NEGATIVE | Year 7 NAPLAN | "pdf" | PHRASE
+2026-03-26T01:26:58.548Z | ADD_NEGATIVE | Year 7 NAPLAN | "download" | PHRASE
+2026-03-26T01:26:59.314Z | ADD_NEGATIVE | Year 7 NAPLAN | "downloads" | PHRASE
+2026-03-26T01:27:00.093Z | ADD_NEGATIVE | Year 7 NAPLAN | "sample" | PHRASE
+2026-03-26T01:27:00.793Z | ADD_NEGATIVE | Year 7 NAPLAN | "samples" | PHRASE
+2026-03-26T01:27:01.567Z | ADD_NEGATIVE | Year 7 NAPLAN | "template" | PHRASE
+2026-03-26T01:27:02.305Z | ADD_NEGATIVE | Year 7 NAPLAN | "templates" | PHRASE
+2026-03-26T01:27:03.052Z | ADD_NEGATIVE | Year 7 NAPLAN | "job" | PHRASE
+2026-03-26T01:27:03.757Z | ADD_NEGATIVE | Year 7 NAPLAN | "careers" | PHRASE
+2026-03-26T01:27:04.475Z | ADD_NEGATIVE | Year 7 NAPLAN | "teacher" | PHRASE
+2026-03-26T01:27:05.280Z | ADD_NEGATIVE | Year 7 NAPLAN | "free year 8 pdf" | PHRASE
+2026-03-26T01:27:06.037Z | ADD_NEGATIVE | Year 7 NAPLAN | "past papers pdf" | PHRASE
+2026-03-26T01:27:06.814Z | ADD_NEGATIVE | Year 7 NAPLAN | "pdf free download" | PHRASE
+2026-03-26T01:27:07.517Z | ADD_NEGATIVE | Year 7 NAPLAN | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:27:08.209Z | ADD_NEGATIVE | Year 7 NAPLAN | "free download" | PHRASE
+2026-03-26T01:27:08.880Z | ADD_NEGATIVE | Year 7 NAPLAN | "practice tests online free" | PHRASE
+2026-03-26T01:27:09.689Z | ADD_NEGATIVE | Year 7 NAPLAN | "online free practice tests" | PHRASE
+2026-03-26T01:27:10.464Z | ADD_NEGATIVE | Year 7 NAPLAN | "naplan free" | PHRASE
+2026-03-26T01:27:11.205Z | ADD_NEGATIVE | Year 7 NAPLAN | "practice tests free" | PHRASE
+2026-03-26T01:27:11.922Z | ADD_NEGATIVE | Year 7 NAPLAN | "test past papers free pdf" | PHRASE
+2026-03-26T01:27:14.361Z | ADD_NEGATIVE | NSW Selective Entry | "free" | PHRASE
+2026-03-26T01:27:15.085Z | ADD_NEGATIVE | NSW Selective Entry | "pdf" | PHRASE
+2026-03-26T01:27:15.821Z | ADD_NEGATIVE | NSW Selective Entry | "download" | PHRASE
+2026-03-26T01:27:16.603Z | ADD_NEGATIVE | NSW Selective Entry | "downloads" | PHRASE
+2026-03-26T01:27:17.377Z | ADD_NEGATIVE | NSW Selective Entry | "sample" | PHRASE
+2026-03-26T01:27:18.085Z | ADD_NEGATIVE | NSW Selective Entry | "samples" | PHRASE
+2026-03-26T01:27:18.928Z | ADD_NEGATIVE | NSW Selective Entry | "template" | PHRASE
+2026-03-26T01:27:19.677Z | ADD_NEGATIVE | NSW Selective Entry | "templates" | PHRASE
+2026-03-26T01:27:20.401Z | ADD_NEGATIVE | NSW Selective Entry | "job" | PHRASE
+2026-03-26T01:27:21.109Z | ADD_NEGATIVE | NSW Selective Entry | "careers" | PHRASE
+2026-03-26T01:27:21.800Z | ADD_NEGATIVE | NSW Selective Entry | "teacher" | PHRASE
+2026-03-26T01:27:22.618Z | ADD_NEGATIVE | NSW Selective Entry | "free year 8 pdf" | PHRASE
+2026-03-26T01:27:23.427Z | ADD_NEGATIVE | NSW Selective Entry | "past papers pdf" | PHRASE
+2026-03-26T01:27:24.151Z | ADD_NEGATIVE | NSW Selective Entry | "pdf free download" | PHRASE
+2026-03-26T01:27:24.900Z | ADD_NEGATIVE | NSW Selective Entry | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:27:25.630Z | ADD_NEGATIVE | NSW Selective Entry | "free download" | PHRASE
+2026-03-26T01:27:26.347Z | ADD_NEGATIVE | NSW Selective Entry | "practice tests online free" | PHRASE
+2026-03-26T01:27:27.199Z | ADD_NEGATIVE | NSW Selective Entry | "online free practice tests" | PHRASE
+2026-03-26T01:27:27.929Z | ADD_NEGATIVE | NSW Selective Entry | "naplan free" | PHRASE
+2026-03-26T01:27:28.680Z | ADD_NEGATIVE | NSW Selective Entry | "practice tests free" | PHRASE
+2026-03-26T01:27:29.494Z | ADD_NEGATIVE | NSW Selective Entry | "test past papers free pdf" | PHRASE
+2026-03-26T01:27:32.037Z | ADD_NEGATIVE | ACER Scholarship | "free" | PHRASE
+2026-03-26T01:27:32.833Z | ADD_NEGATIVE | ACER Scholarship | "pdf" | PHRASE
+2026-03-26T01:27:33.485Z | ADD_NEGATIVE | ACER Scholarship | "download" | PHRASE
+2026-03-26T01:27:34.154Z | ADD_NEGATIVE | ACER Scholarship | "downloads" | PHRASE
+2026-03-26T01:27:34.783Z | ADD_NEGATIVE | ACER Scholarship | "sample" | PHRASE
+2026-03-26T01:27:35.490Z | ADD_NEGATIVE | ACER Scholarship | "samples" | PHRASE
+2026-03-26T01:27:36.129Z | ADD_NEGATIVE | ACER Scholarship | "template" | PHRASE
+2026-03-26T01:27:36.799Z | ADD_NEGATIVE | ACER Scholarship | "templates" | PHRASE
+2026-03-26T01:27:37.637Z | ADD_NEGATIVE | ACER Scholarship | "job" | PHRASE
+2026-03-26T01:27:38.326Z | ADD_NEGATIVE | ACER Scholarship | "careers" | PHRASE
+2026-03-26T01:27:39.043Z | ADD_NEGATIVE | ACER Scholarship | "teacher" | PHRASE
+2026-03-26T01:27:39.813Z | ADD_NEGATIVE | ACER Scholarship | "free year 8 pdf" | PHRASE
+2026-03-26T01:27:40.462Z | ADD_NEGATIVE | ACER Scholarship | "past papers pdf" | PHRASE
+2026-03-26T01:27:41.255Z | ADD_NEGATIVE | ACER Scholarship | "pdf free download" | PHRASE
+2026-03-26T01:27:41.960Z | ADD_NEGATIVE | ACER Scholarship | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:27:42.781Z | ADD_NEGATIVE | ACER Scholarship | "free download" | PHRASE
+2026-03-26T01:27:43.495Z | ADD_NEGATIVE | ACER Scholarship | "practice tests online free" | PHRASE
+2026-03-26T01:27:44.193Z | ADD_NEGATIVE | ACER Scholarship | "online free practice tests" | PHRASE
+2026-03-26T01:27:44.872Z | ADD_NEGATIVE | ACER Scholarship | "naplan free" | PHRASE
+2026-03-26T01:27:45.573Z | ADD_NEGATIVE | ACER Scholarship | "practice tests free" | PHRASE
+2026-03-26T01:27:46.298Z | ADD_NEGATIVE | ACER Scholarship | "test past papers free pdf" | PHRASE
+2026-03-26T01:27:48.972Z | ADD_NEGATIVE | EduTest Scholarship | "free" | PHRASE
+2026-03-26T01:27:49.709Z | ADD_NEGATIVE | EduTest Scholarship | "pdf" | PHRASE
+2026-03-26T01:27:50.346Z | ADD_NEGATIVE | EduTest Scholarship | "download" | PHRASE
+2026-03-26T01:27:50.985Z | ADD_NEGATIVE | EduTest Scholarship | "downloads" | PHRASE
+2026-03-26T01:27:51.750Z | ADD_NEGATIVE | EduTest Scholarship | "sample" | PHRASE
+2026-03-26T01:27:52.492Z | ADD_NEGATIVE | EduTest Scholarship | "samples" | PHRASE
+2026-03-26T01:27:53.441Z | ADD_NEGATIVE | EduTest Scholarship | "template" | PHRASE
+2026-03-26T01:27:54.195Z | ADD_NEGATIVE | EduTest Scholarship | "templates" | PHRASE
+2026-03-26T01:27:54.938Z | ADD_NEGATIVE | EduTest Scholarship | "job" | PHRASE
+2026-03-26T01:27:55.700Z | ADD_NEGATIVE | EduTest Scholarship | "careers" | PHRASE
+2026-03-26T01:27:56.398Z | ADD_NEGATIVE | EduTest Scholarship | "teacher" | PHRASE
+2026-03-26T01:27:57.147Z | ADD_NEGATIVE | EduTest Scholarship | "free year 8 pdf" | PHRASE
+2026-03-26T01:27:57.902Z | ADD_NEGATIVE | EduTest Scholarship | "past papers pdf" | PHRASE
+2026-03-26T01:27:58.635Z | ADD_NEGATIVE | EduTest Scholarship | "pdf free download" | PHRASE
+2026-03-26T01:27:59.445Z | ADD_NEGATIVE | EduTest Scholarship | "practice test year 7 pdf free download" | PHRASE
+2026-03-26T01:28:00.148Z | ADD_NEGATIVE | EduTest Scholarship | "free download" | PHRASE
+2026-03-26T01:28:00.958Z | ADD_NEGATIVE | EduTest Scholarship | "practice tests online free" | PHRASE
+2026-03-26T01:28:01.619Z | ADD_NEGATIVE | EduTest Scholarship | "online free practice tests" | PHRASE
+2026-03-26T01:28:02.284Z | ADD_NEGATIVE | EduTest Scholarship | "naplan free" | PHRASE
+2026-03-26T01:28:03.018Z | ADD_NEGATIVE | EduTest Scholarship | "practice tests free" | PHRASE
+2026-03-26T01:28:03.737Z | ADD_NEGATIVE | EduTest Scholarship | "test past papers free pdf" | PHRASE
+2026-03-26T01:29:18.124Z | ADD_KEYWORD | EduTest Scholarship | "educourse" | EXACT | $6.71
+2026-03-26T01:29:19.942Z | ADD_KEYWORD | Year 7 NAPLAN | "educourse" | EXACT | $0.56
+2026-03-26T01:29:21.658Z | ADD_KEYWORD | VIC Selective Entry | "online selective practice tests" | EXACT | $1.90
+2026-03-26T01:29:23.449Z | ADD_KEYWORD | Year 5 NAPLAN | "naplan year 5" | EXACT | $7.42
+2026-03-26T01:29:25.079Z | ADD_KEYWORD | ACER Scholarship | "acer test practice" | EXACT | $26.40
+2026-03-26T01:29:26.667Z | ADD_KEYWORD | ACER Scholarship | "acer practice test year 7" | EXACT | $3.89
+2026-03-26T01:29:28.553Z | ADD_KEYWORD | ACER Scholarship | "acer scholarship test preparation" | EXACT | $6.78
+2026-03-26T01:29:30.298Z | ADD_KEYWORD | EduTest Scholarship | "aas scholarship test past papers" | EXACT | $2.21
+2026-03-26T01:29:31.909Z | ADD_KEYWORD | EduTest Scholarship | "edutest practice tests" | EXACT | $59.50
+2026-03-26T01:29:33.364Z | ADD_KEYWORD | Year 5 NAPLAN | "excel naplan year 5" | EXACT | $2.24
+2026-03-26T01:29:35.210Z | ADD_KEYWORD | Year 5 NAPLAN | "educourse" | EXACT | $1.40
+2026-03-26T01:29:36.914Z | ADD_KEYWORD | NSW Selective Entry | "naplan preparation year 5" | EXACT | $2.84
+2026-03-26T01:32:55.378Z | SPLIT_MATCH_TYPE | VIC Selective Entry | Created: Ad group 1 | EXACT | 1 EXACT keywords
+2026-03-26T01:33:03.825Z | SPLIT_MATCH_TYPE | Year 5 NAPLAN | Created: Ad group 1 | EXACT | 3 EXACT keywords
+2026-03-26T01:33:17.560Z | SPLIT_MATCH_TYPE | Year 7 NAPLAN | Created: Ad group 1 | PHRASE | 7 PHRASE keywords
+2026-03-26T01:33:19.729Z | SPLIT_MATCH_TYPE | Year 7 NAPLAN | Created: Ad group 1 | EXACT | 1 EXACT keywords
+2026-03-26T01:33:24.412Z | SPLIT_MATCH_TYPE | NSW Selective Entry | Created: Ad group 1 | EXACT | 1 EXACT keywords
+2026-03-26T01:33:26.396Z | SPLIT_MATCH_TYPE | NSW Selective Entry | Created: Ad group 1 | BROAD | 1 BROAD keywords
+2026-03-26T01:33:42.151Z | SPLIT_MATCH_TYPE | NSW Selective Entry | Created: Ad group 1 | PHRASE | 10 PHRASE keywords
+2026-03-26T01:33:49.867Z | SPLIT_MATCH_TYPE | ACER Scholarship | Created: Ad group 1 | EXACT | 3 EXACT keywords
+2026-03-26T01:34:04.972Z | SPLIT_MATCH_TYPE | ACER Scholarship | Created: Ad group 1 | PHRASE | 10 PHRASE keywords
+2026-03-26T01:34:07.026Z | SPLIT_MATCH_TYPE | ACER Scholarship | Created: Ad group 1 | BROAD | 1 BROAD keywords
+2026-03-26T01:34:14.525Z | SPLIT_MATCH_TYPE | EduTest Scholarship | Created: Ad group 1 | EXACT | 3 EXACT keywords
+2026-03-26T01:34:16.663Z | SPLIT_MATCH_TYPE | EduTest Scholarship | Created: Ad group 1 | BROAD | 1 BROAD keywords

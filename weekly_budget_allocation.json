@@ -1,0 +1,5930 @@
+[
+  {
+    "id": 1,
+    "week_start_date": "2026-01-05",
+    "week_number": 1,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 2,
+    "week_start_date": "2026-01-12",
+    "week_number": 2,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 3,
+    "week_start_date": "2026-01-19",
+    "week_number": 3,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 4,
+    "week_start_date": "2026-01-26",
+    "week_number": 4,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 5,
+    "week_start_date": "2026-02-02",
+    "week_number": 5,
+    "year": 2026,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 769.85,
+    "daily_budget_aud": 109.98,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.37,
+        "weekly_budget": 107.59,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.49,
+        "weekly_budget": 143.45,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 6,
+    "week_start_date": "2026-02-09",
+    "week_number": 6,
+    "year": 2026,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 769.85,
+    "daily_budget_aud": 109.98,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.37,
+        "weekly_budget": 107.59,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.49,
+        "weekly_budget": 143.45,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 7,
+    "week_start_date": "2026-02-16",
+    "week_number": 7,
+    "year": 2026,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 769.85,
+    "daily_budget_aud": 109.98,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.37,
+        "weekly_budget": 107.59,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.49,
+        "weekly_budget": 143.45,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 8,
+    "week_start_date": "2026-02-23",
+    "week_number": 8,
+    "year": 2026,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 769.85,
+    "daily_budget_aud": 109.98,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.37,
+        "weekly_budget": 107.59,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.08,
+        "weekly_budget": 119.54,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.98,
+        "weekly_budget": 139.86,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.49,
+        "weekly_budget": 143.45,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 9,
+    "week_start_date": "2026-03-02",
+    "week_number": 9,
+    "year": 2026,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 502.43,
+    "daily_budget_aud": 71.78,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.16,
+        "weekly_budget": 71.1,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.01,
+        "weekly_budget": 154.05,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.4,
+        "weekly_budget": 30.81,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.28,
+        "weekly_budget": 127.98,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 10,
+    "week_start_date": "2026-03-09",
+    "week_number": 10,
+    "year": 2026,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 502.43,
+    "daily_budget_aud": 71.78,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.16,
+        "weekly_budget": 71.1,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.01,
+        "weekly_budget": 154.05,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.4,
+        "weekly_budget": 30.81,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.28,
+        "weekly_budget": 127.98,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 11,
+    "week_start_date": "2026-03-16",
+    "week_number": 11,
+    "year": 2026,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 502.43,
+    "daily_budget_aud": 71.78,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.16,
+        "weekly_budget": 71.1,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.01,
+        "weekly_budget": 154.05,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.4,
+        "weekly_budget": 30.81,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.28,
+        "weekly_budget": 127.98,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 12,
+    "week_start_date": "2026-03-23",
+    "week_number": 12,
+    "year": 2026,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 502.43,
+    "daily_budget_aud": 71.78,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.16,
+        "weekly_budget": 71.1,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.01,
+        "weekly_budget": 154.05,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.4,
+        "weekly_budget": 30.81,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.28,
+        "weekly_budget": 127.98,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 13,
+    "week_start_date": "2026-03-30",
+    "week_number": 13,
+    "year": 2026,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 502.43,
+    "daily_budget_aud": 71.78,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.16,
+        "weekly_budget": 71.1,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.01,
+        "weekly_budget": 154.05,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.46,
+        "weekly_budget": 59.25,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.4,
+        "weekly_budget": 30.81,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.28,
+        "weekly_budget": 127.98,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 14,
+    "week_start_date": "2026-04-06",
+    "week_number": 14,
+    "year": 2026,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.73,
+    "daily_budget_aud": 41.68,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.49,
+        "weekly_budget": 59.42,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.07,
+        "weekly_budget": 154.48,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.31,
+        "weekly_budget": 23.17,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.11,
+        "weekly_budget": 42.78,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 15,
+    "week_start_date": "2026-04-13",
+    "week_number": 15,
+    "year": 2026,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.73,
+    "daily_budget_aud": 41.68,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.49,
+        "weekly_budget": 59.42,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.07,
+        "weekly_budget": 154.48,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.31,
+        "weekly_budget": 23.17,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.11,
+        "weekly_budget": 42.78,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 16,
+    "week_start_date": "2026-04-20",
+    "week_number": 16,
+    "year": 2026,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.73,
+    "daily_budget_aud": 41.68,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.49,
+        "weekly_budget": 59.42,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.07,
+        "weekly_budget": 154.48,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.31,
+        "weekly_budget": 23.17,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.11,
+        "weekly_budget": 42.78,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 17,
+    "week_start_date": "2026-04-27",
+    "week_number": 17,
+    "year": 2026,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.73,
+    "daily_budget_aud": 41.68,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.49,
+        "weekly_budget": 59.42,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.07,
+        "weekly_budget": 154.48,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.94,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.31,
+        "weekly_budget": 23.17,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.11,
+        "weekly_budget": 42.78,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 18,
+    "week_start_date": "2026-05-04",
+    "week_number": 18,
+    "year": 2026,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.84,
+    "daily_budget_aud": 42.83,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.42,
+        "weekly_budget": 23.94,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 20.01,
+        "weekly_budget": 140.04,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.34,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.36,
+        "weekly_budget": 100.54,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 19,
+    "week_start_date": "2026-05-11",
+    "week_number": 19,
+    "year": 2026,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.84,
+    "daily_budget_aud": 42.83,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.42,
+        "weekly_budget": 23.94,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 20.01,
+        "weekly_budget": 140.04,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.34,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.36,
+        "weekly_budget": 100.54,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 20,
+    "week_start_date": "2026-05-18",
+    "week_number": 20,
+    "year": 2026,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.84,
+    "daily_budget_aud": 42.83,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.42,
+        "weekly_budget": 23.94,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 20.01,
+        "weekly_budget": 140.04,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.34,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.36,
+        "weekly_budget": 100.54,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 21,
+    "week_start_date": "2026-05-25",
+    "week_number": 21,
+    "year": 2026,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.84,
+    "daily_budget_aud": 42.83,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.42,
+        "weekly_budget": 23.94,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 20.01,
+        "weekly_budget": 140.04,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.98,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.34,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.36,
+        "weekly_budget": 100.54,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 22,
+    "week_start_date": "2026-06-01",
+    "week_number": 22,
+    "year": 2026,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 251.22,
+    "daily_budget_aud": 35.89,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.43,
+        "weekly_budget": 93.98,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.36,
+        "weekly_budget": 23.49,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.52,
+        "weekly_budget": 115.67,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 23,
+    "week_start_date": "2026-06-08",
+    "week_number": 23,
+    "year": 2026,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 251.22,
+    "daily_budget_aud": 35.89,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.43,
+        "weekly_budget": 93.98,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.36,
+        "weekly_budget": 23.49,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.52,
+        "weekly_budget": 115.67,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 24,
+    "week_start_date": "2026-06-15",
+    "week_number": 24,
+    "year": 2026,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 251.22,
+    "daily_budget_aud": 35.89,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.43,
+        "weekly_budget": 93.98,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.36,
+        "weekly_budget": 23.49,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.52,
+        "weekly_budget": 115.67,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 25,
+    "week_start_date": "2026-06-22",
+    "week_number": 25,
+    "year": 2026,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 251.22,
+    "daily_budget_aud": 35.89,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.43,
+        "weekly_budget": 93.98,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.36,
+        "weekly_budget": 23.49,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.52,
+        "weekly_budget": 115.67,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 26,
+    "week_start_date": "2026-06-29",
+    "week_number": 26,
+    "year": 2026,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 251.22,
+    "daily_budget_aud": 35.89,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.43,
+        "weekly_budget": 93.98,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.02,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.36,
+        "weekly_budget": 23.49,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.52,
+        "weekly_budget": 115.67,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 27,
+    "week_start_date": "2026-07-06",
+    "week_number": 27,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 28,
+    "week_start_date": "2026-07-13",
+    "week_number": 28,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 29,
+    "week_start_date": "2026-07-20",
+    "week_number": 29,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 30,
+    "week_start_date": "2026-07-27",
+    "week_number": 30,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 31,
+    "week_start_date": "2026-08-03",
+    "week_number": 31,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 32,
+    "week_start_date": "2026-08-10",
+    "week_number": 32,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 33,
+    "week_start_date": "2026-08-17",
+    "week_number": 33,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 34,
+    "week_start_date": "2026-08-24",
+    "week_number": 34,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 35,
+    "week_start_date": "2026-08-31",
+    "week_number": 35,
+    "year": 2026,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 81.04,
+    "daily_budget_aud": 11.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.42,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.82,
+        "weekly_budget": 5.71,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.18,
+        "weekly_budget": 22.26,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.89,
+        "weekly_budget": 34.24,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 36,
+    "week_start_date": "2026-09-07",
+    "week_number": 36,
+    "year": 2026,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.56,
+    "daily_budget_aud": 17.37,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.63,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.72,
+        "weekly_budget": 61.07,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.03,
+        "weekly_budget": 35.23,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 37,
+    "week_start_date": "2026-09-14",
+    "week_number": 37,
+    "year": 2026,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.56,
+    "daily_budget_aud": 17.37,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.63,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.72,
+        "weekly_budget": 61.07,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.03,
+        "weekly_budget": 35.23,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 38,
+    "week_start_date": "2026-09-21",
+    "week_number": 38,
+    "year": 2026,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.56,
+    "daily_budget_aud": 17.37,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.63,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.72,
+        "weekly_budget": 61.07,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.03,
+        "weekly_budget": 35.23,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 39,
+    "week_start_date": "2026-09-28",
+    "week_number": 39,
+    "year": 2026,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.56,
+    "daily_budget_aud": 17.37,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.63,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.87,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.72,
+        "weekly_budget": 61.07,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.03,
+        "weekly_budget": 35.23,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 40,
+    "week_start_date": "2026-10-05",
+    "week_number": 40,
+    "year": 2026,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.8,
+    "daily_budget_aud": 31.26,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.71,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.42,
+        "weekly_budget": 107.92,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.2,
+        "weekly_budget": 85.39,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 41,
+    "week_start_date": "2026-10-12",
+    "week_number": 41,
+    "year": 2026,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.8,
+    "daily_budget_aud": 31.26,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.71,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.42,
+        "weekly_budget": 107.92,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.2,
+        "weekly_budget": 85.39,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 42,
+    "week_start_date": "2026-10-19",
+    "week_number": 42,
+    "year": 2026,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.8,
+    "daily_budget_aud": 31.26,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.71,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.42,
+        "weekly_budget": 107.92,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.2,
+        "weekly_budget": 85.39,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 43,
+    "week_start_date": "2026-10-26",
+    "week_number": 43,
+    "year": 2026,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.8,
+    "daily_budget_aud": 31.26,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.71,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.42,
+        "weekly_budget": 107.92,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.2,
+        "weekly_budget": 85.39,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 44,
+    "week_start_date": "2026-11-02",
+    "week_number": 44,
+    "year": 2026,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 494.33,
+    "daily_budget_aud": 70.62,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.26,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.11,
+        "weekly_budget": 7.75,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.72,
+        "weekly_budget": 124.03,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.31,
+        "weekly_budget": 100.18,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 45,
+    "week_start_date": "2026-11-09",
+    "week_number": 45,
+    "year": 2026,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 494.33,
+    "daily_budget_aud": 70.62,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.26,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.11,
+        "weekly_budget": 7.75,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.72,
+        "weekly_budget": 124.03,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.31,
+        "weekly_budget": 100.18,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 46,
+    "week_start_date": "2026-11-16",
+    "week_number": 46,
+    "year": 2026,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 494.33,
+    "daily_budget_aud": 70.62,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.26,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.11,
+        "weekly_budget": 7.75,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.72,
+        "weekly_budget": 124.03,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.31,
+        "weekly_budget": 100.18,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 47,
+    "week_start_date": "2026-11-23",
+    "week_number": 47,
+    "year": 2026,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 494.33,
+    "daily_budget_aud": 70.62,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.26,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.11,
+        "weekly_budget": 7.75,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.72,
+        "weekly_budget": 124.03,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.31,
+        "weekly_budget": 100.18,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 48,
+    "week_start_date": "2026-11-30",
+    "week_number": 48,
+    "year": 2026,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 494.33,
+    "daily_budget_aud": 70.62,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.26,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.11,
+        "weekly_budget": 7.75,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.22,
+        "weekly_budget": 71.56,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.72,
+        "weekly_budget": 124.03,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.31,
+        "weekly_budget": 100.18,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 49,
+    "week_start_date": "2026-12-07",
+    "week_number": 49,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 50,
+    "week_start_date": "2026-12-14",
+    "week_number": 50,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 51,
+    "week_start_date": "2026-12-21",
+    "week_number": 51,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 52,
+    "week_start_date": "2026-12-28",
+    "week_number": 52,
+    "year": 2026,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 777.96,
+    "daily_budget_aud": 111.14,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.67,
+        "weekly_budget": 123.71,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.99,
+        "weekly_budget": 118.95,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.09,
+        "weekly_budget": 154.64,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.39,
+        "weekly_budget": 142.74,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 53,
+    "week_start_date": "2027-01-04",
+    "week_number": 53,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 54,
+    "week_start_date": "2027-01-11",
+    "week_number": 54,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 55,
+    "week_start_date": "2027-01-18",
+    "week_number": 55,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 56,
+    "week_start_date": "2027-01-25",
+    "week_number": 56,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 57,
+    "week_start_date": "2027-02-01",
+    "week_number": 57,
+    "year": 2027,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 767.99,
+    "daily_budget_aud": 109.71,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.33,
+        "weekly_budget": 107.33,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.44,
+        "weekly_budget": 143.1,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 58,
+    "week_start_date": "2027-02-08",
+    "week_number": 58,
+    "year": 2027,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 767.99,
+    "daily_budget_aud": 109.71,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.33,
+        "weekly_budget": 107.33,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.44,
+        "weekly_budget": 143.1,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 59,
+    "week_start_date": "2027-02-15",
+    "week_number": 59,
+    "year": 2027,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 767.99,
+    "daily_budget_aud": 109.71,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.33,
+        "weekly_budget": 107.33,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.44,
+        "weekly_budget": 143.1,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 60,
+    "week_start_date": "2027-02-22",
+    "week_number": 60,
+    "year": 2027,
+    "market_heat": 0.95,
+    "weekly_budget_aud": 767.99,
+    "daily_budget_aud": 109.71,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.33,
+        "weekly_budget": 107.33,
+        "opportunity_score": 0.9,
+        "seasonal_multiplier": 0.9
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 17.04,
+        "weekly_budget": 119.25,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.93,
+        "weekly_budget": 139.53,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.44,
+        "weekly_budget": 143.1,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 61,
+    "week_start_date": "2027-03-01",
+    "week_number": 61,
+    "year": 2027,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 501.21,
+    "daily_budget_aud": 71.6,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.13,
+        "weekly_budget": 70.93,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 21.95,
+        "weekly_budget": 153.67,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.39,
+        "weekly_budget": 30.73,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.24,
+        "weekly_budget": 127.67,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 62,
+    "week_start_date": "2027-03-08",
+    "week_number": 62,
+    "year": 2027,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 501.21,
+    "daily_budget_aud": 71.6,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.13,
+        "weekly_budget": 70.93,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 21.95,
+        "weekly_budget": 153.67,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.39,
+        "weekly_budget": 30.73,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.24,
+        "weekly_budget": 127.67,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 63,
+    "week_start_date": "2027-03-15",
+    "week_number": 63,
+    "year": 2027,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 501.21,
+    "daily_budget_aud": 71.6,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.13,
+        "weekly_budget": 70.93,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 21.95,
+        "weekly_budget": 153.67,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.39,
+        "weekly_budget": 30.73,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.24,
+        "weekly_budget": 127.67,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 64,
+    "week_start_date": "2027-03-22",
+    "week_number": 64,
+    "year": 2027,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 501.21,
+    "daily_budget_aud": 71.6,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.13,
+        "weekly_budget": 70.93,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 21.95,
+        "weekly_budget": 153.67,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.39,
+        "weekly_budget": 30.73,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.24,
+        "weekly_budget": 127.67,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 65,
+    "week_start_date": "2027-03-29",
+    "week_number": 65,
+    "year": 2027,
+    "market_heat": 0.62,
+    "weekly_budget_aud": 501.21,
+    "daily_budget_aud": 71.6,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.13,
+        "weekly_budget": 70.93,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 21.95,
+        "weekly_budget": 153.67,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.44,
+        "weekly_budget": 59.11,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.39,
+        "weekly_budget": 30.73,
+        "opportunity_score": 0.26,
+        "seasonal_multiplier": 0.2
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 18.24,
+        "weekly_budget": 127.67,
+        "opportunity_score": 1.08,
+        "seasonal_multiplier": 0.9
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 66,
+    "week_start_date": "2027-04-05",
+    "week_number": 66,
+    "year": 2027,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.03,
+    "daily_budget_aud": 41.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.47,
+        "weekly_budget": 59.27,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.02,
+        "weekly_budget": 154.11,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.3,
+        "weekly_budget": 23.12,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.1,
+        "weekly_budget": 42.68,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 67,
+    "week_start_date": "2027-04-12",
+    "week_number": 67,
+    "year": 2027,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.03,
+    "daily_budget_aud": 41.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.47,
+        "weekly_budget": 59.27,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.02,
+        "weekly_budget": 154.11,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.3,
+        "weekly_budget": 23.12,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.1,
+        "weekly_budget": 42.68,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 68,
+    "week_start_date": "2027-04-19",
+    "week_number": 68,
+    "year": 2027,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.03,
+    "daily_budget_aud": 41.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.47,
+        "weekly_budget": 59.27,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.02,
+        "weekly_budget": 154.11,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.3,
+        "weekly_budget": 23.12,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.1,
+        "weekly_budget": 42.68,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 69,
+    "week_start_date": "2027-04-26",
+    "week_number": 69,
+    "year": 2027,
+    "market_heat": 0.36,
+    "weekly_budget_aud": 291.03,
+    "daily_budget_aud": 41.58,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 8.47,
+        "weekly_budget": 59.27,
+        "opportunity_score": 0.5,
+        "seasonal_multiplier": 0.5
+      },
+      "vic-selective": {
+        "phase": "PEAK",
+        "daily_budget": 22.02,
+        "weekly_budget": 154.11,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.93,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.3,
+        "weekly_budget": 23.12,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 6.1,
+        "weekly_budget": 42.68,
+        "opportunity_score": 0.36,
+        "seasonal_multiplier": 0.3
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 70,
+    "week_start_date": "2027-05-03",
+    "week_number": 70,
+    "year": 2027,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.11,
+    "daily_budget_aud": 42.73,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.41,
+        "weekly_budget": 23.88,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.96,
+        "weekly_budget": 139.7,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.28,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.33,
+        "weekly_budget": 100.3,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 71,
+    "week_start_date": "2027-05-10",
+    "week_number": 71,
+    "year": 2027,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.11,
+    "daily_budget_aud": 42.73,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.41,
+        "weekly_budget": 23.88,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.96,
+        "weekly_budget": 139.7,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.28,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.33,
+        "weekly_budget": 100.3,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 72,
+    "week_start_date": "2027-05-17",
+    "week_number": 72,
+    "year": 2027,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.11,
+    "daily_budget_aud": 42.73,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.41,
+        "weekly_budget": 23.88,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.96,
+        "weekly_budget": 139.7,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.28,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.33,
+        "weekly_budget": 100.3,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 73,
+    "week_start_date": "2027-05-24",
+    "week_number": 73,
+    "year": 2027,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.11,
+    "daily_budget_aud": 42.73,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.41,
+        "weekly_budget": 23.88,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.96,
+        "weekly_budget": 139.7,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.28,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.33,
+        "weekly_budget": 100.3,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 74,
+    "week_start_date": "2027-05-31",
+    "week_number": 74,
+    "year": 2027,
+    "market_heat": 0.37,
+    "weekly_budget_aud": 299.11,
+    "daily_budget_aud": 42.73,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "BASELINE",
+        "daily_budget": 3.41,
+        "weekly_budget": 23.88,
+        "opportunity_score": 0.2,
+        "seasonal_multiplier": 0.2
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 19.96,
+        "weekly_budget": 139.7,
+        "opportunity_score": 1.17,
+        "seasonal_multiplier": 0.9
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.97,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.33,
+        "weekly_budget": 23.28,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.33,
+        "weekly_budget": 100.3,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 75,
+    "week_start_date": "2027-06-07",
+    "week_number": 75,
+    "year": 2027,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 250.61,
+    "daily_budget_aud": 35.8,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.39,
+        "weekly_budget": 93.75,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.35,
+        "weekly_budget": 23.44,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.48,
+        "weekly_budget": 115.39,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 76,
+    "week_start_date": "2027-06-14",
+    "week_number": 76,
+    "year": 2027,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 250.61,
+    "daily_budget_aud": 35.8,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.39,
+        "weekly_budget": 93.75,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.35,
+        "weekly_budget": 23.44,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.48,
+        "weekly_budget": 115.39,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 77,
+    "week_start_date": "2027-06-21",
+    "week_number": 77,
+    "year": 2027,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 250.61,
+    "daily_budget_aud": 35.8,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.39,
+        "weekly_budget": 93.75,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.35,
+        "weekly_budget": 23.44,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.48,
+        "weekly_budget": 115.39,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 78,
+    "week_start_date": "2027-06-28",
+    "week_number": 78,
+    "year": 2027,
+    "market_heat": 0.31,
+    "weekly_budget_aud": 250.61,
+    "daily_budget_aud": 35.8,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 13.39,
+        "weekly_budget": 93.75,
+        "opportunity_score": 0.78,
+        "seasonal_multiplier": 0.6
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.86,
+        "weekly_budget": 6.01,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.35,
+        "weekly_budget": 23.44,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 16.48,
+        "weekly_budget": 115.39,
+        "opportunity_score": 0.96,
+        "seasonal_multiplier": 0.8
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 79,
+    "week_start_date": "2027-07-05",
+    "week_number": 79,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 80,
+    "week_start_date": "2027-07-12",
+    "week_number": 80,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 81,
+    "week_start_date": "2027-07-19",
+    "week_number": 81,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 82,
+    "week_start_date": "2027-07-26",
+    "week_number": 82,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 83,
+    "week_start_date": "2027-08-02",
+    "week_number": 83,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 84,
+    "week_start_date": "2027-08-09",
+    "week_number": 84,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 85,
+    "week_start_date": "2027-08-16",
+    "week_number": 85,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 86,
+    "week_start_date": "2027-08-23",
+    "week_number": 86,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 87,
+    "week_start_date": "2027-08-30",
+    "week_number": 87,
+    "year": 2027,
+    "market_heat": 0.1,
+    "weekly_budget_aud": 80.84,
+    "daily_budget_aud": 11.55,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.06,
+        "weekly_budget": 7.4,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.81,
+        "weekly_budget": 5.69,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 3.17,
+        "weekly_budget": 22.2,
+        "opportunity_score": 0.195,
+        "seasonal_multiplier": 0.15
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 4.88,
+        "weekly_budget": 34.16,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 88,
+    "week_start_date": "2027-09-06",
+    "week_number": 88,
+    "year": 2027,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.26,
+    "daily_budget_aud": 17.32,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.62,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.7,
+        "weekly_budget": 60.92,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.02,
+        "weekly_budget": 35.15,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 89,
+    "week_start_date": "2027-09-13",
+    "week_number": 89,
+    "year": 2027,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.26,
+    "daily_budget_aud": 17.32,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.62,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.7,
+        "weekly_budget": 60.92,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.02,
+        "weekly_budget": 35.15,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 90,
+    "week_start_date": "2027-09-20",
+    "week_number": 90,
+    "year": 2027,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.26,
+    "daily_budget_aud": 17.32,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.62,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.7,
+        "weekly_budget": 60.92,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.02,
+        "weekly_budget": 35.15,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 91,
+    "week_start_date": "2027-09-27",
+    "week_number": 91,
+    "year": 2027,
+    "market_heat": 0.15,
+    "weekly_budget_aud": 121.26,
+    "daily_budget_aud": 17.32,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.09,
+        "weekly_budget": 7.62,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.84,
+        "weekly_budget": 5.86,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "EARLY_AWARENESS",
+        "daily_budget": 8.7,
+        "weekly_budget": 60.92,
+        "opportunity_score": 0.52,
+        "seasonal_multiplier": 0.4
+      },
+      "edutest-scholarship": {
+        "phase": "BASELINE",
+        "daily_budget": 5.02,
+        "weekly_budget": 35.15,
+        "opportunity_score": 0.3,
+        "seasonal_multiplier": 0.25
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 92,
+    "week_start_date": "2027-10-04",
+    "week_number": 92,
+    "year": 2027,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.27,
+    "daily_budget_aud": 31.18,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.69,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.38,
+        "weekly_budget": 107.66,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.17,
+        "weekly_budget": 85.18,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 93,
+    "week_start_date": "2027-10-11",
+    "week_number": 93,
+    "year": 2027,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.27,
+    "daily_budget_aud": 31.18,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.69,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.38,
+        "weekly_budget": 107.66,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.17,
+        "weekly_budget": 85.18,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 94,
+    "week_start_date": "2027-10-18",
+    "week_number": 94,
+    "year": 2027,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.27,
+    "daily_budget_aud": 31.18,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.69,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.38,
+        "weekly_budget": 107.66,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.17,
+        "weekly_budget": 85.18,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 95,
+    "week_start_date": "2027-10-25",
+    "week_number": 95,
+    "year": 2027,
+    "market_heat": 0.27,
+    "weekly_budget_aud": 218.27,
+    "daily_budget_aud": 31.18,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.69,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "year-7-naplan": {
+        "phase": "POST_TEST",
+        "daily_budget": 0.85,
+        "weekly_budget": 5.92,
+        "opportunity_score": 0.05,
+        "seasonal_multiplier": 0.05
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 15.38,
+        "weekly_budget": 107.66,
+        "opportunity_score": 0.91,
+        "seasonal_multiplier": 0.7
+      },
+      "edutest-scholarship": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 12.17,
+        "weekly_budget": 85.18,
+        "opportunity_score": 0.72,
+        "seasonal_multiplier": 0.6
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 96,
+    "week_start_date": "2027-11-01",
+    "week_number": 96,
+    "year": 2027,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 493.13,
+    "daily_budget_aud": 70.45,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17,
+        "weekly_budget": 118.97,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.73,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.68,
+        "weekly_budget": 123.73,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.28,
+        "weekly_budget": 99.93,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 97,
+    "week_start_date": "2027-11-08",
+    "week_number": 97,
+    "year": 2027,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 493.13,
+    "daily_budget_aud": 70.45,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17,
+        "weekly_budget": 118.97,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.73,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.68,
+        "weekly_budget": 123.73,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.28,
+        "weekly_budget": 99.93,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 98,
+    "week_start_date": "2027-11-15",
+    "week_number": 98,
+    "year": 2027,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 493.13,
+    "daily_budget_aud": 70.45,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17,
+        "weekly_budget": 118.97,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.73,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.68,
+        "weekly_budget": 123.73,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.28,
+        "weekly_budget": 99.93,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 99,
+    "week_start_date": "2027-11-22",
+    "week_number": 99,
+    "year": 2027,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 493.13,
+    "daily_budget_aud": 70.45,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17,
+        "weekly_budget": 118.97,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.73,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.68,
+        "weekly_budget": 123.73,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.28,
+        "weekly_budget": 99.93,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 100,
+    "week_start_date": "2027-11-29",
+    "week_number": 100,
+    "year": 2027,
+    "market_heat": 0.61,
+    "weekly_budget_aud": 493.13,
+    "daily_budget_aud": 70.45,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 17,
+        "weekly_budget": 118.97,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "POST_TEST",
+        "daily_budget": 1.1,
+        "weekly_budget": 7.73,
+        "opportunity_score": 0.065,
+        "seasonal_multiplier": 0.05
+      },
+      "year-5-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "year-7-naplan": {
+        "phase": "CONSIDERATION",
+        "daily_budget": 10.2,
+        "weekly_budget": 71.38,
+        "opportunity_score": 0.6,
+        "seasonal_multiplier": 0.6
+      },
+      "acer-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.68,
+        "weekly_budget": 123.73,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "edutest-scholarship": {
+        "phase": "RAMP_UP",
+        "daily_budget": 14.28,
+        "weekly_budget": 99.93,
+        "opportunity_score": 0.84,
+        "seasonal_multiplier": 0.7
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 101,
+    "week_start_date": "2027-12-06",
+    "week_number": 101,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 102,
+    "week_start_date": "2027-12-13",
+    "week_number": 102,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 103,
+    "week_start_date": "2027-12-20",
+    "week_number": 103,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  },
+  {
+    "id": 104,
+    "week_start_date": "2027-12-27",
+    "week_number": 104,
+    "year": 2027,
+    "market_heat": 0.96,
+    "weekly_budget_aud": 776.07,
+    "daily_budget_aud": 110.87,
+    "product_allocations": {
+      "nsw-selective": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "vic-selective": {
+        "phase": "RAMP_UP",
+        "daily_budget": 17.63,
+        "weekly_budget": 123.41,
+        "opportunity_score": 1.04,
+        "seasonal_multiplier": 0.8
+      },
+      "year-5-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "year-7-naplan": {
+        "phase": "PEAK",
+        "daily_budget": 16.95,
+        "weekly_budget": 118.67,
+        "opportunity_score": 1,
+        "seasonal_multiplier": 1
+      },
+      "acer-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 22.04,
+        "weekly_budget": 154.26,
+        "opportunity_score": 1.3,
+        "seasonal_multiplier": 1
+      },
+      "edutest-scholarship": {
+        "phase": "PEAK",
+        "daily_budget": 20.34,
+        "weekly_budget": 142.4,
+        "opportunity_score": 1.2,
+        "seasonal_multiplier": 1
+      }
+    },
+    "actual_spend_aud": null,
+    "actual_conversions": 0,
+    "created_at": "2026-03-25T06:22:54.239247+00:00",
+    "updated_at": "2026-03-25T06:22:54.239247+00:00"
+  }
+]
