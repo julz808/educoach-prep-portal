@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import CourseDetail from "./pages/CourseDetail";
+import SchoolPrepPage from "./pages/SchoolPrepPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
@@ -45,6 +46,7 @@ const App = () => {
                         {/* Public routes */}
                         <Route path="/" element={<Landing />} />
                         <Route path="/course/:slug" element={<CourseDetail />} />
+                        <Route path="/prep/:productSlug/:schoolSlug" element={<SchoolPrepPage />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
                         <Route path="/auth/reset-password" element={<ResetPassword />} />

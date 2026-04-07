@@ -1,0 +1,23 @@
+You are continuing a comprehensive audit of VIC Selective Entry test questions to find and fix errors (wrong answers, duplicate options, incorrect solutions, etc.).
+
+CRITICAL INSTRUCTIONS:
+1. Read questions-audit/AUDIT_v2/PROGRESS.md to see current progress and where to continue
+2. Read questions-audit/AUDIT_v2/APPROACH.md to understand the rigorous audit methodology
+3. For EACH question you must:
+   - Solve it independently WITHOUT looking at options or correct answer first
+   - Then compare your answer to the database
+   - Check for duplicate options
+   - Validate the solution explanation
+   - Flag ANY errors in ERRORS.md with SQL fix
+4. Update PROGRESS.md after each batch (~20-30 questions)
+5. Add all SQL fixes to both incremental_session_X.sql and MASTER_FIX.sql
+6. Work in batches of ~100 questions per session max
+
+START BY:
+1. Reading PROGRESS.md to find the "Current Position"
+2. Fetch the next batch using the command shown in PROGRESS.md
+3. Begin rigorous question-by-question audit following APPROACH.md protocol
+
+Total: 994 questions | Order: Mathematics → Quantitative → Verbal → Reading
+
+Begin now by reading PROGRESS.md and continuing from current position.

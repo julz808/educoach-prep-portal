@@ -81,17 +81,20 @@ const TEST_MODE_MAPPING: Record<string, { name: string; type: 'practice' | 'dril
 
 function parseAnswerOptions(answerOptions: any): string[] {
   if (!answerOptions) return [];
-  
+
   if (Array.isArray(answerOptions)) {
     return answerOptions;
   }
-  
+
   if (typeof answerOptions === 'object') {
+    // CRITICAL FIX: Use deterministic A, B, C, D order (not alphabetical sort)
+    // This ensures options always appear in same order regardless of object key ordering
     // Handle object format like { "A": "option1", "B": "option2", ... }
-    const keys = Object.keys(answerOptions).sort();
-    return keys.map(key => answerOptions[key]);
+    return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] // Support up to 8 options
+      .filter(key => answerOptions[key] !== undefined && answerOptions[key] !== null)
+      .map(key => answerOptions[key]);
   }
-  
+
   return [];
 }
 
@@ -133,6 +136,41 @@ function transformQuestion(question: Question, passage?: Passage): OrganizedQues
     passageContent: passage?.content,
     maxPoints: question.max_points || 1, // Use max_points from database, default to 1 for backward compatibility
   };
+}
+
+/**
+ * Ensure deterministic question ordering
+ * This guarantees questions appear in the same order even if database ordering is unstable
+ *
+ * Sorting strategy:
+ * 1. Primary: question_order (if not null)
+ * 2. Secondary: created_at timestamp (for stability when question_order is same)
+ * 3. Tertiary: ID (guaranteed unique - final tiebreaker)
+ */
+function ensureDeterministicOrder(questions: Question[]): Question[] {
+  return questions.sort((a, b) => {
+    // Primary: question_order (handle nulls by putting them at end)
+    if (a.question_order !== null && b.question_order !== null) {
+      if (a.question_order !== b.question_order) {
+        return a.question_order - b.question_order;
+      }
+    }
+    // If one has null question_order, put it at end
+    if (a.question_order === null && b.question_order !== null) return 1;
+    if (a.question_order !== null && b.question_order === null) return -1;
+
+    // Secondary: created_at timestamp (for questions with same question_order)
+    if (a.created_at && b.created_at) {
+      const timeA = new Date(a.created_at).getTime();
+      const timeB = new Date(b.created_at).getTime();
+      if (timeA !== timeB) {
+        return timeA - timeB;
+      }
+    }
+
+    // Tertiary: ID (guaranteed unique and stable)
+    return a.id.localeCompare(b.id);
+  });
 }
 
 export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
@@ -204,8 +242,12 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
 
     console.timeEnd('📊 Fetch all questions');
 
-    const questions: Question[] = allQuestions;
+    // CRITICAL FIX: Apply deterministic sorting to ensure questions always appear in same order
+    // This prevents "questions changing on refresh" bug
+    console.log('🔄 Applying deterministic sorting to', allQuestions.length, 'questions');
+    const questions: Question[] = ensureDeterministicOrder(allQuestions);
     const passages = allPassages;
+    console.log('✅ Questions sorted deterministically');
 
     console.log(`📊 Loaded ${questions.length} questions and ${passages.length} passages in single query`);
     

@@ -1,0 +1,96 @@
+COMPREHENSIVE AUSTRALIAN SCHOLARSHIP & SELECTIVE ENTRY SCHOOLS DATABASE
+========================================================================
+Target: 2027 Entry (use 2026 dates if 2027 not yet published)
+
+Please create an EXHAUSTIVE list of ALL schools in NSW and Victoria that use:
+1. ACER scholarship tests (for Years 6, 7, or 8 entry)
+2. EduTest scholarship tests (for Years 6, 7, or 8 entry)
+3. NSW Selective Entry Test (for Year 7 entry - 2027 intake)
+4. VIC Selective Entry Test (for Year 9 entry - 2027 intake)
+
+IMPORTANT SOURCES TO CHECK FIRST:
+----------------------------------
+1. EduTest's official test calendar page - they publish ALL schools using EduTest in one consolidated list
+2. ACER's official scholarship test calendar / client schools directory
+3. NSW Education Department's complete list of ALL 47+ selective high schools
+4. VIC Education Department's list of all 4 selective entry high schools (Melbourne High, Mac.Robertson, Nossal, Suzanne Cory)
+
+These consolidated calendars/lists are KEY - please find and reference them.
+
+DATA REQUIRED FOR EACH SCHOOL:
+-------------------------------
+
+ESSENTIAL INFORMATION:
+- School name (official full name)
+- State (NSW or VIC)
+- Suburb/Location
+- Test type (ACER / EduTest / NSW Selective / VIC Selective)
+- Entry year(s) available (Year 6 / Year 7 / Year 8 / Year 9)
+- Gender (Co-ed / Boys only / Girls only)
+- School type (Government Selective / Independent / Catholic)
+- Official school website URL
+
+TEST DATES FOR 2027 ENTRY (or 2026 if 2027 not published):
+- Application opening date
+- Application closing date
+- Test date(s)
+- Results announcement date
+- Interview dates (if applicable)
+- NOTE: Please specify whether dates are for 2026 or 2027 entry
+
+MARKET SIZE INDICATORS (for ranking largest to smallest):
+- Total student enrollment at the school (all years)
+- Number of scholarship/entry places offered annually
+- Approximate number of applicants (if published)
+- School's ICSEA score (Index of Community Socio-Educational Advantage)
+
+ADDITIONAL CONTEXT (if publicly available):
+- Acceptance rate percentage OR competitiveness descriptor (e.g., "highly competitive")
+- Academic prerequisites or minimum requirements
+- Scholarship type (full / partial / means-tested)
+- Notable features (e.g., IB program, specific strengths)
+
+CRITICAL REQUIREMENTS:
+----------------------
+1. BE EXHAUSTIVE - Include EVERY school you can find, not just top 25
+   - For NSW Selective: All 47+ schools
+   - For VIC Selective: All 4 schools
+   - For ACER: Every school using ACER scholarship tests
+   - For EduTest: Every school using EduTest scholarship tests
+
+2. RANK ALL SCHOOLS from highest to lowest market size
+   - Primary ranking factor: Total enrollment + estimated applicants
+   - This helps us prioritize which pages to build first
+
+3. FACTUAL DATA ONLY
+   - Only include verifiable information
+   - Cite official sources (school websites, government sites, ACER/EduTest pages)
+   - If data is not available, leave field BLANK - do NOT estimate or guess
+   - This is CRITICAL for AEO (answer engine optimization) - AI will cite us, so we must be accurate
+
+4. FIND THE CONSOLIDATED CALENDARS
+   - EduTest and ACER publish comprehensive school lists - please locate these
+   - This will ensure we don't miss any schools
+
+OUTPUT FORMAT:
+--------------
+Please provide as a CSV table with these columns:
+
+School Name | State | Suburb | Test Type | Entry Years | Gender | School Type | Total Enrollment | Places Offered | Est. Applicants | ICSEA | Acceptance Rate | Website URL | 2026/2027 | App Open Date | App Close Date | Test Date | Results Date | Interview Required | Scholarship Type | Notes | Market Rank
+
+IMPORTANT:
+- Market Rank: 1 = largest market (most students/applicants), increasing numbers = smaller markets
+- 2026/2027 column: Specify which year the dates refer to
+- Leave cells blank if data not available
+- Include source citations in Notes column where helpful
+
+SCOPE EXPECTATION:
+------------------
+- NSW Selective: ~47 schools
+- VIC Selective: 4 schools
+- ACER Scholarship: Estimate 40-60 schools across NSW/VIC
+- EduTest Scholarship: Estimate 50-80 schools across NSW/VIC
+
+Total expected: 150-200 schools (we want to be comprehensive!)
+
+Please begin by locating the consolidated EduTest and ACER school calendars, then compile the complete database ranked by market size.

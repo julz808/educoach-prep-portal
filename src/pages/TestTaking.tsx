@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { PaywallComponent } from '@/components/PaywallComponent';
 import { isPaywallUIEnabled } from '@/config/stripeConfig';
 import { EnhancedTestInterface } from '@/components/EnhancedTestInterface';
+import { SessionResumeModal, type SessionResumeInfo } from '@/components/SessionResumeModal';
 import { 
   fetchDiagnosticModes,
   fetchDrillModes,
@@ -99,12 +100,37 @@ const TestTaking: React.FC = () => {
   // instead of /test/practice/subjectId/sectionId/sessionId (4 params)
   // Also check for sessionId in query parameters (for drill sessions)
   const [searchParams, setSearchParams] = useSearchParams();
-  const sessionIdFromQuery = searchParams.get('sessionId');
   const testModeFromQuery = searchParams.get('testMode'); // Get specific practice test mode
-  
-  // Also check current URL directly in case searchParams is stale
-  const urlSessionId = new URLSearchParams(window.location.search).get('sessionId');
-  const actualSessionId = urlSessionId || sessionIdFromQuery || sessionId || sectionId;
+
+  // CRITICAL FIX: Consolidate session ID resolution to single source of truth
+  // This prevents race conditions where different sources return different IDs
+  const actualSessionId = useMemo(() => {
+    // Priority order:
+    // 1. URL query parameter (most explicit)
+    // 2. Path parameter 'sessionId'
+    // 3. Path parameter 'sectionId' (if it's a valid UUID - fallback for 3-param URLs)
+
+    const fromQuery = searchParams.get('sessionId');
+    if (fromQuery) {
+      console.log('🔗 SESSION-ID: From URL query param:', fromQuery.substring(0, 8) + '...');
+      return fromQuery;
+    }
+
+    if (sessionId) {
+      console.log('🔗 SESSION-ID: From path param (sessionId):', sessionId.substring(0, 8) + '...');
+      return sessionId;
+    }
+
+    // Only use sectionId if it looks like a UUID (not a section name)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (sectionId && uuidRegex.test(sectionId)) {
+      console.log('🔗 SESSION-ID: From path param (sectionId as UUID):', sectionId.substring(0, 8) + '...');
+      return sectionId;
+    }
+
+    console.log('🔗 SESSION-ID: None found, will create new session');
+    return null;
+  }, [searchParams, sessionId, sectionId]);
   
   const navigate = useNavigate();
   const { selectedProduct, currentProduct, hasAccessToCurrentProduct } = useProduct();
@@ -121,13 +147,9 @@ const TestTaking: React.FC = () => {
       </div>
     );
   }
-  
+
   // Determine the actual test mode to use for database operations
   const actualTestMode = testModeFromQuery || testType;
-  console.log('🔗 URL PARAMS: testType:', testType, 'subjectId:', subjectId, 'sectionId:', sectionId, 'sessionId:', sessionId);
-  console.log('🔗 QUERY PARAMS: sessionId:', sessionIdFromQuery);
-  console.log('🔗 ACTUAL SESSION ID:', actualSessionId);
-  console.log('🔗 CURRENT URL:', window.location.href);
   
   const [session, setSession] = useState<TestSessionState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,6 +167,11 @@ const TestTaking: React.FC = () => {
   const periodicSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTextChangeTimeRef = useRef<number>(0);
   const sessionLoadedRef = useRef(false); // Prevent re-initialization when session already loaded
+
+  // Session resume modal state
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [resumeSessionInfo, setResumeSessionInfo] = useState<SessionResumeInfo | null>(null);
+  const [pendingNewSession, setPendingNewSession] = useState(false);
 
   // Handle both 'sectionName' (writing drills) and 'skill' (non-writing drills) query params
   const sectionName = searchParams.get('sectionName') || searchParams.get('skill') || '';
@@ -715,7 +742,8 @@ const TestTaking: React.FC = () => {
                 }
             });
             setSession(resumedSession);
-            setTimeRemaining(savedSession.timeRemainingSeconds);
+            // CRITICAL FIX: Validate timer is not negative on session load
+            setTimeRemaining(Math.max(0, savedSession.timeRemainingSeconds));
 
             // Mark session as loaded to prevent re-initialization
             sessionLoadedRef.current = true;
@@ -1091,13 +1119,16 @@ const TestTaking: React.FC = () => {
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
-        if (prev <= 1) {
+        // CRITICAL FIX: Validate timer is not negative (prevents infinite timer bug)
+        const validPrev = Math.max(0, prev);
+
+        if (validPrev <= 1) {
           // Auto-submit when timer expires (set flag to trigger submission)
           console.log('⏰ TIMER EXPIRED: Setting timerExpired flag');
           setTimerExpired(true);
           return 0;
         }
-        return prev - 1;
+        return validPrev - 1;
       });
     }, 1000); // Run every 1 second for accurate countdown
 
@@ -1967,13 +1998,32 @@ const TestTaking: React.FC = () => {
         flaggedQuestions={session.flaggedQuestions}
         showFeedback={shouldShowImmediateAnswerFeedback(actualTestMode)}
         isReviewMode={false}
-        testTitle={session.sectionName}
+        testTitle={`${PRODUCT_DISPLAY_NAMES[selectedProduct || ''] || selectedProduct} - ${actualTestMode.replace('_', ' ').toUpperCase()} - ${session.sectionName}`}
         onFinish={handleFinish}
         onExit={handleExit}
         sessionId={session.id}
         currentDifficulty={currentDifficulty || undefined}
         onDifficultyChange={handleDifficultyChange}
       />
+
+      {/* Session Resume Modal */}
+      {showResumeModal && resumeSessionInfo && (
+        <SessionResumeModal
+          sessionInfo={resumeSessionInfo}
+          onResume={() => {
+            setShowResumeModal(false);
+            // Session is already loaded, just hide the modal
+          }}
+          onStartNew={() => {
+            setShowResumeModal(false);
+            setPendingNewSession(true);
+            // Clear the existing session and reinitialize
+            setSession(null);
+            sessionLoadedRef.current = false;
+            window.location.reload(); // Simplest way to start fresh
+          }}
+        />
+      )}
 
       {/* Submit Confirmation Dialog */}
       {showSubmitConfirm && (

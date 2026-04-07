@@ -279,6 +279,98 @@ export class UserProgressService {
   }
 
   /**
+   * Reconcile user progress with actual session data
+   * Call this to fix progress tracking desync issues
+   */
+  static async reconcileUserProgress(
+    userId: string,
+    productType: string
+  ): Promise<void> {
+    try {
+      console.log('🔄 PROGRESS-SYNC: Reconciling progress for', productType);
+
+      // 1. Get actual completed sessions from database
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('user_test_sessions')
+        .select('test_mode, status, section_name')
+        .eq('user_id', userId)
+        .eq('product_type', productType)
+        .eq('status', 'completed');
+
+      if (sessionsError) {
+        console.error('🔄 PROGRESS-SYNC: Error fetching sessions:', sessionsError);
+        throw sessionsError;
+      }
+
+      if (!sessions) {
+        console.log('🔄 PROGRESS-SYNC: No sessions found');
+        return;
+      }
+
+      // 2. Calculate actual progress from sessions
+      const diagnosticCompleted = sessions.some(s => s.test_mode === 'diagnostic');
+      const practiceTestsCompleted = sessions
+        .filter(s => s.test_mode.startsWith('practice'))
+        .map(s => s.test_mode)
+        .filter((value, index, self) => self.indexOf(value) === index); // unique
+
+      const totalQuestionsAnswered = sessions.length; // Rough estimate
+
+      console.log('🔄 PROGRESS-SYNC: Calculated from sessions:', {
+        diagnosticCompleted,
+        practiceTestsCompleted: practiceTestsCompleted.length,
+        totalSessions: sessions.length
+      });
+
+      // 3. Get current tracked progress
+      const { data: currentProgress } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('product_type', productType)
+        .single();
+
+      // 4. Check if reconciliation is needed
+      const needsUpdate = !currentProgress ||
+        currentProgress.diagnostic_completed !== diagnosticCompleted ||
+        (currentProgress.tests_completed?.practice || 0) !== practiceTestsCompleted.length;
+
+      if (!needsUpdate) {
+        console.log('🔄 PROGRESS-SYNC: ✅ Progress is already in sync');
+        return;
+      }
+
+      console.log('🔄 PROGRESS-SYNC: ⚠️ Progress mismatch detected, updating...');
+
+      // 5. Update progress to match reality
+      const { error: upsertError } = await supabase
+        .from('user_progress')
+        .upsert({
+          user_id: userId,
+          product_type: productType,
+          diagnostic_completed: diagnosticCompleted,
+          tests_completed: {
+            practice: practiceTestsCompleted.length,
+            drill: currentProgress?.tests_completed?.drill || 0
+          },
+          last_activity: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,product_type'
+        });
+
+      if (upsertError) {
+        console.error('🔄 PROGRESS-SYNC: Error updating progress:', upsertError);
+        throw upsertError;
+      }
+
+      console.log('🔄 PROGRESS-SYNC: ✅ Progress reconciled successfully');
+    } catch (error) {
+      console.error('🔄 PROGRESS-SYNC: Failed to reconcile progress:', error);
+      // Don't throw - this is a non-critical operation
+    }
+  }
+
+  /**
    * Clear progress for a specific test mode within a product
    */
   static async clearTestModeProgress(

@@ -34,6 +34,7 @@ import { SECTION_TO_SUB_SKILLS, TEST_STRUCTURES } from '../data/curriculumData';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchDashboardMetrics, type DashboardMetrics } from '@/services/dashboardService';
+import { UserProgressService } from '@/services/userProgressService';
 
 // Map frontend product IDs to database product_type values
 const getDbProductType = (productId: string): string => {
@@ -61,22 +62,27 @@ const Dashboard: React.FC = () => {
     const loadDashboardData = async () => {
       if (!selectedProduct || !user) return;
       setLoading(true);
-      
+
       try {
         console.log('📊 DASHBOARD: Loading metrics for product:', selectedProduct, 'user:', user.id);
-        
+
+        // CRITICAL FIX: Reconcile progress before loading metrics
+        // This ensures dashboard shows correct data even if progress got out of sync
+        const dbProductType = getDbProductType(selectedProduct);
+        await UserProgressService.reconcileUserProgress(user.id, dbProductType);
+
         // Load both metrics and user profile in parallel
         const [metrics, profileResult] = await Promise.all([
           fetchDashboardMetrics(user.id, selectedProduct),
           supabase.from('user_profiles').select('*').eq('user_id', user.id)
         ]);
-        
+
         setDashboardMetrics(metrics);
-        
+
         if (profileResult.data && profileResult.data.length > 0) {
           setUserProfile(profileResult.data[0]);
         }
-        
+
         console.log('📊 DASHBOARD: Data loaded successfully:', { metrics, profile: profileResult.data });
       } catch (err) {
         console.error('📊 DASHBOARD: Error loading metrics:', err);
