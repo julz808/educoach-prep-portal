@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -1998,7 +1998,7 @@ const TestTaking: React.FC = () => {
         flaggedQuestions={session.flaggedQuestions}
         showFeedback={shouldShowImmediateAnswerFeedback(actualTestMode)}
         isReviewMode={false}
-        testTitle={`${PRODUCT_DISPLAY_NAMES[selectedProduct || ''] || selectedProduct} - ${actualTestMode.replace('_', ' ').toUpperCase()} - ${session.sectionName}`}
+        testTitle={session.sectionName}
         onFinish={handleFinish}
         onExit={handleExit}
         sessionId={session.id}
