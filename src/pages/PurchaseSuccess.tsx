@@ -20,51 +20,56 @@ const PurchaseSuccess: React.FC = () => {
   const [hasAccount, setHasAccount] = useState(false);
 
   const product = searchParams.get('product');
-  const customerEmail = searchParams.get('email');
+  const sessionId = searchParams.get('session_id');
+  const emailParam = searchParams.get('email');
 
   useEffect(() => {
-    // Fire Google Ads conversion tracking with enhanced conversion data
-    if (typeof window !== 'undefined' && window.gtag && product) {
-      console.log('🎯 Firing Google Ads conversion for product:', product);
-
-      const transactionId = Date.now() + '-' + product;
-
-      // Prepare enhanced conversion data
-      const conversionData: any = {
-        'send_to': 'AW-11082636289/I_1RCLmY6osbEIG4zqQp', // Purchase Success conversion
-        'value': 199.0,
-        'currency': 'AUD',
-        'transaction_id': transactionId,
-        'items': [{
-          'id': product,
-          'name': getProductName(product),
-          'category': 'Test Prep',
-          'price': 199.0,
-          'quantity': 1
-        }]
-      };
-
-      // Add enhanced conversion data (user email) for better tracking accuracy
-      // This is required for Google Ads Enhanced Conversions
-      if (customerEmail) {
-        conversionData.user_data = {
-          email_address: customerEmail
-        };
-        console.log('✅ Enhanced conversion data included with email');
-      } else {
-        console.warn('⚠️ No customer email available for enhanced conversion');
+    const fireVerifiedConversion = async () => {
+      if (typeof window === 'undefined' || !window.gtag) return;
+      if (!sessionId || !sessionId.startsWith('cs_')) {
+        console.log('ℹ️ No Stripe session_id in URL — skipping conversion fire (likely a non-purchase visit)');
+        return;
       }
 
-      // Fire Purchase Success conversion with enhanced data
-      window.gtag('event', 'conversion', conversionData);
+      const firedKey = `gads_conv_fired:${sessionId}`;
+      if (localStorage.getItem(firedKey)) {
+        console.log('ℹ️ Conversion already fired for this session — skipping duplicate');
+        return;
+      }
 
-      console.log('✅ Conversion tracked:', {
-        transactionId,
-        product,
-        productName: getProductName(product),
-        hasEnhancedData: !!customerEmail
+      const { data, error } = await supabase.functions.invoke('verify-checkout-session', {
+        body: { sessionId },
       });
-    }
+
+      if (error || !data?.verified) {
+        console.warn('⚠️ Could not verify Stripe session — not firing conversion', { error, data });
+        return;
+      }
+
+      const conversionData: any = {
+        send_to: 'AW-11082636289/I_1RCLmY6osbEIG4zqQp',
+        value: data.amount,
+        currency: data.currency,
+        transaction_id: sessionId,
+      };
+
+      const enhancedEmail = data.customerEmail || emailParam;
+      if (enhancedEmail) {
+        conversionData.user_data = { email_address: enhancedEmail };
+      }
+
+      window.gtag('event', 'conversion', conversionData);
+      localStorage.setItem(firedKey, String(Date.now()));
+
+      console.log('✅ Verified purchase conversion fired', {
+        sessionId,
+        product: data.productId,
+        amount: data.amount,
+        currency: data.currency,
+      });
+    };
+
+    fireVerifiedConversion();
 
     const checkUserStatus = async () => {
       try {
@@ -96,7 +101,7 @@ const PurchaseSuccess: React.FC = () => {
     };
 
     checkUserStatus();
-  }, [navigate]);
+  }, [navigate, sessionId, emailParam]);
 
   const handleSetupPassword = () => {
     // Store the product info and redirect to auth
