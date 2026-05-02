@@ -1,5 +1,10 @@
 # Enhanced Conversion Tracking Fix - January 2, 2026
 
+> ⚠️ **SUPERSEDED 2026-04-29.** This fix added Enhanced Conversions email data to `gtag` but did **not** address the underlying over-firing bug: the conversion fired on any visit to `/purchase-success?product=X` with no payment verification and no dedup. The April 29 fix added server-side Stripe verification (`verify-checkout-session` Edge Function), localStorage dedup keyed on Stripe `session_id`, and uses real Stripe `amount`/`customer_email` instead of hardcoded values. See `Google Ads Agent/CHANGES_MADE.md` (April 29 entry) for the current implementation.
+
+---
+
+
 ## 🎯 Problem Identified
 
 Google Ads was showing the warning: **"Issues detected with your enhanced conversion setup"**

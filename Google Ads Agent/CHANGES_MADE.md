@@ -1,4 +1,130 @@
-# Changes Made - March 28, 2026
+# Google Ads Agent — Change Log
+
+---
+
+## April 29, 2026 — Conversion Tracking Overhaul + URL/Budget/Keyword Cleanup
+
+### Context
+
+Monthly audit revealed Google Ads conversion data was **wildly inconsistent with Stripe truth**:
+- 13 Google Ads "conversions" vs **9 actual Stripe purchases** (44% over-count)
+- EduTest: 4.7 Google conversions vs **0 Stripe purchases** (the worst offender)
+- Year 5 NAPLAN: 0 Google conversions vs **1 Stripe purchase** (under-attribution)
+
+Root cause: `PurchaseSuccess.tsx` fired the `gtag` Purchase Success conversion **on any URL hit containing `?product=`**, with no payment verification and no deduplication. `transaction_id` used `Date.now()` so refresh = new conversion.
+
+### What Changed
+
+#### 1. Conversion Tracking — Server-side Verification (CRITICAL FIX)
+
+**Files:**
+- `src/services/stripeService.ts` — appended `&session_id={CHECKOUT_SESSION_ID}` to Stripe `success_url`
+- `supabase/functions/verify-checkout-session/index.ts` — **new Edge Function** that calls `stripe.checkout.sessions.retrieve()` and only returns `verified: true` for `payment_status === 'paid'`
+- `src/pages/PurchaseSuccess.tsx` — rewritten conversion firing:
+  - Skips fire if no `session_id` in URL (catches direct hits, bookmarks, auth-callback returns)
+  - Skips fire if `localStorage` already recorded this session (catches refresh, back button)
+  - Calls `verify-checkout-session` to confirm payment server-side
+  - Uses Stripe `session_id` as `transaction_id` for native Google Ads dedup
+  - Uses real `amount` from Stripe (not hardcoded $199) and real `customer_email` from `session.customer_details`
+
+**Supersedes** the January 2, 2026 fix in `docs/10-marketing/conversion/ENHANCED_CONVERSION_FIX.md` which only added enhanced-conversion email data but didn't fix the over-firing root cause.
+
+#### 2. Ad URLs — Product-Specific Landing Pages
+
+All 22 ads were either:
+- Pointing to `https://learning.educoach.com.au` (typo'd domain that doesn't exist — 4 paused/disapproved)
+- Pointing to generic `https://educourse.com.au/` homepage (18 enabled)
+
+Replaced all 22 with campaign-specific course pages:
+| Campaign | New URL |
+|---|---|
+| VIC Selective Entry | `/course/vic-selective` |
+| NSW Selective Entry | `/course/nsw-selective` |
+| Year 5 NAPLAN | `/course/year-5-naplan` |
+| Year 7 NAPLAN | `/course/year-7-naplan` |
+| ACER Scholarship | `/course/acer-scholarship` |
+| EduTest Scholarship | `/course/edutest-scholarship` |
+
+Script: `scripts/fix-broken-ad-urls.ts` (4 broken) + `scripts/upgrade-ad-urls-to-product-pages.ts` (18 generic). Pattern: create new ENABLED ad with same headlines/descriptions but correct URL, then `REMOVE` the old ad.
+
+#### 3. Daily Budgets — Aligned to `weekly_budget_allocation` Calendar
+
+The Monday 6 AM AEST GitHub Action that runs `Google Ads Agent/scripts/v2/budget-executor.ts` had stopped firing — budgets had drifted significantly from the calendar. Manually re-aligned to Week 17 (2026-04-27) targets:
+
+| Campaign | Phase | Old | New | Δ |
+|---|---|---|---|---|
+| VIC Selective | PEAK | $22.01 | $22.07 | +$0.06 |
+| EduTest Scholarship | EARLY_AWARENESS | $18.28 | $6.11 | -$12.17 |
+| NSW Selective | CONSIDERATION | $10.16 | $8.49 | -$1.67 |
+| ACER Scholarship | BASELINE | $4.40 | $3.31 | -$1.09 |
+| Year 5 NAPLAN | POST_TEST | $8.46 | $0.85 | -$7.61 |
+| Year 7 NAPLAN | POST_TEST | $8.46 | $0.85 | -$7.61 |
+| **TOTAL** | — | **$71.77** | **$41.68** | **-$30.09/day** |
+
+**Savings: $903/month ($10,800/year).** Script: `scripts/align-budgets-to-calendar.ts`.
+
+**Outstanding:** investigate why GitHub Actions cron stopped (likely failing secrets / expired token / disabled workflow).
+
+#### 4. Stripe-Validated Winning Keywords (+4 EXACT)
+
+Added 4 search terms that converted in last 30 days but weren't yet keywords:
+- `melbourne high school entrance exam practice` → NSW Selective ($1.50 CAC)
+- `selective past papers` → Year 7 NAPLAN ($1.33 CAC)
+- `selective school practice test` → VIC Selective ($16.16 CAC)
+- `victoria selective school test papers` → VIC Selective ($3.98 CAC)
+
+Script: `scripts/add-stripe-winning-keywords.ts`.
+
+#### 5. Tier 1 Negative Keywords (+34)
+
+**Campaign-specific (4):** `edutest` PHRASE → Year 7 NAPLAN; `hscassociate` BROAD → NSW Selective; `higher ability selection test hast` PHRASE → VIC Selective; `edutest practice tests free year 8 pdf` EXACT → EduTest.
+
+**Universal across all 6 campaigns (5 × 6 = 30):** `cheat`, `reddit`, `youtube`, `torrent`, `crack` — all BROAD.
+
+**Note:** owner explicitly chose NOT to negate `free`, `pdf`, `answers`, `download`, `solutions`, `solved` — testing whether bargain-hunter intent can convert. Re-evaluate end of May.
+
+Total negatives in account: 285 → 319. Script: `scripts/add-tier1-negatives.ts`.
+
+#### 6. Account Hygiene
+
+- **Purchase Success counting:** changed from `MANY_PER_CLICK` → `ONE_PER_CLICK` (belt-and-braces with code-level dedup).
+- **Search Partners network:** confirmed already disabled on all 6 campaigns.
+- **Sign-up demotion:** API blocked (`include_in_conversions_metric` is immutable). Functionally moot since all campaigns use Campaign-specific Purchases goal — Sign-up is purely cosmetic in account-default reporting.
+
+Script: `scripts/apply-account-hygiene-fixes.ts`.
+
+### Watch Period (next 30 days, baseline → target)
+
+| Metric | Last 30d (broken) | Target by May 28 |
+|---|---|---|
+| Account ROAS | 0.90x | >1.0x |
+| Avg CAC | $222 | <$199 |
+| EduTest sales | 0 | ≥1 (or pause) |
+| NSW Selective sales | 0 | ≥1 (test in May) |
+| VIC Selective ROAS | 1.79x | hold or improve |
+| Stripe ↔ Google conv match | wildly off | within 10% |
+
+### Tier 2 Negatives — Held for Re-evaluation
+
+13 search terms that look genuinely relevant but didn't convert in the broken-tracking period. Don't negate yet — re-evaluate when 30 days of clean data is available. List in `google-ads-audit_2026-03-30_2026-04-29.txt`.
+
+### Scripts Added Today
+
+All in `Google Ads Agent/scripts/`:
+- `find-bad-urls.ts` — scans all ads/sitelinks/campaign-level URL settings for typo'd domains
+- `fix-broken-ad-urls.ts` — repairs ads with broken URLs by recreating with correct campaign-specific URLs
+- `upgrade-ad-urls-to-product-pages.ts` — upgrades any ad whose URL doesn't match its campaign's product page
+- `verify-all-ad-urls.ts` — read-only audit to confirm every ad's URL matches its campaign
+- `align-budgets-to-calendar.ts` — manual run of what `v2/budget-executor.ts` should do automatically (use this if cron is broken)
+- `add-stripe-winning-keywords.ts` — adds Stripe-validated keywords (template — edit `NEW_KEYWORDS` for next batch)
+- `add-tier1-negatives.ts` — adds campaign-specific + universal negative keywords
+- `apply-account-hygiene-fixes.ts` — Search Partners, conversion-action count type, Sign-up demotion attempt
+- `check-conversion-actions.ts` — lists all conversion actions and per-campaign breakdown of which actions fire
+- `generate-monthly-audit-report.ts` — generates the txt audit report from `google_ads_audit_data.json`
+
+---
+
+## March 28, 2026
 
 ## ✅ All Optimizations Complete!
 
