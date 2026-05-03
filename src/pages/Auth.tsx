@@ -125,7 +125,7 @@ const Auth = () => {
         // Account exists but password is wrong, or account doesn't exist yet
         // Send magic link for password reset/setup
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard&utm_source=email&utm_medium=magic_link&utm_campaign=auth`,
         });
         
         if (resetError) {
@@ -312,20 +312,20 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?utm_source=email&utm_medium=signup_confirmation&utm_campaign=auth`,
         },
       });
       
       if (authError) throw authError;
       
       if (authData.user) {
-        // Since email confirmation is required, the user exists in auth.users 
+        // Since email confirmation is required, the user exists in auth.users
         // but no session will be created until they confirm their email
         console.log('User created, awaiting email confirmation:', authData.user.id);
-        
+
         // For email confirmation flow, we DON'T create user profile yet
         // The profile will be created when they confirm email and first sign in
-        
+
         // Store registration data in localStorage for after email confirmation
         const registrationData = {
           userId: authData.user.id,
@@ -338,7 +338,7 @@ const Auth = () => {
           schoolName,
           yearLevel: parseInt(yearLevel)
         };
-        
+
         localStorage.setItem('pendingRegistrationData', JSON.stringify(registrationData));
       }
       
@@ -379,7 +379,7 @@ const Auth = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: `${window.location.origin}/auth/reset-password?utm_source=email&utm_medium=password_reset&utm_campaign=auth`,
       });
 
       if (error) throw error;

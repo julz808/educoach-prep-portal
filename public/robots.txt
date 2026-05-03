@@ -11,8 +11,9 @@ Disallow: /api/
 Disallow: /test/
 Disallow: /test-instructions/
 
-# Sitemap location
+# Sitemap locations
 Sitemap: https://educourse.com.au/sitemap.xml
+Sitemap: https://insights.educourse.com.au/sitemap.xml
 
 # Crawl-delay for politeness
 Crawl-delay: 1
