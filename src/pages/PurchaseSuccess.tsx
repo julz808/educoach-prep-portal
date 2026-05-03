@@ -46,12 +46,25 @@ const PurchaseSuccess: React.FC = () => {
         return;
       }
 
+      // Re-attach gclid from the URL (passed back through Stripe successUrl)
+      // or from localStorage as a fallback. This restores click attribution
+      // when the original landing-page cookie was wiped by ITP/ad blockers.
+      const gclidFromUrl = searchParams.get('gclid');
+      const gclidFromStorage = (() => {
+        try { return localStorage.getItem('gclid'); } catch { return null; }
+      })();
+      const gclid = gclidFromUrl || gclidFromStorage;
+
       const conversionData: any = {
         send_to: 'AW-11082636289/I_1RCLmY6osbEIG4zqQp',
         value: data.amount,
         currency: data.currency,
         transaction_id: sessionId,
       };
+
+      if (gclid) {
+        conversionData.gclid = gclid;
+      }
 
       const enhancedEmail = data.customerEmail || emailParam;
       if (enhancedEmail) {

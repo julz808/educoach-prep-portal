@@ -44,8 +44,26 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'AW-11082636289', {
-        'allow_enhanced_conversions': true
+        'allow_enhanced_conversions': true,
+        'conversion_linker': true,
+        'linker': {
+          'domains': ['educourse.com.au', 'www.educourse.com.au', 'insights.educourse.com.au'],
+          'decorate_forms': true
+        }
       });
+
+      // Capture gclid on landing so it survives the Stripe redirect.
+      // Stored for 90 days (Google Ads default click-to-conversion window).
+      (function captureGclid() {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var gclid = params.get('gclid');
+          if (gclid) {
+            localStorage.setItem('gclid', gclid);
+            localStorage.setItem('gclid_ts', String(Date.now()));
+          }
+        } catch (e) { /* localStorage unavailable */ }
+      })();
     </script>
     
     <!-- Schema.org Markup for Educational Organization -->

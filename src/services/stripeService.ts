@@ -55,13 +55,30 @@ export async function createCheckoutSession(productId: string): Promise<{ sessio
       isGuestCheckout: !user
     });
 
+    // Preserve Google Ads click ID through the Stripe redirect.
+    // Stripe strips unknown query params unless they're in the success URL we send.
+    const gclid = (() => {
+      try {
+        const stored = localStorage.getItem('gclid');
+        const ts = Number(localStorage.getItem('gclid_ts') || 0);
+        const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
+        if (stored && Date.now() - ts < NINETY_DAYS) return stored;
+      } catch { /* noop */ }
+      return null;
+    })();
+
+    const successUrl = new URL(`${window.location.origin}/purchase-success`);
+    successUrl.searchParams.set('product', productId);
+    successUrl.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
+    if (gclid) successUrl.searchParams.set('gclid', gclid);
+
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
       body: {
         priceId: productConfig.priceId,
         productId: productId,
         userId: user?.id || 'guest',
         userEmail: user?.email || '',
-        successUrl: `${window.location.origin}/purchase-success?product=${productId}&session_id={CHECKOUT_SESSION_ID}`,
+        successUrl: successUrl.toString().replace(encodeURIComponent('{CHECKOUT_SESSION_ID}'), '{CHECKOUT_SESSION_ID}'),
         cancelUrl: `${window.location.origin}${window.location.pathname}`
       }
     });
