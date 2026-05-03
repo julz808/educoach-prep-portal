@@ -1,6 +1,6 @@
 # EduCoach Prep Portal - Complete Platform Documentation
 
-**Last Updated:** March 30, 2026
+**Last Updated:** May 3, 2026
 **Platform Version:** V2.3+
 **Status:** ✅ Production Ready
 
@@ -468,8 +468,43 @@ npx tsx tactical-analyzer.ts            # Phase 3
 ## SEO Agent
 
 **Location:** `SEO Agent/`
-**Status:** 🚧 In Development
-**Runs:** Every Monday 9 AM AEST (planned)
+**Status:** 🟢 Audit toolkit live (May 2026); autonomous weekly agent still planned
+**Runs:** On-demand audit scripts; weekly automation deferred
+
+### Current State (as of 2026-05-03)
+
+A toolkit of read-only audit scripts is live and connected to production data:
+- **GA4 Data API** + **Search Console API** authenticated via gcloud Application Default Credentials (no key files; org policy blocks service account keys)
+- **Ghost Admin API** wired for inventory + management
+- All scripts under `SEO Agent/scripts/`; reports under `docs/04-analysis/`
+
+Re-runnable audit scripts:
+| Script | Purpose |
+|---|---|
+| `audit-30-day.ts` | Full GA4 + GSC 30-day report |
+| `find-impression-cliff.ts` | Detects sustained impression drops + git correlation |
+| `cliff-query-diff.ts` | Spike-vs-current query/page diff (what rankings did we lose?) |
+| `diagnose-ga4-channels.ts` | Source/medium breakdown per channel (catches misattribution) |
+| `check-ghost-posts.ts` | Ghost CMS post inventory |
+| `find-draft-duplicates.ts` | Detects draft posts that duplicate published ones |
+| `delete-all-drafts.ts` | Bulk-delete Ghost drafts (with safety checks) |
+
+Required env vars (in `.env`):
+```
+GA4_PROPERTY_ID=351688132
+GSC_SITE_URL=sc-domain:educourse.com.au
+```
+
+ADC must be active: `gcloud auth application-default login --scopes=...analytics.readonly,...webmasters.readonly` (one-time, see [SEO Analytics session doc](../docs/04-analysis/SEO_ANALYTICS_SESSION_2026-05-03.md) for full setup).
+
+**Companion toolkit in `Google Ads Agent/scripts/`:**
+- `audit-final-urls.ts` — flags ads pointing to wrong URLs/domains
+- `audit-all-ad-destinations.ts` — comprehensive ad URL audit (RSA, sitelinks, PMax)
+- `show-wrong-domain-ads.ts` — full details of ads on non-educourse domains
+
+### Planned (not yet built): Autonomous weekly agent
+
+The original 3-phase autonomous agent (collect → analyze → publish) is still planned but deferred. The audit toolkit replaces "Phase 1" for now.
 
 ### Architecture
 
@@ -547,9 +582,21 @@ npm run seo:execute   # Phase 3: Content generation
 
 ### Documentation
 
-- **`SEO Agent/README.md`** - Complete guide
+- **`docs/04-analysis/SEO_ANALYTICS_SESSION_2026-05-03.md`** ⭐ Latest session: full audit findings, code changes shipped, manual actions outstanding
+- **`SEO Agent/README.md`** - Original architecture (autonomous agent vision)
 - **`SEO Agent/SEO_TIME_LAG_STRATEGY.md`** - 10-week time lag explained
-- **`SEO Agent/SETUP_GUIDE.md`** - Setup instructions
+- **`SEO Agent/SETUP_GUIDE.md`** - Setup instructions (predates audit toolkit)
+
+### Conversion / Attribution Tracking
+
+Production ads conversion pipeline (live as of 2026-05-03):
+- gtag config in [index.html](../index.html) with `conversion_linker: true` and cross-subdomain `linker.domains`
+- gclid captured to localStorage on landing
+- gclid passed through Stripe via [src/services/stripeService.ts](../src/services/stripeService.ts) `successUrl`
+- gclid re-attached to verified purchase conversion in [src/pages/PurchaseSuccess.tsx](../src/pages/PurchaseSuccess.tsx)
+- Supabase email confirmation links carry `utm_source=email&utm_medium=...` to prevent post-purchase email traffic from being misattributed to Paid Search
+
+GA4 measurement ID is **not** installed (`G-XXXXXXX`). GA4 receives data via the linked Google Ads property. Future improvement: install GA4 directly to fire `purchase`, `sign_up`, `test_start` events natively.
 
 ---
 
