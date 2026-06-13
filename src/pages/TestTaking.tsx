@@ -70,6 +70,46 @@ const getDbProductType = (productId: string): string => {
   return productMap[productId] || productId;
 };
 
+/**
+ * BELT-AND-SUSPENDERS for review/resume: reorder the freshly-loaded section questions to match the
+ * exact order the student saw during the test (persisted as a UUID array on the session row).
+ *
+ * Stored answers are keyed by POSITION (question index), so the review screen only lines up if the
+ * question at each position is the same one the student answered. Re-deriving order from the live
+ * question bank can drift if questions were added/removed since the test was taken; anchoring to the
+ * saved order makes review correct regardless. Questions missing from the saved order are appended;
+ * saved UUIDs no longer present in the section are skipped. A null/empty order is a no-op (e.g. drills).
+ */
+const reorderQuestionsBySavedOrder = (questions: Question[], questionOrder?: string[]): Question[] => {
+  if (!questionOrder || questionOrder.length === 0) return questions;
+
+  const byId = new Map(questions.map(q => [q.id, q]));
+  const ordered: Question[] = [];
+  const usedIds = new Set<string>();
+
+  for (const id of questionOrder) {
+    const q = byId.get(id);
+    if (q && !usedIds.has(id)) {
+      ordered.push(q);
+      usedIds.add(id);
+    }
+  }
+  // Append any loaded questions not referenced by the saved order (e.g. newly generated questions)
+  for (const q of questions) {
+    if (!usedIds.has(q.id)) ordered.push(q);
+  }
+
+  if (ordered.length !== questions.length || usedIds.size !== questionOrder.length) {
+    console.log('🔁 REVIEW-ORDER: realigned questions to saved order', {
+      loaded: questions.length,
+      savedOrder: questionOrder.length,
+      matched: usedIds.size,
+      result: ordered.length
+    });
+  }
+  return ordered;
+};
+
 interface TestSessionState {
   id: string;
   type: 'diagnostic' | 'practice' | 'drill';
@@ -332,7 +372,10 @@ const TestTaking: React.FC = () => {
         maxPoints: q.maxPoints || 1
       }));
     } else if (testType === 'practice') {
-      const organizedData = await fetchQuestionsFromSupabase();
+      // Filter to just this product at the DB level: avoids loading the entire (9k+ row, all-product)
+      // question bank on every test load / results view, which had grown slow and was the source of
+      // the "View Results takes a long time" reports.
+      const organizedData = await fetchQuestionsFromSupabase(PRODUCT_DISPLAY_NAMES[selectedProduct] || selectedProduct);
       const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
       
       if (!currentTestType) {
@@ -578,7 +621,8 @@ const TestTaking: React.FC = () => {
         totalQuestions: drillSessionData.questionsTotal || 0,
         status: drillSessionData.status === 'completed' ? 'completed' : 'active',
         createdAt: drillSessionData.startedAt,
-        updatedAt: drillSessionData.startedAt
+        updatedAt: drillSessionData.startedAt,
+        questionOrder: []
       };
 
       return drillSession;
@@ -614,8 +658,8 @@ const TestTaking: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const questions = await loadQuestions();
-        
+        let questions = await loadQuestions();
+
         // If we have a sessionId, try to resume
         if (actualSessionId) {
           // Check if this is a writing drill - writing drills use TestSessionService like diagnostic/practice
@@ -639,6 +683,10 @@ const TestTaking: React.FC = () => {
               setSearchParams(new URLSearchParams(currentUrl.search), { replace: true });
             } else {
               }
+
+            // Align loaded questions with the exact order the student saw, so the position-keyed
+            // answers below map to the correct question even if the bank changed since the test.
+            questions = reorderQuestionsBySavedOrder(questions, savedSession.questionOrder);
 
             // Convert saved session to our format
             const answers: Record<number, number> = {};
@@ -901,6 +949,9 @@ const TestTaking: React.FC = () => {
         
         if (existingSession && existingSession.currentQuestionIndex > 0) {
           // This is an existing session we should resume
+          // Align loaded questions with the exact order the student saw (position-keyed answers).
+          questions = reorderQuestionsBySavedOrder(questions, existingSession.questionOrder);
+
           // Convert saved session to our format
           const answers: Record<number, number> = {};
           Object.entries(existingSession.answers).forEach(([qIndex, optionText]) => {

@@ -192,8 +192,9 @@ const PracticeTests: React.FC = () => {
       setError(null);
 
       try {
-        // Fetch questions from Supabase
-        const organizedData = await fetchQuestionsFromSupabase();
+        // Fetch questions from Supabase, filtered to just this product at the DB level
+        // (avoids loading the entire multi-product question bank).
+        const organizedData = await fetchQuestionsFromSupabase(getDbProductType(selectedProduct));
 
         // Find the test type for the selected product
         const currentTestType = organizedData.testTypes.find(
