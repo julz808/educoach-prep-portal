@@ -81,7 +81,8 @@ const TestInstructionsPage: React.FC = () => {
             questionCount = foundSection.questions.length;
           }
         } else if (testType === 'practice') {
-          const organizedData = await fetchQuestionsFromSupabase();
+          // Filter to just this product at the DB level (avoids loading the whole question bank).
+          const organizedData = await fetchQuestionsFromSupabase(properDisplayName);
           const currentTestType = organizedData.testTypes.find(tt => tt.id === selectedProduct);
           if (currentTestType) {
             let foundSection = null;

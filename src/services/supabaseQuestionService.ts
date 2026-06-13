@@ -173,14 +173,39 @@ function ensureDeterministicOrder(questions: Question[]): Question[] {
   });
 }
 
-export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
+/**
+ * Fetch passages by id in chunks. A single '.in()' with a very large id array can exceed
+ * PostgREST's row cap / URL length limits, so we batch the lookups and dedupe ids first.
+ */
+async function fetchPassagesByIds(passagesTable: string, passageIds: string[]): Promise<Passage[]> {
+  const uniqueIds = [...new Set(passageIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+
+  const chunkSize = 200;
+  const passages: Passage[] = [];
+  for (let i = 0; i < uniqueIds.length; i += chunkSize) {
+    const chunk = uniqueIds.slice(i, i + chunkSize);
+    const { data, error } = await supabase
+      .from(passagesTable)
+      .select('*')
+      .in('id', chunk);
+    if (error) {
+      console.error('Error fetching passages chunk:', error);
+      continue;
+    }
+    if (data) passages.push(...data);
+  }
+  return passages;
+}
+
+export async function fetchQuestionsFromSupabase(testTypeFilter?: string): Promise<OrganizedTestData> {
   try {
     // Check if we should use V2 tables
     const useV2 = import.meta.env.VITE_USE_V2_QUESTIONS === 'true';
     const questionsTable = useV2 ? 'questions_v2' : 'questions';
     const passagesTable = useV2 ? 'passages_v2' : 'passages';
 
-    console.log(`📊 Loading questions from ${useV2 ? 'V2' : 'V1'} tables`);
+    console.log(`📊 Loading questions from ${useV2 ? 'V2' : 'V1'} tables${testTypeFilter ? ` (filtered to "${testTypeFilter}")` : ''}`);
 
     // PERFORMANCE OPTIMIZATION: Use a single query instead of 56 separate queries
     // This reduces loading time from ~3-5 seconds to ~200-500ms
@@ -196,10 +221,21 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
     console.log('📥 Starting paginated fetch from', questionsTable);
 
     while (hasMore) {
-      const { data, error, count } = await supabase
+      // CRITICAL: '.order('id')' is a STABLE, UNIQUE tiebreaker. Without it, paginating
+      // by the non-unique 'question_order' column causes Postgres to return tied rows in an
+      // arbitrary order that differs per page request, silently DROPPING and DUPLICATING rows
+      // across page boundaries (observed: 61 of 9,143 rows lost). That corrupts review/results.
+      let queryBuilder = supabase
         .from(questionsTable)
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact' });
+
+      if (testTypeFilter) {
+        queryBuilder = queryBuilder.eq('test_type', testTypeFilter);
+      }
+
+      const { data, error, count } = await queryBuilder
         .order('question_order', { ascending: true, nullsFirst: false })
+        .order('id', { ascending: true })
         .range(from, from + pageSize - 1);
 
       if (error) {
@@ -222,9 +258,17 @@ export async function fetchQuestionsFromSupabase(): Promise<OrganizedTestData> {
     hasMore = true;
 
     while (hasMore) {
-      const { data, error } = await supabase
+      let passageQuery = supabase
         .from(passagesTable)
-        .select('*')
+        .select('*');
+
+      if (testTypeFilter) {
+        passageQuery = passageQuery.eq('test_type', testTypeFilter);
+      }
+
+      // Stable, unique sort so pagination never drops/duplicates passages across pages.
+      const { data, error } = await passageQuery
+        .order('id', { ascending: true })
         .range(from, from + pageSize - 1);
 
       if (error) {
@@ -477,46 +521,37 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
 
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
 
-    // Fetch all drill questions for this test type
-    // First, get all unique sections that actually exist for this test type
-    const { data: sectionData, error: sectionError } = await supabase
-      .from(questionsTable)
-      .select('section_name')
-      .eq('test_type', dbTestType)
-      .eq('test_mode', 'drill')
-      .order('question_order', { ascending: true, nullsFirst: false });
-    
-    if (sectionError) {
-      console.error('🔧 DEBUG: Error fetching sections:', sectionError);
-      return [];
-    }
-    
-    const sections = [...new Set(sectionData?.map(q => q.section_name) || [])];
-    console.log('🔧 DEBUG: Found sections for', dbTestType, ':', sections);
-    
+    // Fetch all drill questions for this test type in a single PAGINATED pass.
+    // Previously this ran an N+1 pattern (one query per section), and each query was
+    // capped at 1000 rows with no stable ordering. We now page through every drill question
+    // for the product, using '.order('id')' as a stable, unique tiebreaker so rows are never
+    // dropped/duplicated across page boundaries (see fetchQuestionsFromSupabase).
     let allDrillQuestions: Question[] = [];
-    
-    // Fetch questions for each section separately to ensure we get all of them
-    for (const section of sections) {
-      const { data: sectionQuestions, error: sectionError } = await supabase
-        .from(questionsTable)
-        .select('*')
-        .eq('test_type', dbTestType)
-        .eq('test_mode', 'drill')
-        .eq('section_name', section)
-        .order('question_order', { ascending: true, nullsFirst: false });
-        
-      if (sectionError) {
-        console.error(`🔧 DEBUG: Error fetching ${section} questions:`, sectionError);
-        continue;
-      }
-      
-      if (sectionQuestions && sectionQuestions.length > 0) {
-        console.log(`🔧 DEBUG: Found ${sectionQuestions.length} questions for ${section}`);
-        allDrillQuestions = [...allDrillQuestions, ...sectionQuestions];
+    {
+      let drFrom = 0;
+      const drPageSize = 1000;
+      let drHasMore = true;
+      while (drHasMore) {
+        const { data, error: drillError } = await supabase
+          .from(questionsTable)
+          .select('*')
+          .eq('test_type', dbTestType)
+          .eq('test_mode', 'drill')
+          .order('question_order', { ascending: true, nullsFirst: false })
+          .order('id', { ascending: true })
+          .range(drFrom, drFrom + drPageSize - 1);
+
+        if (drillError) {
+          console.error('🔧 DEBUG: Error fetching drill questions:', drillError);
+          return [];
+        }
+
+        if (data) allDrillQuestions = allDrillQuestions.concat(data);
+        drHasMore = !!data && data.length === drPageSize;
+        drFrom += drPageSize;
       }
     }
-    
+
     const drillQuestions = allDrillQuestions;
     
     if (!drillQuestions || drillQuestions.length === 0) {
@@ -539,14 +574,7 @@ export async function fetchDrillModes(testTypeId: string): Promise<TestMode[]> {
       .filter(q => q.passage_id)
       .map(q => q.passage_id);
 
-    let passages: Passage[] = [];
-    if (passageIds.length > 0) {
-      const { data: passageData } = await supabase
-        .from(passagesTable)
-        .select('*')
-        .in('id', passageIds);
-      passages = passageData || [];
-    }
+    const passages: Passage[] = await fetchPassagesByIds(passagesTable, passageIds);
     
     const passageMap = new Map(passages.map(p => [p.id, p]));
     
@@ -675,19 +703,36 @@ export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode
 
     console.log('🔧 DEBUG: Mapped to database test type:', dbTestType);
 
-    // Fetch all diagnostic questions for this test type
-    const { data: diagnosticQuestions, error } = await supabase
-      .from(questionsTable)
-      .select('*')
-      .eq('test_type', dbTestType)
-      .eq('test_mode', 'diagnostic')
-      .order('question_order', { ascending: true, nullsFirst: false });
-      
-    if (error) {
-      console.error('🔧 DEBUG: Error fetching diagnostic questions:', error);
-      return [];
+    // Fetch all diagnostic questions for this test type.
+    // PAGINATED: a single query is capped at 1000 rows by Supabase, which silently truncates
+    // results as the bank grows. '.order('id')' is a stable, unique tiebreaker that prevents
+    // rows from being dropped/duplicated across page boundaries (see fetchQuestionsFromSupabase).
+    let diagnosticQuestions: Question[] = [];
+    {
+      let dFrom = 0;
+      const dPageSize = 1000;
+      let dHasMore = true;
+      while (dHasMore) {
+        const { data, error } = await supabase
+          .from(questionsTable)
+          .select('*')
+          .eq('test_type', dbTestType)
+          .eq('test_mode', 'diagnostic')
+          .order('question_order', { ascending: true, nullsFirst: false })
+          .order('id', { ascending: true })
+          .range(dFrom, dFrom + dPageSize - 1);
+
+        if (error) {
+          console.error('🔧 DEBUG: Error fetching diagnostic questions:', error);
+          return [];
+        }
+
+        if (data) diagnosticQuestions = diagnosticQuestions.concat(data);
+        dHasMore = !!data && data.length === dPageSize;
+        dFrom += dPageSize;
+      }
     }
-    
+
     if (!diagnosticQuestions || diagnosticQuestions.length === 0) {
       console.log('🔧 DEBUG: No diagnostic questions found for test type:', dbTestType);
       return [];
@@ -700,14 +745,7 @@ export async function fetchDiagnosticModes(testTypeId: string): Promise<TestMode
       .filter(q => q.passage_id)
       .map(q => q.passage_id);
 
-    let passages: Passage[] = [];
-    if (passageIds.length > 0) {
-      const { data: passageData } = await supabase
-        .from(passagesTable)
-        .select('*')
-        .in('id', passageIds);
-      passages = passageData || [];
-    }
+    const passages: Passage[] = await fetchPassagesByIds(passagesTable, passageIds);
     
     const passageMap = new Map(passages.map(p => [p.id, p]));
     

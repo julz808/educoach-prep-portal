@@ -1,6 +1,6 @@
 # EduCoach Prep Portal - Complete Platform Documentation
 
-**Last Updated:** May 3, 2026
+**Last Updated:** June 13, 2026
 **Platform Version:** V2.3+
 **Status:** ✅ Production Ready
 
@@ -39,7 +39,7 @@ EduCoach is an **adaptive learning platform** for Australian selective school an
 6. **Year 7 NAPLAN**
 
 ### Key Features
-- ✅ **4,341+ AI-generated questions** (79% complete, targeting 5,500)
+- ✅ **9,140+ AI-generated questions** (surpassed the original 5,500 target)
 - ✅ **Adaptive difficulty** based on user performance
 - ✅ **Real-time progress tracking** with insights dashboard
 - ✅ **Writing assessment** with AI-powered rubric scoring
@@ -246,18 +246,25 @@ npx tsx scripts/audit/detailed-gap-analysis.ts
 npx tsx scripts/audit/full-v2-status.ts
 ```
 
-### Generation Status (as of March 30, 2026)
+### Generation Status (as of June 13, 2026)
 
-| Test Type | Questions | Completion |
-|-----------|-----------|------------|
-| ACER Scholarship | 297 | 68% ✅ |
-| EduTest Scholarship | 1,158 | 87% ✅ |
-| NSW Selective Entry | 403 | 63% ⚠️ |
-| VIC Selective Entry | 905 | 60% ⚠️ |
-| Year 5 NAPLAN | 708 | 67% ⚠️ |
-| Year 7 NAPLAN | 870 | 60% ⚠️ |
+| Test Type | Questions |
+|-----------|-----------|
+| ACER Scholarship | 916 |
+| EduTest Scholarship | 2,052 |
+| NSW Selective Entry | 1,198 |
+| VIC Selective Entry | 2,215 |
+| Year 5 NAPLAN | 1,205 |
+| Year 7 NAPLAN | 1,557 |
 
-**Total:** 4,341 / ~5,500 (79% complete)
+**Total:** 9,143 questions (the bank has surpassed the original ~5,500 target and keeps growing).
+
+> ⚠️ Note for engineers: because the bank is large and still growing, any query that reads
+> `questions_v2` MUST paginate (Supabase caps single requests at 1000 rows) AND include a
+> stable unique tiebreaker — e.g. `.order('question_order').order('id')`. Ordering by
+> `question_order` alone is non-unique and silently drops/duplicates rows across page
+> boundaries. See `fetchQuestionsFromSupabase` / `fetchDiagnosticModes` / `fetchDrillModes`
+> in `src/services/supabaseQuestionService.ts`.
 
 ---
 
@@ -683,7 +690,7 @@ npx tsx audit-pattern-recognition.ts
 
 ### Core Tables
 
-#### `questions_v2` (4,341 questions)
+#### `questions_v2` (9,143 questions)
 ```sql
 - id (uuid, primary key)
 - test_type (text) - e.g., 'vic-selective'
@@ -1052,5 +1059,5 @@ GHOST_ADMIN_API_KEY=
 
 ---
 
-**Last Updated:** March 30, 2026
-**Next Review:** April 30, 2026
+**Last Updated:** June 13, 2026
+**Next Review:** July 13, 2026

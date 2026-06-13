@@ -15,6 +15,7 @@ export interface TestSession {
   status: 'active' | 'completed';
   createdAt: string;
   updatedAt: string;
+  questionOrder: string[]; // Ordered question UUIDs exactly as the student saw them
 }
 
 export interface SectionProgress {
@@ -197,7 +198,8 @@ export class SessionService {
       totalQuestions: data.total_questions,
       status: data.status === 'completed' ? 'completed' : 'active',
       createdAt: data.created_at,
-      updatedAt: data.updated_at
+      updatedAt: data.updated_at,
+      questionOrder: Array.isArray(data.question_order) ? data.question_order : []
     };
     
     console.log('📥 LOAD: Transformed session data:', {
